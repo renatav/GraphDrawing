@@ -1,8 +1,8 @@
 package graph.elements;
 
-public interface Edge {
+public interface Edge<V extends Vertex> {
 	
-	Vertex getSource();
-	Vertex getDestination();
+	V getOrigin();
+	V getDestination();
 
 }
