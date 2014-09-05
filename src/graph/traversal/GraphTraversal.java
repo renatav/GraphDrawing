@@ -1,6 +1,7 @@
 package graph.traversal;
 
 import graph.elements.Edge;
+import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
@@ -24,22 +25,29 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		this.graph = graph;
 	}
 
+	
 	/**
 	 * Depth-First Search
 	 * The depth-first-search algorithm is similar to the standard algorithm for traversing binary trees; 
 	 * it first fully explores one subtree before returning to the current node and then exploring the other subtree.
 	 * Another way to think of depth-first-search is by saying that it is similar to breadth-first search except that it uses a stack instead of a queue.
-	 * @param visited
-	 * @param paths
-	 * @param currentVertex
-	 * @param end
+	 * @param first
+	 * @param target
+	 * @return
 	 */
-	public void findAllPathsDFS(List<E> visited, List<Path<V, E>> paths, V currentVertex, V end) {        
+	public List<Path<V, E>> findAllPathsDFS(V first, V target){
+		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
+		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target);
+		return paths;
+	}
+	
+	private void findAllPathsDFS(List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, V currentVertex, V start, V end) {        
 		if (currentVertex.equals(end)) { 
-			paths.add(new Path<V, E>(visited));
+			if (!(currentVertex.equals(start) && visited.size() == 0)){
+			paths.add(new Path<V, E>(visited, directions));
 			return;
 		}
-		else {
+		}
 			LinkedList<E> edges;
 			if (graph.isDirected())
 				edges = graph.outEdges(currentVertex);
@@ -51,19 +59,28 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 					continue;
 				} 
 				List<E> temp = new ArrayList<E>();
+				List<EdgeDirection> directionsTemp = new ArrayList<EdgeDirection>();
 				temp.addAll(visited);
 				temp.add(e);
-				V nextVert = currentVertex == e.getOrigin() ? e.getDestination() : e.getOrigin();
+				directionsTemp.addAll(directions);
+				V nextVert;
+				if (currentVertex == e.getOrigin()){
+					nextVert = e.getDestination();
+					directionsTemp.add(EdgeDirection.TO_DESTINATION);
+				}
+				else{
+					nextVert = e.getOrigin();
+					directionsTemp.add(EdgeDirection.TO_ORIGIN);
+				}
 
-				findAllPathsDFS(temp, paths, nextVert, end);
+				findAllPathsDFS(temp, directionsTemp, paths, nextVert, start, end);
 			}
 		}
-	}
 	
 	public Path<V,E> getShortestPath(V source, V target){
 		Path<V,E> ret = null;
 		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
-		findAllPathsDFS(new ArrayList<E>(), paths, source, target);
+		findAllPathsDFS(source, target);
 		for (Path<V,E> path : paths)
 			if (ret == null || path.size() < ret.size())
 				ret = path;

@@ -1,9 +1,8 @@
 package graph.test.elements;
 
-import java.awt.Dimension;
-import java.awt.geom.Point2D;
-
 import graph.elements.Vertex;
+
+import java.awt.Dimension;
 
 public class TestVertex implements Vertex{
 
@@ -21,17 +20,6 @@ public class TestVertex implements Vertex{
 		return null;
 	}
 
-	@Override
-	public Point2D getPosition() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setPosition(int xPos, int yPos) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public Object getContent() {

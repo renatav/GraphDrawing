@@ -1,16 +1,17 @@
 package graph.test.elements;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import graph.elements.Graph;
 import graph.elements.Path;
+import graph.ordering.TopologicalOrdering;
 import graph.traversal.GraphTraversal;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestMain {
 
 	public static void main(String[] args) {
-		Graph<TestVertex, TestEdge> graph = new Graph<TestVertex, TestEdge>(false);
+		Graph<TestVertex, TestEdge> graph = new Graph<TestVertex, TestEdge>(true);
 		TestVertex vert1 = new TestVertex("1");
 		TestVertex vert2 = new TestVertex("2");
 		TestVertex vert3 = new TestVertex("3");
@@ -31,14 +32,19 @@ public class TestMain {
 		
 		GraphTraversal<TestVertex,TestEdge> traverse = new GraphTraversal<TestVertex, TestEdge>(graph);
 		List<Path<TestVertex, TestEdge>> paths = new ArrayList<Path<TestVertex, TestEdge>>();
-		traverse.findAllPathsDFS(new ArrayList<TestEdge>(), paths, vert1, vert5);
+		paths = traverse.findAllPathsDFS(vert1, vert5);
 		
-//		for (Path p : paths)
-//			System.out.println(p);
+		for (Path<TestVertex, TestEdge> p : paths)
+			System.out.println(p);
 		
 		//System.out.println(traverse.getShortestPath(vert2, vert3));
 		
-		System.out.println(graph.isConnected());
+		//System.out.println(graph.isConnected());
+		
+		System.out.println(graph.isCyclic());
+		
+		TopologicalOrdering<TestVertex, TestEdge> topOrder = new TopologicalOrdering<>(graph);
+		System.out.println(topOrder.order());
 		
 		
 	}
