@@ -30,11 +30,18 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * An adjacent list contains a list of all the edges leaving the vertex
 	 */
 	private Map<V, LinkedList<E>> adjacentLists;
+	
+	/**
+	 * Vertex by content map
+	 */
+	private Map<Object, V> vertexByContentMap;
 
 	public Graph(){
 		vertices = new ArrayList<V>();
 		edges = new ArrayList<E>();
 		adjacentLists = new HashMap<V, LinkedList<E>>();
+		vertexByContentMap = new HashMap<Object,V>();
+		
 	}
 	
 	public Graph(boolean directed){
@@ -48,12 +55,14 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		for (V v : vert){
 			vertices.add(v);
 			adjacentLists.put(v, new LinkedList<E>());
+			vertexByContentMap.put(v.getContent(), v);
 		}
 	}
 	
 	public void addVertex(V v){
 		vertices.add(v);
 		adjacentLists.put(v, new LinkedList<E>());
+		vertexByContentMap.put(v.getContent(), v);
 	}
 	
 	public void addVertexBeginning(V v){
@@ -269,10 +278,34 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				if (v1 == v2)
 					continue;
 				paths.clear();
-				paths = traversal.findAllPathsDFS(v1, v2);
+				paths = traversal.findAllPathsDFS(v1, v2); //TODO nesto efikasnije ovde naci za proveru ima li path (ne naci sve)
 				if (paths.size() == 0)
 					return false;
 			}
+		return true;
+	}
+	
+	/**
+	 * Checks is graph is connected
+	 * @return
+	 */
+	public boolean isConnected(List<V> excluding){
+		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
+		GraphTraversal<V, E> traversal = new GraphTraversal<>(this);
+		for (V v1 : vertices){
+			if (excluding.contains(v1))
+				continue;
+			for (V v2 : vertices){
+				if (v1 == v2)
+					continue;
+				if (excluding.contains(v2))
+					continue;
+				paths.clear();
+				paths = traversal.findAllPathsDFS(v1, v2, excluding); //TODO nesto efikasnije ovde naci za proveru ima li path (ne naci sve)
+				if (paths.size() == 0)
+					return false;
+			}
+		}
 		return true;
 	}
 	
@@ -295,7 +328,27 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 	
-
+	/**
+	 * Checks if a graph is biconnected. 
+	 * A graph is biconnected if and only if any vertex is deleted, the graph remains connected.
+	 * @return true if graph is biconnected, otherwise false
+	 */
+	public boolean isBiconnected(){
+		List<V> excluding = new ArrayList<V>();
+		for (V v : vertices){
+			excluding.clear();
+			excluding.add(v);
+			if (!isConnected(excluding)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public V getVertexByContent(Object content){
+		return vertexByContentMap.get(content);
+	}
+	
 
 	public List<V> getVertices() {
 		return vertices;

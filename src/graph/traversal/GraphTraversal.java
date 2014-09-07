@@ -25,7 +25,7 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		this.graph = graph;
 	}
 
-	
+
 	/**
 	 * Depth-First Search
 	 * The depth-first-search algorithm is similar to the standard algorithm for traversing binary trees; 
@@ -37,55 +37,81 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 	 */
 	public List<Path<V, E>> findAllPathsDFS(V first, V target){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
-		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target);
+		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
 		return paths;
 	}
-	
-	private void findAllPathsDFS(List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, V currentVertex, V start, V end) {        
+
+	public List<Path<V, E>> findAllPathsDFS(V first, V target, List<V> excluding){
+		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
+		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, excluding);
+		return paths;
+	}
+
+
+
+	private void findAllPathsDFS(List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, 
+			V currentVertex, V start, V end, List<V> excluding) {        
 		if (currentVertex.equals(end)) { 
 			if (!(currentVertex.equals(start) && visited.size() == 0)){
-			paths.add(new Path<V, E>(visited, directions));
-			return;
-		}
-		}
-			LinkedList<E> edges;
-			if (graph.isDirected())
-				edges = graph.outEdges(currentVertex);
-			else
-				edges = graph.allEdges(currentVertex);
-
-			for (E e : edges) {
-				if (visited.contains(e)) {
-					continue;
-				} 
-				List<E> temp = new ArrayList<E>();
-				List<EdgeDirection> directionsTemp = new ArrayList<EdgeDirection>();
-				temp.addAll(visited);
-				temp.add(e);
-				directionsTemp.addAll(directions);
-				V nextVert;
-				if (currentVertex == e.getOrigin()){
-					nextVert = e.getDestination();
-					directionsTemp.add(EdgeDirection.TO_DESTINATION);
-				}
-				else{
-					nextVert = e.getOrigin();
-					directionsTemp.add(EdgeDirection.TO_ORIGIN);
-				}
-
-				findAllPathsDFS(temp, directionsTemp, paths, nextVert, start, end);
+				paths.add(new Path<V, E>(visited, directions));
+				return;
 			}
 		}
-	
+		LinkedList<E> edges;
+		if (graph.isDirected())
+			edges = graph.outEdges(currentVertex);
+		else
+			edges = graph.allEdges(currentVertex);
+
+		for (E e : edges) {
+			if (visited.contains(e)) {
+				continue;
+			}
+			if (excluding != null){
+				if (excluding.contains(e.getOrigin()) || excluding.contains(e.getDestination()))
+					continue;
+			}
+			List<E> temp = new ArrayList<E>();
+			List<EdgeDirection> directionsTemp = new ArrayList<EdgeDirection>();
+			temp.addAll(visited);
+			temp.add(e);
+			directionsTemp.addAll(directions);
+			V nextVert;
+			if (currentVertex == e.getOrigin()){
+				nextVert = e.getDestination();
+				directionsTemp.add(EdgeDirection.TO_DESTINATION);
+			}
+			else{
+				nextVert = e.getOrigin();
+				directionsTemp.add(EdgeDirection.TO_ORIGIN);
+			}
+
+			findAllPathsDFS(temp, directionsTemp, paths, nextVert, start, end, excluding);
+		}
+	}
+
 	public Path<V,E> getShortestPath(V source, V target){
 		Path<V,E> ret = null;
 		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
-		findAllPathsDFS(source, target);
+		paths = findAllPathsDFS(source, target);
 		for (Path<V,E> path : paths)
 			if (ret == null || path.size() < ret.size())
 				ret = path;
 		return ret;
 	}
+
+	public List<Path<V,E>> findAllCycles(){
+		List<Path<V,E>> ret = new ArrayList<Path<V,E>>();
+		for (V v : graph.getVertices()){
+			ret.addAll(findAllPathsDFS(v, v));
+		}
+		return ret;
+	}
+
+
+	
+
+
 
 
 

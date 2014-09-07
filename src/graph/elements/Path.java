@@ -8,10 +8,30 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 	private List<E> path = new ArrayList<E>();
 	private List<EdgeDirection> directions = new ArrayList<EdgeDirection>();
 
+	public Path(){
+		
+	}
+	
 	public Path(List<E> path, List<EdgeDirection> directions) {
 		super();
 		this.path = path;
 		this.directions = directions;
+	}
+	
+	public Path(List<E> path) {
+		super();
+		this.path = path;
+	}
+	
+	
+	
+	public void addEdge(E e, EdgeDirection direction){
+		path.add(e);
+		directions.add(direction);
+	}
+	
+	public boolean containsEdge(E e){
+		return path.contains(e);
 	}
 	
 	public List<E> getPath() {
@@ -48,6 +68,25 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 
 	public void setDirections(List<EdgeDirection> directions) {
 		this.directions = directions;
+	}
+	
+	public List<V> pathVertices(){
+		List<V> ret = new ArrayList<V>();
+		
+		for (int i = 0; i < path.size(); i++){
+			if (directions.get(i) == EdgeDirection.TO_DESTINATION){
+				if (i == 0)
+					ret.add(path.get(i).getOrigin());
+				ret.add(path.get(i).getDestination());
+				
+			}
+			else{
+				if (i == 0)
+					ret.add(path.get(i).getDestination());
+				ret.add(path.get(i).getOrigin());
+			}
+		}
+		return ret;
 	}
 	
 	@Override

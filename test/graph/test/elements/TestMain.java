@@ -18,6 +18,9 @@ public class TestMain {
 		TestVertex vert4 = new TestVertex("4");
 		TestVertex vert5 = new TestVertex("5");
 		TestVertex vert6 = new TestVertex("6");
+		TestVertex vert7 = new TestVertex("7");
+		TestVertex vert8 = new TestVertex("8");
+		TestVertex vert9 = new TestVertex("9");
 		
 		TestEdge edge1 = new TestEdge(vert1, vert2);
 		TestEdge edge2 = new TestEdge(vert1, vert3);
@@ -33,20 +36,27 @@ public class TestMain {
 		GraphTraversal<TestVertex,TestEdge> traverse = new GraphTraversal<TestVertex, TestEdge>(graph);
 		List<Path<TestVertex, TestEdge>> paths = new ArrayList<Path<TestVertex, TestEdge>>();
 		paths = traverse.findAllPathsDFS(vert1, vert5);
-		
-		for (Path<TestVertex, TestEdge> p : paths)
-			System.out.println(p);
+//		
+//		for (Path<TestVertex, TestEdge> p : paths)
+//			System.out.println(p);
 		
 		//System.out.println(traverse.getShortestPath(vert2, vert3));
-		
 		//System.out.println(graph.isConnected());
+		//TopologicalOrdering<TestVertex, TestEdge> topOrder = new TopologicalOrdering<>(graph);
+		//System.out.println(topOrder.order());
+		//System.out.println(graph.isCyclic());
 		
-		System.out.println(graph.isCyclic());
+		//System.out.println(graph.isBiconnected());
+		//TestEdge edge8 = new TestEdge(vert5, vert1);
+		//TestEdge edge9 = new TestEdge(vert3, vert2);
+		//graph.addEdge(edge8);
 		
-		TopologicalOrdering<TestVertex, TestEdge> topOrder = new TopologicalOrdering<>(graph);
-		System.out.println(topOrder.order());
+		//System.out.println(traverse.findAllCycles());
 		
+		//NEW
 		
 	}
+	
+	
 
 }

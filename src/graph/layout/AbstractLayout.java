@@ -1,4 +1,4 @@
-package graph.algorithms.layout;
+package graph.layout;
 
 import java.awt.Dimension;
 
