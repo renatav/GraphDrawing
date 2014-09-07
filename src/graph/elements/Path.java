@@ -1,7 +1,9 @@
 package graph.elements;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Path<V extends Vertex, E extends Edge<V>> {
 	
@@ -70,6 +72,11 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 		this.directions = directions;
 	}
 	
+	public boolean containsDuplicates(){
+		Set<E> set = new HashSet<E>(path);
+		return set.size() == path.size();
+	}
+	
 	public List<V> pathVertices(){
 		List<V> ret = new ArrayList<V>();
 		
@@ -93,7 +100,7 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 	public String toString() {
 		String ret = "Path";
 		for (int i = 0; i < path.size(); i++){
-			if (directions.get(i) == EdgeDirection.TO_DESTINATION){
+			if (directions.size() <= i || directions.get(i) == EdgeDirection.TO_DESTINATION){
 				if (i == 0)
 					ret += " " + path.get(i).getOrigin();
 				ret += " " + path.get(i).getDestination();

@@ -9,6 +9,7 @@ import graph.elements.Vertex;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Contains methods which implement certain graph traversal algorithms
@@ -40,17 +41,21 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
 		return paths;
 	}
+	
+
 
 	public List<Path<V, E>> findAllPathsDFS(V first, V target, List<V> excluding){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
 		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, excluding);
 		return paths;
 	}
+	
 
 
 
 	private void findAllPathsDFS(List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, 
 			V currentVertex, V start, V end, List<V> excluding) {        
+
 		if (currentVertex.equals(end)) { 
 			if (!(currentVertex.equals(start) && visited.size() == 0)){
 				paths.add(new Path<V, E>(visited, directions));
@@ -90,6 +95,82 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		}
 	}
 
+
+	public List<Path<V,E>> nonrecursiveDFS(V start, V end){
+		List<Path<V,E>> ret = new ArrayList<Path<V,E>>();
+
+		List<E> visited;
+		List<EdgeDirection> directions = new ArrayList<EdgeDirection>();
+		Stack<E> stack = new Stack<E>();
+		Stack<EdgeDirection> directionStack = new Stack<EdgeDirection>();
+		Stack<List<E>> visitedStack = new Stack<List<E>>();
+		Stack<List<EdgeDirection>> directionsStack = new Stack<List<EdgeDirection>>();
+
+
+		LinkedList<E> edges;
+		if (graph.isDirected())
+			edges = graph.outEdges(start);
+		else
+			edges = graph.allEdges(start);
+
+		for (E e : edges){
+			EdgeDirection direction = e.getOrigin() == start ? EdgeDirection.TO_DESTINATION : EdgeDirection.TO_ORIGIN;
+			stack.add(0, e);
+			directionStack.add(0, direction);
+			visitedStack.add(0, new ArrayList<E>());
+			directionsStack.add(0, new ArrayList<EdgeDirection>());
+		}
+
+
+
+		E current;
+		EdgeDirection currentDirection;
+		while (!stack.empty()){
+
+			current = stack.pop();
+			currentDirection = directionStack.pop();
+			visited = visitedStack.pop();
+			directions = directionsStack.pop();
+			
+			
+			if (visited.contains(current)){
+				continue;
+			}
+
+			List<E> newVisited = new ArrayList<E>(visited);
+			List<EdgeDirection> newDirections = new ArrayList<EdgeDirection>(directions);
+			
+			newVisited.add(current);
+			newDirections.add(currentDirection);
+			
+		
+			
+			V nextVertex = currentDirection == EdgeDirection.TO_DESTINATION ? current.getDestination() : current.getOrigin();
+			if (nextVertex == end){
+				ret.add(new Path<V,E>(newVisited, newDirections));
+			}
+
+			if (graph.isDirected())
+				edges = graph.outEdges(nextVertex);
+			else
+				edges = graph.allEdges(nextVertex);
+
+			for (E e : edges){
+				if (!visited.contains(e)){
+					EdgeDirection direction = e.getOrigin() == nextVertex ? EdgeDirection.TO_DESTINATION : EdgeDirection.TO_ORIGIN;
+					stack.add(0,e);
+					directionStack.add(0,direction);
+					visitedStack.add(0,newVisited);
+					directionsStack.add(0,newDirections);
+				}
+			}
+
+		}
+
+		return ret;
+
+	}
+
 	public Path<V,E> getShortestPath(V source, V target){
 		Path<V,E> ret = null;
 		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
@@ -103,13 +184,16 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 	public List<Path<V,E>> findAllCycles(){
 		List<Path<V,E>> ret = new ArrayList<Path<V,E>>();
 		for (V v : graph.getVertices()){
-			ret.addAll(findAllPathsDFS(v, v));
+			ret.addAll(nonrecursiveDFS(v, v));
 		}
 		return ret;
 	}
 
 
-	
+
+
+
+
 
 
 

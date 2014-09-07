@@ -129,9 +129,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public LinkedList<E> outEdges(V v){
-		LinkedList<E> ret = new LinkedList<E>();
-		ret.addAll(adjacentLists.get(v));
-		return ret;
+		return adjacentLists.get(v);
 	}
 	
 	/**
@@ -313,7 +311,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
 		GraphTraversal<V, E> traversal = new GraphTraversal<>(this);
 		for (V v : vertices){
-				paths = traversal.findAllPathsDFS(v, v);
+				paths = traversal.nonrecursiveDFS(v, v);
 				if (paths.size() > 0)
 					return true;
 			}

@@ -6,12 +6,58 @@ import static org.junit.Assert.assertTrue;
 import graph.algorithms.bipartite.Bipartite;
 import graph.algorithms.planarity.AuslanderParterPlanarity;
 import graph.elements.Graph;
-import graph.exception.AlgorithmCannotBeAppliedException;
+import graph.traversal.GraphTraversal;
 
 import org.junit.Test;
 
 public class TestGraph {
 
+	
+	@Test
+	public void testTraversal(){
+
+			Graph<TestVertex, TestEdge> graph = new Graph<TestVertex, TestEdge>(false);
+			TestVertex vert1 = new TestVertex("1");
+			TestVertex vert2 = new TestVertex("2");
+			TestVertex vert3 = new TestVertex("3");
+
+			TestEdge edge1 = new TestEdge(vert1, vert2);
+			TestEdge edge2 = new TestEdge(vert1, vert3);
+			TestEdge edge3 = new TestEdge(vert2, vert3);
+
+			graph.addVertex(vert1,vert2,vert3);
+			graph.addEdge(edge1,edge2,edge3);
+			
+			GraphTraversal<TestVertex, TestEdge> traversal = new GraphTraversal<>(graph);
+			
+			System.out.println(traversal.nonrecursiveDFS(vert1, vert3));
+			System.out.println(traversal.findAllPathsDFS(vert1, vert3));
+			assertEquals(2, traversal.nonrecursiveDFS(vert1, vert3).size());
+			assertEquals(2, traversal.findAllPathsDFS(vert1, vert3).size());
+			
+
+
+			TestVertex vert4 = new TestVertex("4");
+			TestEdge edge4 = new TestEdge(vert1, vert4);
+			TestEdge edge5 = new TestEdge(vert2, vert4);
+			graph.addVertex(vert4);
+			graph.addEdge(edge4, edge5);
+			
+			assertEquals(4, traversal.nonrecursiveDFS(vert3, vert4).size());
+			assertEquals(4, traversal.findAllPathsDFS(vert3, vert4).size());
+			System.out.println(traversal.nonrecursiveDFS(vert3, vert4));
+			System.out.println(traversal.findAllPathsDFS(vert3, vert4));
+//
+//			assertTrue(graph.isBiconnected());
+//
+//
+//			graph = new Graph<TestVertex, TestEdge>(false);
+//			graph.addVertex(vert1,vert2,vert3, vert4);
+//			graph.addEdge(edge1,edge3, edge5);
+//			assertFalse(graph.isBiconnected());
+
+//		}
+	}
 	@Test
 	public void testConnected() {
 
@@ -53,32 +99,32 @@ public class TestGraph {
 		TestVertex vert4 = new TestVertex("4");
 		TestVertex vert5 = new TestVertex("5");
 		TestVertex vert6 = new TestVertex("6");
-		
+
 		TestEdge edge1 = new TestEdge(vert1, vert4);
 		TestEdge edge2 = new TestEdge(vert1, vert5);
 		TestEdge edge3 = new TestEdge(vert1, vert6);
 		TestEdge edge4 = new TestEdge(vert2, vert4);
 		TestEdge edge5 = new TestEdge(vert2, vert5);
 		TestEdge edge6 = new TestEdge(vert3, vert6);
-		
-		
+
+
 		Graph<TestVertex, TestEdge> graph = new Graph<TestVertex,TestEdge>();
 		graph.addVertex(vert1, vert2, vert3, vert4, vert5, vert6);
 		graph.addEdge(edge1, edge2, edge3, edge4, edge5, edge6);
-		
+
 		Bipartite<TestVertex, TestEdge> bipartite= new Bipartite<TestVertex, TestEdge>(graph);
 		assertEquals(true, bipartite.isBipartite());
-		
+
 		//insert another edge which causes the graph not to be bipartite
 		TestEdge edge7 = new TestEdge(vert1, vert2);
 		graph.addEdge(edge7);
-		
+
 		assertEquals(false, bipartite.isBipartite());
-		
-		
+
+
 	}
-	
-	
+
+
 	@Test
 	public void testPlanar(){
 
@@ -118,18 +164,13 @@ public class TestGraph {
 		Graph<TestVertex, TestEdge> graph2 = new Graph<TestVertex, TestEdge>(false);
 		graph2.addVertex(vert1,vert2,vert3,vert4,vert5,vert6, vert7, vert8, vert9);
 		graph2.addEdge(edge1n, edge2n, edge3n, edge4n, edge5n, edge6n,
-				edge7n, edge8n, edge9n, edge10n, edge11n, edge12n, edge13n, edge14n);
-		
-		AuslanderParterPlanarity<TestVertex, TestEdge> planarTest = new 
-				AuslanderParterPlanarity<TestVertex, TestEdge> (graph2);
-		
-		try {
-			System.out.println(planarTest.isPlannar());
-		} catch (AlgorithmCannotBeAppliedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+				edge7n, edge8n, edge9n);
 
+		AuslanderParterPlanarity<TestVertex, TestEdge> planarTest = new 
+				AuslanderParterPlanarity<TestVertex, TestEdge> ();
+
+		System.out.println(planarTest.isPlannar(graph2));
 	}
+
 
 }
