@@ -3,7 +3,6 @@ package graph.elements;
 import graph.traversal.GraphTraversal;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -132,6 +131,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return adjacentLists.get(v);
 	}
 	
+
+
 	/**
 	 * Number of edges leaving vertex v
 	 * @param v
@@ -356,7 +357,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		this.vertices = vertices;
 	}
 
-	public Collection<E> getEdges() {
+	public List<E> getEdges() {
 		return edges;
 	}
 
@@ -376,6 +377,70 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	@Override
 	public String toString() {
 		return "Graph [vertices=" + vertices + ", edges=" + edges + "]";
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (directed ? 1231 : 1237);
+		result = prime * result + ((edges == null) ? 0 : edges.hashCode());
+		result = prime * result
+				+ ((vertices == null) ? 0 : vertices.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Graph<V,E> other = (Graph<V,E>) obj;
+		if (vertices != null && (other.getVertices()) == null )
+			return false;
+		if (vertices == null && (other.getVertices()) != null )
+			return false;
+		if (vertices != null && other.getVertices() != null){
+			if (vertices.size() != other.getVertices().size())
+				return false;
+			for (V v1 : vertices){
+				boolean found = false;
+				for (V v2 : other.getVertices()){
+					if (v1.equals(v2)){
+						found = true;
+						break;
+					}
+				}
+				if (!found){
+					return false;
+				}
+			}
+		}
+		
+		if (edges != null && (other.getEdges()) == null )
+			return false;
+		if (edges == null && (other.getEdges()) != null )
+			return false;
+		if (edges != null && other.getEdges() != null){
+			if (edges.size() != other.getEdges().size())
+				return false;
+			for (E e1 : edges){
+				boolean found = false;
+				for (E e2 : other.getEdges()){
+					if (e1.equals(e2)){
+						found = true;
+						break;
+					}
+				}
+				if (!found){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 

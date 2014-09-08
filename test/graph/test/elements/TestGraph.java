@@ -30,8 +30,6 @@ public class TestGraph {
 			
 			GraphTraversal<TestVertex, TestEdge> traversal = new GraphTraversal<>(graph);
 			
-			System.out.println(traversal.nonrecursiveDFS(vert1, vert3));
-			System.out.println(traversal.findAllPathsDFS(vert1, vert3));
 			assertEquals(2, traversal.nonrecursiveDFS(vert1, vert3).size());
 			assertEquals(2, traversal.findAllPathsDFS(vert1, vert3).size());
 			
@@ -45,8 +43,6 @@ public class TestGraph {
 			
 			assertEquals(4, traversal.nonrecursiveDFS(vert3, vert4).size());
 			assertEquals(4, traversal.findAllPathsDFS(vert3, vert4).size());
-			System.out.println(traversal.nonrecursiveDFS(vert3, vert4));
-			System.out.println(traversal.findAllPathsDFS(vert3, vert4));
 //
 //			assertTrue(graph.isBiconnected());
 //
@@ -161,15 +157,36 @@ public class TestGraph {
 		TestEdge edge12n = new TestEdge(vert6, vert9);
 		TestEdge edge13n = new TestEdge(vert9, vert4);
 
-		Graph<TestVertex, TestEdge> graph2 = new Graph<TestVertex, TestEdge>(false);
-		graph2.addVertex(vert1,vert2,vert3,vert4,vert5,vert6, vert7, vert8, vert9);
-		graph2.addEdge(edge1n, edge2n, edge3n, edge4n, edge5n, edge6n,
-				edge7n, edge8n, edge9n);
+		Graph<TestVertex, TestEdge> graph1 = new Graph<TestVertex, TestEdge>(false);
+		graph1.addVertex(vert1,vert2,vert3,vert4,vert5,vert6, vert7, vert8, vert9);
+		graph1.addEdge(edge1n, edge2n, edge3n, edge4n, edge5n, edge6n,
+				edge7n, edge8n, edge9n, edge10n, edge11n, edge12n, edge13n, edge14n);
 
 		AuslanderParterPlanarity<TestVertex, TestEdge> planarTest = new 
 				AuslanderParterPlanarity<TestVertex, TestEdge> ();
 
-		System.out.println(planarTest.isPlannar(graph2));
+		assertEquals(true, planarTest.isPlannar(graph1));
+		
+		
+		//Construct pentatope - one of the named non-planar graphs
+		
+		Graph<TestVertex, TestEdge> graph2 = new Graph<TestVertex, TestEdge>(false);
+		TestEdge pentEdge1 = new TestEdge(vert1, vert2);
+		TestEdge pentEdge2 = new TestEdge(vert1, vert3);
+		TestEdge pentEdge3 = new TestEdge(vert1, vert4);
+		TestEdge pentEdge4 = new TestEdge(vert1, vert5);
+		TestEdge pentEdge5 = new TestEdge(vert2, vert3);
+		TestEdge pentEdge6 = new TestEdge(vert2, vert4);
+		TestEdge pentEdge7 = new TestEdge(vert2, vert5);
+		TestEdge pentEdge8 = new TestEdge(vert3, vert4);
+		TestEdge pentEdge9 = new TestEdge(vert3, vert5);
+		TestEdge pentEdge10 = new TestEdge(vert4, vert5);
+		graph2.addVertex(vert1, vert2, vert3, vert4, vert5);;
+		graph2.addEdge(pentEdge1, pentEdge2, pentEdge3, pentEdge4, pentEdge5, pentEdge6,
+				pentEdge7, pentEdge8, pentEdge9, pentEdge10);
+		
+		
+		assertEquals(false, planarTest.isPlannar(graph2));
 	}
 
 
