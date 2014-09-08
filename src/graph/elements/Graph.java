@@ -398,7 +398,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Graph<V,E> other = (Graph<V,E>) obj;
+		Graph<?,?> other = (Graph<?,?>) obj;
 		if (vertices != null && (other.getVertices()) == null )
 			return false;
 		if (vertices == null && (other.getVertices()) != null )
@@ -408,7 +408,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				return false;
 			for (V v1 : vertices){
 				boolean found = false;
-				for (V v2 : other.getVertices()){
+				for (Object v2 : other.getVertices()){
 					if (v1.equals(v2)){
 						found = true;
 						break;
@@ -429,7 +429,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				return false;
 			for (E e1 : edges){
 				boolean found = false;
-				for (E e2 : other.getEdges()){
+				for (Object e2 : other.getEdges()){
 					if (e1.equals(e2)){
 						found = true;
 						break;
