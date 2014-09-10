@@ -206,13 +206,10 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 			
 		covered.add(current);
 		
-		System.out.println("Stavlja " + current + " " + index);
-		
-		tree.getVerticesWithIndexes().put(current, index);
+		tree.addVertex(current, index);
 		
 		if (currentEdge != null){
-			System.out.println("Stavlja " + currentEdge);
-			tree.getTreeEdges().add(currentEdge);
+			tree.addTreeEdge(currentEdge);
 		}
 		
 		LinkedList<E> edges;
@@ -242,13 +239,6 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 			formDFSTree(nextVert, e, tree, covered, temp, ++index);
 		}
 	}
-
-
-
-
-
-
-
 
 
 }

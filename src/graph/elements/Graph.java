@@ -21,19 +21,19 @@ import java.util.Set;
  */
 public class Graph<V extends Vertex,E extends Edge<V>>{
 
-	private List<V> vertices;
-	private List<E> edges;
-	private boolean directed = true;
+	protected List<V> vertices;
+	protected List<E> edges;
+	protected boolean directed = true;
 
 	/**
 	 * An adjacent list contains a list of all the edges leaving the vertex
 	 */
-	private Map<V, LinkedList<E>> adjacentLists;
+	protected Map<V, LinkedList<E>> adjacentLists;
 	
 	/**
 	 * Vertex by content map
 	 */
-	private Map<Object, V> vertexByContentMap;
+	protected Map<Object, V> vertexByContentMap;
 
 	public Graph(){
 		vertices = new ArrayList<V>();
