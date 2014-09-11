@@ -1,5 +1,6 @@
 package graph.test.algorithms;
 
+import graph.algorithms.planarity.LRPartition;
 import graph.elements.Graph;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
@@ -9,7 +10,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class TestDFSTree extends TestCase{
+public class TestLRPartitioning extends TestCase{
 
 	private Graph<TestVertex, TestEdge> graph;
 	private TestVertex vert1 = new TestVertex("1");
@@ -52,31 +53,32 @@ public class TestDFSTree extends TestCase{
 
 	@Test
 	public void test(){
-		DFSTreeTraversal<TestVertex, TestEdge> traversal = new DFSTreeTraversal<>(graph);
-		DFSTree<TestVertex, TestEdge> tree = traversal.formDFSTree(vert1);
-
-
-		Graph<TestVertex, TestEdge> graph2 = new Graph<TestVertex, TestEdge>();
-		for (TestVertex v  : tree.getVertices())
-			graph2.addVertex(v);
-		for (TestEdge e : tree.getTreeEdges())
-			graph2.addEdge(e);
-
-		assertEquals(false, tree.isCyclic());
-		assertEquals(10, tree.allDescendantsOf(vert1, false).size());
-		assertEquals(9, tree.allDescendantsOf(vert2, false).size());
-		assertEquals(4, tree.allDescendantsOf(vert3, false).size());
-		assertEquals(0, tree.allDescendantsOf(vert4, false).size());
+		LRPartition<TestVertex, TestEdge> partition = new LRPartition<>(graph);
+		partition.createLRPartition();
 		
-		assertEquals(1, tree.lowpt(vert2));
-		assertEquals(1, tree.lowpt(vert3));
-		assertEquals(3, tree.highpt(vert5));
-		assertEquals(2, tree.lowpt(vert5));
-		assertEquals(1, tree.lowpt(vert8));
+		DFSTreeTraversal<TestVertex, TestEdge> traversal = new  DFSTreeTraversal<TestVertex,TestEdge>(graph);
+		DFSTree<TestVertex, TestEdge> tree = traversal.formDFSTree(graph.getVertices().get(0));
 		
-		assertEquals(edge7, tree.returningEdges(edge2).get(0));
-		assertEquals(edge8, tree.returningEdges(edge4).get(0));
-		assertEquals(edge14, tree.returningEdges(edge12).get(0));
+
+		assertEquals(tree.getBackEdges().size(), partition.getLeft().size() + partition.getRight().size());
+		for (TestEdge e : tree.getBackEdges()){
+			assertEquals(true, partition.getLeft().contains(e) || partition.getRight().contains(e));
+			
+			if (partition.getLeft().contains(e))
+				assertEquals(false, partition.getRight().contains(e));
+			
+			if (partition.getRight().contains(e))
+				assertEquals(false, partition.getLeft().contains(e));
+			
+			
+		}
+		
+		
+		
+		System.out.println(partition);
+		
+		
+		
 
 	}
 

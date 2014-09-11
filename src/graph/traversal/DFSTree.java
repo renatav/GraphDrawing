@@ -6,6 +6,7 @@ import graph.elements.Vertex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,8 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	}
 
+
+
 	public void formBackEdges(List<E> allEdges){
 		for (E e : allEdges)
 			if (!treeEdges.contains(e))
@@ -38,8 +41,8 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 
 	public void addVertex(V v, int index){
-		verticesWithIndexes.put(v, index);
 		super.addVertex(v);
+		verticesWithIndexes.put(v, index);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -48,6 +51,17 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		super.addEdge(e);
 	}
 
+
+	@Override	
+	public LinkedList<E> allEdges(V v){
+		LinkedList<E> ret = new LinkedList<E>();
+		List<E> all = new ArrayList<>(treeEdges);
+		all.addAll(backEdges);
+		for (E e : all)
+			if (e.getDestination() == v || e.getOrigin() == v)
+				ret.add(e);
+		return ret;
+	}
 	/**
 	 * Finds the incoming edge (starting from an ancestor of v (edge with lower index) and ending in v)
 	 * @param v
@@ -57,9 +71,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 		V other;
 		for (E e : allEdges(v)){
-			other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
-			if (compareVertices(v, other) == 1) //index of v is higher
-				return e;
+			if (treeEdges.contains(e)){
+				other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+				if (compareVertices(v, other) == 1) //index of v is higher
+					return e;
+			}
 		}
 		return null;
 	}
@@ -74,10 +90,34 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		List<E> ret = new ArrayList<E>();
 		V other;
 		for (E e : allEdges(v)){
+			if (treeEdges.contains(e)){
+				other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+				if (compareVertices(v, other) == -1) //index of v is lower
+					if (!ret.contains(e))
+						ret.add(e);
+			}
+		}
+		return ret;
+	}
+
+	public List<E> allOutgoingEdges(V v){
+		List<E> ret = new ArrayList<E>();
+		V other;
+		for (E e : allEdges(v)){
 			other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
-			if (compareVertices(v, other) == -1) //index of v is lower
-				if (!ret.contains(e))
-					ret.add(e);
+			if (treeEdges.contains(e)){
+				if (compareVertices(v, other) == -1){ //index of v is lower
+					if (!ret.contains(e))
+						ret.add(e);
+				}
+			}
+			else{
+				if (compareVertices(v, other) == 1){
+					if (!ret.contains(e)){
+						ret.add(e);
+					}
+				}
+			}
 		}
 		return ret;
 	}
@@ -97,6 +137,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	}
 
+
 	private void allDescendantsOf(V current, List<V> descendants){
 
 		V other;
@@ -107,6 +148,18 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 				allDescendantsOf(other, descendants);
 			}
 		}
+	}
+
+	public List<V> directDescendantsOf(V v){
+		List<V> ret = new ArrayList<V>();
+		V other;
+		for (E e : allOutgoingTreeEdges(v)){
+			other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+			if (verticesWithIndexes.get(v) < verticesWithIndexes.get(other) && !ret.contains(other) ){
+				ret.add(other);
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -135,7 +188,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 * @return lowpt of v if there are back edges leading form descendant to ancestor of v, -1 otherwise
 	 */
 	public int lowpt(V v){
-		List<V> descendants = allDescendantsOf(v, false); //TODO da li je stvarno ovde false
+		List<V> descendants = allDescendantsOf(v, true); 
 		int currentIndex = getIndex(v);
 		Integer lowest = null;
 		for (E back : getBackEdges()){
@@ -193,9 +246,9 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 * @return
 	 */
 	public int lowpt(E e){
-		
+
 		V origin, destination;
-		
+
 		if (getIndex(e.getOrigin()) < getIndex(e.getDestination())){
 			origin = e.getOrigin();
 			destination = e.getDestination();
@@ -205,15 +258,43 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 			origin = e.getDestination();
 		}
 
-		if (backEdges.contains(e))
+		if (backEdges.contains(e)){
 			return getIndex(origin);
-		
+		}
+
 		//else tree edge
-		
+
 		int lowpt = lowpt(destination);
 		if (lowpt != -1)
 			return lowpt;
 		return getIndex(destination);
+
+	}
+	
+	
+	public int highpt(E e){
+
+		V origin, destination;
+
+		if (getIndex(e.getOrigin()) < getIndex(e.getDestination())){
+			origin = e.getOrigin();
+			destination = e.getDestination();
+		}
+		else {
+			destination = e.getOrigin();
+			origin = e.getDestination();
+		}
+
+		if (backEdges.contains(e)){
+			return getIndex(destination);
+		}
+
+		//else tree edge
+
+		int highpt = highpt(destination);
+		if (highpt != -1)
+			return highpt;
+		return getIndex(origin);
 
 	}
 
@@ -225,35 +306,41 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 * @return
 	 */
 	public List<E> returningEdges(E e){
+
 		List<E> ret = new ArrayList<E>();
 
-		V origin, destination;
+		if (backEdges.contains(e))
+			ret.add(e);
+		else{
 
-		if (getIndex(e.getOrigin()) < getIndex(e.getDestination())){
-			origin = e.getOrigin();
-			destination = e.getDestination();
-		}
-		else {
-			destination = e.getOrigin();
-			origin = e.getDestination();
-		}
+			V origin, destination;
 
-
-		int originIndex = getIndex(origin);
-
-		List<V> descendants = allDescendantsOf(destination, true); 
-		for (E back : backEdges){
-			if (descendants.contains(back.getDestination()) || descendants.contains(back.getOrigin())){
-				int index;
-				if (descendants.contains(back.getDestination()))
-					index = getIndex(back.getOrigin());
-				else
-					index = getIndex(back.getDestination());
+			if (getIndex(e.getOrigin()) < getIndex(e.getDestination())){
+				origin = e.getOrigin();
+				destination = e.getDestination();
+			}
+			else {
+				destination = e.getOrigin();
+				origin = e.getDestination();
+			}
 
 
-				//ancestor of origin
-				if (index < originIndex)
-					ret.add(back);
+			int originIndex = getIndex(origin);
+
+			List<V> descendants = allDescendantsOf(destination, true); 
+			for (E back : backEdges){
+				if (descendants.contains(back.getDestination()) || descendants.contains(back.getOrigin())){
+					int index;
+					if (descendants.contains(back.getDestination()))
+						index = getIndex(back.getOrigin());
+					else
+						index = getIndex(back.getDestination());
+
+
+					//ancestor of origin
+					if (index < originIndex)
+						ret.add(back);
+				}
 			}
 		}
 		return ret;
@@ -296,9 +383,17 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	@Override
 	public String toString() {
-		return "DFSTree [root=" + root + ", verticesWithIndexes="
-				+ verticesWithIndexes + ", treeEdges=" + treeEdges
-				+ ", backEdges=" + backEdges + "]";
+		String ret = "DFS Tree: \n";
+		for (V v : verticesWithIndexes.keySet())
+			ret += " Vertex " + v +" with index = " + verticesWithIndexes.get(v);
+
+		ret += "\nTree edges: " + treeEdges;
+
+		ret += "\nBack edges: " + backEdges;
+
+		return ret;
+
+
 	}
 
 

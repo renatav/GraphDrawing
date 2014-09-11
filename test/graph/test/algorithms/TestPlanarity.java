@@ -5,8 +5,6 @@ import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.elements.Graph;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
-import graph.traversal.DFSTree;
-import graph.traversal.GraphTraversal;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -75,6 +73,11 @@ public class TestPlanarity extends TestCase{
 		nonPlanarGraph.addVertex(vert1, vert2, vert3, vert4, vert5);;
 		nonPlanarGraph.addEdge(pentEdge1, pentEdge2, pentEdge3, pentEdge4, pentEdge5, pentEdge6,
 				pentEdge7, pentEdge8, pentEdge9, pentEdge10);
+		
+		Graph<TestVertex, TestEdge> graph = new Graph<>();
+		graph.addVertex(vert1, vert2, vert3, vert4, vert5);
+		graph.addEdge(pentEdge1, pentEdge5, pentEdge8, pentEdge10, pentEdge2, pentEdge6);
+		
  
 	}
 
@@ -85,9 +88,9 @@ public class TestPlanarity extends TestCase{
 		AuslanderParterPlanarity<TestVertex, TestEdge> planarTest = new 
 				AuslanderParterPlanarity<TestVertex, TestEdge> ();
 
-		//assertEquals(true, planarTest.isPlannar(planarGraph));
+		assertEquals(true, planarTest.isPlannar(planarGraph));
 
-		//assertEquals(false, planarTest.isPlannar(nonPlanarGraph));
+		assertEquals(false, planarTest.isPlannar(nonPlanarGraph));
 	}
 	
 	@Test
@@ -96,14 +99,10 @@ public class TestPlanarity extends TestCase{
 		FraysseixMendezPlanarity<TestVertex, TestEdge> planarTest = new 
 				FraysseixMendezPlanarity<TestVertex, TestEdge> ();
 		
-		GraphTraversal<TestVertex, TestEdge> traversal = new GraphTraversal<>(planarGraph);
-		DFSTree<TestVertex, TestEdge> tree = traversal.formDFSTree(planarGraph.getVertices().get(0));
-		
-		
-		for (TestEdge e : tree.getBackEdges()){
-			System.out.println(planarTest.findFundamentalCycle(tree, e));
+		assertEquals(true, planarTest.isPlannar(planarGraph));
+
+		assertEquals(false, planarTest.isPlannar(nonPlanarGraph));
 		}
 		
 		
-	}
 }

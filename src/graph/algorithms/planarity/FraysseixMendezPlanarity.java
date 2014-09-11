@@ -14,8 +14,13 @@ public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> exten
 
 	@Override
 	public boolean isPlannar(Graph<V,E> graph) {
-		// TODO Auto-generated method stub
-		return false;
+
+		if (!graph.isCyclic())
+			return true;
+		
+		LRPartition<V, E> partition = new LRPartition<V,E>(graph);
+		
+		return partition.createLRPartition();
 	}
 
 
