@@ -1,5 +1,6 @@
 package graph.elements;
 
+import graph.traversal.DijkstraAlgorithm;
 import graph.traversal.GraphTraversal;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * An adjacent list contains a list of all the edges leaving the vertex
 	 */
 	protected Map<V, LinkedList<E>> adjacentLists;
-	
+
 	/**
 	 * Vertex by content map
 	 */
@@ -40,15 +41,15 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		edges = new ArrayList<E>();
 		adjacentLists = new HashMap<V, LinkedList<E>>();
 		vertexByContentMap = new HashMap<Object,V>();
-		
+
 	}
-	
+
 	public Graph(boolean directed){
 		this();
 		this.directed = directed;
 	}
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	public void addVertex(V...vert){
 		for (V v : vert){
@@ -57,13 +58,13 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			vertexByContentMap.put(v.getContent(), v);
 		}
 	}
-	
+
 	public void addVertex(V v){
 		vertices.add(v);
 		adjacentLists.put(v, new LinkedList<E>());
 		vertexByContentMap.put(v.getContent(), v);
 	}
-	
+
 	public void addVertexBeginning(V v){
 		vertices.add(0, v);
 		adjacentLists.put(v, new LinkedList<E>());
@@ -130,7 +131,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public LinkedList<E> outEdges(V v){
 		return adjacentLists.get(v);
 	}
-	
+
 
 
 	/**
@@ -154,7 +155,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(e);
 		return ret;
 	}
-	
+
 	/**
 	 * Number of edges entering v
 	 * @param v
@@ -163,8 +164,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public int inDegree(V v){
 		return inEdges(v).size();
 	}
-	
-	
+
+
 	/**
 	 * Checks if vertex is a source (vertex with no incoming edges)
 	 * @param v
@@ -173,7 +174,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public boolean isSource(V v){
 		return inDegree(v) == 0;
 	}
-	
+
 	/**
 	 * Checks if vertex is a sink (vertex with no outgoing edges)
 	 * @param v
@@ -182,7 +183,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public boolean isSink(V v){
 		return outDegree(v) == 0;
 	}
-	
+
 	/**
 	 * All edges leaving or entering v
 	 * @param v
@@ -208,7 +209,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * Checks if graph has self loop edges 
 	 * @return
@@ -220,6 +221,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 		return false;
 	}
+
 
 	/**
 	 * Checks if graph is simple
@@ -271,19 +273,18 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 */
 	public boolean isConnected(){
 		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
-		GraphTraversal<V, E> traversal = new GraphTraversal<>(this);
+		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<>(this);
 		for (V v1 : vertices)
 			for (V v2 : vertices){
 				if (v1 == v2)
 					continue;
 				paths.clear();
-				paths = traversal.findAllPathsDFS(v1, v2); //TODO nesto efikasnije ovde naci za proveru ima li path (ne naci sve)
-				if (paths.size() == 0)
+				if (dijkstra.getPath(v1, v2) == null); 
 					return false;
 			}
 		return true;
 	}
-	
+
 	/**
 	 * Checks is graph is connected
 	 * @return
@@ -307,18 +308,18 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 		return true;
 	}
-	
+
 	public boolean isCyclic(){
 		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
 		GraphTraversal<V, E> traversal = new GraphTraversal<>(this);
 		for (V v : vertices){
-				paths = traversal.nonrecursiveDFS(v, v);
-				if (paths.size() > 0)
-					return true;
-			}
+			paths = traversal.nonrecursiveDFS(v, v);
+			if (paths.size() > 0)
+				return true;
+		}
 		return false;
 	}
-	
+
 	public List<V> getAllSinks(){
 		List<V> ret = new ArrayList<V>();
 		for (V v : vertices)
@@ -326,7 +327,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(v);
 		return ret;
 	}
-	
+
 	/**
 	 * Checks if a graph is biconnected. 
 	 * A graph is biconnected if and only if any vertex is deleted, the graph remains connected.
@@ -343,11 +344,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 		return true;
 	}
-	
+
 	public V getVertexByContent(Object content){
 		return vertexByContentMap.get(content);
 	}
-	
+
 
 	public List<V> getVertices() {
 		return vertices;
@@ -378,7 +379,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public String toString() {
 		return "Graph [vertices=" + vertices + ", edges=" + edges + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -419,7 +420,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				}
 			}
 		}
-		
+
 		if (edges != null && (other.getEdges()) == null )
 			return false;
 		if (edges == null && (other.getEdges()) != null )

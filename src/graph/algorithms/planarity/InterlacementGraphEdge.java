@@ -31,4 +31,9 @@ public class InterlacementGraphEdge<V extends Vertex, E extends Edge<V>> impleme
 				+ destination + "]";
 	}
 
+	@Override
+	public int getWeight() {
+		return 1;
+	}
+
 }

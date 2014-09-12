@@ -6,6 +6,7 @@ public class TestEdge implements Edge<TestVertex>{
 	
 
 	private TestVertex origin, destination;
+	private int weight = 1;
 	
 	public TestEdge(TestVertex origin, TestVertex destination) {
 		super();
@@ -61,5 +62,10 @@ public class TestEdge implements Edge<TestVertex>{
 		} else if (!origin.equals(other.origin))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int getWeight() {
+		return weight;
 	}
 }

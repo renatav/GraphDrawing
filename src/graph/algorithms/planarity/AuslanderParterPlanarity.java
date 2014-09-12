@@ -28,8 +28,10 @@ public class AuslanderParterPlanarity<V extends Vertex,E extends Edge<V>> extend
 	@Override
 	public boolean isPlannar(Graph<V,E> graph){
 
-		if (!graph.isCyclic())
+		if (!graph.isCyclic()){
+			System.out.println("nije cilkican");
 			return true;
+		}
 
 		List<Graph<V,E>> tested = new ArrayList<Graph<V,E>>();
 		Stack<Graph<V,E>> graphStack = new Stack<Graph<V,E>>();
