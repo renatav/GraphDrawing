@@ -1,11 +1,11 @@
 package graph.algorithms.planarity;
 
-import graph.algorithms.bipartite.Bipartite;
 import graph.elements.Edge;
 import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
+import graph.properties.bipartite.Bipartite;
 import graph.traversal.GraphTraversal;
 
 import java.util.ArrayList;
@@ -28,10 +28,8 @@ public class AuslanderParterPlanarity<V extends Vertex,E extends Edge<V>> extend
 	@Override
 	public boolean isPlannar(Graph<V,E> graph){
 
-		if (!graph.isCyclic()){
-			System.out.println("nije cilkican");
+		if (!graph.isCyclic())
 			return true;
-		}
 
 		List<Graph<V,E>> tested = new ArrayList<Graph<V,E>>();
 		Stack<Graph<V,E>> graphStack = new Stack<Graph<V,E>>();

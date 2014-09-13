@@ -24,7 +24,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	protected List<V> vertices;
 	protected List<E> edges;
-	protected boolean directed = true;
+	protected boolean directed = false;
 
 	/**
 	 * An adjacent list contains a list of all the edges leaving the vertex
@@ -43,6 +43,16 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		vertexByContentMap = new HashMap<Object,V>();
 
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Graph(List<V> vertices, List<E> edges){
+		this();
+		for (V v : vertices)
+			addVertex(v);
+		for (E e : edges)
+			addEdge(e);
+		
+	}
 
 	public Graph(boolean directed){
 		this();
@@ -60,6 +70,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	}
 
 	public void addVertex(V v){
+		if (vertices.contains(v))
+			return;
 		vertices.add(v);
 		adjacentLists.put(v, new LinkedList<E>());
 		vertexByContentMap.put(v.getContent(), v);
@@ -78,8 +90,17 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	@SuppressWarnings("unchecked")
 	public void addEdge(E...edge){
 		for (E e : edge){
-			edges.add(e);
-			adjacentLists.get(e.getOrigin()).add(e);
+			if (edges.contains(e))
+				continue;
+			if (adjacentLists.get(e.getOrigin()) != null){
+				edges.add(e);
+				adjacentLists.get(e.getOrigin()).add(e);
+			}
+			else if (!directed && (adjacentLists.get(e.getDestination()) != null)){
+				edges.add(e);
+				adjacentLists.get(e.getDestination()).add(e);
+			}
+			
 		}
 	}
 
@@ -290,8 +311,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public boolean isConnected(List<V> excluding){
-		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
-		GraphTraversal<V, E> traversal = new GraphTraversal<>(this);
+		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<>(this);
 		for (V v1 : vertices){
 			if (excluding.contains(v1))
 				continue;
@@ -300,9 +320,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 					continue;
 				if (excluding.contains(v2))
 					continue;
-				paths.clear();
-				paths = traversal.findAllPathsDFS(v1, v2, excluding); //TODO nesto efikasnije ovde naci za proveru ima li path (ne naci sve)
-				if (paths.size() == 0)
+				if (dijkstra.getPath(v1, v2, excluding) == null) 
 					return false;
 			}
 		}

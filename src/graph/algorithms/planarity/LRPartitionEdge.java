@@ -30,7 +30,7 @@ public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 			if (e == edge)
 				continue;
 			if (different.contains(e)){
-				System.out.println("Ne moze same " + toBeAdded);
+				//System.out.println("Ne moze same " + toBeAdded);
 				valid = false;
 				return false;
 			}
@@ -45,7 +45,7 @@ public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 			if (e == edge)
 				continue;
 			if (same.contains(e)){
-				System.out.println("Ne moze diff " + toBeAdded);
+				//System.out.println("Ne moze diff " + toBeAdded);
 				valid = false;
 				return false;
 			}

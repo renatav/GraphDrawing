@@ -40,13 +40,17 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 		this.edges = new ArrayList<E>(graph.getEdges());
 	}
 
+	public Path<V,E> getPath(V source, V target){
+		return getPath(source, target, null);
+	}
+	
 	/**
 	 * Returns path from source to target if one exists, otherwise null
 	 * @param target
 	 * @return shortest path if one exists, otherwise null
 	 */
-	public Path<V,E> getPath(V source, V target) {
-		execute(source);
+	public Path<V,E> getPath(V source, V target, List<V> excluding) {
+		execute(source, excluding);
 		List<E> path = new ArrayList<E>();
 		List<EdgeDirection> directions = new ArrayList<EdgeDirection>();
 		V step = target;
@@ -65,12 +69,17 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 			step = predecessors.get(step);
 		}
 		// Put it into the correct order
+		
+		if (path.size() == 0)
+			return null;
+		
 		Collections.reverse(path);
 		Collections.reverse(directions);
+		
 		return new Path<V,E>(path, directions);
 	}
 
-	private void execute(V source) {
+	private void execute(V source, List<V> excluding) {
 
 		settledNodes = new HashSet<V>();
 		unSettledNodes = new HashSet<V>();
@@ -84,14 +93,16 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 			V node = getMinimum(unSettledNodes);
 			settledNodes.add(node);
 			unSettledNodes.remove(node);
-			findMinimalDistances(node);
+			findMinimalDistances(node, excluding);
 		}
 	}
 
-	private void findMinimalDistances(V node) {
+	private void findMinimalDistances(V node, List<V> excluding) {
 		List<V> adjacentNodes = getNeighbors(node);
 		E minEdge;
 		for (V target : adjacentNodes) {
+			if (excluding != null && excluding.contains(target))
+				continue;
 			minEdge = getMinDistance(node, target);
 			if (getShortestDistance(target) > getShortestDistance(node)
 					+ minEdge.getWeight())

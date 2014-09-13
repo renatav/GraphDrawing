@@ -1,7 +1,7 @@
 package graph.test.graph.properties;
 
-import graph.algorithms.bipartite.Bipartite;
 import graph.elements.Graph;
+import graph.properties.bipartite.Bipartite;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
 import graph.traversal.GraphTraversal;

@@ -5,8 +5,8 @@ import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
-import graph.traversal.DFSTree;
 import graph.traversal.GraphTraversal;
+import graph.trees.DFSTree;
 
 import java.util.List;
 

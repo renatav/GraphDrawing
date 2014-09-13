@@ -3,8 +3,8 @@ package graph.algorithms.planarity;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.traversal.DFSTree;
 import graph.traversal.DFSTreeTraversal;
+import graph.trees.DFSTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +44,6 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
 		DFSTree<V, E> tree = traversal.formDFSTree(graph.getVertices().get(0));
 		createLRPartition(tree);
-		System.out.println(toString());
 		return canBeCreated;
 	}
 
@@ -102,6 +101,12 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 				edgesToBePlacedE1.clear();
 				edgesToBePlacedE2.clear();
 
+				//TODO
+				//Ovde se moze izanalizirati nesto tipa ako ima nesto ispod, onda mora sa razlicite strane
+				//a ako moze i "okolo" onda nije bitno na kojoj ce strani biti
+				//napraviti neku listu "dependant" pa da se tu gleda tako nesto -> ako je ovo sa jedne strane
+				//onda  ovo mora iznad, i tako pa da se to posle izanalizira
+				
 				for (E retEdgeE1 : tree.returningEdges(e1)){
 					int edgeEndIndex = Math.min(tree.getIndex(retEdgeE1.getOrigin()), tree.getIndex(retEdgeE1.getDestination()));
 					if (edgeEndIndex < lowptE2){ //ends higher
@@ -125,10 +130,10 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 				
-				System.out.println("E1: " + e1);
-				System.out.println("E2: " + e2);
-				System.out.println(edgesToBePlacedE1);
-				System.out.println(edgesToBePlacedE2);
+//				System.out.println("E1: " + e1);
+//				System.out.println("E2: " + e2);
+//				System.out.println(edgesToBePlacedE1);
+//				System.out.println(edgesToBePlacedE2);
 				
 
 

@@ -1,4 +1,4 @@
-package graph.algorithms.bipartite;
+package graph.properties.bipartite;
 
 import graph.elements.Edge;
 import graph.elements.Graph;
@@ -64,7 +64,7 @@ public class Bipartite<V extends Vertex,E extends Edge<V>> {
 				colour.put(other, !colour.get(v));
 				dfs(other);
 			}
-			//if colours of the current vertex and one of its adjacenet ones mathc => contradiction
+			//if colours of the current vertex and one of its adjacenet ones match => contradiction
 			//graph isn't bipartite
 			else if (colour.get(v) == colour.get(other)) 
 				isBipartite = false;

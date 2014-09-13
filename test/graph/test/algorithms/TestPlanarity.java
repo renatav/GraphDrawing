@@ -2,6 +2,7 @@ package graph.test.algorithms;
 
 import graph.algorithms.planarity.AuslanderParterPlanarity;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
+import graph.algorithms.planarity.MaximumPlanaritySubgraph;
 import graph.elements.Graph;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
@@ -104,5 +105,15 @@ public class TestPlanarity extends TestCase{
 		assertEquals(false, planarTest.isPlannar(nonPlanarGraph));
 		}
 		
+	
+	@Test
+	public void testMaximumPlanarity(){
+		MaximumPlanaritySubgraph<TestVertex, TestEdge> maxPlanarity 
+			= new MaximumPlanaritySubgraph<>(nonPlanarGraph);
+			
+		Graph<TestVertex, TestEdge> maxPlanarityGraph = maxPlanarity.calculateMaximumPlanarityGraph();
+		assertEquals(9, maxPlanarityGraph.getEdges().size());
+		
+	}
 		
 }

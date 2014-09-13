@@ -1,4 +1,4 @@
-package graph.traversal;
+package graph.trees;
 
 import graph.elements.Edge;
 import graph.elements.Graph;

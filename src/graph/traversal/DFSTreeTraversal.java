@@ -3,6 +3,7 @@ package graph.traversal;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.trees.DFSTree;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
