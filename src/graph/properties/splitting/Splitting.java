@@ -116,11 +116,77 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 			}
 
-
-
 		return true;
 	}
 
+	/**
+	 * A split graph of a split pair with respect of some edge 
+	 * is the union of all split components which don't contain that edge
+	 * @param splitComponents
+	 * @param edge
+	 * @return
+	 */
+	public Graph<V,E> splitGraph(List<SplitComponent<V, E>> splitComponents, E edge){
+
+		List<Graph<V, E>> allComponentsNotContainingEdge = new ArrayList<Graph<V,E>>();
+		for (SplitComponent<V, E> component : splitComponents)
+			if (!component.getEdges().contains(edge))
+				allComponentsNotContainingEdge.add(component);
+
+
+		GraphOperations<V, E> operations = new GraphOperations<>();
+		return operations.union(allComponentsNotContainingEdge);
+
+	}
+
+	/**
+	 * A split pair {u,v} is dominated by another split pair {x,y} if
+	 * 
+	 * @param dominant
+	 * @param other
+	 * @param edge
+	 * @return
+	 */
+	public boolean splitPairIsDominantedBy(Graph<V,E> graph, SplitPair<V,E> dominanted, SplitPair<V, E> dominant, E edge){
+		GraphOperations<V, E> operations = new GraphOperations<>();
+
+		Graph<V,E> splitGraph1 = splitGraph(findAllSplitComponents(graph, dominanted), edge);
+		Graph<V,E> splitGraph2 = splitGraph(findAllSplitComponents(graph, dominant), edge);
+
+		return operations.isProperSubgraph(splitGraph2, splitGraph1);
+
+	}
+
+	/**
+	 * A maximal split pair with respect to some edge 
+	 * is a split pair not dominated by any other split pair with respect to that edge
+	 * There may several such pairs
+	 * @param graph
+	 * @param edge
+	 * @return
+	 */
+	public List<SplitPair<V, E>> maximalSplitPairs(Graph<V,E> graph, E edge){
+		List<SplitPair<V,E>> ret = new ArrayList<SplitPair<V,E>>();
+
+		List<SplitPair<V,E>> splitPairs =  findAllSplitPairs(graph);
+
+		for (SplitPair<V, E> splitPair1 : splitPairs){
+			boolean maximal = true;
+			for (SplitPair<V, E> splitPair2 : splitPairs){
+				if (splitPair1 == splitPair2)
+					continue;
+				if (splitPairIsDominantedBy(graph, splitPair1, splitPair2, edge)){
+					maximal = false;
+					break;
+				}
+			}
+			if (maximal)
+				ret.add(splitPair1);
+		}
+		return ret;
+
+
+	}
 
 
 

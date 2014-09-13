@@ -1,4 +1,4 @@
-package graph.trees;
+package graph.tree.spqr;
 
 /**
  * SPQR-trees implicitly represent all embeddings of a graph

@@ -65,6 +65,17 @@ public class TestSplitting extends TestCase{
 		
 		assertTrue(splitting.testSplitComponents(splitting.findAllSplitComponents(graph2, pair1), pair1));
 		assertTrue(splitting.testSplitComponents(splitting.findAllSplitComponents(graph, pair1), pair1));
+		
+//		System.out.println(splitting.splitGraph(splitting.findAllSplitComponents(graph2, pair1), edge7_2));
+		
+		SplitPair<TestVertex, TestEdge> split1 = new SplitPair<TestVertex, TestEdge>(vert1, vert3);
+		SplitPair<TestVertex, TestEdge> split2 = new SplitPair<TestVertex, TestEdge>(vert1, vert4);
+		TestEdge edge = edge3_2;
+		
+		assertTrue(splitting.splitPairIsDominantedBy(graph2, split1, split2, edge));
+		assertFalse(splitting.splitPairIsDominantedBy(graph2, split2, split1, edge));
+		
+		System.out.println(splitting.maximalSplitPairs(graph2, edge));
 	}
 
 }

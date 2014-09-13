@@ -45,6 +45,17 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	}
 	
 	@SuppressWarnings("unchecked")
+	public Graph(boolean directed, List<V> vertices, List<E> edges){
+		this();
+		this.directed = directed;
+		for (V v : vertices)
+			addVertex(v);
+		for (E e : edges)
+			addEdge(e);
+		
+	}
+	
+	@SuppressWarnings("unchecked")
 	public Graph(List<V> vertices, List<E> edges){
 		this();
 		for (V v : vertices)
