@@ -25,6 +25,7 @@ public class Skeleton<V extends Vertex,E extends Edge<V>> extends Graph<V,E>{
 		virtualEdges = new ArrayList<>();
 	}
 	
+	
 	public Skeleton(List<V> vertices, List<E> edges) {
 		super(vertices, edges);
 		virtualEdges = new ArrayList<>();
@@ -38,6 +39,10 @@ public class Skeleton<V extends Vertex,E extends Edge<V>> extends Graph<V,E>{
 	public void addVirualEdge(E e){
 		if (!virtualEdges.contains(e))
 			virtualEdges.add(e);
+	}
+	
+	public boolean isVirtualEdge(E e){
+		return virtualEdges.contains(e);
 	}
 
 	public List<E> getVirtualEdges() {

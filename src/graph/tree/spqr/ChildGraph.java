@@ -11,6 +11,10 @@ public class ChildGraph<V extends Vertex, E extends Edge<V>> extends Graph<V,E>{
 	private E referenceEdge;
 	
 
+	public ChildGraph() {
+		super();
+	}
+
 	public ChildGraph(List<V> vertices, List<E> edges, E referenceEdge) {
 		super(vertices, edges);
 		this.referenceEdge = referenceEdge;

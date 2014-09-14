@@ -5,13 +5,15 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.operations.GraphOperations;
 import graph.properties.splitting.Block;
+import graph.properties.splitting.SplitComponent;
+import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<TreeNode<V,E>, Edge<TreeNode<V,E>>>{
+public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<TreeNode<V,TreeEdgeWithContent<V,E>>, Edge<TreeNode<V,TreeEdgeWithContent<V,E>>>>{
 
 	/**
 	 * Original graph - reference edge
@@ -28,7 +30,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 	/**
 	 * Root of the tree
 	 */
-	private TreeNode<V, E> root;
+	private TreeNode<V,TreeEdgeWithContent<V,E>> root;
 
 	//TODO mozda napraviti neki AbstractTree
 
@@ -45,15 +47,22 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 	private void constructTree(){
 
 		Splitting<V, E> splitting = new Splitting<>();
-		GraphOperations<V, E> operations = new GraphOperations<>();
+		GraphOperations<V, TreeEdgeWithContent<V,E>> operations = new GraphOperations<>();
 		V s = referenceEdge.getOrigin();
 		V t = referenceEdge.getDestination();
 
 		//trivial case
 		if (gPrimIsASingleEdge()){ //is g prim is a single edge
-			TreeNode<V, E> node = new TreeNode<>(NodeType.Q, graph);
-			addVertex(node);
-			root = node;
+			Skeleton<V,TreeEdgeWithContent<V,E>> skeleton = new Skeleton<>();
+			
+			for (V v : graph.getVertices())
+				skeleton.addVertex(v);
+			for (E e : graph.getEdges())
+				skeleton.addEdge(new TreeEdgeWithContent<V,E>(e.getOrigin(), e.getDestination()));
+			
+			
+			root = new TreeNode<V,TreeEdgeWithContent<V, E>>(NodeType.Q, skeleton);
+			addVertex(root);
 		}
 		//series case
 		else if (!gPrim.isBiconnected()){ //g prim is not a single edge and is not biconnected
@@ -63,11 +72,11 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 			organizeBlocksAndVertices(s, t, vertices, blocks);
 
 			//create root
-			Graph<V,E> cycle = operations.formCycleGraph(vertices, graph.getEdges().get(0).getClass());
-			Skeleton<V, E> rootSkeleton = new Skeleton<>(cycle.getVertices(), cycle.getEdges());
-			E virtualEdge = cycle.edgeesBetween(s, t).get(0);
+			Graph<V,TreeEdgeWithContent<V,E>> cycle = operations.formCycleGraph(vertices, TreeEdgeWithContent.class);
+			Skeleton<V, TreeEdgeWithContent<V,E>> rootSkeleton = new Skeleton<>(cycle.getVertices(), cycle.getEdges());
+			TreeEdgeWithContent<V,E> virtualEdge = cycle.edgeesBetween(s, t).get(0);
 			rootSkeleton.addVirualEdge(virtualEdge);
-			TreeNode<V,E> root = new TreeNode<>(NodeType.S, rootSkeleton);
+			root = new TreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.S, rootSkeleton);
 			addVertex(root);
 
 			//now create its children
@@ -77,17 +86,85 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 			 * from the block Bi by adding edge ei
 			 * ei is an edge between vi-1 and vi
 			 */
-			E childReferenceEdge;
+			TreeEdgeWithContent<V, E> childReferenceEdge;
+			Block<V,E> current;
 			for (int i = 0; i < blocks.size(); i++ ){
-				childReferenceEdge = graph.edgeesBetween(vertices.get(i), vertices.get(i+1)).get(0);
-				ChildGraph<V, E> child= new ChildGraph<V,E>(blocks.get(i).getVertices(),
-						blocks.get(i).getEdges(),childReferenceEdge);
-				child.addEdge(referenceEdge);
+				E edge = graph.edgeesBetween(vertices.get(i), vertices.get(i+1)).get(0);
+				childReferenceEdge = new TreeEdgeWithContent<V,E> (edge.getOrigin(), edge.getDestination());
+				ChildGraph<V, TreeEdgeWithContent<V,E>> child= new ChildGraph<V, TreeEdgeWithContent<V,E>>();
+				current = blocks.get(i);
+				for (V v : current.getVertices())
+					child.addVertex(v);
+				for (E e : current.getEdges())
+					child.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
+				child.setReferenceEdge(childReferenceEdge);
+				
+				child.addEdge(childReferenceEdge);
 				root.getChildren().add(child);
 			}
+		}
 
+		else{
+			//check if vertices s and t are a split pair of G'
+			List<SplitPair<V, E>> splitPairs = splitting.findAllSplitPairs(gPrim);
+			SplitPair<V,E> stSplit = new SplitPair<V,E>(s, t);
+			boolean isSpliPair = false;
+			for (SplitPair<V,E> split : splitPairs)
+				if (split.equals(stSplit)){
+					isSpliPair = true;
+					break;
+				}
+			
+			//parallel case
+			if (isSpliPair){
+				List<SplitComponent<V, E>> components = splitting.findAllSplitComponents(gPrim, stSplit);
+				
+				//firstly, create the root node
+				
+				/*
+				 *Root node is a P-node whose skeleton consists of two vertices - s and t
+				 *and the edges e1...ek+1
+				 *e1...ek are components ci...ck, ek+1 is the virtual edge s-t
+				 */
+				Skeleton<V, TreeEdgeWithContent<V, E>> rootSkeleton = new Skeleton<>();
+				rootSkeleton.addVertex(s,t);
+				for (SplitComponent<V, E> splitComponent : components){
+					rootSkeleton.addEdge(new TreeEdgeWithContent<V,E>(s, t, splitComponent));
+				}
+				//add virtual edge
+				TreeEdgeWithContent<V, E> stEdge = new TreeEdgeWithContent<V,E>(s,t);
+				rootSkeleton.addEdge(stEdge);
+				rootSkeleton.addVirualEdge(stEdge);
+				//create root
+				root = new TreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.P, rootSkeleton);
+				addVertex(root);
+				
+				//add children
+				
+				/*
+				 * Children are defined by graphs G1...Gk constructed from
+				 * C1...Ck by adding edge ei for i=1...k
+				 */
+				for (int i = 0; i < components.size(); i++){
+					ChildGraph<V, TreeEdgeWithContent<V,E>> child = new ChildGraph<>();
+					SplitComponent<V, E> splitComponent = components.get(i);
+					TreeEdgeWithContent<V, E> childReferenceEdge = root.getSkeleton().getEdges().get(i);
+					for (V v : splitComponent.getVertices())
+						child.addVertex(v);
+					for (E e : splitComponent.getEdges())
+						child.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
+					
+					child.setReferenceEdge(childReferenceEdge);
+					
+					child.addEdge(childReferenceEdge);
+					root.getChildren().add(child);
+				}
+			}
 
-
+			//Rigid case
+			else{
+				
+			}
 		}
 	}
 
@@ -201,12 +278,13 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 		this.graph = graph;
 	}
 
-	public TreeNode<V, E> getRoot() {
+	public TreeNode<V, TreeEdgeWithContent<V, E>> getRoot() {
 		return root;
 	}
 
-	public void setRoot(TreeNode<V, E> root) {
+	public void setRoot(TreeNode<V, TreeEdgeWithContent<V, E>> root) {
 		this.root = root;
 	}
+
 
 }
