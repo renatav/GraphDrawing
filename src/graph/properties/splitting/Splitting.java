@@ -249,6 +249,10 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 		return operations.union(allComponentsNotContainingEdge);
 
 	}
+	
+	public Graph<V,E> splitGraph(SplitPair<V,E> splitPair, E edge, Graph<V,E> graph){
+		return splitGraph(findAllSplitComponents(graph, splitPair), edge);
+	}
 
 	/**
 	 * A split pair {u,v} is dominated by another split pair {x,y} if

@@ -108,17 +108,21 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 			//check if vertices s and t are a split pair of G'
 			List<SplitPair<V, E>> splitPairs = splitting.findAllSplitPairs(gPrim);
 			SplitPair<V,E> stSplit = new SplitPair<V,E>(s, t);
-			boolean isSpliPair = false;
+			boolean isSplitPair = false;
 			for (SplitPair<V,E> split : splitPairs)
 				if (split.equals(stSplit)){
-					isSpliPair = true;
+					isSplitPair = true;
 					break;
 				}
 			
+			
+			List<SplitComponent<V, E>> components = null;
+			if (isSplitPair)
+				components = splitting.findAllSplitComponents(gPrim, stSplit);
+			
 			//parallel case
-			if (isSpliPair){
-				List<SplitComponent<V, E>> components = splitting.findAllSplitComponents(gPrim, stSplit);
-				
+			if (components != null && components.size() >= 2){
+			
 				//firstly, create the root node
 				
 				/*
@@ -161,8 +165,63 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				}
 			}
 
-			//Rigid case
+			//Rigid case - grim is biconnected and {s,t} is not a split pair
+			//with two or more components
 			else{
+				
+				//The vertices in the skeleton are s,t ad all {si, ti} from split pairs.
+				//Skeleton contains st edge (virtual) and edges ei which connect si to ti
+				//Each ei represents subgraph Ui - split graph
+				Skeleton<V, TreeEdgeWithContent<V, E>> rootSkeleton = new Skeleton<>();
+				rootSkeleton.addVertex(s,t);
+				
+				E stEdge = graph.edgeesBetween(s, t).get(0);
+				List<SplitPair<V,E>> maxSplittingPairs = splitting.maximalSplitPairs(graph, stEdge);
+				List<Graph<V, E>> uGraphs = new ArrayList<Graph<V,E>>();
+				List<TreeEdgeWithContent<V, E>> edges = new ArrayList<TreeEdgeWithContent<V, E>>();
+				for (SplitPair<V, E> splitPair : maxSplittingPairs){
+					//split graph of splitPair with respect to {s,t} edge
+					Graph<V, E> uGraph = splitting.splitGraph(splitPair, stEdge, graph);
+					uGraphs.add(uGraph);
+					rootSkeleton.addVertex(splitPair.getU(), splitPair.getV());
+					TreeEdgeWithContent<V, E> edge = new TreeEdgeWithContent<V, E>(splitPair.getU(),
+							splitPair.getV(),uGraph);
+					rootSkeleton.addEdge(edge);
+					edges.add(edge);
+				}
+				
+				
+				TreeEdgeWithContent<V, E> stTreeEdge = new TreeEdgeWithContent<V,E>(s,t);
+				rootSkeleton.addEdge(stTreeEdge);
+				rootSkeleton.addVirualEdge(stTreeEdge);
+				
+				root = new TreeNode<>(NodeType.R, rootSkeleton);
+				addVertex(root);
+				
+				//create children
+				/*
+				 * children are defined by the graphs Gi, constructed from Ui by
+				 * adding edge ei				 
+				 */
+				/*
+				 * Children are defined by graphs G1...Gk constructed from
+				 * C1...Ck by adding edge ei for i=1...k
+				 */
+				for (int i = 0; i < uGraphs.size(); i++){
+					ChildGraph<V, TreeEdgeWithContent<V,E>> child = new ChildGraph<>();
+					Graph<V, E> uGraph = uGraphs.get(i);
+					TreeEdgeWithContent<V, E> childReferenceEdge = edges.get(i);
+					for (V v : uGraph.getVertices())
+						child.addVertex(v);
+					for (E e : uGraph.getEdges())
+						child.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
+					
+					child.setReferenceEdge(childReferenceEdge);
+					
+					child.addEdge(childReferenceEdge);
+					root.getChildren().add(child);
+				}
+				
 				
 			}
 		}
