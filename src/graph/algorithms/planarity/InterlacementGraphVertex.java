@@ -1,10 +1,10 @@
 package graph.algorithms.planarity;
 
-import java.awt.Dimension;
-
 import graph.elements.Edge;
 import graph.elements.Path;
 import graph.elements.Vertex;
+
+import java.awt.Dimension;
 
 public class InterlacementGraphVertex<V extends Vertex,E extends Edge<V>> implements Vertex{
 
@@ -30,6 +30,7 @@ public class InterlacementGraphVertex<V extends Vertex,E extends Edge<V>> implem
 	public String toString() {
 		return "InterlacementGraphVertex [content=" + content + "]";
 	}
+
 	
 
 }

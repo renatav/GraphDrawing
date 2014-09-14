@@ -41,19 +41,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		edges = new ArrayList<E>();
 		adjacentLists = new HashMap<V, LinkedList<E>>();
 		vertexByContentMap = new HashMap<Object,V>();
-
 	}
 	
-	@SuppressWarnings("unchecked")
-	public Graph(boolean directed, List<V> vertices, List<E> edges){
-		this();
-		this.directed = directed;
-		for (V v : vertices)
-			addVertex(v);
-		for (E e : edges)
-			addEdge(e);
-		
-	}
 	
 	@SuppressWarnings("unchecked")
 	public Graph(List<V> vertices, List<E> edges){
@@ -65,11 +54,15 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		
 	}
 
-	public Graph(boolean directed){
+	public Graph( boolean directed){
 		this();
 		this.directed = directed;
 	}
 
+	public boolean hasVertex(V v){
+		return vertices.contains(v);
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	public void addVertex(V...vert){
@@ -377,6 +370,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public V getVertexByContent(Object content){
 		return vertexByContentMap.get(content);
 	}
+	
 
 
 	public List<V> getVertices() {

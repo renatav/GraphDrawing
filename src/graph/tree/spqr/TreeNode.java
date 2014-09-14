@@ -5,31 +5,49 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 	
 	
 	private NodeType nodeType;
 	
-	/**
-	 * Each node is associated with a special graph which is called a skeleton of the node
-	 */
-	private Graph<V,E> skeleton;
+	
+	private Skeleton<V,E> skeleton;
+	
+	private List<ChildGraph<V,E>> children;
+	
+	
+	public TreeNode() {
+		super();
+		children = new ArrayList<ChildGraph<V,E>>();
+	}
 	
 	
 	public TreeNode(NodeType nodeType) {
 		super();
 		this.nodeType = nodeType;
+		children = new ArrayList<ChildGraph<V,E>>();
 	}
 	
 	
 
+	public TreeNode(NodeType nodeType, Skeleton<V, E> skeleton) {
+		this(nodeType);
+		this.skeleton = skeleton;
+	}
+	
 	public TreeNode(NodeType nodeType, Graph<V, E> skeleton) {
 		super();
 		this.nodeType = nodeType;
-		this.skeleton = skeleton;
+		this.skeleton = new Skeleton<>(skeleton.getVertices(), skeleton.getEdges());
 	}
 
+	public void addChildNode(ChildGraph<V,E> node){
+		if (!children.contains(node))
+			children.add(node);
+	}
 
 
 	@Override
@@ -52,13 +70,26 @@ public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 		this.nodeType = nodeType;
 	}
 
-	public Graph<V, E> getSkeleton() {
+	public Skeleton<V, E> getSkeleton() {
 		return skeleton;
 	}
 
-	public void setSkeleton(Graph<V, E> skeleton) {
+	public void setSkeleton(Skeleton<V, E> skeleton) {
 		this.skeleton = skeleton;
 	}
+
+
+
+	public List<ChildGraph<V, E>> getChildren() {
+		return children;
+	}
+
+
+
+	public void setChildren(List<ChildGraph<V, E>> children) {
+		this.children = children;
+	}
+
 
 	
 }

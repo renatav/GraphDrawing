@@ -2,7 +2,7 @@ package graph.elements;
 
 import java.awt.Dimension;
 
-public interface Vertex{
+public interface Vertex {
 	
 	
 	Dimension getSize();

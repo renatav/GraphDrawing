@@ -4,11 +4,122 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.operations.GraphOperations;
+import graph.traversal.DijkstraAlgorithm;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Splitting<V extends Vertex, E extends Edge<V>> {
+
+	/**
+	 * A cut vertex is a vertex whose removal would disconnect the remaining graph
+	 * @param graph
+	 * @return
+	 */
+	public List<V> findAllCutVertices(Graph<V,E> graph){
+		List<V> ret = new ArrayList<V>();
+		List<V> excluding = new ArrayList<V>();
+
+		for (V v :  graph.getVertices()){
+			excluding.clear();
+			excluding.add(v);
+			if (!graph.isConnected(excluding))
+				ret.add(v);
+		}
+		return ret;
+	}
+
+
+	public List<Block<V,E>> findAllBlocks(Graph<V,E> graph){
+
+		return findAllBlocks(graph, findAllCutVertices(graph));
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Block<V,E>> findAllBlocks(Graph<V,E> graph, List<V> cutVertices){
+
+		List<Block<V,E>> ret = new ArrayList<Block<V,E>>();
+		List<E> coveredEdges = new ArrayList<E>();
+		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<>(graph);
+
+		for (V v : cutVertices){
+			for (E e : graph.allEdges(v)){
+				if (coveredEdges.contains(e))
+					continue;
+				coveredEdges.add(e);
+				Block<V,E> block = new Block<V,E>(graph);
+				block.addVertex(v);
+				block.addEdge(e);
+				V other = e.getDestination() == v ? e.getOrigin() : e.getDestination();
+				formBlock(v, other, cutVertices, coveredEdges, new ArrayList<V>(), block, graph, dijkstra);
+				ret.add(block);
+			}
+		}
+
+		return ret;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void formBlock(V startVertex, V current, List<V> cutVertices,  List<E> coveredEdges,
+			 List<V> coveredVertices, Block<V, E> block, Graph<V,E> graph, DijkstraAlgorithm<V,E> dijkstra){
+
+		
+		if (coveredVertices.contains(current))
+			return;
+		coveredVertices.add(current);
+
+		block.addVertex(current);
+		
+		
+		for (E e : edgesInBlock(startVertex, current, graph, cutVertices, dijkstra)){
+			if (coveredEdges.contains(e))
+				continue;
+			coveredEdges.add(e);
+			block.addEdge(e);
+			V other = e.getDestination() == current ? e.getOrigin() : e.getDestination();
+			formBlock(startVertex, other, cutVertices, coveredEdges, coveredVertices, block, graph, dijkstra);
+		}
+
+	}
+
+	/**
+	 * If current vertex is a cut vertex, the method 
+	 * tries to find a path between the next vertex, connected to the current one 
+	 * and the starting point (cut vertex being processed)
+	 * Paths cannot include the current current cut vertex 
+	 * (those edges are contained by a different block)
+	 * @param startVertex
+	 * @param current
+	 * @param graph
+	 * @param cutVertices
+	 * @param dijkstra
+	 * @return
+	 */
+	private List<E> edgesInBlock(V startVertex, V current, Graph<V,E> graph,
+			List<V> cutVertices, DijkstraAlgorithm<V, E> dijkstra){
+		
+		
+		if (!cutVertices.contains(current))
+			return graph.allEdges(current);
+		
+		List<E> ret = new ArrayList<E>();
+		if (current != startVertex){
+			List<V> excluding = new ArrayList<V>();
+			excluding.add(current);
+			for (E e : graph.allEdges(current)){
+				V other = e.getDestination() == current ? e.getOrigin() : e.getDestination();
+				if (other == startVertex){
+					ret.add(e);
+					continue;
+				}
+				if (dijkstra.getPath(other, startVertex, excluding) != null)
+					ret.add(e);
+			}
+		}
+			
+		return ret;
+	}
+
 
 
 	/**
@@ -184,8 +295,6 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 				ret.add(splitPair1);
 		}
 		return ret;
-
-
 	}
 
 

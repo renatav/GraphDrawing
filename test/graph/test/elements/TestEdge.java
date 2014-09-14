@@ -8,6 +8,10 @@ public class TestEdge implements Edge<TestVertex>{
 	private TestVertex origin, destination;
 	private int weight = 1;
 	
+	public TestEdge(){
+		
+	}
+	
 	public TestEdge(TestVertex origin, TestVertex destination) {
 		super();
 		this.origin = origin;
@@ -68,4 +72,16 @@ public class TestEdge implements Edge<TestVertex>{
 	public int getWeight() {
 		return weight;
 	}
+
+	@Override
+	public void setOrigin(TestVertex origin) {
+		this.origin = origin;
+		
+	}
+
+	@Override
+	public void setDestination(TestVertex destination) {
+		this.destination = destination;
+	}
+
 }

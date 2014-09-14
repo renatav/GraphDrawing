@@ -36,4 +36,15 @@ public class InterlacementGraphEdge<V extends Vertex, E extends Edge<V>> impleme
 		return 1;
 	}
 
+	@Override
+	public void setOrigin(InterlacementGraphVertex<V, E> origin) {
+		 this.origin = origin;
+	}
+
+	@Override
+	public void setDestination(InterlacementGraphVertex<V, E> destination) {
+		this.destination = destination;
+		
+	}
+
 }

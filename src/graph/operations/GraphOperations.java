@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GraphOperations<V extends Vertex, E extends Edge<V>> {
 
-
+	
 	public List<V> verticesInCommon(Graph<V,E> graph1, Graph<V,E> graph2){
 
 		List<V> ret = new ArrayList<V>();
@@ -79,5 +79,56 @@ public class GraphOperations<V extends Vertex, E extends Edge<V>> {
 		ret.removeEdge(edge);
 		return ret;
 	}
+	
+	/**
+	 * Forms a cycle from vertices v1...vn in that order
+	 * @param vertices
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Graph<V,E> formCycleGraph(List<V> vertices, Class<?> edgeClass){
+		Graph<V,E> ret = new Graph<V,E>();
+		V current = null, next = null;
+		E edge;
+		for (int i = 0; i < vertices.size() - 1; i++){
+			current = vertices.get(i);
+			next = vertices.get(i + 1);
+			ret.addVertex(current);
+			edge = createNewEdge(current, next, edgeClass);
+			ret.addEdge(edge);
+		}
+		
+		//add the last on and close the cycle
+		
+		if (next == null) //only one vertex
+			next = current;
+		
+		
+		ret.addVertex(next);
+		edge = createNewEdge(next, vertices.get(0), edgeClass);
+		ret.addEdge(edge);
+		
+		return ret;
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	public E createNewEdge(V source, V destination, Class<?> edgeClass){
+		if (edgeClass == null)
+			throw new RuntimeException("Edge class must be provided!");
+		try {
+			E newEdge = (E) edgeClass.newInstance();
+			newEdge.setOrigin(source);
+			newEdge.setDestination(destination);
+			return newEdge;
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
 	
 }

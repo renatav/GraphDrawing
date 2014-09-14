@@ -5,6 +5,9 @@ import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
+
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -44,8 +47,30 @@ public class TestSplitting extends TestCase{
 	TestEdge edge6_2 = new TestEdge(vert1, vert5);
 	TestEdge edge7_2 = new TestEdge(vert3, vert5);
 	
-	Graph<TestVertex, TestEdge> graph, graph2;
+	Graph<TestVertex, TestEdge> graph, graph2, graph3;
 	
+	
+	TestVertex vertA = new TestVertex("A");
+	TestVertex vertB = new TestVertex("B");
+	TestVertex vertC = new TestVertex("C");
+	TestVertex vertD = new TestVertex("D");
+	TestVertex vertE = new TestVertex("E");
+	TestVertex vertF = new TestVertex("F");
+	TestVertex vertG = new TestVertex("G");
+	TestVertex vertH = new TestVertex("H");
+	TestVertex vertI = new TestVertex("I");
+	
+	TestEdge edgeA1 = new TestEdge(vertA, vertB);
+	TestEdge edgeA2 = new TestEdge(vertA, vertC);
+	TestEdge edgeA3 = new TestEdge(vertB, vertC);
+	TestEdge edgeA4 = new TestEdge(vertC, vertD);
+	TestEdge edgeA5 = new TestEdge(vertC, vertE);
+	TestEdge edgeA6 = new TestEdge(vertD, vertE);
+	TestEdge edgeA7 = new TestEdge(vertD, vertF);
+	TestEdge edgeA8 = new TestEdge(vertE, vertG);
+	TestEdge edgeA9 = new TestEdge(vertG, vertH);
+	TestEdge edgeA10 = new TestEdge(vertH, vertI);
+	TestEdge edgeA11 = new TestEdge(vertG, vertI);
 	
 	@Override
 	public void setUp(){
@@ -55,10 +80,14 @@ public class TestSplitting extends TestCase{
 		graph2 = new Graph<>();
 		graph2.addVertex(vert1, vert2, vert3, vert4, vert5);
 		graph2.addEdge(edge1_2, edge2_2, edge3_2, edge4_2, edge5_2, edge6_2, edge7_2);
+		
+		graph3 = new Graph<>();
+		graph3.addVertex(vertA, vertB, vertC, vertD, vertE, vertF, vertG, vertH, vertI);
+		graph3.addEdge(edgeA1, edgeA2, edgeA3, edgeA4, edgeA5, edgeA6, edgeA7, edgeA8, edgeA9, edgeA10, edgeA11);
 	}
 	
 	@Test
-	public void test(){
+	public void testSplittingPairs(){
 		Splitting<TestVertex, TestEdge> splitting = new Splitting<TestVertex,TestEdge>();
 		//System.out.println(splitting.findAllSplitPairs(graph2));
 		SplitPair<TestVertex, TestEdge> pair1 = new SplitPair<TestVertex, TestEdge>(vert1, vert4);
@@ -77,5 +106,20 @@ public class TestSplitting extends TestCase{
 		
 		System.out.println(splitting.maximalSplitPairs(graph2, edge));
 	}
-
+	
+	@Test
+	public void testSplittingCutVertices(){
+		Splitting<TestVertex, TestEdge> splitting = new Splitting<TestVertex,TestEdge>();
+		List<TestVertex> cutVertices = splitting.findAllCutVertices(graph3);
+		assertEquals(true, cutVertices.contains(vertC));
+		assertEquals(true, cutVertices.contains(vertD));
+		assertEquals(true, cutVertices.contains(vertE));
+		assertEquals(true, cutVertices.contains(vertG));
+		assertEquals(4, cutVertices.size());
+		
+		System.out.println(splitting.findAllCutVertices(graph3));
+		System.out.println(splitting.findAllBlocks(graph3));
+		
+		//TODO Napraviti onaj veliki grapf sa 17 cvorova iz pdf-a chapter 5 pa testirati
+	}
 }
