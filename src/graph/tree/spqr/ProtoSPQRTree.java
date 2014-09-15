@@ -16,34 +16,23 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<TreeNode<V,TreeEdgeWithContent<V,E>>, Edge<TreeNode<V,TreeEdgeWithContent<V,E>>>>{
+public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V,E>{
 
 	/**
 	 * Original graph - reference edge
 	 */
 	private Graph<V,E> gPrim;
 
-	private E referenceEdge;
 
-	/**
-	 * Original graph. Must be biconnected
-	 */
-	private Graph<V,E> graph; 
-
-	/**
-	 * Root of the tree
-	 */
-	private TreeNode<V,TreeEdgeWithContent<V,E>> root;
 	
 	private Logger log = Logger.getLogger(ProtoSPQRTree.class);
 
-	//TODO mozda napraviti neki AbstractTree
 
-	public ProtoSPQRTree(Graph<V,E> graph, E referenceEdge) throws CannotBeAppliedException{
+	public ProtoSPQRTree(E referenceEdge, Graph<V, E> graph) throws CannotBeAppliedException{
+		super(referenceEdge, graph);
+		
 		if (!graph.isBiconnected())
 			throw new CannotBeAppliedException("Cannot construct SPQR tree for provided graph. Graph must be biconnected.");
-		this.referenceEdge = referenceEdge;
-		this.graph = graph;
 		GraphOperations<V, E> operations = new GraphOperations<>();
 		gPrim = operations.removeEdgeFromGraph(graph, referenceEdge);
 		
@@ -133,15 +122,16 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 			for (int i = 0; i < edges.size(); i++ ){
 				childReferenceEdge = edges.get(i);
 				currentBlock = blocks.get(i);
-				ChildGraph<V, TreeEdgeWithContent<V,E>> child= new ChildGraph<V, TreeEdgeWithContent<V,E>>();
+				Skeleton<V, TreeEdgeWithContent<V,E>> childSkeleton= new Skeleton<V, TreeEdgeWithContent<V,E>>();
 				for (V v : currentBlock.getVertices())
-					child.addVertex(v);
+					childSkeleton.addVertex(v);
 				for (E e : currentBlock.getEdges())
-					child.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
-				child.setReferenceEdge(childReferenceEdge);
-				child.addEdge(childReferenceEdge);
-				log.info("Adding child graph: " + child);
-				root.getChildren().add(child);
+					childSkeleton.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
+				childSkeleton.addEdge(childReferenceEdge);
+				TreeNode<V,TreeEdgeWithContent<V,E>> childNode = new TreeNode<V,TreeEdgeWithContent<V,E>>(childReferenceEdge, childSkeleton);
+				
+				log.info("Adding child node: " + childNode);
+				root.getChildren().add(childNode);
 			}
 		}
 
@@ -201,19 +191,19 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				 * C1...Ck by adding edge ei for i=1...k
 				 */
 				for (int i = 0; i < components.size(); i++){
-					ChildGraph<V, TreeEdgeWithContent<V,E>> child = new ChildGraph<>();
+					Skeleton<V, TreeEdgeWithContent<V,E>> childSkeleton= new Skeleton<V, TreeEdgeWithContent<V,E>>();
 					SplitComponent<V, E> splitComponent = components.get(i);
 					TreeEdgeWithContent<V, E> childReferenceEdge = root.getSkeleton().getEdges().get(i);
 					for (V v : splitComponent.getVertices())
-						child.addVertex(v);
+						childSkeleton.addVertex(v);
 					for (E e : splitComponent.getEdges())
-						child.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
+						childSkeleton.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
+					childSkeleton.addEdge(childReferenceEdge);
 					
-					child.setReferenceEdge(childReferenceEdge);
+					TreeNode<V,TreeEdgeWithContent<V,E>> childNode = new TreeNode<V,TreeEdgeWithContent<V,E>>(childReferenceEdge, childSkeleton);
 					
-					child.addEdge(childReferenceEdge);
-					log.info("Adding child: " + child);
-					root.getChildren().add(child);
+					log.info("Adding child: " + childNode);
+					root.getChildren().add(childNode);
 				}
 			}
 
@@ -264,19 +254,18 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				 */
 				
 				for (int i = 0; i < uGraphs.size(); i++){
-					ChildGraph<V, TreeEdgeWithContent<V,E>> child = new ChildGraph<>();
+					Skeleton<V, TreeEdgeWithContent<V,E>> childSkeleton= new Skeleton<V, TreeEdgeWithContent<V,E>>();
 					Graph<V, E> uGraph = uGraphs.get(i);
 					TreeEdgeWithContent<V, E> childReferenceEdge = edges.get(i);
 					for (V v : uGraph.getVertices())
-						child.addVertex(v);
+						childSkeleton.addVertex(v);
 					for (E e : uGraph.getEdges())
-						child.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
-					
-					child.setReferenceEdge(childReferenceEdge);
-					
-					child.addEdge(childReferenceEdge);
-					log.info("Adding child: " + child);
-					root.getChildren().add(child);
+						childSkeleton.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
+					childSkeleton.addEdge(childReferenceEdge);
+					TreeNode<V,TreeEdgeWithContent<V,E>> childNode = new TreeNode<V,TreeEdgeWithContent<V,E>>(childReferenceEdge, childSkeleton);
+				
+					log.info("Adding child: " + childNode);
+					root.getChildren().add(childNode);
 				}
 				
 				
