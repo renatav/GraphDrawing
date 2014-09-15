@@ -71,6 +71,7 @@ public class TestSplitting extends TestCase{
 	TestEdge edgeA9 = new TestEdge(vertG, vertH);
 	TestEdge edgeA10 = new TestEdge(vertH, vertI);
 	TestEdge edgeA11 = new TestEdge(vertG, vertI);
+	Splitting<TestVertex, TestEdge> splitting;
 	
 	@Override
 	public void setUp(){
@@ -84,18 +85,19 @@ public class TestSplitting extends TestCase{
 		graph3 = new Graph<>();
 		graph3.addVertex(vertA, vertB, vertC, vertD, vertE, vertF, vertG, vertH, vertI);
 		graph3.addEdge(edgeA1, edgeA2, edgeA3, edgeA4, edgeA5, edgeA6, edgeA7, edgeA8, edgeA9, edgeA10, edgeA11);
+		
+	   splitting = new Splitting<TestVertex,TestEdge>();
 	}
 	
 	@Test
 	public void testSplittingPairs(){
-		Splitting<TestVertex, TestEdge> splitting = new Splitting<TestVertex,TestEdge>();
 		//System.out.println(splitting.findAllSplitPairs(graph2));
 		SplitPair<TestVertex, TestEdge> pair1 = new SplitPair<TestVertex, TestEdge>(vert1, vert4);
 		
 		assertTrue(splitting.testSplitComponents(splitting.findAllSplitComponents(graph2, pair1), pair1));
 		assertTrue(splitting.testSplitComponents(splitting.findAllSplitComponents(graph, pair1), pair1));
 		
-//		System.out.println(splitting.splitGraph(splitting.findAllSplitComponents(graph2, pair1), edge7_2));
+		//System.out.println(splitting.splitGraph(splitting.findAllSplitComponents(graph2, pair1), edge7_2));
 		
 		SplitPair<TestVertex, TestEdge> split1 = new SplitPair<TestVertex, TestEdge>(vert1, vert3);
 		SplitPair<TestVertex, TestEdge> split2 = new SplitPair<TestVertex, TestEdge>(vert1, vert4);
@@ -104,12 +106,12 @@ public class TestSplitting extends TestCase{
 		assertTrue(splitting.splitPairIsDominantedBy(graph2, split1, split2, edge));
 		assertFalse(splitting.splitPairIsDominantedBy(graph2, split2, split1, edge));
 		
-		System.out.println(splitting.maximalSplitPairs(graph2, edge));
+		//System.out.println(splitting.maximalSplitPairs(graph2, edge));
 	}
 	
 	@Test
 	public void testSplittingCutVertices(){
-		Splitting<TestVertex, TestEdge> splitting = new Splitting<TestVertex,TestEdge>();
+		
 		List<TestVertex> cutVertices = splitting.findAllCutVertices(graph3);
 		assertEquals(true, cutVertices.contains(vertC));
 		assertEquals(true, cutVertices.contains(vertD));
@@ -117,9 +119,32 @@ public class TestSplitting extends TestCase{
 		assertEquals(true, cutVertices.contains(vertG));
 		assertEquals(4, cutVertices.size());
 		
-		System.out.println(splitting.findAllCutVertices(graph3));
-		System.out.println(splitting.findAllBlocks(graph3));
+		//System.out.println(splitting.findAllCutVertices(graph3));
+		//System.out.println(splitting.findAllBlocks(graph3));
 		
 		//TODO Napraviti onaj veliki grapf sa 17 cvorova iz pdf-a chapter 5 pa testirati
+	}
+	
+	@Test
+	public void testMaximalSplit(){
+		graph = new Graph<>();
+		graph.addVertex(vert1, vert2, vert3, vert4, vert5, vert6, vert7, vert8, vert9);
+		TestEdge edge45 = new TestEdge(vert4, vert5);
+		graph.addEdge(new TestEdge(vert1, vert2), new TestEdge(vert1, vert3), new TestEdge(vert1, vert4), new TestEdge(vert1, vert6),
+				new TestEdge(vert2, vert3), new TestEdge(vert2, vert5), new TestEdge(vert2, vert9), new TestEdge(vert4, vert6),
+				edge45, new TestEdge(vert5, vert9), new TestEdge(vert6, vert7), new TestEdge(vert6, vert8),
+				new TestEdge(vert7, vert8), new TestEdge(vert7, vert9), new TestEdge(vert8, vert9));
+		
+		
+		for (SplitPair<TestVertex, TestEdge> sp : splitting.findAllSplitPairs(graph)){
+			assertTrue(splitting.testSplitComponents(splitting.findAllSplitComponents(graph, sp), sp));
+		}
+		
+		List<SplitPair<TestVertex, TestEdge>> maxSplittingPairs = splitting.maximalSplitPairs(graph, edge45);
+		assertTrue(maxSplittingPairs.contains(new SplitPair<TestVertex, TestEdge>(vert1, vert2)));
+		assertTrue(maxSplittingPairs.contains(new SplitPair<TestVertex, TestEdge>(vert4, vert6)));
+		assertTrue(maxSplittingPairs.contains(new SplitPair<TestVertex, TestEdge>(vert5, vert9)));
+		
+		
 	}
 }

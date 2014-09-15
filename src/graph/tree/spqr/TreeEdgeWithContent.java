@@ -10,6 +10,10 @@ public class TreeEdgeWithContent<V extends Vertex, E extends Edge<V>> implements
 	private Graph<V,E> content;
 	
 	
+	public TreeEdgeWithContent() {
+		super();
+	}
+
 	public TreeEdgeWithContent(V origin, V destination) {
 		super();
 		this.origin = origin;
@@ -60,10 +64,14 @@ public class TreeEdgeWithContent<V extends Vertex, E extends Edge<V>> implements
 	}
 
 
-
-
 	public void setContent(Graph<V, E> content) {
 		this.content = content;
+	}
+
+	@Override
+	public String toString() {
+		return "TreeEdgeWithContent [origin=" + origin + ", destination="
+				+ destination + ", content=" + content + "]";
 	}
 	
 

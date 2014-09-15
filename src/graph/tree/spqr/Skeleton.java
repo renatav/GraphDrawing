@@ -36,6 +36,13 @@ public class Skeleton<V extends Vertex,E extends Edge<V>> extends Graph<V,E>{
 		this.virtualEdges = virtualEdges;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void addEdge(E e, boolean virtual){
+		addEdge(e);
+		if (virtual)
+			addVirualEdge(e);
+	}
+	
 	public void addVirualEdge(E e){
 		if (!virtualEdges.contains(e))
 			virtualEdges.add(e);
@@ -51,6 +58,13 @@ public class Skeleton<V extends Vertex,E extends Edge<V>> extends Graph<V,E>{
 
 	public void setVirtualEdges(List<E> virtualEdges) {
 		this.virtualEdges = virtualEdges;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Skeleton [vertices="+ vertices + ",\n edges=" + edges + ",\n Virtual edges: " +
+				virtualEdges + "]";
 	}
 
 	

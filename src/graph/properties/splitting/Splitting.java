@@ -61,16 +61,16 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 	@SuppressWarnings("unchecked")
 	private void formBlock(V startVertex, V current, List<V> cutVertices,  List<E> coveredEdges,
-			 List<V> coveredVertices, Block<V, E> block, Graph<V,E> graph, DijkstraAlgorithm<V,E> dijkstra){
+			List<V> coveredVertices, Block<V, E> block, Graph<V,E> graph, DijkstraAlgorithm<V,E> dijkstra){
 
-		
+
 		if (coveredVertices.contains(current))
 			return;
 		coveredVertices.add(current);
 
 		block.addVertex(current);
-		
-		
+
+
 		for (E e : edgesInBlock(startVertex, current, graph, cutVertices, dijkstra)){
 			if (coveredEdges.contains(e))
 				continue;
@@ -97,11 +97,11 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	 */
 	private List<E> edgesInBlock(V startVertex, V current, Graph<V,E> graph,
 			List<V> cutVertices, DijkstraAlgorithm<V, E> dijkstra){
-		
-		
+
+
 		if (!cutVertices.contains(current))
 			return graph.allEdges(current);
-		
+
 		List<E> ret = new ArrayList<E>();
 		if (current != startVertex){
 			List<V> excluding = new ArrayList<V>();
@@ -116,7 +116,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 					ret.add(e);
 			}
 		}
-			
+
 		return ret;
 	}
 
@@ -159,23 +159,42 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	@SuppressWarnings("unchecked")
 	public List<SplitComponent<V, E>> findAllSplitComponents(Graph<V,E> graph, SplitPair<V, E> splitPair){
 
+		
 		List<E> coveredEdges = new ArrayList<E>();
 		List<SplitComponent<V, E>> ret = new ArrayList<SplitComponent<V,E>>();
 		V u = splitPair.getU();
 		V v = splitPair.getV();
-		for (E e : graph.allEdges(u)){
+		//add edge
+
+		List<E> edges =  graph.edgeesBetween(u, v);
+		
+		for (E e : edges){ //TODO sta ako stvarno ima vise izmedju, da li ovako, ili ne moze...?
 			SplitComponent<V, E> component = new SplitComponent<>(splitPair, graph);
+			component.addVertex(v);
+			component.addVertex(u);
+			component.addEdge(e);
+			coveredEdges.add(e);
 			ret.add(component);
+		}
+
+		for (E e : graph.allEdges(u)){
+			if (coveredEdges.contains(e))
+				continue;
+			SplitComponent<V, E> component = new SplitComponent<>(splitPair, graph);
+			
 			coveredEdges.add(e);
 			component.addVertex(u);
 			component.addEdge(e);
 			V other = e.getDestination() == u ? e.getOrigin() : e.getDestination();
-			if (other == v) //just add split pair vertices and the edge
-				component.addVertex(v);
+			if (other == v) //just add split pair vertices and the edge{
+				continue; 
 
-			else
+			else{
 				formSplitComponent(u, v, other, coveredEdges, new ArrayList<V>(), component, graph);
+			}
+			ret.add(component);
 		}
+		
 
 		return ret;
 
@@ -194,6 +213,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 			if (coveredEdges.contains(e))
 				continue;
 
+			coveredEdges.add(e);
 			component.addEdge(e);
 			V other = e.getDestination() == current ? e.getOrigin() : e.getDestination();
 			if (other != u && other != v){
@@ -249,7 +269,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 		return operations.union(allComponentsNotContainingEdge);
 
 	}
-	
+
 	public Graph<V,E> splitGraph(SplitPair<V,E> splitPair, E edge, Graph<V,E> graph){
 		return splitGraph(findAllSplitComponents(graph, splitPair), edge);
 	}
@@ -267,7 +287,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 		Graph<V,E> splitGraph1 = splitGraph(findAllSplitComponents(graph, dominanted), edge);
 		Graph<V,E> splitGraph2 = splitGraph(findAllSplitComponents(graph, dominant), edge);
-
+		
 		return operations.isProperSubgraph(splitGraph2, splitGraph1);
 
 	}
@@ -285,9 +305,14 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 		List<SplitPair<V,E>> splitPairs =  findAllSplitPairs(graph);
 
+		SplitPair<V, E> edgeSplit = new SplitPair<V,E>(edge.getOrigin(), edge.getDestination());
 		for (SplitPair<V, E> splitPair1 : splitPairs){
+			if (splitPair1.equals(edgeSplit))
+				continue;
 			boolean maximal = true;
 			for (SplitPair<V, E> splitPair2 : splitPairs){
+				if (splitPair2.equals(edgeSplit))
+					continue;
 				if (splitPair1 == splitPair2)
 					continue;
 				if (splitPairIsDominantedBy(graph, splitPair1, splitPair2, edge)){

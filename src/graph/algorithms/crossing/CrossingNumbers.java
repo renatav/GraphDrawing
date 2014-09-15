@@ -61,5 +61,15 @@ public class CrossingNumbers<V extends Vertex, E extends Edge<V>> {
 	}
 
 
+	public Graph<V, E> getGraph() {
+		return graph;
+	}
+
+
+	public void setGraph(Graph<V, E> graph) {
+		this.graph = graph;
+	}
+
+
 
 }

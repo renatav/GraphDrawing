@@ -133,13 +133,16 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 */
 	public List<E> edgeesBetween (V v1, V v2){
 		List<E> ret = new ArrayList<E>();
+		
 		for (E e : adjacentLists.get(v1))
 			if (e.getDestination() == v2)
 				ret.add(e);
 		if (!directed)
 			for (E e : adjacentLists.get(v2))
-				if (e.getDestination() == v1)
+				if (e.getDestination() == v1){
 					ret.add(e);
+				}
+		
 		return ret;
 	}
 

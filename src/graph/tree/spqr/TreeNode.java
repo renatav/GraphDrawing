@@ -91,5 +91,11 @@ public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 	}
 
 
+	@Override
+	public String toString() {
+		return "TreeNode [Node type =" + nodeType + ",\n skeleton=" + skeleton +"]";
+	}
+
+
 	
 }

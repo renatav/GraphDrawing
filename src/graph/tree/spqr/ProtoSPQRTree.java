@@ -3,6 +3,7 @@ package graph.tree.spqr;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.exception.CannotBeAppliedException;
 import graph.operations.GraphOperations;
 import graph.properties.splitting.Block;
 import graph.properties.splitting.SplitComponent;
@@ -12,6 +13,8 @@ import graph.properties.splitting.Splitting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<TreeNode<V,TreeEdgeWithContent<V,E>>, Edge<TreeNode<V,TreeEdgeWithContent<V,E>>>>{
 
@@ -31,21 +34,32 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 	 * Root of the tree
 	 */
 	private TreeNode<V,TreeEdgeWithContent<V,E>> root;
+	
+	private Logger log = Logger.getLogger(ProtoSPQRTree.class);
 
 	//TODO mozda napraviti neki AbstractTree
 
-	public ProtoSPQRTree(Graph<V,E> graph, E referenceEdge){
+	public ProtoSPQRTree(Graph<V,E> graph, E referenceEdge) throws CannotBeAppliedException{
+		if (!graph.isBiconnected())
+			throw new CannotBeAppliedException("Cannot construct SPQR tree for provided graph. Graph must be biconnected.");
 		this.referenceEdge = referenceEdge;
 		this.graph = graph;
 		GraphOperations<V, E> operations = new GraphOperations<>();
 		gPrim = operations.removeEdgeFromGraph(graph, referenceEdge);
+		
+		log.info("Created G' graph");
+		
 		constructTree();
+		
+		
 
 	}
 
 	@SuppressWarnings("unchecked")
 	private void constructTree(){
 
+		log.info("Constructing Proto-SPQR tree");
+		
 		Splitting<V, E> splitting = new Splitting<>();
 		GraphOperations<V, TreeEdgeWithContent<V,E>> operations = new GraphOperations<>();
 		V s = referenceEdge.getOrigin();
@@ -53,6 +67,9 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 
 		//trivial case
 		if (gPrimIsASingleEdge()){ //is g prim is a single edge
+			
+			log.info("Trivial case: creating Q root node");
+			
 			Skeleton<V,TreeEdgeWithContent<V,E>> skeleton = new Skeleton<>();
 			
 			for (V v : graph.getVertices())
@@ -66,19 +83,44 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 		}
 		//series case
 		else if (!gPrim.isBiconnected()){ //g prim is not a single edge and is not biconnected
+			
+			log.info("Series case: creating S root node");
+			
 			List<V> cutVertices = splitting.findAllCutVertices(gPrim);
+			
+			log.info("Found cut vertices og G': " + cutVertices);
+			
 			List<Block<V, E>> blocks = splitting.findAllBlocks(gPrim, cutVertices);
+			
+			log.info("Split G' into blocks: " +blocks);
+			
 			List<V> vertices = new ArrayList<>(cutVertices);
+			
 			organizeBlocksAndVertices(s, t, vertices, blocks);
 
 			//create root
 			Graph<V,TreeEdgeWithContent<V,E>> cycle = operations.formCycleGraph(vertices, TreeEdgeWithContent.class);
-			Skeleton<V, TreeEdgeWithContent<V,E>> rootSkeleton = new Skeleton<>(cycle.getVertices(), cycle.getEdges());
+			
+			//edges of the skeleton represent the blocks - ei represent Bi
+			List<TreeEdgeWithContent<V, E>> edges = new ArrayList<TreeEdgeWithContent<V,E>>();
+			TreeEdgeWithContent<V, E> treeEdge;
+			
+			for (int i = 0; i < vertices.size() - 1; i++){
+				treeEdge = cycle.edgeesBetween(vertices.get(i), vertices.get(i+1)).get(0);
+				treeEdge.setContent(blocks.get(i));
+				edges.add(treeEdge);
+			}
+			
+			
+			Skeleton<V, TreeEdgeWithContent<V,E>> rootSkeleton = new Skeleton<>(vertices, edges);
 			TreeEdgeWithContent<V,E> virtualEdge = cycle.edgeesBetween(s, t).get(0);
-			rootSkeleton.addVirualEdge(virtualEdge);
+			rootSkeleton.addEdge(virtualEdge, true);
 			root = new TreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.S, rootSkeleton);
 			addVertex(root);
+			
+			log.info("Constructed tree root: " + root);
 
+			log.info("Creating children...");
 			//now create its children
 
 			/*
@@ -87,24 +129,26 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 			 * ei is an edge between vi-1 and vi
 			 */
 			TreeEdgeWithContent<V, E> childReferenceEdge;
-			Block<V,E> current;
-			for (int i = 0; i < blocks.size(); i++ ){
-				E edge = graph.edgeesBetween(vertices.get(i), vertices.get(i+1)).get(0);
-				childReferenceEdge = new TreeEdgeWithContent<V,E> (edge.getOrigin(), edge.getDestination());
+			Block<V,E> currentBlock;
+			for (int i = 0; i < edges.size(); i++ ){
+				childReferenceEdge = edges.get(i);
+				currentBlock = blocks.get(i);
 				ChildGraph<V, TreeEdgeWithContent<V,E>> child= new ChildGraph<V, TreeEdgeWithContent<V,E>>();
-				current = blocks.get(i);
-				for (V v : current.getVertices())
+				for (V v : currentBlock.getVertices())
 					child.addVertex(v);
-				for (E e : current.getEdges())
+				for (E e : currentBlock.getEdges())
 					child.addEdge(new TreeEdgeWithContent<V, E>(e.getOrigin(), e.getDestination()));
 				child.setReferenceEdge(childReferenceEdge);
-				
 				child.addEdge(childReferenceEdge);
+				log.info("Adding child graph: " + child);
 				root.getChildren().add(child);
 			}
 		}
 
 		else{
+			
+			log.info("G' is biconnected, finding split pairs");
+			
 			//check if vertices s and t are a split pair of G'
 			List<SplitPair<V, E>> splitPairs = splitting.findAllSplitPairs(gPrim);
 			SplitPair<V,E> stSplit = new SplitPair<V,E>(s, t);
@@ -115,14 +159,21 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 					break;
 				}
 			
+			log.info("Found split pairs: " + splitPairs);
+			log.info("{s,t} is a split pair: " + isSplitPair);
+			
 			
 			List<SplitComponent<V, E>> components = null;
-			if (isSplitPair)
+			if (isSplitPair){
 				components = splitting.findAllSplitComponents(gPrim, stSplit);
+				log.info("Found split components: " + components);
+			}
 			
 			//parallel case
 			if (components != null && components.size() >= 2){
 			
+				log.info("Parallel case: creating P root node");
+				
 				//firstly, create the root node
 				
 				/*
@@ -142,6 +193,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				//create root
 				root = new TreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.P, rootSkeleton);
 				addVertex(root);
+				
 				
 				//add children
 				
@@ -169,6 +221,9 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 			//with two or more components
 			else{
 				
+				log.info("Rigid case: creating R root node");
+				
+				
 				//The vertices in the skeleton are s,t ad all {si, ti} from split pairs.
 				//Skeleton contains st edge (virtual) and edges ei which connect si to ti
 				//Each ei represents subgraph Ui - split graph
@@ -177,6 +232,9 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				
 				E stEdge = graph.edgeesBetween(s, t).get(0);
 				List<SplitPair<V,E>> maxSplittingPairs = splitting.maximalSplitPairs(graph, stEdge);
+				
+				log.info("Maximal splitting pairs: " + maxSplittingPairs);
+				
 				List<Graph<V, E>> uGraphs = new ArrayList<Graph<V,E>>();
 				List<TreeEdgeWithContent<V, E>> edges = new ArrayList<TreeEdgeWithContent<V, E>>();
 				for (SplitPair<V, E> splitPair : maxSplittingPairs){
@@ -225,6 +283,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				
 			}
 		}
+		log.info("Finished constructing Proto-SPQR tree");
 	}
 
 	/**
@@ -235,6 +294,8 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 	 */
 	private void organizeBlocksAndVertices(V s, V t, List<V> vertices, List<Block<V, E>> blocks){
 
+		log.info("Organizing vertices and blocks");
+		
 		/*
 		 * If there v1...vk-1 are cut vertices, there are k blocks, b1 to bk
 		 * Since graph is biconnected
@@ -279,7 +340,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 			Collections.swap(blocks, currentIndex++, blocks.indexOf(currentBlock));
 
 		}
-
+		
 
 	}
 
