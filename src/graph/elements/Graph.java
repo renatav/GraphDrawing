@@ -42,8 +42,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		adjacentLists = new HashMap<V, LinkedList<E>>();
 		vertexByContentMap = new HashMap<Object,V>();
 	}
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	public Graph(List<V> vertices, List<E> edges){
 		this();
@@ -51,7 +51,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			addVertex(v);
 		for (E e : edges)
 			addEdge(e);
-		
+
 	}
 
 	public Graph( boolean directed){
@@ -62,14 +62,16 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public boolean hasVertex(V v){
 		return vertices.contains(v);
 	}
-	
+
 
 	@SuppressWarnings("unchecked")
 	public void addVertex(V...vert){
 		for (V v : vert){
-			vertices.add(v);
-			adjacentLists.put(v, new LinkedList<E>());
-			vertexByContentMap.put(v.getContent(), v);
+			if (!vertices.contains(v)){
+				vertices.add(v);
+				adjacentLists.put(v, new LinkedList<E>());
+				vertexByContentMap.put(v.getContent(), v);
+			}
 		}
 	}
 
@@ -104,7 +106,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				edges.add(e);
 				adjacentLists.get(e.getDestination()).add(e);
 			}
-			
+
 		}
 	}
 
@@ -133,7 +135,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 */
 	public List<E> edgeesBetween (V v1, V v2){
 		List<E> ret = new ArrayList<E>();
-		
+
 		for (E e : adjacentLists.get(v1))
 			if (e.getDestination() == v2)
 				ret.add(e);
@@ -142,7 +144,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				if (e.getDestination() == v1){
 					ret.add(e);
 				}
-		
+
 		return ret;
 	}
 
@@ -308,7 +310,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 					continue;
 				paths.clear();
 				if (dijkstra.getPath(v1, v2) == null); 
-					return false;
+				return false;
 			}
 		return true;
 	}
@@ -373,7 +375,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public V getVertexByContent(Object content){
 		return vertexByContentMap.get(content);
 	}
-	
+
 
 
 	public List<V> getVertices() {

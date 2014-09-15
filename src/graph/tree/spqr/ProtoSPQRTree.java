@@ -188,12 +188,11 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				}
 				//add virtual edge
 				TreeEdgeWithContent<V, E> stEdge = new TreeEdgeWithContent<V,E>(s,t);
-				rootSkeleton.addEdge(stEdge);
-				rootSkeleton.addVirualEdge(stEdge);
+				rootSkeleton.addEdge(stEdge, true);
 				//create root
 				root = new TreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.P, rootSkeleton);
 				addVertex(root);
-				
+				log.info("Create root node: " + root);
 				
 				//add children
 				
@@ -213,6 +212,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 					child.setReferenceEdge(childReferenceEdge);
 					
 					child.addEdge(childReferenceEdge);
+					log.info("Adding child: " + child);
 					root.getChildren().add(child);
 				}
 			}
@@ -250,21 +250,19 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				
 				
 				TreeEdgeWithContent<V, E> stTreeEdge = new TreeEdgeWithContent<V,E>(s,t);
-				rootSkeleton.addEdge(stTreeEdge);
-				rootSkeleton.addVirualEdge(stTreeEdge);
+				rootSkeleton.addEdge(stTreeEdge, true);
 				
 				root = new TreeNode<>(NodeType.R, rootSkeleton);
 				addVertex(root);
 				
+				log.info("Create root node: " + root);
+				
 				//create children
 				/*
 				 * children are defined by the graphs Gi, constructed from Ui by
-				 * adding edge ei				 
+				 * adding edge ei	
 				 */
-				/*
-				 * Children are defined by graphs G1...Gk constructed from
-				 * C1...Ck by adding edge ei for i=1...k
-				 */
+				
 				for (int i = 0; i < uGraphs.size(); i++){
 					ChildGraph<V, TreeEdgeWithContent<V,E>> child = new ChildGraph<>();
 					Graph<V, E> uGraph = uGraphs.get(i);
@@ -277,6 +275,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 					child.setReferenceEdge(childReferenceEdge);
 					
 					child.addEdge(childReferenceEdge);
+					log.info("Adding child: " + child);
 					root.getChildren().add(child);
 				}
 				
@@ -326,6 +325,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 
 		while (true){
 			currentVertex = otherVertexInBlock(currentBlock, previousVertex, vertices);
+			System.out.println(currentVertex);
 			Collections.swap(vertices, currentIndex, vertices.indexOf(currentVertex));
 			List<Block<V,E>> blocksContainingVertex = blocksContainingVertex(blocks, currentVertex);
 			if (blocksContainingVertex.size() != 2)
@@ -337,6 +337,7 @@ public class ProtoSPQRTree<V extends Vertex, E extends Edge<V>> extends Graph<Tr
 				}
 			if (currentBlock == lastBlock)
 				break;
+			previousVertex = currentVertex;
 			Collections.swap(blocks, currentIndex++, blocks.indexOf(currentBlock));
 
 		}
