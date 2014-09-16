@@ -26,30 +26,17 @@ public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 	 */
 	private List<TreeNode<V,E>> children;
 	
-	/**
-	 * Reference edge 
-	 */
-	private E referenceEdge;
-	
 	
 	public TreeNode() {
 		super();
 		children = new ArrayList<TreeNode<V,E>>();
 	}
 	
-	public TreeNode(E referenceEdge){
-		this.referenceEdge = referenceEdge;
-	}
 	
 	public TreeNode(NodeType nodeType) {
 		super();
 		this.nodeType = nodeType;
 		children = new ArrayList<TreeNode<V,E>>();
-	}
-	
-	public TreeNode(E referenceEdge, Skeleton<V, E> skeleton) {
-		this(referenceEdge);
-		this.skeleton = skeleton;
 	}
 	
 
@@ -72,13 +59,11 @@ public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 
 	@Override
 	public Dimension getSize() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Object getContent() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -115,17 +100,6 @@ public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 	public String toString() {
 		return "TreeNode [Node type =" + nodeType + ",\n skeleton=" + skeleton +"]";
 	}
-
-
-	public E getReferenceEdge() {
-		return referenceEdge;
-	}
-
-
-	public void setReferenceEdge(E referenceEdge) {
-		this.referenceEdge = referenceEdge;
-	}
-
 
 	
 }

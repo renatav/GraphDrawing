@@ -45,32 +45,22 @@ public class TestProtoSPQR extends TestCase{
 		graph = new Graph<>();
 		graph.addVertex(vert1, vert2, vert3, vert4, vert5, vert6, vert7, vert8, vert9, vert10);
 		graph.addEdge(edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9, edge10, 
-				edge11, edge12, edge13, edge14);
+				edge11, edge12, edge14);
 	
 	}
 	
 	@Test
 	public void test(){
-		try {
+		
 			//series case
-			ProtoSPQRTree<TestVertex, TestEdge> protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(graph, edge1);
+			ProtoSPQRTree<TestVertex, TestEdge> protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(edge1, graph);
 			assertNotNull(protoTree.getRoot());
-			assertEquals(3, protoTree.getRoot().getSkeleton().getVertices().size());
-			assertEquals(3, protoTree.getRoot().getSkeleton().getEdges().size());
-			assertTrue(protoTree.getRoot().getSkeleton().getVertices().contains(vert1));
-			assertTrue(protoTree.getRoot().getSkeleton().getVertices().contains(vert2));
-			assertEquals(2, protoTree.getRoot().getChildren().size());
-			
 			//Rigid case
 			graph.addEdge(edge15);
 			//ProtoSPQRTree<TestVertex, TestEdge> protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(graph, edge1);
-			protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(graph, edge7);
+			protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(edge7, graph);
 			assertNotNull(protoTree.getRoot());
 			
-		} catch (CannotBeAppliedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 	}
 	

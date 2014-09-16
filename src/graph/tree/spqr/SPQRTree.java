@@ -23,18 +23,26 @@ public class SPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V
 		if (!graph.isBiconnected())
 			throw new CannotBeAppliedException("Cannot construct SPQR tree for provided graph. Graph must be biconnected.");
 		
-		/**
-		 *The SPQR tree of a biconnected planar graph G
-		 *consists of a Q node representing the reference edge e whose child is the root of the
-		 *Proto-SPQR tree for G with reference edge e.
-		 */
+		
 		
 		constructTree();
 		
 	}
 	
-	
+	/** Construct the spqr tree
+	 *  The SPQR tree of a biconnected planar graph G
+	 *  consists of a Q node representing the reference edge e whose child is the root of the
+	 *  Proto-SPQR tree for G with reference edge e.
+	 */
+	@SuppressWarnings("unchecked")
 	private void constructTree(){
+		Skeleton<V,TreeEdgeWithContent<V,E>> skeleton = new Skeleton<>();
+		skeleton.addVertex(referenceEdge.getOrigin(), referenceEdge.getDestination());
+		skeleton.addEdge(new TreeEdgeWithContent<V,E>(referenceEdge.getOrigin(), referenceEdge.getDestination()));
+		root = new TreeNode<>(NodeType.Q, skeleton);
+		
+		ProtoSPQRTree<V, E> protoTree = new ProtoSPQRTree<V,E>(referenceEdge, graph);
+		root.addChildNode(protoTree.getRoot());
 		
 	}
 	
