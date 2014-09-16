@@ -78,7 +78,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 				skeleton.addEdge(new TreeEdgeWithContent<V,E>(e.getOrigin(), e.getDestination()));
 
 
-			root = new TreeNode<V,TreeEdgeWithContent<V, E>>(NodeType.Q, skeleton);
+			root = new SPQRTreeNode<V,TreeEdgeWithContent<V, E>>(NodeType.Q, skeleton);
 			addVertex(root);
 		}
 		//series case
@@ -118,7 +118,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 
 			TreeEdgeWithContent<V,E> virtualEdge = new TreeEdgeWithContent<V,E>(s,t);
 			rootSkeleton.addEdge(virtualEdge, true);
-			root = new TreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.S, rootSkeleton);
+			root = new SPQRTreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.S, rootSkeleton);
 			addVertex(root);
 
 			log.info("Constructed tree root: " + root);
@@ -133,7 +133,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 			 * Children are roots of Proto-SPQR trees for the subgraphs
 			 */
 			Block<V,E> currentBlock;
-			TreeNode<V, TreeEdgeWithContent<V,E>> childNode;
+			SPQRTreeNode<V, TreeEdgeWithContent<V,E>> childNode;
 			E referenceEdge;
 			for (int i = 0; i < blocks.size(); i++ ){
 				currentBlock = blocks.get(i);
@@ -146,7 +146,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 						childSkeleton.addVertex(v);
 					for (E e : currentBlock.getEdges())
 						childSkeleton.addEdge(new TreeEdgeWithContent<V,E>(e.getOrigin(), e.getDestination()));
-					childNode = new TreeNode<>(NodeType.Q, childSkeleton);
+					childNode = new SPQRTreeNode<>(NodeType.Q, childSkeleton);
 
 				}
 				else{
@@ -205,7 +205,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 				TreeEdgeWithContent<V, E> stEdge = new TreeEdgeWithContent<V,E>(s,t);
 				rootSkeleton.addEdge(stEdge, true);
 				//create root
-				root = new TreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.P, rootSkeleton);
+				root = new SPQRTreeNode<V,TreeEdgeWithContent<V,E>>(NodeType.P, rootSkeleton);
 				addVertex(root);
 				log.info("Create root node: " + root);
 
@@ -217,7 +217,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 				 * all ei edges are between vertices s and t - reference edge of the this tree
 				 */
 
-				TreeNode<V, TreeEdgeWithContent<V,E>> childNode;
+				SPQRTreeNode<V, TreeEdgeWithContent<V,E>> childNode;
 				SplitComponent<V, E> splitComponent;
 
 				for (int i = 0; i < components.size(); i++){
@@ -230,7 +230,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 							childSkeleton.addVertex(v);
 						for (E e : splitComponent.getEdges())
 							childSkeleton.addEdge(new TreeEdgeWithContent<V,E>(e.getOrigin(), e.getDestination()));
-						childNode = new TreeNode<>(NodeType.Q, childSkeleton);
+						childNode = new SPQRTreeNode<>(NodeType.Q, childSkeleton);
 
 					}
 					else{
@@ -283,7 +283,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 				TreeEdgeWithContent<V, E> stTreeEdge = new TreeEdgeWithContent<V,E>(s,t);
 				rootSkeleton.addEdge(stTreeEdge, true);
 
-				root = new TreeNode<>(NodeType.R, rootSkeleton);
+				root = new SPQRTreeNode<>(NodeType.R, rootSkeleton);
 				addVertex(root);
 
 				log.info("Create root node: " + root);
@@ -294,7 +294,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 				 * adding edge ei	
 				 */
 				E childReferenceEdge;
-				TreeNode<V, TreeEdgeWithContent<V,E>> childNode;
+				SPQRTreeNode<V, TreeEdgeWithContent<V,E>> childNode;
 				for (int i = 0; i < uGraphs.size(); i++){
 					Graph<V, E> uGraph = uGraphs.get(i);
 
@@ -310,7 +310,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 							childSkeleton.addVertex(v);
 						for (E e : uGraph.getEdges())
 							childSkeleton.addEdge(new TreeEdgeWithContent<V,E>(e.getOrigin(), e.getDestination()));
-						childNode = new TreeNode<>(NodeType.Q, childSkeleton);
+						childNode = new SPQRTreeNode<>(NodeType.Q, childSkeleton);
 
 					}
 
@@ -444,11 +444,11 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 		this.graph = graph;
 	}
 
-	public TreeNode<V, TreeEdgeWithContent<V, E>> getRoot() {
+	public SPQRTreeNode<V, TreeEdgeWithContent<V, E>> getRoot() {
 		return root;
 	}
 
-	public void setRoot(TreeNode<V, TreeEdgeWithContent<V, E>> root) {
+	public void setRoot(SPQRTreeNode<V, TreeEdgeWithContent<V, E>> root) {
 		this.root = root;
 	}
 

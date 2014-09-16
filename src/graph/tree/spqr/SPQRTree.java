@@ -39,7 +39,7 @@ public class SPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V
 		Skeleton<V,TreeEdgeWithContent<V,E>> skeleton = new Skeleton<>();
 		skeleton.addVertex(referenceEdge.getOrigin(), referenceEdge.getDestination());
 		skeleton.addEdge(new TreeEdgeWithContent<V,E>(referenceEdge.getOrigin(), referenceEdge.getDestination()));
-		root = new TreeNode<>(NodeType.Q, skeleton);
+		root = new SPQRTreeNode<>(NodeType.Q, skeleton);
 		
 		ProtoSPQRTree<V, E> protoTree = new ProtoSPQRTree<V,E>(referenceEdge, graph);
 		root.addChildNode(protoTree.getRoot());

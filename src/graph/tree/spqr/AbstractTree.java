@@ -4,13 +4,13 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
-public class AbstractTree<V extends Vertex, E extends Edge<V>> extends Graph<TreeNode<V,TreeEdgeWithContent<V,E>>, Edge<TreeNode<V,TreeEdgeWithContent<V,E>>>> {
+public class AbstractTree<V extends Vertex, E extends Edge<V>> extends Graph<SPQRTreeNode<V,TreeEdgeWithContent<V,E>>, Edge<SPQRTreeNode<V,TreeEdgeWithContent<V,E>>>> {
 
 
 	/**
 	 * Root of the tree
 	 */
-	protected TreeNode<V,TreeEdgeWithContent<V,E>> root;
+	protected SPQRTreeNode<V,TreeEdgeWithContent<V,E>> root;
 	
 	/**
 	 * Reference edge
@@ -30,11 +30,11 @@ public class AbstractTree<V extends Vertex, E extends Edge<V>> extends Graph<Tre
 		this.graph = graph;
 	}
 
-	public TreeNode<V, TreeEdgeWithContent<V, E>> getRoot() {
+	public SPQRTreeNode<V, TreeEdgeWithContent<V, E>> getRoot() {
 		return root;
 	}
 
-	public void setRoot(TreeNode<V, TreeEdgeWithContent<V, E>> root) {
+	public void setRoot(SPQRTreeNode<V, TreeEdgeWithContent<V, E>> root) {
 		this.root = root;
 	}
 	

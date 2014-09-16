@@ -1,7 +1,6 @@
-package graph.test.spqr;
+package graph.test.tree;
 
 import graph.elements.Graph;
-import graph.exception.CannotBeAppliedException;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
 import graph.tree.spqr.ProtoSPQRTree;

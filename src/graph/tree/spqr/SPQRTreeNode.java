@@ -8,7 +8,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
+public class SPQRTreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 	
 	
 	/**
@@ -24,34 +24,34 @@ public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 	/**
 	 * Children of the node
 	 */
-	private List<TreeNode<V,E>> children;
+	private List<SPQRTreeNode<V,E>> children;
 	
 	
-	public TreeNode() {
+	public SPQRTreeNode() {
 		super();
-		children = new ArrayList<TreeNode<V,E>>();
+		children = new ArrayList<SPQRTreeNode<V,E>>();
 	}
 	
 	
-	public TreeNode(NodeType nodeType) {
+	public SPQRTreeNode(NodeType nodeType) {
 		super();
 		this.nodeType = nodeType;
-		children = new ArrayList<TreeNode<V,E>>();
+		children = new ArrayList<SPQRTreeNode<V,E>>();
 	}
 	
 
-	public TreeNode(NodeType nodeType, Skeleton<V, E> skeleton) {
+	public SPQRTreeNode(NodeType nodeType, Skeleton<V, E> skeleton) {
 		this(nodeType);
 		this.skeleton = skeleton;
 	}
 	
-	public TreeNode(NodeType nodeType, Graph<V, E> skeleton) {
+	public SPQRTreeNode(NodeType nodeType, Graph<V, E> skeleton) {
 		super();
 		this.nodeType = nodeType;
 		this.skeleton = new Skeleton<>(skeleton.getVertices(), skeleton.getEdges());
 	}
 
-	public void addChildNode(TreeNode<V,E> node){
+	public void addChildNode(SPQRTreeNode<V,E> node){
 		if (!children.contains(node))
 			children.add(node);
 	}
@@ -85,13 +85,13 @@ public class TreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 
 
 
-	public List<TreeNode<V, E>> getChildren() {
+	public List<SPQRTreeNode<V, E>> getChildren() {
 		return children;
 	}
 
 
 
-	public void setChildren(List<TreeNode<V, E>> children) {
+	public void setChildren(List<SPQRTreeNode<V, E>> children) {
 		this.children = children;
 	}
 
