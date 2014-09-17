@@ -63,8 +63,6 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 		V s = referenceEdge.getOrigin();
 		V t = referenceEdge.getDestination();
 
-
-
 		//trivial case
 		if (gPrimIsASingleEdge()){ //is g prim is a single edge
 

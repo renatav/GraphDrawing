@@ -75,7 +75,7 @@ public class TestSPQR extends TestCase{
 			tree = new SPQRTree<TestVertex, TestEdge>(edge1, graph2);
 			assertNotNull(tree.getRoot());
 			assertNotNull(tree.getRoot().getChildren().get(0));
-			tree.printTree();
+			//tree.printTree();
 		} catch (CannotBeAppliedException e) {
 			e.printStackTrace();
 		}

@@ -65,7 +65,7 @@ public class SPQRTreeNode<V extends Vertex, E extends Edge<V>> implements Vertex
 			children.get(children.size() - 1).print(prefix + (isTail ?"    " : "│   "), true);
 		}
 	}
-
+	
 
 	@Override
 	public Dimension getSize() {
