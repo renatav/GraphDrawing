@@ -1,9 +1,9 @@
 package graph.test.operations;
 
+import graph.application.elements.TestEdge;
+import graph.application.elements.TestVertex;
 import graph.elements.Graph;
 import graph.operations.GraphOperations;
-import graph.test.elements.TestEdge;
-import graph.test.elements.TestVertex;
 
 import java.util.ArrayList;
 import java.util.List;

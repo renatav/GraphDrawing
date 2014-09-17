@@ -3,9 +3,9 @@ package graph.test.algorithms;
 import graph.algorithms.planarity.AuslanderParterPlanarity;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.MaximumPlanaritySubgraph;
+import graph.application.elements.TestEdge;
+import graph.application.elements.TestVertex;
 import graph.elements.Graph;
-import graph.test.elements.TestEdge;
-import graph.test.elements.TestVertex;
 import junit.framework.TestCase;
 
 import org.junit.Test;

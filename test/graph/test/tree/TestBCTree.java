@@ -1,8 +1,8 @@
 package graph.test.tree;
 
+import graph.application.elements.TestEdge;
+import graph.application.elements.TestVertex;
 import graph.elements.Graph;
-import graph.test.elements.TestEdge;
-import graph.test.elements.TestVertex;
 import graph.tree.bc.BCTree;
 import junit.framework.TestCase;
 

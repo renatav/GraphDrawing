@@ -1,9 +1,9 @@
 package graph.test.algorithms;
 
 import graph.algorithms.planarity.LRPartition;
+import graph.application.elements.TestEdge;
+import graph.application.elements.TestVertex;
 import graph.elements.Graph;
-import graph.test.elements.TestEdge;
-import graph.test.elements.TestVertex;
 import graph.traversal.DFSTreeTraversal;
 import graph.trees.DFSTree;
 import junit.framework.TestCase;

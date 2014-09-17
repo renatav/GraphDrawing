@@ -9,42 +9,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SPQRTreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
-	
-	
+
+
 	/**
 	 * Node type -S,P,Q,R
 	 */
 	private NodeType nodeType;
-	
+
 	/**
 	 * Graph associated with the node
 	 */
 	private Skeleton<V,E> skeleton;
-	
+
 	/**
 	 * Children of the node
 	 */
 	private List<SPQRTreeNode<V,E>> children;
-	
-	
+
+
 	public SPQRTreeNode() {
 		super();
 		children = new ArrayList<SPQRTreeNode<V,E>>();
 	}
-	
-	
+
+
 	public SPQRTreeNode(NodeType nodeType) {
 		super();
 		this.nodeType = nodeType;
 		children = new ArrayList<SPQRTreeNode<V,E>>();
 	}
-	
+
 
 	public SPQRTreeNode(NodeType nodeType, Skeleton<V, E> skeleton) {
 		this(nodeType);
 		this.skeleton = skeleton;
 	}
-	
+
 	public SPQRTreeNode(NodeType nodeType, Graph<V, E> skeleton) {
 		super();
 		this.nodeType = nodeType;
@@ -54,6 +54,16 @@ public class SPQRTreeNode<V extends Vertex, E extends Edge<V>> implements Vertex
 	public void addChildNode(SPQRTreeNode<V,E> node){
 		if (!children.contains(node))
 			children.add(node);
+	}
+
+	public void print(String prefix, boolean isTail) {
+		System.out.println(prefix + (isTail ? "└── " : "├── ") + nodeType);
+		for (int i = 0; i < children.size() - 1; i++) {
+			children.get(i).print(prefix + (isTail ? "    " : "│   "), false);
+		}
+		if (children.size() > 0) {
+			children.get(children.size() - 1).print(prefix + (isTail ?"    " : "│   "), true);
+		}
 	}
 
 
@@ -101,5 +111,6 @@ public class SPQRTreeNode<V extends Vertex, E extends Edge<V>> implements Vertex
 		return "TreeNode [Node type =" + nodeType + ",\n skeleton=" + skeleton +"]";
 	}
 
-	
+
+
 }

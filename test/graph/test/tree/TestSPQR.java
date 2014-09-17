@@ -1,15 +1,17 @@
 package graph.test.tree;
 
+import graph.application.elements.TestEdge;
+import graph.application.elements.TestVertex;
 import graph.elements.Graph;
-import graph.test.elements.TestEdge;
-import graph.test.elements.TestVertex;
+import graph.exception.CannotBeAppliedException;
 import graph.tree.spqr.ProtoSPQRTree;
+import graph.tree.spqr.SPQRTree;
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class TestProtoSPQR extends TestCase{
-	
+public class TestSPQR extends TestCase{
+
 	TestVertex vert1 = new TestVertex("1");
 	TestVertex vert2 = new TestVertex("2");
 	TestVertex vert3 = new TestVertex("3");
@@ -35,33 +37,59 @@ public class TestProtoSPQR extends TestCase{
 	TestEdge edge12 = new TestEdge(vert8, vert9);
 	TestEdge edge13 = new TestEdge(vert10, vert9);
 	TestEdge edge14 = new TestEdge(vert5, vert9);
-	
 	TestEdge edge15 = new TestEdge(vert3, vert2);
-	
-	Graph<TestVertex, TestEdge> graph;
+	TestEdge edge16 = new TestEdge(vert1, vert4);
+
+	Graph<TestVertex, TestEdge> graph, graph2;
 	@Override
 	public void setUp(){
 		graph = new Graph<>();
 		graph.addVertex(vert1, vert2, vert3, vert4, vert5, vert6, vert7, vert8, vert9, vert10);
 		graph.addEdge(edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9, edge10, 
 				edge11, edge12, edge14);
-	
+		graph2 = new Graph<>();
+		graph2.addVertex(vert1, vert2, vert3, vert4);
+		graph2.addEdge(edge1, edge2, edge3, edge15, edge16);
+
 	}
-	
+
 	@Test
-	public void test(){
-		
-			//series case
-			ProtoSPQRTree<TestVertex, TestEdge> protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(edge1, graph);
-			assertNotNull(protoTree.getRoot());
-			//Rigid case
-			graph.addEdge(edge15);
-			//ProtoSPQRTree<TestVertex, TestEdge> protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(graph, edge1);
-			protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(edge7, graph);
-			assertNotNull(protoTree.getRoot());
-			
-		
+	public void testProto(){
+
+		//series case
+		ProtoSPQRTree<TestVertex, TestEdge> protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(edge1, graph);
+		assertNotNull(protoTree.getRoot());
+		//Rigid case
+		graph.addEdge(edge15);
+		//ProtoSPQRTree<TestVertex, TestEdge> protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(graph, edge1);
+		protoTree = new ProtoSPQRTree<TestVertex, TestEdge>(edge7, graph);
+		assertNotNull(protoTree.getRoot());
 	}
-	
+
+
+	@Test
+	public void testSPQRBiconnected(){
+
+		SPQRTree<TestVertex, TestEdge> tree;
+		try {
+			tree = new SPQRTree<TestVertex, TestEdge>(edge1, graph2);
+			assertNotNull(tree.getRoot());
+			assertNotNull(tree.getRoot().getChildren().get(0));
+			tree.printTree();
+		} catch (CannotBeAppliedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void testSPQRNotBiconnected(){
+
+		SPQRTree<TestVertex, TestEdge> tree = null;
+		try {
+			tree = new SPQRTree<TestVertex, TestEdge>(edge1, graph);
+		} catch (CannotBeAppliedException e) {
+			assertNull(tree);
+		}
+	}
+
 
 }
