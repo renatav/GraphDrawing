@@ -346,8 +346,8 @@ public class Application {
 		}
 
 
-		if (command.startsWith(commands[9])){
-			String name = command.substring(commands[9].length()).trim();
+		if (command.startsWith(commands[15])){
+			String name = command.substring(commands[15].length()).trim();
 			if (!graphs.containsKey(name))
 				return "Unknown graph";
 
@@ -355,7 +355,7 @@ public class Application {
 		}
 
 
-		if (command.equals(commands[10])){
+		if (command.equals(commands[16])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
 			builder.append("create graph name [true/false] \n");
