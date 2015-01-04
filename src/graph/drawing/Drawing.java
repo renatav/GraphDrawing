@@ -39,10 +39,11 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 
 	public void separate(int minXDistance, int minYDistance){
+		
 		List<V> covered = new ArrayList<V>();
 
 		//separate on y axis
-		while (covered.size() < vertexMappings.size()){
+		while (covered.size() <= vertexMappings.size()){
 			V top = findTopExcluding(covered);
 			covered.add(top);
 			for (V other : vertexMappings.keySet()){
@@ -51,9 +52,11 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 					continue;
 
 				int yDist = calcDistances(top, other)[1];
-				int minOverallDistanceY = (int) (top.getSize().getHeight()/2 + other.getSize().getHeight()/2 + minYDistance); 
-				if (yDist < minOverallDistanceY){
-					int toBeMoved = minOverallDistanceY - yDist;
+				int xDist = calcDistances(top, other)[0];
+				
+				if (yDist < minYDistance && xDist < 0){
+					
+					int toBeMoved = - yDist + minYDistance;
 					Point2D position = vertexMappings.get(other);
 					position.setLocation(position.getX(), position.getY() + toBeMoved);
 				}
@@ -63,7 +66,7 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 		//separate on x axis
 		covered.clear();
-		while (covered.size() < vertexMappings.size()){
+		while (covered.size() <= vertexMappings.size()){
 			V leftmost = findLeftmostExcluding(covered);
 			covered.add(leftmost);
 			for (V other : vertexMappings.keySet()){
@@ -72,9 +75,10 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 					continue;
 
 				int xDist = calcDistances(leftmost, other)[0];
-				int minOverallDistanceX = (int) (leftmost.getSize().getWidth()/2 + other.getSize().getWidth()/2 + minXDistance); 
-				if (xDist < minOverallDistanceX){
-					int toBeMoved = minOverallDistanceX - xDist;
+				int yDist = calcDistances(leftmost, other)[1];
+				
+				if (xDist < minXDistance && yDist < 0){
+					int toBeMoved = - xDist + minXDistance;
 					Point2D position = vertexMappings.get(other);
 					position.setLocation(position.getX() + toBeMoved, position.getY());
 				}
@@ -139,14 +143,14 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 	private int[] calcDistances(V v1, V v2){
-		int v1X = (int) vertexMappings.get(v1).getX();
-		int v2X = (int) vertexMappings.get(v2).getX();
-		int v1Y = (int) vertexMappings.get(v1).getY();
-		int v2Y = (int) vertexMappings.get(v2).getY();
+		int v1X = (int) vertexMappings.get(v1).getX() + (int) v1.getSize().getWidth()/2;
+		int v2X = (int) vertexMappings.get(v2).getX() - (int) v2.getSize().getWidth()/2;
+		int v1Y = (int) vertexMappings.get(v1).getY() + (int) v1.getSize().getHeight()/2;
+		int v2Y = (int) vertexMappings.get(v2).getY() - (int) v2.getSize().getHeight()/2;
 
 		int[] ret = new int[2];
-		ret[0] = Math.abs(v1X - v2X);
-		ret[1] = Math.abs(v1Y - v2Y);
+		ret[0] = -(v1X - v2X);
+		ret[1] = -(v1Y - v2Y);
 		return ret;
 
 	}
@@ -177,9 +181,6 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 		bounds[0] = width;
 		bounds[1] = height;
-
-		System.out.println("width: " + width);
-		System.out.println("height: " + height);
 
 		return bounds;
 	}
