@@ -189,5 +189,31 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		return ret;
 	}
 
+	/**
+	 * Finds the longest path in a graph
+	 * @return
+	 */
+	//TODO efikasnije napraviti ovo
+	public Path<V,E> findLongestPath(){
+		Path<V,E> longestPath = null;
+		
+		
+		for (V v1 : graph.getVertices())
+			for (V v2 : graph.getVertices()){
+				
+				if (v1 == v2)
+					continue;
+				
+				
+				List<Path<V,E>> paths = findAllPathsDFS(v1, v2);
+				for (Path<V,E> path : paths)
+					if (longestPath == null || path.size() > longestPath.size())
+						longestPath = path;
+				
+			}
+		
+		return longestPath;
+	}
+	
 
 }

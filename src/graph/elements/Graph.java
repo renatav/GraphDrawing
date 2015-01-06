@@ -95,6 +95,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	@SuppressWarnings("unchecked")
 	public void addEdge(E...edge){
+
 		for (E e : edge){
 			if (edges.contains(e))
 				continue;
@@ -102,7 +103,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				edges.add(e);
 				adjacentLists.get(e.getOrigin()).add(e);
 			}
-			else if (!directed && (adjacentLists.get(e.getDestination()) != null)){
+			if (!directed && (adjacentLists.get(e.getDestination()) != null)){
 				edges.add(e);
 				adjacentLists.get(e.getDestination()).add(e);
 			}
@@ -136,24 +137,32 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public List<E> edgeesBetween (V v1, V v2){
 		List<E> ret = new ArrayList<E>();
 
-		for (E e : adjacentLists.get(v1))
-			if (e.getDestination() == v2)
-				ret.add(e);
-		if (!directed)
-			for (E e : adjacentLists.get(v2))
-				if (e.getDestination() == v1){
+		if (adjacentLists.get(v1) != null)
+			for (E e : adjacentLists.get(v1))
+				if (e.getDestination() == v2)
 					ret.add(e);
-				}
+		if (!directed)
+			if (adjacentLists.get(v2) != null)
+				for (E e : adjacentLists.get(v2))
+					if (e.getDestination() == v1){
+						ret.add(e);
+					}
 
 		return ret;
 	}
 
+	public E edgeBetween(V v1, V v2){
+		List<E> edges = edgeesBetween(v1, v2);
+		if (edges.size() == 0)
+			return null;
+		else 
+			return edges.get(0);
+	}
+
 	public void removeEdge(E e){
 		edges.remove(e);
-		if (adjacentLists.get(e.getOrigin()) != null)
-			adjacentLists.get(e.getOrigin()).remove(e);
-		else if (adjacentLists.get(e.getDestination()) != null)
-			adjacentLists.get(e.getDestination()).remove(e);
+		adjacentLists.get(e.getOrigin()).remove(e);
+		adjacentLists.get(e.getDestination()).remove(e);
 	}
 
 	/**
@@ -165,6 +174,21 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return adjacentLists.get(v);
 	}
 
+	/**
+	 * All vertices adjacent to the given one
+	 * @param v
+	 * @return
+	 */
+	public List<V> adjacentVertices(V v){
+		List<V> ret = new ArrayList<V>();
+		if (adjacentLists.get(v) != null)
+			for (E e : adjacentLists.get(v)){
+				V other = e.getDestination() != v ? e.getDestination() : e.getOrigin();
+				if (! ret.contains(other))
+					ret.add(other);
+			}
+		return ret;
+	}
 
 
 	/**

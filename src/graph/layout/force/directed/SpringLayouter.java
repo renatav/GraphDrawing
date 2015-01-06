@@ -1,11 +1,11 @@
-package graph.layout.force.driven;
+package graph.layout.force.directed;
 
 import edu.uci.ics.jung.algorithms.layout.SpringLayout2;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
-public class SpringLayouter<V extends Vertex, E extends Edge<V>> extends AbstractForceDrivenLayouter<V,E> {
+public class SpringLayouter<V extends Vertex, E extends Edge<V>> extends AbstractForceDirectedLayouter<V,E> {
 
 
 	public SpringLayouter(Graph<V, E> graph) {

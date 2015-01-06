@@ -1,4 +1,4 @@
-package graph.layout.force.driven;
+package graph.layout.force.directed;
 
 import java.awt.geom.Point2D;
 
@@ -11,13 +11,13 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 
-public abstract class AbstractForceDrivenLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V,E>{
+public abstract class AbstractForceDirectedLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V,E>{
 	
 	
 	protected AbstractLayout<V,E> layouter;
 	protected UndirectedSparseGraph<V,E> jungGraph;
 	
-	public AbstractForceDrivenLayouter(Graph<V, E> graph) {
+	public AbstractForceDirectedLayouter(Graph<V, E> graph) {
 		super(graph);
 	}
 

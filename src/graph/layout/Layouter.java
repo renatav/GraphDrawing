@@ -5,10 +5,10 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.box.BoxLayouter;
-import graph.layout.force.driven.CircleLayouter;
-import graph.layout.force.driven.FruchtermanReingoldLayouter;
-import graph.layout.force.driven.KamadaKawaiLayouter;
-import graph.layout.force.driven.SpringLayouter;
+import graph.layout.circle.CircleLayouter;
+import graph.layout.force.directed.FruchtermanReingoldLayouter;
+import graph.layout.force.directed.KamadaKawaiLayouter;
+import graph.layout.force.directed.SpringLayouter;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

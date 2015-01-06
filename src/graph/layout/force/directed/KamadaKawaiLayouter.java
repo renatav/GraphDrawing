@@ -1,11 +1,11 @@
-package graph.layout.force.driven;
+package graph.layout.force.directed;
 
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
-public class KamadaKawaiLayouter<V extends Vertex, E extends Edge<V>> extends AbstractForceDrivenLayouter<V,E> {
+public class KamadaKawaiLayouter<V extends Vertex, E extends Edge<V>> extends AbstractForceDirectedLayouter<V,E> {
 
 
 	public KamadaKawaiLayouter(Graph<V, E> graph) {

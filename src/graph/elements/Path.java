@@ -96,6 +96,31 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 	
+	public List<V> pathVertivesWithoutDuplicates(){
+		List<V> ret = new ArrayList<V>();
+		
+		for (int i = 0; i < path.size(); i++){
+			if (directions.get(i) == EdgeDirection.TO_DESTINATION){
+				if (i == 0){
+					if (!ret.contains(path.get(i).getOrigin()))
+						ret.add(path.get(i).getOrigin());
+				}
+				if (!ret.contains(path.get(i).getDestination()))
+						ret.add(path.get(i).getDestination());
+				
+			}
+			else{
+				if (i == 0){
+					if (!ret.contains(path.get(i).getDestination()))
+						ret.add(path.get(i).getDestination());
+				}
+				if (!ret.contains(path.get(i).getOrigin()))
+					ret.add(path.get(i).getOrigin());
+			}
+		}
+		return ret;
+	}
+	
 	@Override
 	public String toString() {
 //		String ret = "Path";
