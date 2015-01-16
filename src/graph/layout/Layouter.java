@@ -42,22 +42,22 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 	@SuppressWarnings("unchecked")
 	private Graph<V,E> formOneGraph(List<V> vertices, List<E> edges){
 		Graph<V,E> graph = new Graph<V,E>();
-		
+
 		for (V v : vertices)
 			graph.addVertex(v);
-		
+
 		for (E e : edges)
 			graph.addEdge(e);
-		
+
 		return graph;
 	}
 
 	private List<Graph<V,E>> formGraphs(List<V> vertices, List<E> edges){
-		
+
 		List<Graph<V,E>> graphs = new ArrayList<Graph<V,E>>();
 		List<V> coveredVertices = new ArrayList<V>();
 		List<E> coveredEdges = new ArrayList<E>();
-		
+
 		for (V v : vertices){
 			if (coveredVertices.contains(v))
 				continue;
@@ -66,10 +66,10 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 			formGraph(graph, v, coveredVertices, coveredEdges);
 			graphs.add(graph);
 		}
-		
+
 		return graphs;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void formGraph(Graph<V,E> graph, V v, List<V> coveredVertices, List<E> coveredEdges){
 		coveredVertices.add(v);
@@ -112,7 +112,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 
-	public Map<V, Point2D> layout(){
+	public Drawing<V,E> layout(){
 
 
 		int startX = 200;
@@ -131,61 +131,60 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
 		Drawing<V,E> drawing = null;
-		
+
 		AbstractLayouter<V, E> layouter;
-		
+
 		if (algorithm == Algorithms.BOX){
 			layouter = new BoxLayouter<>(formOneGraph(vertices, edges));
 			drawing = layouter.layout();
-			return drawing.getVertexMappings();
+			return drawing;
 		}
-		
+
 		else{
-		for (Graph<V,E> graph : formGraphs(vertices, edges)){
-
-			
-			
-			if (algorithm == Algorithms.KAMADA_KAWAI)
-				layouter = new KamadaKawaiLayouter<>(graph);
-			else if (algorithm == Algorithms.FRUCHTERMAN_REINGOLD)
-				layouter= new FruchtermanReingoldLayouter<>(graph);
-			else if (algorithm == Algorithms.CIRCLE)
-				layouter = new CircleLayouter<>(graph);
-			else
-				layouter = new SpringLayouter<>(graph);
+			for (Graph<V,E> graph : formGraphs(vertices, edges)){
 
 
-			drawing = layouter.layout();
-			int currentLeftmost = drawing.findLeftmostPosition();
-			int currentTop = drawing.findTop();
+				if (algorithm == Algorithms.KAMADA_KAWAI)
+					layouter = new KamadaKawaiLayouter<>(graph);
+					else if (algorithm == Algorithms.FRUCHTERMAN_REINGOLD)
+						layouter= new FruchtermanReingoldLayouter<>(graph);
+						else if (algorithm == Algorithms.CIRCLE)
+							layouter = new CircleLayouter<>(graph);
+							else
+								layouter = new SpringLayouter<>(graph);
 
 
-			//leftmost should start at point currentStartPositionX
-			int moveByX = currentStartPositionX - currentLeftmost;
+								drawing = layouter.layout();
+								int currentLeftmost = drawing.findLeftmostPosition();
+								int currentTop = drawing.findTop();
 
-			//top should start at point currentStartPositionY
-			int moveByY = currentStartPositionY - currentTop;
 
-			drawing.moveBy(moveByX, moveByY);
+								//leftmost should start at point currentStartPositionX
+								int moveByX = currentStartPositionX - currentLeftmost;
 
-			int[] bounds = drawing.getBounds();
-			if (bounds[1] > maxYInRow)
-				maxYInRow = bounds[1];
+								//top should start at point currentStartPositionY
+								int moveByY = currentStartPositionY - currentTop;
 
-			currentStartPositionX += bounds[0] + spaceX;
+								drawing.moveBy(moveByX, moveByY);
 
-			if (currentIndex % numInRow == 0){
-				currentStartPositionY += maxYInRow + spaceY;
-				maxYInRow = 0;
-				currentStartPositionX = startX;
+								int[] bounds = drawing.getBounds();
+								if (bounds[1] > maxYInRow)
+									maxYInRow = bounds[1];
+
+								currentStartPositionX += bounds[0] + spaceX;
+
+								if (currentIndex % numInRow == 0){
+									currentStartPositionY += maxYInRow + spaceY;
+									maxYInRow = 0;
+									currentStartPositionX = startX;
+								}
+
+								ret.putAll(drawing.getVertexMappings());
+
+								currentIndex ++;
 			}
 
-			ret.putAll(drawing.getVertexMappings());
-
-			currentIndex ++;
-		}
-
-		return ret;
+			return drawing;
 		}
 
 	}
