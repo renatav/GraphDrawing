@@ -10,11 +10,8 @@ import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
 import graph.layout.force.directed.SpringLayouter;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Layouter accepts lists of veritces and edges which might in fact form more than one graph
@@ -128,8 +125,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 		int maxYInRow = 0;
 
-		Map<V, Point2D> ret = new HashMap<V, Point2D>();
-
+		Drawing<V,E> ret =  new Drawing<V,E>();
+		
 		Drawing<V,E> drawing = null;
 
 		AbstractLayouter<V, E> layouter;
@@ -179,12 +176,13 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 									currentStartPositionX = startX;
 								}
 
-								ret.putAll(drawing.getVertexMappings());
+								ret.getVertexMappings().putAll(drawing.getVertexMappings());
+								ret.getEdgeMappings().putAll(drawing.getEdgeMappings());
 
 								currentIndex ++;
 			}
 
-			return drawing;
+			return ret;
 		}
 
 	}
