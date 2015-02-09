@@ -3,6 +3,7 @@ package graph.drawing;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 	private Map<V, Point2D> vertexMappings;
 	private Map<E, List<Point2D>> edgeMappings;
+	private int reursiveLinkDistance = 20;
 
 
 	public Drawing(){
@@ -37,6 +39,113 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		this.edgeMappings = edgeMappings;
 	}
 
+	
+	public void positionEdges(List<E> edges){
+		
+		//initialize mappings
+		for (E e : edges){
+			
+			List<Point2D> edgeNodePoints = new ArrayList<Point2D>();
+			
+			//check if the edge's origin and destination vertices are the same
+			
+			if (e.getDestination() == e.getOrigin()){
+				
+				//position edge nodes near the top edge of the vertex, to the side, and near the bottom
+				
+				int vertexHeight = (int) e.getOrigin().getSize().getHeight();
+				int vertexWidth = (int) e.getOrigin().getSize().getWidth();
+				Point2D position = vertexMappings.get(e.getOrigin());
+				int xPosition = (int) position.getX();
+				int yPosition = (int) position.getY();
+				
+				//first node
+				Point2D node1 = new Point(xPosition, (int) (yPosition - vertexHeight/3));
+				Point2D node2 = new Point((int) (xPosition - vertexWidth - reursiveLinkDistance), (int) (yPosition - vertexHeight/3));
+				Point2D node3 = new Point((int) (xPosition - vertexWidth - reursiveLinkDistance), (int) (yPosition + vertexHeight/3));
+				Point2D node4 = new Point(xPosition, (int) (yPosition + vertexHeight/3));
+				
+				edgeNodePoints.add(node1);
+				edgeNodePoints.add(node2);
+				edgeNodePoints.add(node3);
+				edgeNodePoints.add(node4);
+				
+			}
+			//else if the link isn't recursive
+			else{ 
+				Point2D originPosition = vertexMappings.get(e.getOrigin());
+				Point2D destinationPosition = vertexMappings.get(e.getDestination());
+				edgeNodePoints.add(new Point((int) originPosition.getX(), (int) originPosition.getY()));
+				edgeNodePoints.add(new Point((int) destinationPosition.getX(), (int) destinationPosition.getY()));
+			}
+			
+			edgeMappings.put(e, edgeNodePoints);
+		}
+		
+		//now check for multiple links
+		List<E> processedEdges = new ArrayList<E>();
+		for (E e : edges){
+			if (processedEdges.contains(e))
+				continue;
+			
+			processedEdges.add(e);
+			List<E> multipleEdges = findMultipleEdgesForEdge(e);
+			if (multipleEdges.size() == 0)
+				continue;
+			
+			int count = multipleEdges.size();
+			int originWidth = (int) e.getOrigin().getSize().getWidth();
+			int destinationWidth = (int) e.getDestination().getSize().getWidth();
+			
+			
+			int distanceOrigin = originWidth/(count * 2);
+			int distanceDestination = destinationWidth/(count * 2);
+			
+			int distanceMultiplicity = 1;
+			
+			for (int i = 0; i <  multipleEdges.size(); i++){
+				
+				E multEedge = multipleEdges.get(i);
+				Point2D originPosition = edgeMappings.get(multEedge).get(0);
+				Point2D destinationPosition = edgeMappings.get(multEedge).get(1);
+				
+				if (i < (int) multipleEdges.size()/2){
+					originPosition.setLocation((int)(originPosition.getX() - distanceMultiplicity * distanceOrigin),
+							originPosition.getY());
+					destinationPosition.setLocation((int)(destinationPosition.getX() - distanceMultiplicity * distanceDestination),
+							destinationPosition.getY());
+				}
+				
+				else{
+					originPosition.setLocation((int)(originPosition.getX() + distanceMultiplicity * distanceOrigin),
+							originPosition.getY());
+					destinationPosition.setLocation((int)(destinationPosition.getX() + distanceMultiplicity * distanceDestination),
+							destinationPosition.getY());
+				}
+				
+				if (i == (int) multipleEdges.size()) //change side from left to right
+					distanceMultiplicity = 1;
+				else
+					distanceMultiplicity ++;
+					
+			}
+			
+			processedEdges.addAll(multipleEdges);
+			
+			
+		}
+	}
+	
+	private List<E> findMultipleEdgesForEdge(E edge){
+		List<E> ret = new ArrayList<E>();
+	
+		for (E e : edgeMappings.keySet()){
+			if (e.getOrigin() == edge.getOrigin() && e.getDestination() == edge.getDestination())
+				ret.add(e);
+		}
+		
+		return ret;
+	}
 
 	public void separate(int minXDistance, int minYDistance){
 		
@@ -215,6 +324,14 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 	public void setEdgeMappings(Map<E, List<Point2D>> edgeMappings) {
 		this.edgeMappings = edgeMappings;
+	}
+
+	public void setReursiveLinkDistance(int reursiveLinkDistance) {
+		this.reursiveLinkDistance = reursiveLinkDistance;
+	}
+
+	public int getReursiveLinkDistance() {
+		return reursiveLinkDistance;
 	}
 
 
