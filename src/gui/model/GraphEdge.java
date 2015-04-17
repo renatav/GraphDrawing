@@ -47,6 +47,10 @@ public class GraphEdge implements Edge<GraphVertex>{
 	public List<Point2D> getLinkNodes() {
 		return linkNodes;
 	}
+
+	public void setLinkNodes(List<Point2D> linkNodes) {
+		this.linkNodes = linkNodes;
+	}
 	
 	
 

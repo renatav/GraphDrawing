@@ -4,9 +4,13 @@ import graph.elements.Graph;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.NewGraphAction;
 import gui.actions.palette.AddVertexAction;
+import gui.actions.palette.LinkAction;
+import gui.actions.palette.SelectAction;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 import gui.state.AddState;
+import gui.state.LinkState;
+import gui.state.SelectState;
 import gui.util.GuiUtil;
 import gui.util.StatusBar;
 import gui.view.GraphView;
@@ -63,47 +67,56 @@ public class MainFrame extends JFrame{
 
 		initMenu();
 		initToolBar();
-		
+
 		initGui();
 
 	}
-	
+
 	private void initGui(){
-		
+
 		pane = new JTabbedPane();
 		add(pane, "grow");
-		
+
 		statusBar = new StatusBar();
 		add(statusBar, "height 20:20:20, dock south");
-		
+
 		palette = new JToolBar(JToolBar.VERTICAL);
 		ButtonGroup group = new ButtonGroup();
-		
-		btnVertex = new JToggleButton(new AddVertexAction());
+
+		JToggleButton btnVertex = new JToggleButton(new AddVertexAction());
 		palette.add(btnVertex);
 		group.add(btnVertex);
+
+		JToggleButton btnEdge = new JToggleButton(new LinkAction());
+		palette.add(btnEdge);
+		group.add(btnEdge);
 		
+		JToggleButton btnSelect = new JToggleButton(new SelectAction());
+		palette.add(btnSelect);
+		group.add(btnSelect);
+
+
 		add(palette, "dock east");
-		
+
 	}
-	
+
 	private void initMenu(){
-		
+
 		menuBar = new JMenuBar();
-		
+
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem exitMi = new JMenuItem(new ExitAction());
-		
+
 		JMenu editMenu = new JMenu("Edit");
 		JMenuItem newMi = new JMenuItem(new NewGraphAction());
 		editMenu.add(newMi);
 		menuBar.add(editMenu);
-		
+
 		fileMenu.add(exitMi);
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
 	}
-	
+
 	private void initToolBar(){
 		toolBar = new JToolBar();
 		add(toolBar, "dock north");
@@ -115,8 +128,8 @@ public class MainFrame extends JFrame{
 			instance = new MainFrame();
 		return instance;
 	}
-	
-	
+
+
 	public GraphView getCurrentView(){
 		if (pane.getComponentCount() > 0)
 			return (GraphView) pane.getSelectedComponent();
@@ -126,13 +139,28 @@ public class MainFrame extends JFrame{
 		Graph<GraphVertex, GraphEdge> graph = new Graph<GraphVertex, GraphEdge>();
 		GraphView view = new GraphView(graph);
 		pane.add(view);
-		
+
 	}
-	
+
 	public void changeToAdd(ElementsEnum elementType){
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new AddState(currentView, ElementsEnum.VERTEX));
 		statusBar.setLabelText("Add");
+	}
+
+	public void changeToLink(){
+		GraphView currentView = getCurrentView();
+		currentView.setCurrentState(new LinkState(currentView));
+		statusBar.setLabelText("Link");
+
+
+	}
+
+	public void changeToSelect(){
+		GraphView currentView = getCurrentView();
+		currentView.setCurrentState(new SelectState(currentView));
+		statusBar.setLabelText("Select");
+
 	}
 
 }
