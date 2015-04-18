@@ -87,6 +87,8 @@ public class GraphView extends JPanel implements Observer{
 		}
 
 		if (linkPoints != null){
+			g.setStroke(dashed);
+			g.setColor(Color.BLACK);
 			for (int i = 0; i < linkPoints.size()-1; i++){
 				g.drawLine((int) linkPoints.get(i).getX(),(int) linkPoints.get(i).getY(),
 						(int) linkPoints.get(i + 1).getX(),(int) linkPoints.get(i+1).getY());
@@ -98,6 +100,7 @@ public class GraphView extends JPanel implements Observer{
 		
 		if (lassoStart != null && lassoEnd != null){
 			//draw lasso
+			g.setColor(Color.BLACK);
 			setLassoRectangle();
 			g.draw(lassoRectangle);
 		}

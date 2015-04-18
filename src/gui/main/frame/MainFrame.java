@@ -6,6 +6,7 @@ import gui.actions.main.frame.NewGraphAction;
 import gui.actions.palette.AddVertexAction;
 import gui.actions.palette.LinkAction;
 import gui.actions.palette.SelectAction;
+import gui.command.panel.CommandPanel;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 import gui.state.AddState;
@@ -16,15 +17,19 @@ import gui.util.GuiUtil;
 import gui.util.StatusBar;
 import gui.view.GraphView;
 
+import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -42,10 +47,11 @@ public class MainFrame extends JFrame{
 	private JTabbedPane pane;
 	private JToolBar toolBar;
 	private StatusBar statusBar;
-	private JToolBar palette;
 	private JToggleButton btnVertex = new JToggleButton(new AddVertexAction());
 	private JToggleButton btnEdge = new JToggleButton(new LinkAction());
 	private JToggleButton btnSelect = new JToggleButton(new SelectAction());
+	private JPanel propertiesPanel;
+	private CommandPanel commandPanel;
 
 	public MainFrame(){
 
@@ -73,30 +79,53 @@ public class MainFrame extends JFrame{
 	}
 
 	private void initGui(){
-
+		
+		JPanel centralPanel = new JPanel(new MigLayout("fill"));
+		add(centralPanel, "grow");
+		
+		
+		JPanel leftPanel = new JPanel(new MigLayout("fill"));
 		pane = new JTabbedPane();
-		add(pane, "grow");
+		leftPanel.add(pane, "grow");
+		
 
-		statusBar = new StatusBar();
-		add(statusBar, "height 20:20:20, dock south");
-
-		palette = new JToolBar(JToolBar.VERTICAL);
+		JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		JPanel palettePanel = new JPanel(new MigLayout());
 		ButtonGroup group = new ButtonGroup();
 
 		btnVertex = new JToggleButton(new AddVertexAction());
-		palette.add(btnVertex);
+		palettePanel.add(btnVertex, "gapy 10px, wrap");
 		group.add(btnVertex);
 
 		btnEdge = new JToggleButton(new LinkAction());
-		palette.add(btnEdge);
+		palettePanel.add(btnEdge, "wrap");
 		group.add(btnEdge);
 		
 		btnSelect = new JToggleButton(new SelectAction());
-		palette.add(btnSelect);
+		palettePanel.add(btnSelect);
 		group.add(btnSelect);
+		
+		
+		propertiesPanel = new JPanel(new MigLayout("fill"));
+		propertiesPanel.add(new JLabel("Properties"));
+		propertiesPanel.setBackground(Color.RED);
+		
+		rightSplitPane.setLeftComponent(palettePanel);
+		rightSplitPane.setRightComponent(propertiesPanel);
+		
+		
+		commandPanel = new CommandPanel();
+		leftPanel.add(commandPanel, "dock south");
+		
+		JSplitPane centralSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		centralSplitPane.setRightComponent(rightSplitPane);
+		centralSplitPane.setResizeWeight(0.9);
+		centralSplitPane.setLeftComponent(leftPanel);
+		centralPanel.add(centralSplitPane, "grow");
 
-
-		add(palette, "dock east");
+		
+		statusBar = new StatusBar();
+		add(statusBar, "height 20:20:20, dock south");
 
 	}
 
