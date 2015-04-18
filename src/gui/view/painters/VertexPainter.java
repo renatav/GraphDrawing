@@ -5,18 +5,22 @@ import gui.model.GraphVertex;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 public class VertexPainter {
 
 	private GraphVertex vertex;
+	private Shape shape;
 	
 	public VertexPainter(GraphVertex vertex){
 		this.vertex = vertex;
 	}
-	
-	public void paint(Graphics g){
+
+	public void paint(Graphics2D g){
 		
 		calculateVertexRadius(g.getFontMetrics());
 		int x = (int) vertex.getPosition().getX();
@@ -26,8 +30,11 @@ public class VertexPainter {
 		x -= r/2;
 		y -= r/2;
 		
+		shape = new Ellipse2D.Double(x,y,r,r);
+		g.setColor(Color.BLACK);
+		g.draw(shape);
 		g.setColor(Color.GRAY);
-		g.fillOval(x, y, r, r);
+		g.fill(shape);
 		g.setColor(Color.BLACK);
 		
 		Dimension textDim = PaintingUtil.calculateStringDimension(g.getFontMetrics(), 
@@ -64,6 +71,10 @@ public class VertexPainter {
 		int c = (int) Math.pow(vertex.getSize().getWidth()/2, 2);
 		return a + b <= c;
 				
+	}
+	
+	public Rectangle getBounds(){
+		return shape.getBounds();
 	}
 	
 

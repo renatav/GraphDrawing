@@ -1,5 +1,9 @@
 package gui.state;
 
+import gui.main.frame.MainFrame;
+import gui.model.GraphEdge;
+import gui.model.GraphElement;
+import gui.model.GraphVertex;
 import gui.view.GraphView;
 
 import java.awt.event.MouseEvent;
@@ -13,7 +17,33 @@ public class SelectState extends State{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		System.out.println(view.elementAtPoint(e.getPoint()));
+		GraphElement hitElement = view.elementAtPoint(e.getPoint());
+		if (hitElement != null){
+			if (hitElement instanceof GraphVertex){
+				GraphVertex hitVertex = (GraphVertex)hitElement;
+				if (e.isControlDown()){
+					if (view.getSelectionModel().isSelected(hitVertex))
+						view.getSelectionModel().removeVertexFromSelection(hitVertex);
+					else
+						view.getSelectionModel().addVertexToSelection(hitVertex);
+				}
+				else
+					view.getSelectionModel().selecteVertex(hitVertex);
+			}
+			else if (hitElement instanceof GraphEdge){
+				GraphEdge hitEdge = (GraphEdge)hitElement;	
+				if (e.isControlDown()){
+					if (view.getSelectionModel().isSelected(hitEdge))
+						view.getSelectionModel().removeEdgeFromSelection(hitEdge);
+					else
+						view.getSelectionModel().addEdgeToSelection(hitEdge);
+				}
+				else
+					view.getSelectionModel().selecteEdge(hitEdge);
+			}
+		}
+		else
+			view.getSelectionModel().clearSelection();
 		
 	}
 
@@ -24,7 +54,11 @@ public class SelectState extends State{
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
+		GraphElement hitElement = view.elementAtPoint(e.getPoint());
+		if (hitElement == null){
+			//lasso
+			MainFrame.getInstance().changeToLassoSelect();
+		}
 		
 	}
 }

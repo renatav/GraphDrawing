@@ -5,7 +5,7 @@ import graph.elements.Vertex;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 
-public class GraphVertex implements Vertex{
+public class GraphVertex extends GraphElement implements Vertex{
 
 	private Dimension size;
 	private String content;

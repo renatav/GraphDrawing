@@ -2,7 +2,6 @@ package gui.view.painters;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.Collections;

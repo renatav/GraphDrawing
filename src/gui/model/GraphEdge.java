@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GraphEdge implements Edge<GraphVertex>{
+public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 
 	private GraphVertex origin, destination;
 	private List<Point2D> linkNodes = new ArrayList<Point2D>();

@@ -1,6 +1,7 @@
 package gui.state;
 
 import graph.elements.Graph;
+import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 import gui.view.GraphView;
@@ -10,6 +11,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 
 public class LinkState extends State{
 
@@ -29,22 +32,28 @@ public class LinkState extends State{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		Point2D p = e.getPoint();
-		GraphVertex vertex = view.elementAtPoint(p);
-		if (startVertex == null && vertex != null)
-			startVertex = vertex;
-		else if (startVertex != null && vertex != null){
-			endVertex = vertex;
-			linkPoints.add(p);
-			view.setLastLinkPoint(null);
+		if (SwingUtilities.isLeftMouseButton(e)){
+			Point2D p = e.getPoint();
+			GraphVertex vertex = view.vertexAtPoint(p);
+			if (startVertex == null && vertex != null)
+				startVertex = vertex;
+			else if (startVertex != null && vertex != null){
+				endVertex = vertex;
+				linkPoints.add(p);
+				view.setLastLinkPoint(null);
+			}
+			if (startVertex != null && endVertex == null){
+				linkPoints.add(p);
+				view.setLinkPoints(linkPoints);
+				view.repaint();
+			}
+			if (endVertex != null){
+				link();
+			}
 		}
-		if (startVertex != null && endVertex == null){
-			linkPoints.add(p);
-			view.setLinkPoints(linkPoints);
-			view.repaint();
-		}
-		if (endVertex != null){
-			link();
+		else if (SwingUtilities.isRightMouseButton(e)){
+			clearAndRepaint();
+			MainFrame.getInstance().changeToSelect();
 		}
 	}
 
@@ -66,7 +75,6 @@ public class LinkState extends State{
 	}
 
 	private void link(){
-
 		GraphEdge edge = new GraphEdge(startVertex, endVertex);
 		List<Point2D> edgePoints = new ArrayList<Point2D>(linkPoints);
 		edge.setLinkNodes(edgePoints);
@@ -74,11 +82,15 @@ public class LinkState extends State{
 		graph.addEdge(edge);
 		EdgePainter painter = new EdgePainter(edge);
 		view.getEdgePainters().add(painter);
+		clearAndRepaint();
+	}
+	
+	private void clearAndRepaint(){
 		view.getLinkPoints().clear();
+		view.setLastLinkPoint(null);
 		startVertex = null;
 		endVertex = null;
 		linkPoints.clear();
 		view.repaint();
-		
 	}
 }

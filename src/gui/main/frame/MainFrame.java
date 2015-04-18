@@ -9,6 +9,7 @@ import gui.actions.palette.SelectAction;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 import gui.state.AddState;
+import gui.state.LassoSelectState;
 import gui.state.LinkState;
 import gui.state.SelectState;
 import gui.util.GuiUtil;
@@ -19,13 +20,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -44,7 +43,9 @@ public class MainFrame extends JFrame{
 	private JToolBar toolBar;
 	private StatusBar statusBar;
 	private JToolBar palette;
-	private JToggleButton btnVertex;
+	private JToggleButton btnVertex = new JToggleButton(new AddVertexAction());
+	private JToggleButton btnEdge = new JToggleButton(new LinkAction());
+	private JToggleButton btnSelect = new JToggleButton(new SelectAction());
 
 	public MainFrame(){
 
@@ -67,7 +68,6 @@ public class MainFrame extends JFrame{
 
 		initMenu();
 		initToolBar();
-
 		initGui();
 
 	}
@@ -83,15 +83,15 @@ public class MainFrame extends JFrame{
 		palette = new JToolBar(JToolBar.VERTICAL);
 		ButtonGroup group = new ButtonGroup();
 
-		JToggleButton btnVertex = new JToggleButton(new AddVertexAction());
+		btnVertex = new JToggleButton(new AddVertexAction());
 		palette.add(btnVertex);
 		group.add(btnVertex);
 
-		JToggleButton btnEdge = new JToggleButton(new LinkAction());
+		btnEdge = new JToggleButton(new LinkAction());
 		palette.add(btnEdge);
 		group.add(btnEdge);
 		
-		JToggleButton btnSelect = new JToggleButton(new SelectAction());
+		btnSelect = new JToggleButton(new SelectAction());
 		palette.add(btnSelect);
 		group.add(btnSelect);
 
@@ -143,12 +143,14 @@ public class MainFrame extends JFrame{
 	}
 
 	public void changeToAdd(ElementsEnum elementType){
+		btnVertex.setSelected(true);
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new AddState(currentView, ElementsEnum.VERTEX));
 		statusBar.setLabelText("Add");
 	}
 
 	public void changeToLink(){
+		btnEdge.setSelected(true);
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new LinkState(currentView));
 		statusBar.setLabelText("Link");
@@ -157,10 +159,18 @@ public class MainFrame extends JFrame{
 	}
 
 	public void changeToSelect(){
+		btnSelect.setSelected(true);
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new SelectState(currentView));
 		statusBar.setLabelText("Select");
 
+	}
+	
+	public void changeToLassoSelect(){
+		GraphView currentView = getCurrentView();
+		currentView.setCurrentState(new LassoSelectState(currentView));
+		statusBar.setLabelText("Lasso selection");
+		
 	}
 
 }
