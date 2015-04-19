@@ -2,6 +2,7 @@ package gui.view.painters;
 
 import gui.model.GraphVertex;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -15,12 +16,15 @@ public class VertexPainter {
 
 	private GraphVertex vertex;
 	private Shape shape;
+	private BasicStroke stroke = new BasicStroke();
 	
 	public VertexPainter(GraphVertex vertex){
 		this.vertex = vertex;
 	}
 
 	public void paint(Graphics2D g){
+		
+		g.setStroke(stroke);
 		
 		calculateVertexRadius(g.getFontMetrics());
 		int x = (int) vertex.getPosition().getX();
@@ -33,7 +37,7 @@ public class VertexPainter {
 		shape = new Ellipse2D.Double(x,y,r,r);
 		g.setColor(Color.BLACK);
 		g.draw(shape);
-		g.setColor(Color.GRAY);
+		g.setColor(vertex.getColor());
 		g.fill(shape);
 		g.setColor(Color.BLACK);
 		

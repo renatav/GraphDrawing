@@ -3,6 +3,7 @@ package gui.view.painters;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
@@ -14,6 +15,7 @@ public class EdgePainter {
 	private GraphEdge edge;
 	private GeneralPath path = new GeneralPath();
 	private double selectionMaxDistance=8;
+	private BasicStroke stroke = new BasicStroke();
 
 	public EdgePainter(GraphEdge edge){
 		this.edge = edge;
@@ -22,6 +24,7 @@ public class EdgePainter {
 	public void paint(Graphics2D g){
 
 		GraphVertex destination = edge.getDestination();
+		g.setStroke(stroke);
 
 		path.reset();
 
@@ -39,7 +42,7 @@ public class EdgePainter {
 				(double) destination.getSize().getWidth()/2).get(0);
 		path.lineTo(intersection.getX(), intersection.getY());
 
-
+		g.setColor(edge.getColor());
 		g.draw(path);
 		drawArrow(g, (int) p1.getX(), (int) p1.getY(), (int) intersection.getX(), (int) intersection.getY());
 

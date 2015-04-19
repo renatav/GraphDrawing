@@ -18,12 +18,14 @@ public class SelectionModel extends Observable{
 	public void selecteVertex(GraphVertex vertex){
 		selectedVertices.clear();
 		selectedVertices.add(vertex);
+		selectedEdges.clear();
 		observerChanged();
 	}
 	
 	public void selecteEdge(GraphEdge edge){
 		selectedEdges.clear();
 		selectedEdges.add(edge);
+		selectedVertices.clear();
 		observerChanged();
 	}
 	

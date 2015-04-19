@@ -2,6 +2,7 @@ package gui.model;
 
 import graph.elements.Vertex;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 
@@ -11,11 +12,11 @@ public class GraphVertex extends GraphElement implements Vertex{
 	private String content;
 	private Point2D position;
 	
-	
 	public GraphVertex(Point2D position, String content){
 		size = new Dimension(50,50);
 		this.position = position;
 		this.content = content;
+		color = Color.lightGray;
 	}
 	
 	@Override

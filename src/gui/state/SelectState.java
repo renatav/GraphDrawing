@@ -4,6 +4,7 @@ import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphElement;
 import gui.model.GraphVertex;
+import gui.properties.PropertiesFactory;
 import gui.view.GraphView;
 
 import java.awt.event.MouseEvent;
@@ -44,6 +45,18 @@ public class SelectState extends State{
 		}
 		else
 			view.getSelectionModel().clearSelection();
+		
+		boolean clearPanel = true;
+		if (view.getSelectionModel().getSelectedVertices().size() == 1){
+			clearPanel = false;
+			MainFrame.getInstance().setPropertiesPanel(PropertiesFactory.getPropertiesPanel(view.getSelectionModel().getSelectedVertices().get(0)));
+		}
+		else if (view.getSelectionModel().getSelectedEdges().size() == 1){
+			clearPanel = false;
+			MainFrame.getInstance().setPropertiesPanel(PropertiesFactory.getPropertiesPanel(view.getSelectionModel().getSelectedEdges().get(0)));
+		}
+		if (clearPanel)
+			MainFrame.getInstance().setPropertiesPanel(null);
 		
 	}
 

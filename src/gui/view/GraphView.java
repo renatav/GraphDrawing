@@ -63,7 +63,6 @@ public class GraphView extends JPanel implements Observer{
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, getWidth(), getHeight());
-		g.setColor(Color.BLUE);
 		
 		for (EdgePainter edgePainter : edgePainters){
 			edgePainter.paint(g);

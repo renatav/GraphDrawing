@@ -2,6 +2,7 @@ package gui.model;
 
 import graph.elements.Edge;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 	public GraphEdge(GraphVertex origin, GraphVertex destination){
 		this.origin = origin;
 		this.destination = destination;
+		this.color = Color.BLUE;
+		
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import gui.actions.palette.SelectAction;
 import gui.command.panel.CommandPanel;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
+import gui.properties.PropertiesPanel;
 import gui.state.AddState;
 import gui.state.LassoSelectState;
 import gui.state.LinkState;
@@ -107,8 +108,7 @@ public class MainFrame extends JFrame{
 		
 		
 		propertiesPanel = new JPanel(new MigLayout("fill"));
-		propertiesPanel.add(new JLabel("Properties"));
-		propertiesPanel.setBackground(Color.RED);
+		propertiesPanel.add(new JLabel("Properties"), "dock north");
 		
 		rightSplitPane.setLeftComponent(palettePanel);
 		rightSplitPane.setRightComponent(propertiesPanel);
@@ -128,7 +128,7 @@ public class MainFrame extends JFrame{
 		add(statusBar, "height 20:20:20, dock south");
 
 	}
-
+	
 	private void initMenu(){
 
 		menuBar = new JMenuBar();
@@ -169,6 +169,15 @@ public class MainFrame extends JFrame{
 		GraphView view = new GraphView(graph);
 		pane.add(view);
 
+	}
+	
+	public void setPropertiesPanel(PropertiesPanel panel){
+		if (propertiesPanel.getComponentCount() > 1)
+			propertiesPanel.remove(1);
+		if (panel != null)
+			propertiesPanel.add(panel, "grow");
+		propertiesPanel.revalidate();
+		propertiesPanel.repaint();
 	}
 
 	public void changeToAdd(ElementsEnum elementType){
