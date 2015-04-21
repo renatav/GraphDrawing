@@ -45,4 +45,9 @@ public class GraphVertex extends GraphElement implements Vertex{
 		this.content = content;
 	}
 
+	@Override
+	public String toString() {
+		return content;
+	}
+
 }

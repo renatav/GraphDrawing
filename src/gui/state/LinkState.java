@@ -1,6 +1,5 @@
 package gui.state;
 
-import graph.elements.Graph;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
@@ -52,8 +51,9 @@ public class LinkState extends State{
 			}
 		}
 		else if (SwingUtilities.isRightMouseButton(e)){
-			clearAndRepaint();
+			clearAll();
 			MainFrame.getInstance().changeToSelect();
+			view.repaint();
 		}
 	}
 
@@ -78,19 +78,17 @@ public class LinkState extends State{
 		GraphEdge edge = new GraphEdge(startVertex, endVertex);
 		List<Point2D> edgePoints = new ArrayList<Point2D>(linkPoints);
 		edge.setLinkNodes(edgePoints);
-		Graph<GraphVertex, GraphEdge> graph = view.getGraph();
-		graph.addEdge(edge);
 		EdgePainter painter = new EdgePainter(edge);
 		view.getEdgePainters().add(painter);
-		clearAndRepaint();
+		clearAll();
+		view.getModel().addEdge(edge);
 	}
 	
-	private void clearAndRepaint(){
+	private void clearAll(){
 		view.getLinkPoints().clear();
 		view.setLastLinkPoint(null);
 		startVertex = null;
 		endVertex = null;
 		linkPoints.clear();
-		view.repaint();
 	}
 }

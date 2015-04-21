@@ -1,8 +1,10 @@
 package gui.view;
 
 import graph.elements.Graph;
+import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphElement;
+import gui.model.GraphModel;
 import gui.model.GraphVertex;
 import gui.model.SelectionModel;
 import gui.state.SelectState;
@@ -32,7 +34,7 @@ public class GraphView extends JPanel implements Observer{
 
 	private List<VertexPainter> vertexPainters = new ArrayList<VertexPainter>();
 	private List<EdgePainter> edgePainters = new ArrayList<EdgePainter>();
-	private Graph<GraphVertex, GraphEdge> graph;
+	private GraphModel model;
 	private State currentState;
 	private GraphController controller;
 	private List<Point2D> linkPoints;
@@ -45,7 +47,7 @@ public class GraphView extends JPanel implements Observer{
 	private Rectangle lassoRectangle;
 	
 	public GraphView(Graph<GraphVertex, GraphEdge> graph){
-		this.graph = graph;
+		model = new GraphModel(graph, this);
 		controller = new GraphController();
 		addMouseListener(controller);
 		addMouseMotionListener(controller);
@@ -133,12 +135,16 @@ public class GraphView extends JPanel implements Observer{
 		return vertexPainters;
 	}
 
-	public Graph<GraphVertex, GraphEdge> getGraph() {
-		return graph;
+	public GraphModel getModel(){
+		return model;
 	}
 
 	public void addVertexPainter(VertexPainter vertexPainter){
 		vertexPainters.add(vertexPainter);
+	}
+	
+	public void addEdgePainter(EdgePainter edgePainter){
+		edgePainters.add(edgePainter);
 	}
 	
 	private void setLassoRectangle(){
@@ -222,6 +228,7 @@ public class GraphView extends JPanel implements Observer{
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
+			MainFrame.getInstance().updateStatusBarPosition(e.getPoint());
 			currentState.mouseMoved(e);
 
 		}

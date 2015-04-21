@@ -18,9 +18,9 @@ import gui.util.GuiUtil;
 import gui.util.StatusBar;
 import gui.view.GraphView;
 
-import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
@@ -84,12 +84,10 @@ public class MainFrame extends JFrame{
 		JPanel centralPanel = new JPanel(new MigLayout("fill"));
 		add(centralPanel, "grow");
 		
-		
 		JPanel leftPanel = new JPanel(new MigLayout("fill"));
 		pane = new JTabbedPane();
 		leftPanel.add(pane, "grow");
 		
-
 		JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		JPanel palettePanel = new JPanel(new MigLayout());
 		ButtonGroup group = new ButtonGroup();
@@ -106,14 +104,12 @@ public class MainFrame extends JFrame{
 		palettePanel.add(btnSelect);
 		group.add(btnSelect);
 		
-		
 		propertiesPanel = new JPanel(new MigLayout("fill"));
 		propertiesPanel.add(new JLabel("Properties"), "dock north");
 		
 		rightSplitPane.setLeftComponent(palettePanel);
 		rightSplitPane.setRightComponent(propertiesPanel);
-		
-		
+	
 		commandPanel = new CommandPanel();
 		leftPanel.add(commandPanel, "dock south");
 		
@@ -122,7 +118,6 @@ public class MainFrame extends JFrame{
 		centralSplitPane.setResizeWeight(0.9);
 		centralSplitPane.setLeftComponent(leftPanel);
 		centralPanel.add(centralSplitPane, "grow");
-
 		
 		statusBar = new StatusBar();
 		add(statusBar, "height 20:20:20, dock south");
@@ -178,6 +173,10 @@ public class MainFrame extends JFrame{
 			propertiesPanel.add(panel, "grow");
 		propertiesPanel.revalidate();
 		propertiesPanel.repaint();
+	}
+	
+	public void updateStatusBarPosition(Point2D position){
+		statusBar.setPositionText((int)position.getX() + ", " + (int)position.getY());
 	}
 
 	public void changeToAdd(ElementsEnum elementType){

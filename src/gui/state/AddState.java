@@ -19,13 +19,13 @@ public class AddState extends State{
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (currentElementType == ElementsEnum.VERTEX){
-			int count = view.getGraph().getVertices().size();
+			
+			int count =view.getModel().getVerticeCount();
 			String content = "v" + count;
 			GraphVertex vertex = new GraphVertex(e.getPoint(), content);
-			view.getGraph().addVertex(vertex);
 			VertexPainter painter = new VertexPainter(vertex);
 			view.addVertexPainter(painter);
-			view.repaint();
+			view.getModel().addVertex(vertex);
 		}
 
 	}

@@ -329,15 +329,13 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public boolean isConnected(){
-		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
 		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<>(this);
 		for (V v1 : vertices)
 			for (V v2 : vertices){
 				if (v1 == v2)
 					continue;
-				paths.clear();
-				if (dijkstra.getPath(v1, v2) == null); 
-				return false;
+				if (dijkstra.getPath(v1, v2) == null) 
+					return false;
 			}
 		return true;
 	}

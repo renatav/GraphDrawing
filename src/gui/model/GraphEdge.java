@@ -18,6 +18,11 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 		this.color = Color.BLUE;
 		
 	}
+	
+	public void setNodesBasedOnVertices(){
+		linkNodes.add(origin.getPosition());
+		linkNodes.add(destination.getPosition());
+	}
 
 	@Override
 	public GraphVertex getOrigin() {
