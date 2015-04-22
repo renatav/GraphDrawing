@@ -24,7 +24,6 @@ import java.util.List;
 public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 
-
 	private List<E> edges;
 	private List<V> vertices;
 	private Algorithms algorithm;
@@ -175,13 +174,12 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 									maxYInRow = 0;
 									currentStartPositionX = startX;
 								}
-
+								
 								ret.getVertexMappings().putAll(drawing.getVertexMappings());
-								ret.getEdgeMappings().putAll(drawing.getEdgeMappings());
 
 								currentIndex ++;
 			}
-
+			ret.positionEdges(edges);
 			return ret;
 		}
 

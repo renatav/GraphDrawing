@@ -3,16 +3,21 @@ package gui.model;
 import graph.elements.Graph;
 import gui.view.GraphView;
 
+import java.awt.Color;
 import java.util.Observable;
 
-public class GraphModel extends Observable{
+public class GraphModel extends Observable implements IGraphElement{
 	
 	private Graph<GraphVertex, GraphEdge> graph;
+	private Color color;
+	private String name;
 	
 	
 	public GraphModel(Graph<GraphVertex, GraphEdge> graph, GraphView view){
 		this.graph = graph;
 		addObserver(view);
+		this.name = "Graph";
+		this.color = Color.WHITE;
 	}
 	
 	public void addVertex(GraphVertex v){
@@ -57,7 +62,24 @@ public class GraphModel extends Observable{
 		return graph;
 	}
 
+	@Override
+	public Color getColor() {
+		return color;
+	}
+
+	@Override
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
 	
+	public String getName(){
+		return name;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
 	
 
 }

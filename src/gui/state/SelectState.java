@@ -2,7 +2,7 @@ package gui.state;
 
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
-import gui.model.GraphElement;
+import gui.model.IGraphElement;
 import gui.model.GraphVertex;
 import gui.properties.PropertiesFactory;
 import gui.view.GraphView;
@@ -18,7 +18,7 @@ public class SelectState extends State{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		GraphElement hitElement = view.elementAtPoint(e.getPoint());
+		IGraphElement hitElement = view.elementAtPoint(e.getPoint());
 		if (hitElement != null){
 			if (hitElement instanceof GraphVertex){
 				GraphVertex hitVertex = (GraphVertex)hitElement;
@@ -56,7 +56,7 @@ public class SelectState extends State{
 			MainFrame.getInstance().setPropertiesPanel(PropertiesFactory.getPropertiesPanel(view.getSelectionModel().getSelectedEdges().get(0)));
 		}
 		if (clearPanel)
-			MainFrame.getInstance().setPropertiesPanel(null);
+			MainFrame.getInstance().setPropertiesPanel(PropertiesFactory.getPropertiesPanel(view.getModel()));
 		
 	}
 
@@ -67,7 +67,7 @@ public class SelectState extends State{
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		GraphElement hitElement = view.elementAtPoint(e.getPoint());
+		IGraphElement hitElement = view.elementAtPoint(e.getPoint());
 		if (hitElement == null){
 			//lasso
 			MainFrame.getInstance().changeToLassoSelect();

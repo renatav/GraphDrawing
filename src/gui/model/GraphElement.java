@@ -2,8 +2,8 @@ package gui.model;
 
 import java.awt.Color;
 
-public class GraphElement {
-
+public class GraphElement implements IGraphElement{
+	
 	protected Color color;
 	
 	public Color getColor() {
@@ -13,4 +13,5 @@ public class GraphElement {
 	public void setColor(Color color) {
 		this.color = color;
 	}
+
 }

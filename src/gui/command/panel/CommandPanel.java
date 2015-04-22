@@ -2,8 +2,10 @@ package gui.command.panel;
 
 import graph.algorithms.planarity.AuslanderParterPlanarity;
 import graph.elements.Graph;
+import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
+import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
@@ -222,18 +224,13 @@ public class CommandPanel extends JPanel{
 			return splitting.findAllSplitComponents(graph, pair).toString(); 
 		}
 
-/*
 		if (command.startsWith(commands[12])){
 			command = command.substring(commands[12].length()).trim();
 			String[] split = command.split(" ");
-			if (split.length < 3)
-				return "Please enter split pair, edge and graph's name";
+			if (split.length < 2)
+				return "Please enter split pair and edge";
 
-
-			String name = split[2];
-			if (!graphs.containsKey(name))
-				return "Unknown graph";
-			Graph<TestVertex, TestEdge> graph = graphs.get(name);
+			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			if (!graph.isBiconnected())
 				return "Graph is not biconnected.";
 
@@ -244,10 +241,10 @@ public class CommandPanel extends JPanel{
 			String v1 = split2[0];
 			String v2 = split2[1];
 
-			TestVertex vert1 = graph.getVertexByContent(v1);
+			GraphVertex vert1 = graph.getVertexByContent(v1);
 			if (vert1 == null)
 				return "Unknown vertex \"" + v1 + "\"";
-			TestVertex vert2 = graph.getVertexByContent(v2);
+			GraphVertex vert2 = graph.getVertexByContent(v2);
 			if (vert2 == null)
 				return "Unknown vertex \"" + v2 + "\"";
 
@@ -258,32 +255,30 @@ public class CommandPanel extends JPanel{
 			v1 = split2[0];
 			v2 = split2[1];
 
-			TestVertex vert3 = graph.getVertexByContent(v1);
+			GraphVertex vert3 = graph.getVertexByContent(v1);
 			if (vert3 == null)
 				return "Unknown vertex \"" + v1 + "\"";
-			TestVertex vert4 = graph.getVertexByContent(v2);
+			GraphVertex vert4 = graph.getVertexByContent(v2);
 			if (vert4 == null)
 				return "Unknown vertex \"" + v2 + "\"";
 			if (!graph.hasEdge(vert3, vert4))
 				return "Edge doesn't exist";
-			TestEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
+			GraphEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
 
-			SplitPair<TestVertex, TestEdge> pair = new SplitPair<TestVertex, TestEdge>(vert1, vert2);
+			SplitPair<GraphVertex, GraphEdge> pair = new SplitPair<GraphVertex, GraphEdge>(vert1, vert2);
 
 			return splitting.splitGraph(pair, edge, graph).toString(); 
 		}
+
 		
 		if (command.startsWith(commands[13])){
 			command = command.substring(commands[13].length()).trim();
 			String[] split = command.split(" ");
-			if (split.length < 2)
-				return "Please enter edge and graph's name";
+			if (split.length < 1)
+				return "Please enter one edge";
 
 
-			String name = split[1];
-			if (!graphs.containsKey(name))
-				return "Unknown graph";
-			Graph<TestVertex, TestEdge> graph = graphs.get(name);
+			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			if (!graph.isBiconnected())
 				return "Graph is not biconnected.";
 
@@ -295,15 +290,15 @@ public class CommandPanel extends JPanel{
 			String v1 = split2[0];
 			String v2 = split2[1];
 
-			TestVertex vert3 = graph.getVertexByContent(v1);
+			GraphVertex vert3 = graph.getVertexByContent(v1);
 			if (vert3 == null)
 				return "Unknown vertex \"" + v1 + "\"";
-			TestVertex vert4 = graph.getVertexByContent(v2);
+			GraphVertex vert4 = graph.getVertexByContent(v2);
 			if (vert4 == null)
 				return "Unknown vertex \"" + v2 + "\"";
 			if (!graph.hasEdge(vert3, vert4))
 				return "Edge doesn't exist";
-			TestEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
+			GraphEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
 
 			return splitting.maximalSplitPairs(graph, edge).toString(); 
 		}
@@ -311,14 +306,11 @@ public class CommandPanel extends JPanel{
 		if (command.startsWith(commands[14])){
 			command = command.substring(commands[14].length()).trim();
 			String[] split = command.split(" ");
-			if (split.length < 2)
-				return "Please enter edge and graph's name";
+			if (split.length < 1)
+				return "Please enter one edge";
 
 
-			String name = split[1];
-			if (!graphs.containsKey(name))
-				return "Unknown graph";
-			Graph<TestVertex, TestEdge> graph = graphs.get(name);
+			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			if (!graph.isBiconnected())
 				return "Graph is not biconnected.";
 
@@ -330,18 +322,18 @@ public class CommandPanel extends JPanel{
 			String v1 = split2[0];
 			String v2 = split2[1];
 
-			TestVertex vert3 = graph.getVertexByContent(v1);
+			GraphVertex vert3 = graph.getVertexByContent(v1);
 			if (vert3 == null)
 				return "Unknown vertex \"" + v1 + "\"";
-			TestVertex vert4 = graph.getVertexByContent(v2);
+			GraphVertex vert4 = graph.getVertexByContent(v2);
 			if (vert4 == null)
 				return "Unknown vertex \"" + v2 + "\"";
 			if (!graph.hasEdge(vert3, vert4))
 				return "Edge doesn't exist";
-			TestEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
+			GraphEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
 
 			try {
-				new SPQRTree<TestVertex, TestEdge>(edge, graph).printTree();
+				new SPQRTree<GraphVertex, GraphEdge>(edge, graph).printTree();
 				return "";
 			} catch (CannotBeAppliedException e) {
 				return "Couldn't construct spqr tree: " + e.getMessage();
@@ -349,16 +341,7 @@ public class CommandPanel extends JPanel{
 		}
 
 
-		if (command.startsWith(commands[15])){
-			String name = command.substring(commands[15].length()).trim();
-			if (!graphs.containsKey(name))
-				return "Unknown graph";
-
-			return graphs.toString();
-		}
-*/
-
-		if (command.equals(commands[16])){
+		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
 			builder.append("create graph name [true/false] \n");
@@ -375,7 +358,6 @@ public class CommandPanel extends JPanel{
 			builder.append("split graph {u,v} {e1, e2} graph\n");
 			builder.append("maximal split pairs {e1, e2} graph\n");
 			builder.append("construct spqr tree {e1, e2} graph\n");
-			builder.append("print\n");
 			return builder.toString();
 		}
 
@@ -385,7 +367,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[17];
+		commands = new String[16];
 		commands[0] = "quit";
 		commands[1] = "create graph";
 		commands[2] = "add vertex";
@@ -401,8 +383,7 @@ public class CommandPanel extends JPanel{
 		commands[12] = "split graph";
 		commands[13] = "maximal split pairs";
 		commands[14] = "construct spqr";
-		commands[15] = "print";
-		commands[16] = "help";
+		commands[15] = "help";
 
 	}
 		

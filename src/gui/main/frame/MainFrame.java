@@ -4,6 +4,7 @@ import graph.elements.Graph;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.NewGraphAction;
 import gui.actions.palette.AddVertexAction;
+import gui.actions.palette.LayoutAction;
 import gui.actions.palette.LinkAction;
 import gui.actions.palette.SelectAction;
 import gui.command.panel.CommandPanel;
@@ -23,6 +24,7 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -101,8 +103,12 @@ public class MainFrame extends JFrame{
 		group.add(btnEdge);
 		
 		btnSelect = new JToggleButton(new SelectAction());
-		palettePanel.add(btnSelect);
+		palettePanel.add(btnSelect, "wrap");
 		group.add(btnSelect);
+		
+		palettePanel.add(new JButton(new LayoutAction()));
+		
+		
 		
 		propertiesPanel = new JPanel(new MigLayout("fill"));
 		propertiesPanel.add(new JLabel("Properties"), "dock north");

@@ -85,10 +85,12 @@ public class LinkState extends State{
 	}
 	
 	private void clearAll(){
-		view.getLinkPoints().clear();
+		if (view.getLinkPoints() != null)
+			view.getLinkPoints().clear();
 		view.setLastLinkPoint(null);
 		startVertex = null;
 		endVertex = null;
-		linkPoints.clear();
+		if (linkPoints != null)
+			linkPoints.clear();
 	}
 }

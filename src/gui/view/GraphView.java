@@ -3,7 +3,7 @@ package gui.view;
 import graph.elements.Graph;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
-import gui.model.GraphElement;
+import gui.model.IGraphElement;
 import gui.model.GraphModel;
 import gui.model.GraphVertex;
 import gui.model.SelectionModel;
@@ -63,7 +63,7 @@ public class GraphView extends JPanel implements Observer{
 
 	public void paintView(Graphics2D g){
 		
-		g.setColor(Color.WHITE);
+		g.setColor(model.getColor());
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
 		for (EdgePainter edgePainter : edgePainters){
@@ -108,7 +108,7 @@ public class GraphView extends JPanel implements Observer{
 
 	}
 
-	public GraphElement elementAtPoint(Point2D point){
+	public IGraphElement elementAtPoint(Point2D point){
 		
 		//if both element and link are hit, return element
 		

@@ -59,6 +59,13 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 	public void setLinkNodes(List<Point2D> linkNodes) {
 		this.linkNodes = linkNodes;
 	}
+
+	@Override
+	public String toString() {
+		return "[" +origin + ", " + destination + "]";
+	}
+	
+	
 	
 	
 

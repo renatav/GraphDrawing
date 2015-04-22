@@ -2,7 +2,7 @@ package gui.properties;
 
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
-import gui.model.GraphElement;
+import gui.model.IGraphElement;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -59,7 +59,7 @@ private static final long serialVersionUID = 1L;
 	
 
 	@Override
-	public void setElement(GraphElement element) {
+	public void setElement(IGraphElement element) {
 		this.edge = (GraphEdge) element;
 		setValues();
 	}
