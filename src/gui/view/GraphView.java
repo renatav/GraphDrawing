@@ -16,10 +16,15 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +32,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 public class GraphView extends JPanel implements Observer{
 
@@ -42,15 +49,18 @@ public class GraphView extends JPanel implements Observer{
 	private SelectionModel selectionModel;
 	private final static float dash1[] = {5.0f};
 	private static final  BasicStroke dashed =  new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
-				BasicStroke.JOIN_MITER, 5.0f,  dash1, 0.0f);
+			BasicStroke.JOIN_MITER, 5.0f,  dash1, 0.0f);
 	private Point2D lassoStart, lassoEnd;	
 	private Rectangle lassoRectangle;
-	
+	private AffineTransform transformation = new AffineTransform();
+	private static final double TRANSLATION_STEP = 12;
+
 	public GraphView(Graph<GraphVertex, GraphEdge> graph){
 		model = new GraphModel(graph, this);
 		controller = new GraphController();
 		addMouseListener(controller);
 		addMouseMotionListener(controller);
+		addMouseWheelListener(controller);
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
 	}
@@ -62,14 +72,16 @@ public class GraphView extends JPanel implements Observer{
 	}
 
 	public void paintView(Graphics2D g){
-		
+
 		g.setColor(model.getColor());
 		g.fillRect(0, 0, getWidth(), getHeight());
-		
+		g.transform(transformation);
+
+
 		for (EdgePainter edgePainter : edgePainters){
 			edgePainter.paint(g);
 		}
-		
+
 		for (VertexPainter vertexPainter : vertexPainters){
 			vertexPainter.paint(g);
 			if (selectionModel.isSelected(vertexPainter.getVertex())){
@@ -77,7 +89,7 @@ public class GraphView extends JPanel implements Observer{
 				g.draw(vertexPainter.getBounds());
 			}
 		}
-		
+
 		for (EdgePainter edgePainter : edgePainters){
 			if (selectionModel.isSelected(edgePainter.getEdge())){
 				for (Point2D linkNode : edgePainter.getEdge().getLinkNodes()){
@@ -98,7 +110,7 @@ public class GraphView extends JPanel implements Observer{
 				g.drawLine((int) linkPoints.get(linkPoints.size() - 1).getX(),(int) linkPoints.get(linkPoints.size() - 1).getY(),
 						(int) lastLinkPoint.getX(), (int) lastLinkPoint.getY());
 		}
-		
+
 		if (lassoStart != null && lassoEnd != null){
 			//draw lasso
 			g.setColor(Color.BLACK);
@@ -109,9 +121,9 @@ public class GraphView extends JPanel implements Observer{
 	}
 
 	public IGraphElement elementAtPoint(Point2D point){
-		
+
 		//if both element and link are hit, return element
-		
+
 		for (VertexPainter vp : vertexPainters)
 			if (vp.containsPoint(point))
 				return vp.getVertex();
@@ -119,17 +131,17 @@ public class GraphView extends JPanel implements Observer{
 		for (EdgePainter ep : edgePainters)
 			if (ep.containsPoint(point))
 				return ep.getEdge();
-		
+
 		return null;
 	}
-	
+
 	public GraphVertex vertexAtPoint(Point2D point){
 		for (VertexPainter vp : vertexPainters)
 			if (vp.containsPoint(point))
 				return vp.getVertex();
 		return null;
 	}
-	
+
 
 	public List<VertexPainter> getVertexPainters() {
 		return vertexPainters;
@@ -142,29 +154,29 @@ public class GraphView extends JPanel implements Observer{
 	public void addVertexPainter(VertexPainter vertexPainter){
 		vertexPainters.add(vertexPainter);
 	}
-	
+
 	public void addEdgePainter(EdgePainter edgePainter){
 		edgePainters.add(edgePainter);
 	}
-	
+
 	private void setLassoRectangle(){
 
 		int startX = (int) lassoStart.getX();
 		int endX = (int) lassoEnd.getX();
 		int startY = (int) lassoStart.getY();
 		int endY = (int) lassoEnd.getY();
-		
+
 		int topLeftX = Math.min(startX, endX);
 		int topLeftY = Math.min(startY, endY);
 		int width = Math.abs(startX - endX);
 		int height = Math.abs(startY - endY);
-		
+
 		if (lassoRectangle == null)
 			lassoRectangle = new Rectangle(topLeftX, topLeftY, width, height);
 		else
 			lassoRectangle.setBounds(topLeftX, topLeftY, width, height);
 	}
-	
+
 	public void selectAllInLassoRectangle(){
 		if (lassoRectangle == null)
 			return;
@@ -181,10 +193,71 @@ public class GraphView extends JPanel implements Observer{
 		selectionModel.selectVertices(selectedVertices);
 		selectionModel.selectEdges(selectedEdges);
 	}
-	
-	
 
-	public class GraphController implements MouseListener, MouseMotionListener{
+	private void transformFromUserSpace(Point2D userSpace) {
+		transformation.transform(userSpace, userSpace);
+	}
+
+
+	private void transformToUserSpace(Point2D deviceSpace) {
+		try {
+			transformation.inverseTransform(deviceSpace, deviceSpace);
+		} catch (NoninvertibleTransformException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private MouseEvent makeUserSpaceMouseEvent(MouseEvent e) {
+		Point2D point = e.getPoint();
+		transformToUserSpace(point);
+		return new MouseEvent(
+				e.getComponent(), e.getID(), e.getWhen(), e.getModifiers(), 
+				(int)point.getX(), (int)point.getY(), 
+				e.getXOnScreen(), e.getYOnScreen(), 
+				e.getClickCount(), e.isPopupTrigger(), e.getButton()
+				);
+	}
+
+
+	//----------------------//
+	//Scrolling
+	//----------------------//	
+	public void scrollToPoint(Point target){
+		Point current = new Point(0,0);
+		transformToUserSpace(current);
+		double scrollX = current.getX() - target.getX();
+		double scrollY = current.getY() - target.getY();
+		transformation.translate(scrollX, scrollY);
+		repaint();
+	}
+
+	public void scrollBy(int deltaX, int deltaY){
+		transformation.translate(deltaX, deltaY);
+		repaint();
+	}
+
+
+	public void scrollRight(){
+		transformation.translate(-TRANSLATION_STEP / transformation.getScaleX(), 0);
+		repaint();
+	}
+
+
+	public void scrollLeft(){
+		transformation.translate(TRANSLATION_STEP / transformation.getScaleX(), 0);
+		repaint();
+	}
+
+	public void scrollUp(){
+		transformation.translate(0, TRANSLATION_STEP / transformation.getScaleY());
+		repaint();
+	}
+
+	public void scrollDown(){
+		transformation.translate(0, -TRANSLATION_STEP / transformation.getScaleY());
+		repaint();
+	}
+	public class GraphController implements MouseListener, MouseMotionListener, MouseWheelListener{
 
 		public GraphController(){
 
@@ -198,13 +271,13 @@ public class GraphView extends JPanel implements Observer{
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			currentState.mousePressed(e);
+			currentState.mousePressed(makeUserSpaceMouseEvent(e));
 
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			currentState.mouseReleased(e);
+			currentState.mouseReleased(makeUserSpaceMouseEvent(e));
 
 		}
 
@@ -222,14 +295,39 @@ public class GraphView extends JPanel implements Observer{
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			currentState.mouseDragged(e);
+			currentState.mouseDragged(makeUserSpaceMouseEvent(e));
 
 		}
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			MainFrame.getInstance().updateStatusBarPosition(e.getPoint());
-			currentState.mouseMoved(e);
+			currentState.mouseMoved(makeUserSpaceMouseEvent(e));
+			Point2D point = e.getPoint();
+			transformToUserSpace(point);
+			MainFrame.getInstance().updateStatusBarPosition(point);
+
+
+
+		}
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			int notches = e.getWheelRotation();
+			if (notches < 0){ //mouse moved up
+				if (e.isShiftDown())
+					scrollRight();
+				else
+					scrollUp();
+			}
+			else if (notches > 0){
+				if (e.isShiftDown())
+					scrollLeft();
+				else
+					scrollDown();
+			}
+			Point2D point = e.getPoint();
+			transformToUserSpace(point);
+			MainFrame.getInstance().updateStatusBarPosition(point);
 
 		}
 
