@@ -99,12 +99,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		for (E e : edge){
 			if (edges.contains(e))
 				continue;
+			edges.add(e);
 			if (adjacentLists.get(e.getOrigin()) != null){
-				edges.add(e);
 				adjacentLists.get(e.getOrigin()).add(e);
 			}
 			if (!directed && (adjacentLists.get(e.getDestination()) != null)){
-				edges.add(e);
 				adjacentLists.get(e.getDestination()).add(e);
 			}
 

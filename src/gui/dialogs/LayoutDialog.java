@@ -22,6 +22,7 @@ public class LayoutDialog extends JDialog{
 	private static final long serialVersionUID = 1L;
 	private JComboBox<?> cbAlogorithms = new JComboBox<>(Algorithms.values());
 	private boolean ok = false;
+	private KamadaKawaiPanel layoutPanel;
 
 	public LayoutDialog(){
 		setTitle("Choose layout algorithm");
@@ -31,7 +32,7 @@ public class LayoutDialog extends JDialog{
 		setLocationRelativeTo(MainFrame.getInstance());
 		
 		add(new JLabel("Algorithm:"));
-		add(cbAlogorithms);
+		add(cbAlogorithms, "wrap");
 		
 		JPanel buttonsPanel = new JPanel();
 		JButton btnOk = new JButton("OK");
@@ -54,7 +55,13 @@ public class LayoutDialog extends JDialog{
 		});
 		buttonsPanel.add(btnCancel);
 		add(buttonsPanel,"dock south");
+		
+		layoutPanel = new KamadaKawaiPanel(MainFrame.getInstance().getCurrentView().getModel().getGraph());
+		add(layoutPanel, "span 2");
+		
 		pack();
+		
+		
 		
 	}
 	

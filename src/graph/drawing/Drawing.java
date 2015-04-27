@@ -140,6 +140,8 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		List<E> ret = new ArrayList<E>();
 	
 		for (E e : edgeMappings.keySet()){
+			if (e == edge)
+				continue;
 			if (e.getOrigin() == edge.getOrigin() && e.getDestination() == edge.getDestination())
 				ret.add(e);
 		}

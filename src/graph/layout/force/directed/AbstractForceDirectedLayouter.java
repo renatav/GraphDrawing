@@ -10,6 +10,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
+import graph.layout.GraphLayoutProperties;
 
 public abstract class AbstractForceDirectedLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V,E>{
 	
@@ -56,9 +57,13 @@ public abstract class AbstractForceDirectedLayouter<V extends Vertex, E extends 
 			jungGraph.addEdge(e, e.getOrigin(), e.getDestination());
 	}
 
-	protected abstract void initLayouter();
+	protected void initLayouter(){
+		
+	}
 
-
+	protected void initLayouter(GraphLayoutProperties properties){
+		
+	}
 
 
 
