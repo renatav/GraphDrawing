@@ -2,7 +2,8 @@ package gui.actions.palette;
 
 import graph.drawing.Drawing;
 import graph.elements.Graph;
-import graph.layout.Algorithms;
+import graph.layout.LayoutAlgorithms;
+import graph.layout.GraphLayoutProperties;
 import graph.layout.Layouter;
 import gui.dialogs.LayoutDialog;
 import gui.main.frame.MainFrame;
@@ -36,9 +37,11 @@ public class LayoutAction extends AbstractAction{
 		LayoutDialog d = new LayoutDialog();
 		d.setVisible(true);
 		if (d.isOk()){
-			Algorithms algorithm = d.getAlogithm();
+			LayoutAlgorithms algorithm = d.getAlogithm();
+			GraphLayoutProperties layoutProeprties = d.getLayoutProperties();
 			Graph<GraphVertex, GraphEdge> graph = view.getModel().getGraph();
-			Layouter<GraphVertex, GraphEdge> layouter = new Layouter<>(graph.getVertices(), graph.getEdges(), algorithm);
+			Layouter<GraphVertex, GraphEdge> layouter = new Layouter<>(graph.getVertices(), graph.getEdges(), 
+					algorithm, layoutProeprties);
 			Drawing<GraphVertex, GraphEdge> drawing = layouter.layout();
 			for (GraphVertex vert : graph.getVertices()){
 				vert.setPosition(drawing.getVertexMappings().get(vert));

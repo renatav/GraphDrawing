@@ -1,7 +1,5 @@
 package graph.layout.force.directed;
 
-import java.awt.geom.Point2D;
-
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.visualization.DefaultVisualizationModel;
@@ -12,14 +10,16 @@ import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
 
+import java.awt.geom.Point2D;
+
 public abstract class AbstractForceDirectedLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V,E>{
 	
 	
 	protected AbstractLayout<V,E> layouter;
 	protected UndirectedSparseGraph<V,E> jungGraph;
 	
-	public AbstractForceDirectedLayouter(Graph<V, E> graph) {
-		super(graph);
+	public AbstractForceDirectedLayouter(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
+		super(graph, layoutProperties);
 	}
 
 	@Override
@@ -57,13 +57,8 @@ public abstract class AbstractForceDirectedLayouter<V extends Vertex, E extends 
 			jungGraph.addEdge(e, e.getOrigin(), e.getDestination());
 	}
 
-	protected void initLayouter(){
+	protected abstract void initLayouter();
 		
-	}
-
-	protected void initLayouter(GraphLayoutProperties properties){
-		
-	}
 
 
 

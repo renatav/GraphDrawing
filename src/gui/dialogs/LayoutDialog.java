@@ -1,10 +1,16 @@
 package gui.dialogs;
 
-import graph.layout.Algorithms;
+import graph.layout.LayoutAlgorithms;
+import graph.layout.DefaultGraphLayoutProperties;
+import graph.layout.GraphLayoutProperties;
 import gui.main.frame.MainFrame;
+import gui.panels.layout.LayoutPanelFactory;
+import gui.panels.layout.LayoutPropertyPanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,13 +26,14 @@ public class LayoutDialog extends JDialog{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JComboBox<?> cbAlogorithms = new JComboBox<>(Algorithms.values());
+	private JComboBox<?> cbAlogorithms = new JComboBox<>(LayoutAlgorithms.values());
 	private boolean ok = false;
-	private KamadaKawaiPanel layoutPanel;
+	private JPanel layoutPanelContainer = new JPanel();
+	private LayoutPropertyPanel layoutPanel;
 
 	public LayoutDialog(){
 		setTitle("Choose layout algorithm");
-		setLayout(new MigLayout());
+		setLayout(new MigLayout("insets 10"));
 		setSize(400,300);
 		setModal(true);
 		setLocationRelativeTo(MainFrame.getInstance());
@@ -56,17 +63,42 @@ public class LayoutDialog extends JDialog{
 		buttonsPanel.add(btnCancel);
 		add(buttonsPanel,"dock south");
 		
-		layoutPanel = new KamadaKawaiPanel(MainFrame.getInstance().getCurrentView().getModel().getGraph());
-		add(layoutPanel, "span 2");
+		add(layoutPanelContainer, "span 2");
 		
+		cbAlogorithms.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				layoutPanelContainer.removeAll();
+				setLayoutPanel();
+				layoutPanelContainer.revalidate();
+				layoutPanelContainer.repaint();
+				pack();
+			}
+		});
+		
+		setLayoutPanel();
 		pack();
-		
-		
 		
 	}
 	
-	public Algorithms getAlogithm(){
-		return (Algorithms) cbAlogorithms.getSelectedItem();
+	
+	private void setLayoutPanel(){
+		layoutPanel = LayoutPanelFactory.getPanel((LayoutAlgorithms) cbAlogorithms.getSelectedItem());
+		if (layoutPanel != null){
+			layoutPanel.setDefaultValue(DefaultGraphLayoutProperties.getDefaultLayoutProperties((LayoutAlgorithms) cbAlogorithms.getSelectedItem(), 
+					MainFrame.getInstance().getCurrentView().getModel().getGraph()));
+			layoutPanelContainer.add(layoutPanel);
+		}
+	}
+	public LayoutAlgorithms getAlogithm(){
+		return (LayoutAlgorithms) cbAlogorithms.getSelectedItem();
+	}
+	
+	public GraphLayoutProperties getLayoutProperties(){
+		if (layoutPanel != null)
+			return layoutPanel.getEnteredLayoutProperties();
+		return null;
 	}
 
 	public boolean isOk() {

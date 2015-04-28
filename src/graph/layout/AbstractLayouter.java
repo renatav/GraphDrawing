@@ -12,10 +12,14 @@ public abstract class AbstractLayouter <V extends Vertex,E extends Edge<V>> {
 	 */
 	protected Graph<V,E> graph;
 	
+	protected GraphLayoutProperties layoutProperties;
 	
-	public AbstractLayouter(Graph<V,E> graph){
+	
+	public AbstractLayouter(Graph<V,E> graph, GraphLayoutProperties layoutProperties){
 		this.graph = graph;
+		this.layoutProperties = layoutProperties;
 	}
+	
 	
 	public abstract Drawing<V,E> layout();
 

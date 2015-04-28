@@ -26,13 +26,19 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 	private List<E> edges;
 	private List<V> vertices;
-	private Algorithms algorithm;
+	private LayoutAlgorithms algorithm;
+	private GraphLayoutProperties layoutProperties;
 
 
-	public Layouter(List<V> vertices, List<E> edges, Algorithms algorithm){
+	public Layouter(List<V> vertices, List<E> edges, LayoutAlgorithms algorithm){
 		this.edges = edges;
 		this.vertices = vertices;
 		this.algorithm = algorithm;
+	}
+	
+	public Layouter(List<V> vertices, List<E> edges, LayoutAlgorithms algorithm, GraphLayoutProperties layoutProperties){
+		this(vertices, edges, algorithm);
+		this.layoutProperties = layoutProperties;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -130,8 +136,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 		AbstractLayouter<V, E> layouter;
 
-		if (algorithm == Algorithms.BOX){
-			layouter = new BoxLayouter<>(formOneGraph(vertices, edges));
+		if (algorithm == LayoutAlgorithms.BOX){
+			layouter = new BoxLayouter<>(formOneGraph(vertices, edges), layoutProperties);
 			drawing = layouter.layout();
 			return drawing;
 		}
@@ -140,14 +146,14 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 			for (Graph<V,E> graph : formGraphs(vertices, edges)){
 
 
-				if (algorithm == Algorithms.KAMADA_KAWAI)
-					layouter = new KamadaKawaiLayouter<>(graph);
-					else if (algorithm == Algorithms.FRUCHTERMAN_REINGOLD)
-						layouter= new FruchtermanReingoldLayouter<>(graph);
-						else if (algorithm == Algorithms.CIRCLE)
-							layouter = new CircleLayouter<>(graph);
+				if (algorithm == LayoutAlgorithms.KAMADA_KAWAI)
+					layouter = new KamadaKawaiLayouter<>(graph, layoutProperties);
+					else if (algorithm == LayoutAlgorithms.FRUCHTERMAN_REINGOLD)
+						layouter= new FruchtermanReingoldLayouter<>(graph, layoutProperties);
+						else if (algorithm == LayoutAlgorithms.CIRCLE)
+							layouter = new CircleLayouter<>(graph, layoutProperties);
 							else
-								layouter = new SpringLayouter<>(graph);
+								layouter = new SpringLayouter<>(graph, layoutProperties);
 
 
 								drawing = layouter.layout();

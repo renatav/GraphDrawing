@@ -11,13 +11,14 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
+import graph.layout.GraphLayoutProperties;
 import graph.ordering.circular.Circular;
 
 public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>
 {
 
-	public CircleLayouter(Graph<V, E> graph) {
-		super(graph);
+	public CircleLayouter(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
+		super(graph, layoutProperties);
 	}
 
 

@@ -5,6 +5,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
+import graph.layout.GraphLayoutProperties;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -22,8 +23,8 @@ public class BoxLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLa
 	private int xStart = 200, yStart = 200, xOffset = 100, yOffset = 50;
 	private List<V> elementsToLayout;
 	
-	public BoxLayouter(Graph<V, E> graph) {
-		super(graph);
+	public BoxLayouter(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
+		super(graph, layoutProperties);
 	}
 
 
