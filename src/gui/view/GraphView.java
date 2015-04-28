@@ -3,9 +3,9 @@ package gui.view;
 import graph.elements.Graph;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
-import gui.model.IGraphElement;
 import gui.model.GraphModel;
 import gui.model.GraphVertex;
+import gui.model.IGraphElement;
 import gui.model.SelectionModel;
 import gui.state.SelectState;
 import gui.state.State;
@@ -32,8 +32,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
 public class GraphView extends JPanel implements Observer{
 
@@ -54,6 +52,9 @@ public class GraphView extends JPanel implements Observer{
 	private Rectangle lassoRectangle;
 	private AffineTransform transformation = new AffineTransform();
 	private static final double TRANSLATION_STEP = 12;
+	private boolean disablCenterZoom;
+	private double scale = 1;
+	private static final double SCALE_STEP = 0.1;
 
 	public GraphView(Graph<GraphVertex, GraphEdge> graph){
 		model = new GraphModel(graph, this);
@@ -219,9 +220,9 @@ public class GraphView extends JPanel implements Observer{
 	}
 
 
-	//----------------------//
-	//Scrolling
-	//----------------------//	
+	//***************************
+	//		Scrolling
+	//***************************	
 	public void scrollToPoint(Point target){
 		Point current = new Point(0,0);
 		transformToUserSpace(current);
@@ -257,6 +258,81 @@ public class GraphView extends JPanel implements Observer{
 		transformation.translate(0, -TRANSLATION_STEP / transformation.getScaleY());
 		repaint();
 	}
+
+	//*****************************************
+	//				ZOOM
+	//*****************************************
+	public void zoom(double scale) {
+		if (!disablCenterZoom)
+			zoomAtPoint(scale, getCenterPoint());
+		else
+			disablCenterZoom = false;
+	}
+
+	public void zoomAtPoint(double scale, Point2D position) {
+
+
+		scale = limitScaleFactor(scale);
+
+
+		Point2D oldPosition = new Point2D.Double(position.getX(), position.getY());
+
+		transformToUserSpace(oldPosition);
+
+		transformation.setToScale(scale, scale);
+
+		Point2D newPosition = new Point2D.Double(position.getX(), position.getY());
+		transformToUserSpace(newPosition);
+
+
+		double tx = newPosition.getX() - oldPosition.getX();
+		double ty = newPosition.getY() - oldPosition.getY();
+
+		transformation.translate(tx, ty);
+
+		disablCenterZoom = true;
+		repaint();
+
+	}
+
+	public void zoomToPoint(Point2D position){
+		transformFromUserSpace(position);
+		zoomToPoint(1, position, false);
+	}
+
+
+	protected Point2D getCenterPoint() {
+		return new Point2D.Double(getWidth() / 2, getHeight() / 2);
+	}
+
+
+	protected void zoomToPoint(double scale, Point2D position, boolean limitScaleFactor) {
+		if (limitScaleFactor)
+			scale = limitScaleFactor(scale);
+
+		transformToUserSpace(position);
+
+		transformation.setToScale(scale, scale);
+
+		Point2D center = getCenterPoint();
+		transformToUserSpace(center);
+
+		transformation.translate(center.getX() - position.getX(),
+				center.getY() - position.getY());
+
+		repaint();
+	}
+
+	private double limitScaleFactor(double scale) {
+		final double scaleMax = 5;
+		final double scaleMin = 0.1; 
+
+		if (scale > scaleMax) {
+			return scaleMax;
+		}
+		return (scale < scaleMin) ? scaleMin : scale;
+	}
+
 	public class GraphController implements MouseListener, MouseMotionListener, MouseWheelListener{
 
 		public GraphController(){
@@ -313,21 +389,30 @@ public class GraphView extends JPanel implements Observer{
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
 			int notches = e.getWheelRotation();
-			if (notches < 0){ //mouse moved up
-				if (e.isShiftDown())
-					scrollRight();
+			if (e.isControlDown()){
+				if (notches < 0)
+					scale += SCALE_STEP;
 				else
-					scrollUp();
+					scale -= SCALE_STEP;
+				zoomAtPoint(scale, e.getPoint());
 			}
-			else if (notches > 0){
-				if (e.isShiftDown())
-					scrollLeft();
-				else
-					scrollDown();
+			else{
+				if (notches < 0){ //mouse moved up
+					if (e.isShiftDown())
+						scrollRight();
+					else
+						scrollUp();
+				}
+				else if (notches > 0){
+					if (e.isShiftDown())
+						scrollLeft();
+					else
+						scrollDown();
+				}
+				Point2D point = e.getPoint();
+				transformToUserSpace(point);
+				MainFrame.getInstance().updateStatusBarPosition(point);
 			}
-			Point2D point = e.getPoint();
-			transformToUserSpace(point);
-			MainFrame.getInstance().updateStatusBarPosition(point);
 
 		}
 
