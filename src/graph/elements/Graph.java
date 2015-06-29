@@ -1,7 +1,8 @@
 package graph.elements;
 
+import graph.traversal.DFSTreeTraversal;
 import graph.traversal.DijkstraAlgorithm;
-import graph.traversal.GraphTraversal;
+import graph.trees.DFSTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -361,14 +362,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	}
 
 	public boolean isCyclic(){
-		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
-		GraphTraversal<V, E> traversal = new GraphTraversal<>(this);
-		for (V v : vertices){
-			paths = traversal.nonrecursiveDFS(v, v);
-			if (paths.size() > 0)
-				return true;
-		}
-		return false;
+		//TODO umesto pravljenja celog stabla, prekinuti kada se naidje na back ivivu
+		//proveriti da li je ok i za directed i za undirected 
+		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(this);
+		DFSTree<V, E> tree = traversal.formDFSTree(getVertices().get(0));
+		return tree.getBackEdges().size() > 0;
 	}
 
 	public List<V> getAllSinks(){

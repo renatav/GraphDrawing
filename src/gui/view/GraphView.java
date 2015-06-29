@@ -65,6 +65,16 @@ public class GraphView extends JPanel implements Observer{
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
 	}
+	
+	public GraphView(GraphModel model){
+		this.model = model;
+		controller = new GraphController();
+		addMouseListener(controller);
+		addMouseMotionListener(controller);
+		addMouseWheelListener(controller);
+		currentState = new SelectState(this);
+		selectionModel = new SelectionModel(this);
+	}
 
 	@Override
 	public void paintComponent(Graphics g) {

@@ -2,7 +2,9 @@ package gui.main.frame;
 
 import graph.elements.Graph;
 import gui.actions.main.frame.ExitAction;
+import gui.actions.main.frame.LoadAction;
 import gui.actions.main.frame.NewGraphAction;
+import gui.actions.main.frame.SaveAction;
 import gui.actions.palette.AddVertexAction;
 import gui.actions.palette.LayoutAction;
 import gui.actions.palette.LinkAction;
@@ -136,14 +138,21 @@ public class MainFrame extends JFrame{
 
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem exitMi = new JMenuItem(new ExitAction());
+		JMenuItem saveMi = new JMenuItem(new SaveAction());
+		JMenuItem loadMi = new JMenuItem(new LoadAction());
 
 		JMenu editMenu = new JMenu("Edit");
 		JMenuItem newMi = new JMenuItem(new NewGraphAction());
 		editMenu.add(newMi);
-		menuBar.add(editMenu);
+	
 
+		fileMenu.add(saveMi);
+		fileMenu.addSeparator();
 		fileMenu.add(exitMi);
+		fileMenu.add(loadMi);
+		
 		menuBar.add(fileMenu);
+		menuBar.add(editMenu);
 		setJMenuBar(menuBar);
 	}
 
@@ -170,6 +179,9 @@ public class MainFrame extends JFrame{
 		GraphView view = new GraphView(graph);
 		pane.add(view);
 
+	}
+	public void addDiagram(GraphView view){
+		pane.add(view);
 	}
 	
 	public void setPropertiesPanel(PropertiesPanel panel){
