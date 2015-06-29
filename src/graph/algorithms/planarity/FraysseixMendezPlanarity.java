@@ -1,5 +1,6 @@
 package graph.algorithms.planarity;
 
+import graph.algorithms.lrpartition.LRPartition;
 import graph.elements.Edge;
 import graph.elements.EdgeDirection;
 import graph.elements.Graph;
@@ -10,13 +11,19 @@ import graph.trees.DFSTree;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V,E> {
 
+	private Logger log = Logger.getLogger(FraysseixMendezPlanarity.class);
+	
 	@Override
 	public boolean isPlannar(Graph<V,E> graph) {
 
+		log.info("checking cyclic");
 		if (!graph.isCyclic())
 			return true;
+		log.info("finished checking cyclic");
 		
 		LRPartition<V, E> partition = new LRPartition<V,E>(graph);
 		

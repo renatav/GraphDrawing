@@ -1,4 +1,4 @@
-package graph.algorithms.planarity;
+package graph.algorithms.lrpartition;
 
 import graph.elements.Edge;
 import graph.elements.Vertex;

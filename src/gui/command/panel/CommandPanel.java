@@ -1,6 +1,7 @@
 package gui.command.panel;
 
-import graph.algorithms.planarity.AuslanderParterPlanarity;
+import graph.algorithms.planarity.FraysseixMendezPlanarity;
+import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
@@ -34,7 +35,7 @@ public class CommandPanel extends JPanel{
 	private JTextArea centralArea = new JTextArea(10, 10);
 	private List<String> allCommands = new ArrayList<String>();
 	private int currentCommandIndex;
-	private static AuslanderParterPlanarity<GraphVertex, GraphEdge> planarityTest = new AuslanderParterPlanarity<>();
+	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
 	private static Splitting<GraphVertex, GraphEdge> splitting = new Splitting<>();
 
 	public CommandPanel(){

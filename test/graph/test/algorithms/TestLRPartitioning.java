@@ -1,6 +1,6 @@
 package graph.test.algorithms;
 
-import graph.algorithms.planarity.LRPartition;
+import graph.algorithms.lrpartition.LRPartition;
 import graph.application.elements.TestEdge;
 import graph.application.elements.TestVertex;
 import graph.elements.Graph;

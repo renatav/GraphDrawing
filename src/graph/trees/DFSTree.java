@@ -129,10 +129,12 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 */
 	public List<V> allDescendantsOf(V v, boolean includeVertex){
 
+		
 		List<V> ret = new ArrayList<V>();
 		allDescendantsOf(v, ret);
 		if (includeVertex)
 			ret.add(0, v);
+		
 		return ret;
 
 	}
@@ -306,6 +308,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 * @return
 	 */
 	public List<E> returningEdges(E e){
+		
 
 		List<E> ret = new ArrayList<E>();
 
@@ -320,6 +323,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 				destination = e.getDestination();
 			}
 			else {
+				
 				destination = e.getOrigin();
 				origin = e.getDestination();
 			}
@@ -328,6 +332,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 			int originIndex = getIndex(origin);
 
 			List<V> descendants = allDescendantsOf(destination, true); 
+			
 			for (E back : backEdges){
 				if (descendants.contains(back.getDestination()) || descendants.contains(back.getOrigin())){
 					int index;
@@ -345,6 +350,23 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		}
 		return ret;
 
+	}
+	
+	public E getHighestReturningEdge(E e){
+		E highestEdge = null;
+		int highestPoint = -1;
+		
+		for (E returningEdge : returningEdges(e)){
+			
+			int currentPoint = Math.min(getIndex(returningEdge.getOrigin()), getIndex(returningEdge.getDestination()));
+			if (currentPoint > highestPoint){
+				highestPoint = currentPoint;
+				highestEdge = returningEdge;
+			}
+		}
+		
+		return highestEdge;
+		
 	}
 
 	public V getRoot() {
@@ -379,6 +401,13 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	public void setBackEdges(List<E> backEdges) {
 		this.backEdges = backEdges;
+	}
+	
+	public List<E> getAllEdges(){
+		List<E> ret = new ArrayList<E>();
+		ret.addAll(backEdges);
+		ret.addAll(treeEdges);
+		return ret;
 	}
 
 	@Override
