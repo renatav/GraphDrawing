@@ -74,6 +74,13 @@ public class GraphView extends JPanel implements Observer{
 		addMouseWheelListener(controller);
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
+		
+		//initialize painters
+		for (GraphVertex vertex : model.getGraph().getVertices())
+			vertexPainters.add(new VertexPainter(vertex));
+		for (GraphEdge edge : model.getGraph().getEdges())
+			edgePainters.add(new EdgePainter(edge));
+		
 	}
 
 	@Override
