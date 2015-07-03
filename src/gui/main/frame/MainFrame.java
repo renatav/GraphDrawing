@@ -146,12 +146,11 @@ public class MainFrame extends JFrame{
 		JMenu editMenu = new JMenu("Edit");
 		JMenuItem newMi = new JMenuItem(new NewGraphAction());
 		editMenu.add(newMi);
-	
 
 		fileMenu.add(saveMi);
+		fileMenu.add(loadMi);
 		fileMenu.addSeparator();
 		fileMenu.add(exitMi);
-		fileMenu.add(loadMi);
 		
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);

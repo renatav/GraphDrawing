@@ -6,8 +6,6 @@ import gui.view.GraphView;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
@@ -44,8 +42,8 @@ public class LoadAction extends AbstractAction {
 		
 		GraphModel model = (GraphModel) xstream.fromXML(f);
 		GraphView view = new GraphView(model);
-		System.out.println(model.getGraph().getVertices());
 		MainFrame.getInstance().addDiagram(view);
+		view.repaint();
 		
 	}
 

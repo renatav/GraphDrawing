@@ -81,12 +81,22 @@ public class GraphView extends JPanel implements Observer{
 		this.model = model;
 		setFocusable(true);
 		controller = new GraphController();
+		CancelAction cancelAction = controller.new CancelAction();
 		addMouseListener(controller);
 		addMouseMotionListener(controller);
 		addMouseWheelListener(controller);
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
-	
+		getActionMap().put("cancelAction", cancelAction);
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
+		
+
+		//initialize painters
+		for (GraphVertex vertex : model.getGraph().getVertices())
+			vertexPainters.add(new VertexPainter(vertex));
+		for (GraphEdge edge : model.getGraph().getEdges())
+			edgePainters.add(new EdgePainter(edge));
+		
 	}
 
 	@Override
