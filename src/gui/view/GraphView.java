@@ -9,6 +9,7 @@ import gui.model.IGraphElement;
 import gui.model.SelectionModel;
 import gui.state.SelectState;
 import gui.state.State;
+import gui.view.GraphView.GraphController.CancelAction;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
 
@@ -18,6 +19,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -31,7 +34,9 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.AbstractAction;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 public class GraphView extends JPanel implements Observer{
 
@@ -58,22 +63,30 @@ public class GraphView extends JPanel implements Observer{
 
 	public GraphView(Graph<GraphVertex, GraphEdge> graph){
 		model = new GraphModel(graph, this);
+		setFocusable(true);
+		requestFocus();
 		controller = new GraphController();
+		CancelAction cancelAction = controller.new CancelAction();
 		addMouseListener(controller);
 		addMouseMotionListener(controller);
 		addMouseWheelListener(controller);
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
+		getActionMap().put("cancelAction", cancelAction);
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
+		
 	}
-	
+
 	public GraphView(GraphModel model){
 		this.model = model;
+		setFocusable(true);
 		controller = new GraphController();
 		addMouseListener(controller);
 		addMouseMotionListener(controller);
 		addMouseWheelListener(controller);
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
+	
 	}
 
 	@Override
@@ -424,6 +437,22 @@ public class GraphView extends JPanel implements Observer{
 				MainFrame.getInstance().updateStatusBarPosition(point);
 			}
 
+		}
+
+		
+		public class CancelAction extends AbstractAction{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				currentState.cancel();
+				
+			}
+			
 		}
 
 	}

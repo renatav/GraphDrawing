@@ -28,8 +28,10 @@ public class SelectState extends State{
 					else
 						view.getSelectionModel().addVertexToSelection(hitVertex);
 				}
-				else
-					view.getSelectionModel().selecteVertex(hitVertex);
+				else{
+					if (view.getSelectionModel().getSelectedVertices().size() == 0)
+						view.getSelectionModel().selecteVertex(hitVertex);
+				}
 			}
 			else if (hitElement instanceof GraphEdge){
 				GraphEdge hitEdge = (GraphEdge)hitElement;	
@@ -62,15 +64,29 @@ public class SelectState extends State{
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		IGraphElement hitElement = view.elementAtPoint(e.getPoint());
+		if (hitElement != null){
+			if (hitElement instanceof GraphVertex){
+				GraphVertex hitVertex = (GraphVertex)hitElement;
+				if (!e.isControlDown()){
+					if (view.getSelectionModel().getSelectedVertices().size() > 0)
+						view.getSelectionModel().selecteVertex(hitVertex);
+				}
+			}
+		}
 	}
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		IGraphElement hitElement = view.elementAtPoint(e.getPoint());
 		if (hitElement == null){
 			//lasso
 			MainFrame.getInstance().changeToLassoSelect();
+		}
+		else{
+			//change to move state
+			MainFrame.getInstance().changeToMoveState(e.getPoint());
+			
 		}
 		
 	}

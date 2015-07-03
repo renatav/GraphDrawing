@@ -16,6 +16,7 @@ import gui.properties.PropertiesPanel;
 import gui.state.AddState;
 import gui.state.LassoSelectState;
 import gui.state.LinkState;
+import gui.state.MoveState;
 import gui.state.SelectState;
 import gui.util.GuiUtil;
 import gui.util.StatusBar;
@@ -24,6 +25,7 @@ import gui.view.GraphView;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -228,4 +230,9 @@ public class MainFrame extends JFrame{
 		
 	}
 
+	public void changeToMoveState(Point2D mousePosition){
+		GraphView currentView = getCurrentView();
+		currentView.setCurrentState(new MoveState(currentView.getSelectionModel().getSelectedVertices(), currentView, mousePosition));
+		statusBar.setLabelText("Move state");
+	}
 }
