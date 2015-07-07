@@ -1,5 +1,7 @@
 package graph.algorithms.planarity;
 
+import graph.algorithms.interlacement.InterlacementGraphEdge;
+import graph.algorithms.interlacement.InterlacementGraphVertex;
 import graph.elements.Edge;
 import graph.elements.EdgeDirection;
 import graph.elements.Graph;

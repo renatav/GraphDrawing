@@ -368,6 +368,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return highestEdge;
 		
 	}
+	
 
 	public V getRoot() {
 		return root;
