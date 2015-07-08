@@ -2,7 +2,7 @@ package gui.command.panel;
 
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
-import graph.algorithms.planarity.ShihShuPlanarity;
+import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
@@ -37,7 +37,7 @@ public class CommandPanel extends JPanel{
 	private List<String> allCommands = new ArrayList<String>();
 	private int currentCommandIndex;
 //	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
-	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new ShihShuPlanarity<GraphVertex, GraphEdge>();
+	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
 	private static Splitting<GraphVertex, GraphEdge> splitting = new Splitting<>();
 
 	public CommandPanel(){

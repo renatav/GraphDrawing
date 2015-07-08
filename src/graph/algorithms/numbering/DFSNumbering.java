@@ -13,6 +13,12 @@ import java.util.Comparator;
 public class DFSNumbering<V extends Vertex, E extends Edge<V>> extends Numbering<V,E>{
 
 	private DFSTree<V, E> dfsTree;
+	
+	public DFSNumbering(DFSTree<V, E> dfsTree){
+		order = new ArrayList<V>();
+		this.dfsTree = dfsTree;
+		formOrder();
+	}
 
 	public DFSNumbering(Graph<V,E> graph){
 
@@ -20,6 +26,10 @@ public class DFSNumbering<V extends Vertex, E extends Edge<V>> extends Numbering
 
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
 		dfsTree = traversal.formDFSTree(graph.getVertices().get(0));
+		formOrder();
+	}
+	
+	private void formOrder(){
 
 
 		order.addAll(dfsTree.getVertices());

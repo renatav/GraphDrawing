@@ -80,6 +80,21 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return null;
 	}
 
+	public List<E> allIncomingBackEdges(V v){
+
+		List<E> ret = new ArrayList<E>();
+
+		V other;
+		for (E e : backEdges){
+			if (e.getOrigin() == v || e.getDestination() == v){
+				other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+				if (compareVertices(v, other) == -1) //index of v is lower
+					ret.add(e);
+			}
+		}
+		return ret;
+	}
+
 	/**
 	 * Finds all edges starting from an v and ending in a descendant of v (index of v is lower)
 	 * @param v
@@ -129,12 +144,12 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 */
 	public List<V> allDescendantsOf(V v, boolean includeVertex){
 
-		
+
 		List<V> ret = new ArrayList<V>();
 		allDescendantsOf(v, ret);
 		if (includeVertex)
 			ret.add(0, v);
-		
+
 		return ret;
 
 	}
@@ -272,8 +287,8 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return getIndex(destination);
 
 	}
-	
-	
+
+
 	public int highpt(E e){
 
 		V origin, destination;
@@ -308,7 +323,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 * @return
 	 */
 	public List<E> returningEdges(E e){
-		
+
 
 		List<E> ret = new ArrayList<E>();
 
@@ -323,7 +338,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 				destination = e.getDestination();
 			}
 			else {
-				
+
 				destination = e.getOrigin();
 				origin = e.getDestination();
 			}
@@ -332,7 +347,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 			int originIndex = getIndex(origin);
 
 			List<V> descendants = allDescendantsOf(destination, true); 
-			
+
 			for (E back : backEdges){
 				if (descendants.contains(back.getDestination()) || descendants.contains(back.getOrigin())){
 					int index;
@@ -351,24 +366,24 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return ret;
 
 	}
-	
+
 	public E getHighestReturningEdge(E e){
 		E highestEdge = null;
 		int highestPoint = -1;
-		
+
 		for (E returningEdge : returningEdges(e)){
-			
+
 			int currentPoint = Math.min(getIndex(returningEdge.getOrigin()), getIndex(returningEdge.getDestination()));
 			if (currentPoint > highestPoint){
 				highestPoint = currentPoint;
 				highestEdge = returningEdge;
 			}
 		}
-		
+
 		return highestEdge;
-		
+
 	}
-	
+
 
 	public V getRoot() {
 		return root;
@@ -403,7 +418,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	public void setBackEdges(List<E> backEdges) {
 		this.backEdges = backEdges;
 	}
-	
+
 	public List<E> getAllEdges(){
 		List<E> ret = new ArrayList<E>();
 		ret.addAll(backEdges);

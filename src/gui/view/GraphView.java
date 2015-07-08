@@ -73,7 +73,7 @@ public class GraphView extends JPanel implements Observer{
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
-		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
+	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 	}
 
@@ -88,7 +88,7 @@ public class GraphView extends JPanel implements Observer{
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
-		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
+	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 
 		//initialize painters
