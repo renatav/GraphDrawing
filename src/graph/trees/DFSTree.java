@@ -384,6 +384,29 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	}
 
+	/**
+	 * Vertex directly adjacent to v by a back edge
+	 * @param v Vertex
+	 * @return least ancestor if one exists, null otherwise
+	 */
+	public V leastAncestor(V v){
+
+		for (E backEdge : backEdges){
+
+			V other = null;
+
+			if (backEdge.getOrigin() == v)
+				other = backEdge.getDestination();
+			else if (backEdge.getDestination() == v)
+				other = backEdge.getOrigin();
+
+			//if back edges goes from v to other
+			if (other != null && verticesWithIndexes.get(v) > verticesWithIndexes.get(other))
+				return other;
+		}
+		
+		return null;
+	}
 
 	public V getRoot() {
 		return root;
