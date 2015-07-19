@@ -1,14 +1,21 @@
 package graph.trees;
 
 import graph.elements.Edge;
+import graph.elements.EdgeDirection;
 import graph.elements.Graph;
+import graph.elements.Path;
 import graph.elements.Vertex;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+
+import org.apache.commons.collections15.comparators.ComparableComparator;
 
 public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
@@ -96,7 +103,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 
 	/**
-	 * Finds all edges starting from an v and ending in a descendant of v (index of v is lower)
+	 * Finds all edges starting from v and ending in a descendant of v (index of v is lower)
 	 * @param v
 	 * @return
 	 */
@@ -404,8 +411,73 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 			if (other != null && verticesWithIndexes.get(v) > verticesWithIndexes.get(other))
 				return other;
 		}
-		
+
 		return null;
+	}
+
+
+	public List<V> treePathBetween(V first, V target){
+		Path<V,E> path = findAllPathsDFS(first, target).get(0);
+		List<V> ret = path.pathVertices();
+
+		Collections.sort(ret, new Comparator<V>(){
+
+			@Override
+			public int compare(V o1, V o2) {
+
+				if (verticesWithIndexes.get(o1) > verticesWithIndexes.get(o2))
+					return 1;
+				else if  (verticesWithIndexes.get(o1) < verticesWithIndexes.get(o2))
+					return -1;
+				else
+					return 0;
+			}
+			
+		});
+		
+		return ret;
+
+	}
+
+	public List<Path<V, E>> findAllPathsDFS(V first, V target){
+		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
+		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target);
+		return paths;
+	}
+
+	private void findAllPathsDFS(List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, 
+			V currentVertex, V start, V end) {        
+
+		if (currentVertex.equals(end)) { 
+			if (!(currentVertex.equals(start) && visited.size() == 0)){
+				paths.add(new Path<V, E>(visited, directions));
+				return;
+			}
+		}
+		List<E> edges = allOutgoingTreeEdges(currentVertex);
+
+		for (E e : edges) {
+			if (visited.contains(e)) {
+				continue;
+			}
+
+			List<E> temp = new ArrayList<E>();
+			List<EdgeDirection> directionsTemp = new ArrayList<EdgeDirection>();
+			temp.addAll(visited);
+			temp.add(e);
+			directionsTemp.addAll(directions);
+			V nextVert;
+			if (currentVertex == e.getOrigin()){
+				nextVert = e.getDestination();
+				directionsTemp.add(EdgeDirection.TO_DESTINATION);
+			}
+			else{
+				nextVert = e.getOrigin();
+				directionsTemp.add(EdgeDirection.TO_ORIGIN);
+			}
+
+			findAllPathsDFS(temp, directionsTemp, paths, nextVert, start, end);
+		}
 	}
 
 	public V getRoot() {

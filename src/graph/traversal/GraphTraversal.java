@@ -96,6 +96,8 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 	}
 
 
+	
+	//TODO ovo popraviti
 	public List<Path<V,E>> nonrecursiveDFS(V start, V end){
 		List<Path<V,E>> ret = new ArrayList<Path<V,E>>();
 
@@ -170,6 +172,7 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		return ret;
 
 	}
+	
 
 	public Path<V,E> getShortestPath(V source, V target){
 		Path<V,E> ret = null;
