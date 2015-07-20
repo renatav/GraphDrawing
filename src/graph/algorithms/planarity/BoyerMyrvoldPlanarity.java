@@ -7,7 +7,6 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.traversal.DFSTreeTraversal;
 import graph.trees.DFSTree;
-import graph.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,11 +123,11 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 			for (E back : incomingBackEdges){
 				walkup(v, back);
 			}
-			
+
 			for (E back : incomingBackEdges){
 				walkdown(v, back);
 			}
-			
+
 			//for each back edge of G incident to v and a descendant w
 			//Walkup(G ˜, v, w)
 
@@ -249,112 +248,121 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 	private boolean walkdown(V v, E backEdge){
 
-		
+
+		log.info("Walkdown " + v + " " + backEdge);
+
 		//!! pertinentBlocksForEdge treba obratiti paznju na to da se to sve moze menjati po 
 		//embeddovanju ivice...
-		
+
 		//find block whose root is v and which leads to the end of the back edge
 		Block current = pertinentBlocksForEdge.get(backEdge).get(v);
 		List<Block> blocksToBeJoined = new ArrayList<Block>();
 		List<Block> toBeFlipped = new ArrayList<Block>();
-		
+
 		V endpoint = backEdge.getOrigin() == v ? backEdge.getDestination() : backEdge.getOrigin();
 
 
+		//clockwise or anticlockwise
 		boolean direction = true;
-		boolean end = false;
+		//found the back edge ending vertex while traversing the structure
+		boolean foundEnding = false;
 
-		while (!end){
+		List<Block> blocksWhichContainEndpoint = blocksWhichContainVertex(endpoint);
 
-			
-			System.out.println(current);
+		while (!foundEnding){
+
+			System.out.println("Processing block: " + current);
 			blocksToBeJoined.add(current);
 			Block nextBlock = null;
-
 
 			//analyze block
 			//go in one direction, if extremely active vertex is reached, go the other way
 			//until a vertex which leads to another block is reached
 			boolean changeDirection = false;
 
-			if (direction){
-				for (int i = 1; i < current.getBoundaryVertices().size(); i++){ //skip root
-					V currentBoundary = current.getBoundaryVertices().get(i);
-					if (extremelyActive(currentBoundary, v)){
-						changeDirection = true;
-						break;
-					}
+
+			int index = 1;
+			if (!direction)
+				index = current.getBoundaryVertices().size() -1;
+
+			while (true){
+
+				V currentBoundary = current.getBoundaryVertices().get(index);
+				if (extremelyActive(currentBoundary, v)){
+					changeDirection = true;
+					break;
+				}
+
+				if (!blocksWhichContainEndpoint.contains(current)) //don't move to next block if this contains the endpoint
 					if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null){
 						nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
 						break;
 					}
-					if (currentBoundary == endpoint){
-						end = true;
+
+				if (currentBoundary == endpoint){
+					foundEnding = true;
+					break;
+				}
+
+				if (direction){
+					index ++;
+					if (index == current.getBoundaryVertices().size())
 						break;
-					}
+				}
+				else{
+					index --;
+					if (index == 0)
+						break;
 				}
 			}
-			else{
-				for (int i = current.getBoundaryVertices().size() - 1; i > 0 ; i--){
-					V currentBoundary = current.getBoundaryVertices().get(i);
+
+
+
+			if (changeDirection){
+				direction = !direction;
+
+				index = 1;
+				if (!direction)
+					index = current.getBoundaryVertices().size() -1;
+
+				while (true){
+
+					V currentBoundary = current.getBoundaryVertices().get(index);
 					if (extremelyActive(currentBoundary, v)){
-						changeDirection = true;
-						break;
+						return false;
 					}
-					if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null){
-						nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
-						break;
-					}
+
+					if (!blocksWhichContainEndpoint.contains(current)) //don't move to next block if this contains the endpoint
+						if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null){
+							nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
+							break;
+						}
 					if (currentBoundary == endpoint){
-						end = true;
+						foundEnding = true;
 						break;
+					}
+
+					if (direction){
+						index ++;
+						if (index == current.getBoundaryVertices().size())
+							break;
+					}
+					else{
+						index --;
+						if (index == 0)
+							break;
 					}
 				}
 			}
 
-			if (changeDirection){
-				direction = !direction;
-				if (direction){
-					for (int i = current.getBoundaryVertices().size() - 1; i > 0 ; i--){
-						V currentBoundary = current.getBoundaryVertices().get(i);
-						if (extremelyActive(currentBoundary, v)){
-							return false;
-						}
-						if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null){
-							nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
-							break;
-						}
-						if (currentBoundary == endpoint){
-							end = true;
-							break;
-						}
-					}
-				}
-				else{
-					for (int i = 1; i < current.getBoundaryVertices().size(); i++){
-						V currentBoundary = current.getBoundaryVertices().get(i);
-						if (extremelyActive(currentBoundary, v)){
-							return false;
-						}
-						if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null){
-							nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
-							break;
-						}
-						if (currentBoundary == endpoint){
-							end = true;
-							break;
-						}
-					}
-				}
-			}
-			
 			if (changeDirection)
 				toBeFlipped.add(current);
 
 			current = nextBlock;
 
 		}
-
+		
+		System.out.println("Covered blocks: " + blocksToBeJoined);
 
 
 		//ideja je da idemo, krecemo sre kroz listu napred ili nazad, da ne naidjemo na active
@@ -372,7 +380,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	private boolean extremelyActive(V w, V v){
 
 		V leastAncestor = dfsTree.leastAncestor(w);
-			
+
 		if ((leastAncestor != null && dfsTree.getIndex(leastAncestor) < dfsTree.getIndex(v)) || 
 				(vertexChildListMap.get(w).size() > 0 && dfsTree.getIndex(vertexChildListMap.get(w).get(0)) < dfsTree.getIndex(v)))
 			return true;
