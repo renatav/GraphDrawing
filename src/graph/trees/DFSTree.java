@@ -13,9 +13,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-
-import org.apache.commons.collections15.comparators.ComparableComparator;
 
 public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
@@ -392,11 +389,14 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 
 	/**
-	 * Vertex directly adjacent to v by a back edge
+	 * Vertex directly adjacent to v by a back edge that has the lowest index of all
+	 * such vertices
 	 * @param v Vertex
 	 * @return least ancestor if one exists, null otherwise
 	 */
 	public V leastAncestor(V v){
+		
+		V leastAncestor = null;
 
 		for (E backEdge : backEdges){
 
@@ -408,11 +408,14 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 				other = backEdge.getOrigin();
 
 			//if back edges goes from v to other
-			if (other != null && verticesWithIndexes.get(v) > verticesWithIndexes.get(other))
-				return other;
+			if (other != null && verticesWithIndexes.get(v) > verticesWithIndexes.get(other)){
+				if (leastAncestor == null || getIndex(other) < getIndex(leastAncestor))
+					leastAncestor = other;
+			}
+				
 		}
 
-		return null;
+		return leastAncestor;
 	}
 
 

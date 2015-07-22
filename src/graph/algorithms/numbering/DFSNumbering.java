@@ -49,13 +49,6 @@ public class DFSNumbering<V extends Vertex, E extends Edge<V>> extends Numbering
 
 
 		});
-		System.out.println(order);
-		System.out.println(dfsTree.getRoot());
-
-
-		for (V v : order){
-			System.out.println(dfsTree.getVerticesWithIndexes().get(v));
-		}
 	}
 
 }
