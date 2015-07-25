@@ -30,17 +30,27 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	private List<Block> blocks = new ArrayList<Block>();
 
 	/**
-	 * Map of all blocks and their roots. When checking for pertinents roots of a vertex
+	 * Map of all blocks and their roots. When checking for pertinent roots of a vertex
 	 * just check if it is a key in this map
 	 */
 	private Map<E, Map<V, Block>> pertinentBlocksForEdge = new HashMap<E, Map<V, Block>>();
+
 	/**
 	 * DFS tree formed from the graph which is being analyzed 
 	 */
 	private DFSTree<V,E> dfsTree;
 
+	/**Map with a vertex as a key and lists of its dfs children as values*/
 	private Map<V, List<V>> vertexChildListMap = new HashMap<V, List<V>>();
+
+	/**Map which pairs a vertex with its lowpoint index*/
 	private Map<V, Integer> vertexLowpointMap = new HashMap<V, Integer>();
+
+	/**List of endpoints of back edges used during the walkdown phase*/
+	private List<V> endpoins = new ArrayList<V>();
+
+	/**List of externally active vertices used during the walkdown phase*/
+	private List<V> externallyActive;
 
 	private Logger log = Logger.getLogger(BoyerMyrvoldPlanarity.class);
 
@@ -65,8 +75,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
 		dfsTree = traversal.formDFSTree(graph.getVertices().get(0));
 
-		System.out.println("DFS TREE");
-		System.out.println(dfsTree);
+		//System.out.println("DFS TREE");
+		//System.out.println(dfsTree);
 
 		//equip each vertex with a list called separatedDFSChildList
 		//which initially contains references to all DFS children of the vertex, sorted by
@@ -114,9 +124,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		for (V v : numbering.getOrder()){
 
 
-			System.out.println("PROCESSING VERTEX + " + v);
+			//System.out.println("PROCESSING VERTEX + " + v);
 
-			//System.out.println("processing " + v + " " + dfsTree.getIndex(v));
 
 			//for each DFS child c of v in G
 			//Embed tree edge (vc, c) as a biconnected component in G
@@ -124,40 +133,115 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				formBlock(e);
 			}
 
-
-			List<E> incomingBackEdges = dfsTree.allIncomingBackEdges(v);
-
-
-			for (E back : incomingBackEdges)
-				walkup(v, back);
+			if (!processVertex(v))
+				return false;
 
 
-			//the Walkdown is invoked by the core planarity algorithm once for each DFS child
-			//c of the vertex v to embed the back
-			//edges from v to descendants of c.
-			for (V child : dfsTree.directDescendantsOf(v)){
-				if (incomingBackEdges.size() > 0){
-					List<E> edgesToEmbed = new ArrayList<E>();
-					for (E back : incomingBackEdges){
-						V endpoint = back.getOrigin() == v ? back.getDestination() : back.getOrigin();
-						if (dfsTree.allDescendantsOf(child, false).contains(endpoint)){
-							edgesToEmbed.add(back);
-						}
+		}
+
+		//if the implementation needed to be expanded
+		//to embed all back edges which can be embedded and to isolate
+		//Kuratowski subgraph
+		//don't return false, just keep going
+		return true;
+	}
+
+
+	private boolean processVertex(V v){
+
+		List<E> incomingBackEdges = dfsTree.allIncomingBackEdges(v);
+
+		//the Walkdown is invoked by the core planarity algorithm once for each DFS child
+		//c of the vertex v to embed the back
+		//edges from v to descendants of c.
+		for (V child : dfsTree.directDescendantsOf(v)){
+
+			//if the vertex has incoming back edges
+			if (incomingBackEdges.size() > 0){
+				List<E> edgesToEmbed = new ArrayList<E>();
+				for (E back : incomingBackEdges){
+					V endpoint = back.getOrigin() == v ? back.getDestination() : back.getOrigin();
+					if (dfsTree.allDescendantsOf(child, false).contains(endpoint)){
+						edgesToEmbed.add(back);
 					}
-					if (edgesToEmbed.size() > 0)
-						if (!walkdown(v, child, edgesToEmbed))
-							return false;
 				}
 
+				if (edgesToEmbed.size() > 0){
 
+					endpoins.clear();
+					externallyActive = listExternalyActive(v);
+
+					//sort the embedding order
+					//if the edges are chosen randomly
+					//it is possible that some of them won't be embedded
+					//resulting in algorithm's failure
+					Collections.sort(edgesToEmbed, new Comparator<E>() {
+
+						@Override
+						public int compare(E o1, E o2) {
+
+							V endpoint1 = dfsTree.getIndex(o1.getOrigin()) > dfsTree.getIndex(o1.getDestination()) ?
+									o1.getOrigin() : o1.getDestination();
+
+									V endpoint2 = dfsTree.getIndex(o2.getOrigin()) > dfsTree.getIndex(o2.getDestination()) ?
+											o2.getOrigin() : o2.getDestination();
+
+
+											//if there are no externally active vertices
+											//usually when the last vertex is being processed (and only one block is left)
+											//embed edges in the order of vertices on the external face of the block
+											//which contains the vertices
+											if (externallyActive.size() == 0){
+												//both in the same block?
+												List<Block> blocks1 = blocksWhichContainVertex(endpoint1);
+												List<Block> blocks2 = blocksWhichContainVertex(endpoint2);
+												blocks1.retainAll(blocks2);
+												if (blocks1.size() > 0){
+													Block b = blocks1.get(0);
+													if (b.getBoundaryVertices().indexOf(endpoint1) < b.getBoundaryVertices().indexOf(endpoint2))
+														return 1;
+													else if (b.getBoundaryVertices().indexOf(endpoint1) > b.getBoundaryVertices().indexOf(endpoint2))
+														return -1;
+													return 0;
+												}
+											}
+
+											//else embed those with lower DFI first
+
+											if (dfsTree.getIndex(endpoint1) > dfsTree.getIndex(endpoint2))
+												return 1;
+
+											if (dfsTree.getIndex(endpoint1) < dfsTree.getIndex(endpoint2))
+												return -1;
+
+											return 0;
+						}
+					});
+
+
+
+					//set endpoints list
+					for (E backEdge : edgesToEmbed){
+						V endpoint = backEdge.getOrigin() == v ? backEdge.getDestination() : backEdge.getOrigin();
+						endpoins.add(endpoint);
+					}
+
+					for (E backEdge : edgesToEmbed){
+						//perform walkup for every edge
+						//since blocks are changed when merging and 
+						//some kind of processing would have to be performed in any case
+						walkup(v, backEdge);
+						//now perform walkdown and embed the edge
+						//if that is not possible, return false
+						if (!walkdown(v, child, backEdge, edgesToEmbed))
+							return false;
+					}
+				}
 			}
-			//if the implementation needed to be expanded
-			//to embed all back edges which can be embedded and to isolate
-			//Kuratowski subgraph
-			//don't return false, just keep going
 		}
 		return true;
 	}
+
 
 
 
@@ -175,7 +259,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 		//find dfs tree path between vertices connected with the back edge
 		List<V> dfsTreePath = dfsTree.treePathBetween(v, w);
-		//	System.out.println("DFS path " + dfsTreePath);
+		//System.out.println("DFS path " + dfsTreePath);
+
 
 		for (V pathVertex : dfsTreePath){
 
@@ -209,84 +294,114 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		}
 	}
 
+	/*in this phase it is determined how to embed an edge
+	  and blocks are joined
+	  it is important to keep externally active vertices
+	  on the external face*/
+	private boolean walkdown(V v, V child, E backEdge,  List<E> backEdges){
 
 
-	private List<Block> blocksWhichContainVertex(V v){
+		log.info("Walkdown " + v + " " + backEdge);
+		
+		System.out.println("CURRENT BLOCKS " + blocks);
+		System.out.println("PERTINENT " + pertinentBlocksForEdge.get(backEdge));
+		System.out.println("Externally active " + externallyActive);
 
-		List<Block> ret = new ArrayList<Block>();
-		for (Block b : blocks)
-			if (b.getVertices().contains(v))
-				ret.add(b);
+		//find block whose root is v and which leads to the end of the back edge
+		Block current = pertinentBlocksForEdge.get(backEdge).get(v);
+		List<Block> blocksToBeJoined = new ArrayList<Block>();
 
-		return ret;
-	}
+		//found the back edge ending vertex while traversing the structure
+		boolean foundEnding = false;
 
-	private boolean walkdown(V v, V child, List<E> backEdges){
+		V endpoint = backEdge.getOrigin() == v ? backEdge.getDestination() : backEdge.getOrigin();
+		List<Block> blocksWhichContainEndpoint = blocksWhichContainVertex(endpoint);
 
-		//in this phase it is determined how to embed an edge
-		//and blocks are joined
-		//it is important to keep externally active vertices
-		//on the external face
+		Direction currentDirection = Direction.CLOCKWISE;
+		boolean first = true;
 
-		//other endpoint vertices must stay on the external face!
+		List<V> traversedVerticesList = new ArrayList<V>();
 
-		List<V> endpoins = new ArrayList<V>();
+		while (!foundEnding){
 
-		for (E backEdge : backEdges){
-			V endpoint = backEdge.getOrigin() == v ? backEdge.getDestination() : backEdge.getOrigin();
-			endpoins.add(endpoint);
-		}
+			System.out.println("Processing block: " + current);
 
+			traversedVerticesList.clear();
 
-		for (E backEdge : backEdges){
+			blocksToBeJoined.add(current);
+			Block nextBlock = null;
 
-			System.out.println("CURRENT BLOCKS " + blocks);
+			//analyze block
+			//go in one direction, if extremely active vertex is reached, go the other way
+			//until a vertex which leads to another block is reached
+			boolean changeDirection = false;
 
-			log.info("Walkdown " + v + " " + backEdge);
+			int index = 1;
+			if (currentDirection == Direction.COUNTERCLOCKWISE)
+				index = current.getBoundaryVertices().size() -1;
 
-			List<V> externallyActive = listExternalyActive(v);
-			System.out.println("Externally active " + externallyActive);
+			while (true){ //simulating for loop in order to avoid writing the same code twice 
 
-			//find block whose root is v and which leads to the end of the back edge
-			Block current = pertinentBlocksForEdge.get(backEdge).get(v);
-			List<Block> blocksToBeJoined = new ArrayList<Block>();
+				V currentBoundary = current.getBoundaryVertices().get(index);
+				traversedVerticesList.add(currentBoundary);
 
-			//found the back edge ending vertex while traversing the structure
-			boolean foundEnding = false;
-
-			V endpoint = backEdge.getOrigin() == v ? backEdge.getDestination() : backEdge.getOrigin();
-			List<Block> blocksWhichContainEndpoint = blocksWhichContainVertex(endpoint);
-
-			Direction currentDirection = Direction.CLOCKWISE;
-			boolean first = true;
-
-			List<V> traversedVerticesList = new ArrayList<V>();
-
-			while (!foundEnding){
-
-				System.out.println("Processing block: " + current);
-
-				traversedVerticesList.clear();
-
-				blocksToBeJoined.add(current);
-				Block nextBlock = null;
-
-				//analyze block
-				//go in one direction, if extremely active vertex is reached, go the other way
-				//until a vertex which leads to another block is reached
-				boolean changeDirection = false;
+				//System.out.println("Current boundary: " + currentBoundary);
 
 
-				int index = 1;
+				if (!blocksWhichContainEndpoint.contains(current)) //don't move to next block if this contains the endpoint
+					if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null && 
+					pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != current){
+						System.out.println("FOUND PERTINENT " + currentBoundary);
+						nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
+						break;
+					}
+
+				if (currentBoundary == endpoint){
+					System.out.println("endpoint");
+					foundEnding = true;
+					break;
+				}
+
+				if (externallyActive.contains(currentBoundary)){
+					changeDirection = true;
+					System.out.println("found extremely active vertex " + currentBoundary + " changing direction");
+					break;
+				}
+
+
+				if (currentDirection == Direction.CLOCKWISE){
+					index ++;
+					if (index == current.getBoundaryVertices().size()){
+						System.out.println("kraj");
+						break;
+					}
+				}
+				else{
+					index --;
+					if (index == 0)
+						break;
+				}
+			}
+
+
+
+			if (changeDirection){
+
+				currentDirection = currentDirection == Direction.CLOCKWISE ? Direction.COUNTERCLOCKWISE : Direction.CLOCKWISE;
+
+				index = 1;
 				if (currentDirection == Direction.COUNTERCLOCKWISE)
 					index = current.getBoundaryVertices().size() -1;
 
-				while (true){ //simulating for loop in order to avoid writing the same code twice 
+				traversedVerticesList.clear();
+
+				while (true){
 
 					V currentBoundary = current.getBoundaryVertices().get(index);
-					traversedVerticesList.add(currentBoundary);
 
-					System.out.println("Current boundary: " + currentBoundary);
+					//System.out.println("Current boundary: " + currentBoundary);
+
+					traversedVerticesList.add(currentBoundary);
 
 
 					if (!blocksWhichContainEndpoint.contains(current)) //don't move to next block if this contains the endpoint
@@ -295,19 +410,15 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 							nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
 							break;
 						}
-
 					if (currentBoundary == endpoint){
-						System.out.println("endpoint");
 						foundEnding = true;
 						break;
 					}
 
 					if (externallyActive.contains(currentBoundary)){
-						changeDirection = true;
-						System.out.println("found extremely active vertex " + currentBoundary + " changing direction");
-						break;
+						System.out.println("found another externally active " + currentBoundary + " - not planar!");
+						return false;
 					}
-
 
 					if (currentDirection == Direction.CLOCKWISE){
 						index ++;
@@ -320,169 +431,121 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 							break;
 					}
 				}
+			}
 
+			//update external face and flip if necessary (to keep externally active on the external face)
+			//this is when the second traversal is performed:
+			//check if there are externally active on the other side
+			//but it wasn't traversed since the correct direction was chosen
+			//also check if there are other endpoints (to make sure that it will be possible to embed them as well
+			//and if there is no reason to flip at that point
+			//see if there are any pertinent vertices on the other side - leave them on the external face
 
+			//TODO Ovo za direction, uvek pocinje od clockwise?
+			
+			V last = traversedVerticesList.get(traversedVerticesList.size() - 1);
 
-				if (changeDirection){
+			if (changeDirection)
+				current.setExternalFace(last, Direction.CLOCKWISE);
+			else{
 
-					currentDirection = currentDirection == Direction.CLOCKWISE ? Direction.COUNTERCLOCKWISE : Direction.CLOCKWISE;
+				boolean flip = false;
 
-					index = 1;
-					if (currentDirection == Direction.COUNTERCLOCKWISE)
-						index = current.getBoundaryVertices().size() -1;
+				int indexOfEnd = current.getBoundaryVertices().
+						indexOf(traversedVerticesList.get(traversedVerticesList.size() - 1));
 
-					traversedVerticesList.clear();
+				boolean hasExternallyActive = false;
+				boolean hasOtherToBeEmbedded = false;
+				boolean hasPertiment = false;
 
-					while (true){
-
-						V currentBoundary = current.getBoundaryVertices().get(index);
-
-						//System.out.println("Current boundary: " + currentBoundary);
-
-						traversedVerticesList.add(currentBoundary);
-
-
-						if (!blocksWhichContainEndpoint.contains(current)) //don't move to next block if this contains the endpoint
-							if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null && 
-							pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != current){
-								nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
-								break;
-							}
-						if (currentBoundary == endpoint){
-							foundEnding = true;
-							break;
-						}
-
-						if (externallyActive.contains(currentBoundary)){
-							System.out.println("found another externally active " + currentBoundary + " - not planar!");
-							return false;
-						}
-
-						if (currentDirection == Direction.CLOCKWISE){
-							index ++;
-							if (index == current.getBoundaryVertices().size())
-								break;
-						}
-						else{
-							index --;
-							if (index == 0)
-								break;
-						}
+				for (int i = current.getBoundaryVertices().size() - 1; i > indexOfEnd; i--){
+					V vert = current.getBoundaryVertices().get(i);
+					if (externallyActive.contains(vert)){
+						hasExternallyActive = true;
+						break;
+					}
+					if (endpoins.contains(vert)){
+						hasOtherToBeEmbedded = true;
+						break;
+					}
+					if (allBlocksWithRoot.get(vert) != null && allBlocksWithRoot.get(vert).size() > 0){
+						hasPertiment = true;
 					}
 				}
 
-				//update external face and flip if necessary (to keep externally active on the external face)
+
+				flip = hasExternallyActive || hasOtherToBeEmbedded;
+
+				if (!flip){
+					boolean traversedPertinent = false;
+					for(V vert : traversedVerticesList){
+						if (vert == last)
+							break;
+						if (allBlocksWithRoot.get(vert) != null && allBlocksWithRoot.get(vert).size() > 0){
+							traversedPertinent = true;
+							System.out.println(vert  + " je pertinent");
+							break;
+						}
+					}
+					if (!traversedPertinent && hasPertiment)
+						flip = true;
+				}
 
 
-				//now check if there are externally active on the other side
-				//but it wasn't traversed since the correct direction was chosen
+				System.out.println("FLIP " + flip);
 
-
-				V last = traversedVerticesList.get(traversedVerticesList.size() - 1);
-				
-				if (changeDirection)
+				if (flip)
+					current.setExternalFace(last, Direction.COUNTERCLOCKWISE);
+				else
 					current.setExternalFace(last, Direction.CLOCKWISE);
-				else{
-
-					boolean flip = false;
-
-
-					int indexOfEnd = current.getBoundaryVertices().
-							indexOf(traversedVerticesList.get(traversedVerticesList.size() - 1));
-
-					boolean hasExternallyActive = false;
-					boolean hasOtherToBeEmbedded = false;
-					boolean hasPertiment = false;
-
-					for (int i = current.getBoundaryVertices().size() - 1; i > indexOfEnd; i--){
-						V vert = current.getBoundaryVertices().get(i);
-						if (externallyActive.contains(vert)){
-							hasExternallyActive = true;
-							break;
-						}
-						if (endpoins.contains(vert)){
-							hasOtherToBeEmbedded = true;
-							break;
-						}
-						if (allBlocksWithRoot.get(vert) != null){
-							hasPertiment = true;
-						}
-					}
-
-					flip = hasExternallyActive || hasOtherToBeEmbedded;
-
-//					if (!flip){
-//						boolean traversedPertinent = false;
-//						for(V vert : traversedVerticesList){
-//							if (vert == endpoint)
-//								break;
-//							if (allBlocksWithRoot.get(vert) != null){
-//								traversedPertinent = true;
-//								break;
-//							}
-//						}
-//						if (!traversedPertinent && hasPertiment)
-//							flip = true;
-//					}
-
-
-					System.out.println("FLIP " + flip);
-
-					if (flip)
-						current.setExternalFace(last, Direction.COUNTERCLOCKWISE);
-					else
-						current.setExternalFace(last, Direction.CLOCKWISE);
-				}
-
-
-				System.out.println("Blok posle: " + current);
-
-				current = nextBlock;
-				if (first)
-					first = false;
-
 			}
 
 
-			//now merge blocks
-			//and set the external face of the new block properly
+			System.out.println("Blok posle: " + current);
 
-			if (blocksToBeJoined.size() > 1){
-				System.out.println("Merging blocks: " + blocksToBeJoined);
-				Block newBlock = mergeBlocks(blocksToBeJoined);
+			current = nextBlock;
+			if (first)
+				first = false;
 
-				//update pertiment block maps for other edges
-				for (E e : backEdges){
-					if (e == backEdge)
-						continue;
-					Map<V, Block> toBeTraversed =  pertinentBlocksForEdge.get(e);
-					boolean modified = false;
-					for (Block joinedBlock : blocksToBeJoined){
-						if (toBeTraversed.get(joinedBlock.getRoot()) == joinedBlock){
-							toBeTraversed.remove(joinedBlock);
-							modified = true;
-						}
-					}
-					if (modified)
-						toBeTraversed.put(newBlock.getRoot(), newBlock);
+		}
 
 
-				}
-				//now embed the edge
-				newBlock.addEdge(backEdge);
+		//now merge blocks
+		//and set the external face of the new block properly
 
-				System.out.println(newBlock);
-				//System.out.println(blocks);
-			}
+		if (blocksToBeJoined.size() > 1){
+			System.out.println("Merging blocks: " + blocksToBeJoined);
+			Block newBlock = mergeBlocks(blocksToBeJoined);
+
+			newBlock.addEdge(backEdge);
+
+			System.out.println(newBlock);
+			endpoins.remove(endpoint);
 		}
 
 		return true;
 
 	}
 
-	/*
+	/**
+	 * @param v vertex
+	 * @return List of block which contain the vertex
+	 */
+	private List<Block> blocksWhichContainVertex(V v){
+
+		List<Block> ret = new ArrayList<Block>();
+		for (Block b : blocks)
+			if (b.getVertices().contains(v))
+				ret.add(b);
+
+		return ret;
+	}
+
+
+	/**
 	   A vertex w is externally active during the processing of v if w either has a least ancestor less than
 		v or if the first element in the separatedDFSChildList of w has a lowpoint less than v.
+		Checks if vertex w is externally active during the processing of v
 	 */
 	private boolean externallyActive(V w, V v){
 
@@ -661,7 +724,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		public String toString() {
 			return "Block [vertices=" + vertices + ", edges=" + edges
 					+ ", boundaryVertices=" + boundaryVertices
-					+  "root=" + root;
+					+  "root=" + root + "\n";
 		}
 
 	}
