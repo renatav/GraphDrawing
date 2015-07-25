@@ -302,7 +302,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 
 		log.info("Walkdown " + v + " " + backEdge);
-		
+
 		System.out.println("CURRENT BLOCKS " + blocks);
 		System.out.println("PERTINENT " + pertinentBlocksForEdge.get(backEdge));
 		System.out.println("Externally active " + externallyActive);
@@ -441,12 +441,16 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 			//and if there is no reason to flip at that point
 			//see if there are any pertinent vertices on the other side - leave them on the external face
 
-			//TODO Ovo za direction, uvek pocinje od clockwise?
-			
+
 			V last = traversedVerticesList.get(traversedVerticesList.size() - 1);
 
-			if (changeDirection)
-				current.setExternalFace(last, Direction.CLOCKWISE);
+			if (changeDirection){
+				if (currentDirection == Direction.COUNTERCLOCKWISE)
+					current.setExternalFace(last, Direction.CLOCKWISE);
+				else
+					current.setExternalFace(last, Direction.COUNTERCLOCKWISE);
+
+			}
 			else{
 
 				boolean flip = false;
@@ -458,18 +462,36 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				boolean hasOtherToBeEmbedded = false;
 				boolean hasPertiment = false;
 
-				for (int i = current.getBoundaryVertices().size() - 1; i > indexOfEnd; i--){
-					V vert = current.getBoundaryVertices().get(i);
-					if (externallyActive.contains(vert)){
-						hasExternallyActive = true;
-						break;
+				if (currentDirection == Direction.CLOCKWISE){
+					for (int i = current.getBoundaryVertices().size() - 1; i > indexOfEnd; i--){
+						V vert = current.getBoundaryVertices().get(i);
+						if (externallyActive.contains(vert)){
+							hasExternallyActive = true;
+							break;
+						}
+						if (endpoins.contains(vert)){
+							hasOtherToBeEmbedded = true;
+							break;
+						}
+						if (allBlocksWithRoot.get(vert) != null && allBlocksWithRoot.get(vert).size() > 0){
+							hasPertiment = true;
+						}
 					}
-					if (endpoins.contains(vert)){
-						hasOtherToBeEmbedded = true;
-						break;
-					}
-					if (allBlocksWithRoot.get(vert) != null && allBlocksWithRoot.get(vert).size() > 0){
-						hasPertiment = true;
+				}
+				else{
+					for (int i = 1; i < indexOfEnd; i++){
+						V vert = current.getBoundaryVertices().get(i);
+						if (externallyActive.contains(vert)){
+							hasExternallyActive = true;
+							break;
+						}
+						if (endpoins.contains(vert)){
+							hasOtherToBeEmbedded = true;
+							break;
+						}
+						if (allBlocksWithRoot.get(vert) != null && allBlocksWithRoot.get(vert).size() > 0){
+							hasPertiment = true;
+						}
 					}
 				}
 
@@ -494,10 +516,15 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 				System.out.println("FLIP " + flip);
 
-				if (flip)
-					current.setExternalFace(last, Direction.COUNTERCLOCKWISE);
-				else
-					current.setExternalFace(last, Direction.CLOCKWISE);
+				Direction toSet = currentDirection;
+				if (flip){
+					if (currentDirection == Direction.CLOCKWISE)
+						toSet = Direction.COUNTERCLOCKWISE;
+					else
+						toSet = Direction.CLOCKWISE;
+				}
+				
+				current.setExternalFace(last, toSet);
 			}
 
 
