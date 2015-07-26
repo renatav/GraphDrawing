@@ -75,8 +75,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
 		dfsTree = traversal.formDFSTree(graph.getVertices().get(0));
 
-		//System.out.println("DFS TREE");
-		//System.out.println(dfsTree);
+		System.out.println("DFS TREE");
+		System.out.println(dfsTree);
 
 		//equip each vertex with a list called separatedDFSChildList
 		//which initially contains references to all DFS children of the vertex, sorted by
@@ -171,54 +171,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					endpoins.clear();
 					externallyActive = listExternalyActive(v);
 
-					//sort the embedding order
-					//if the edges are chosen randomly
-					//it is possible that some of them won't be embedded
-					//resulting in algorithm's failure
-					Collections.sort(edgesToEmbed, new Comparator<E>() {
-
-						@Override
-						public int compare(E o1, E o2) {
-
-							V endpoint1 = dfsTree.getIndex(o1.getOrigin()) > dfsTree.getIndex(o1.getDestination()) ?
-									o1.getOrigin() : o1.getDestination();
-
-									V endpoint2 = dfsTree.getIndex(o2.getOrigin()) > dfsTree.getIndex(o2.getDestination()) ?
-											o2.getOrigin() : o2.getDestination();
-
-
-											//if there are no externally active vertices
-											//usually when the last vertex is being processed (and only one block is left)
-											//embed edges in the order of vertices on the external face of the block
-											//which contains the vertices
-											if (externallyActive.size() == 0){
-												//both in the same block?
-												List<Block> blocks1 = blocksWhichContainVertex(endpoint1);
-												List<Block> blocks2 = blocksWhichContainVertex(endpoint2);
-												blocks1.retainAll(blocks2);
-												if (blocks1.size() > 0){
-													Block b = blocks1.get(0);
-													if (b.getBoundaryVertices().indexOf(endpoint1) < b.getBoundaryVertices().indexOf(endpoint2))
-														return 1;
-													else if (b.getBoundaryVertices().indexOf(endpoint1) > b.getBoundaryVertices().indexOf(endpoint2))
-														return -1;
-													return 0;
-												}
-											}
-
-											//else embed those with lower DFI first
-
-											if (dfsTree.getIndex(endpoint1) > dfsTree.getIndex(endpoint2))
-												return 1;
-
-											if (dfsTree.getIndex(endpoint1) < dfsTree.getIndex(endpoint2))
-												return -1;
-
-											return 0;
-						}
-					});
-
-
 
 					//set endpoints list
 					for (E backEdge : edgesToEmbed){
@@ -226,20 +178,151 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 						endpoins.add(endpoint);
 					}
 
-					for (E backEdge : edgesToEmbed){
+
+					while (edgesToEmbed.size() > 0){
 						//perform walkup for every edge
 						//since blocks are changed when merging and 
 						//some kind of processing would have to be performed in any case
-						walkup(v, backEdge);
+
+						for (E backEdge : edgesToEmbed)
+							walkup(v, backEdge);
+
+						sortEdgesToEmbed(edgesToEmbed);
+						System.out.println(edgesToEmbed);
+						E backEdge = edgesToEmbed.get(0);
 						//now perform walkdown and embed the edge
 						//if that is not possible, return false
 						if (!walkdown(v, child, backEdge, edgesToEmbed))
 							return false;
+						edgesToEmbed.remove(backEdge);
 					}
 				}
 			}
 		}
 		return true;
+	}
+
+
+	private void sortEdgesToEmbed(List<E> edgesToEmbed){
+
+		//sort the embedding order
+		//if the edges are chosen randomly
+		//it is possible that some of them won't be embedded
+		//resulting in algorithm's failure
+		//if there are more relevant vertices in a block, not just back edges
+		//make sure that they are not left out of the external face
+		//basically, traversing the external face of the relevant block and searching for 
+		//ednpoints and pertinent vertices
+
+		System.out.println(edgesToEmbed);
+		Collections.sort(edgesToEmbed, new Comparator<E>() {
+
+			@Override
+			public int compare(E o1, E o2) {
+
+
+				V endpoint1 = dfsTree.getIndex(o1.getOrigin()) > dfsTree.getIndex(o1.getDestination()) ? o1.getOrigin() : o1.getDestination();
+				V endpoint2 = dfsTree.getIndex(o2.getOrigin()) > dfsTree.getIndex(o2.getDestination()) ? o2.getOrigin() : o2.getDestination();
+
+
+				System.out.println("for edges " + o1 + " "+ o2);
+
+				Map<V,Block> pertinent1 = pertinentBlocksForEdge.get(o1);
+				Map<V,Block> pertinent2 = pertinentBlocksForEdge.get(o2);
+
+				//System.out.println("pertinent1 " + pertinent1);
+				//	System.out.println("pertinent2 " + pertinent2);
+
+				List<Block> overlappingBlocks = new ArrayList<Block>(pertinent1.values());
+				overlappingBlocks.retainAll(pertinent2.values());
+				//System.out.println("overlapping blocks: " + overlappingBlocks);
+
+
+				if (overlappingBlocks.size() > 0){
+
+					//find block with lowest dfi (where paths part)
+					Block block = overlappingBlocks.get(0);
+					for (Block overlapping : overlappingBlocks)
+						if (dfsTree.getIndex(overlapping.getRoot()) > dfsTree.getIndex(block.getRoot()))
+							block = overlapping;
+
+					//	System.out.println("RELEVANT BLOCK " + block);
+
+					int index1 = -1, index2 = -1;
+					int stopIndex = -1;
+					for (int i = 1; i < block.getBoundaryVertices().size(); i++){
+						V boundary = block.getBoundaryVertices().get(i);
+						if (externallyActive.contains(boundary)){
+							stopIndex = i;
+							break;
+						}
+						if (boundary == endpoint1 || pertinent1.containsKey(boundary))
+							index1 = i;
+						if (boundary == endpoint2 || pertinent2.containsKey(boundary))
+							index2 = i;
+						if (index1 != -1 && index2 != -1)
+							break;
+					}
+
+					if (stopIndex != -1){
+						for (int i = block.getBoundaryVertices().size() - 1; i > stopIndex; i--){
+							V boundary = block.getBoundaryVertices().get(i);
+
+							if (boundary == endpoint1 || pertinent1.containsKey(boundary))
+								index1 = i;
+							if (boundary == endpoint2 || pertinent2.containsKey(boundary))
+								index2 = i;
+							if (index1 != -1 && index2 != -1)
+								break;
+						}
+					}
+
+//					System.out.println("INDEKSI");
+//					System.out.println(index1);
+//					System.out.println(index2);
+
+
+					if (stopIndex == -1){
+						if (index1 > index2){
+							return 1;
+						}
+
+
+						if (index1 < index2){
+							return -1;
+						}
+					}
+					else{
+						if (index1 > index2){
+							return -1;
+						}
+
+
+						if (index1 < index2){
+							return 1;
+						}
+					}
+
+					if (dfsTree.getIndex(endpoint1) > dfsTree.getIndex(endpoint2))
+						return 1;
+
+					if (dfsTree.getIndex(endpoint1) < dfsTree.getIndex(endpoint2))
+						return -1;
+
+					return 0;
+
+				}
+
+				if (dfsTree.getIndex(endpoint1) > dfsTree.getIndex(endpoint2))
+					return 1;
+
+				if (dfsTree.getIndex(endpoint1) < dfsTree.getIndex(endpoint2))
+					return -1;
+
+				return 0;
+			}
+		});
+
 	}
 
 
@@ -372,7 +455,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				if (currentDirection == Direction.CLOCKWISE){
 					index ++;
 					if (index == current.getBoundaryVertices().size()){
-						System.out.println("kraj");
 						break;
 					}
 				}
@@ -463,6 +545,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				boolean hasPertiment = false;
 
 				if (currentDirection == Direction.CLOCKWISE){
+
 					for (int i = current.getBoundaryVertices().size() - 1; i > indexOfEnd; i--){
 						V vert = current.getBoundaryVertices().get(i);
 						if (externallyActive.contains(vert)){
@@ -523,7 +606,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					else
 						toSet = Direction.CLOCKWISE;
 				}
-				
+
 				current.setExternalFace(last, toSet);
 			}
 
@@ -537,9 +620,11 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		}
 
 
+		backEdges.remove(backEdge);
+
+
 		//now merge blocks
 		//and set the external face of the new block properly
-
 		if (blocksToBeJoined.size() > 1){
 			System.out.println("Merging blocks: " + blocksToBeJoined);
 			Block newBlock = mergeBlocks(blocksToBeJoined);
@@ -548,6 +633,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 			System.out.println(newBlock);
 			endpoins.remove(endpoint);
+
 		}
 
 		return true;
