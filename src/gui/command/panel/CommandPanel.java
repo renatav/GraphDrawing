@@ -1,8 +1,9 @@
 package gui.command.panel;
 
-import graph.algorithms.planarity.FraysseixMendezPlanarity;
-import graph.algorithms.planarity.PlanarityTestingAlgorithm;
+import graph.algorithm.AlgorithmExecutor;
+import graph.algorithm.ExecuteResult;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
+import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
@@ -184,7 +185,8 @@ public class CommandPanel extends JPanel{
 		}
 
 		if (command.startsWith(commands[7])){
-			return planarityTest.isPlannar(MainFrame.getInstance().getCurrentView().getModel().getGraph()) ? "yes" : "no";
+			ExecuteResult result = AlgorithmExecutor.execute(planarityTest, "isPlannar", MainFrame.getInstance().getCurrentView().getModel().getGraph());
+			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
 		}
 
 		if (command.startsWith(commands[8])){

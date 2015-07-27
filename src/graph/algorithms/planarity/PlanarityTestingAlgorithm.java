@@ -5,7 +5,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.traversal.GraphTraversal;
 
-public abstract class PlanarityTestingAlgorithm<V extends Vertex, E extends Edge<V>> {
+public abstract class PlanarityTestingAlgorithm<V extends Vertex, E extends Edge<V>>  {
 
 
 	protected GraphTraversal<V, E> traversal;
