@@ -3,6 +3,7 @@ package gui.command.panel;
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
+import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
@@ -37,7 +38,7 @@ public class CommandPanel extends JPanel{
 	private JTextArea centralArea = new JTextArea(10, 10);
 	private List<String> allCommands = new ArrayList<String>();
 	private int currentCommandIndex;
-//	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
+	//private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
 	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
 	private static Splitting<GraphVertex, GraphEdge> splitting = new Splitting<>();
 

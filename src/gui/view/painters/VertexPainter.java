@@ -12,7 +12,7 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
-public class VertexPainter {
+public class VertexPainter implements ElementPainter {
 
 	private GraphVertex vertex;
 	private Shape shape;

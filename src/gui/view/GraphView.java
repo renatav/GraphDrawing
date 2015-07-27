@@ -1,8 +1,10 @@
 package gui.view;
 
 import graph.elements.Graph;
+import gui.actions.toolbar.RemoveAction;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
+import gui.model.GraphElement;
 import gui.model.GraphModel;
 import gui.model.GraphVertex;
 import gui.model.IGraphElement;
@@ -11,6 +13,7 @@ import gui.state.SelectState;
 import gui.state.State;
 import gui.view.GraphView.GraphController.CancelAction;
 import gui.view.painters.EdgePainter;
+import gui.view.painters.ElementPainter;
 import gui.view.painters.VertexPainter;
 
 import java.awt.BasicStroke;
@@ -30,6 +33,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -73,6 +77,8 @@ public class GraphView extends JPanel implements Observer{
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
+		getActionMap().put("deleteAction", new RemoveAction());
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
 	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 	}
@@ -88,6 +94,8 @@ public class GraphView extends JPanel implements Observer{
 		currentState = new SelectState(this);
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
+		getActionMap().put("deleteAction", new RemoveAction());
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
 	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 
@@ -191,6 +199,32 @@ public class GraphView extends JPanel implements Observer{
 
 	public void addEdgePainter(EdgePainter edgePainter){
 		edgePainters.add(edgePainter);
+	}
+	
+	public List<ElementPainter> removePainters(List<GraphElement> elements){
+		
+		List<ElementPainter> removedPainters = new ArrayList<ElementPainter>();
+		
+		Iterator<VertexPainter> vertexIt =vertexPainters.iterator();
+		while (vertexIt.hasNext()){
+			VertexPainter current = vertexIt.next();
+			if (elements.contains(current.getVertex())){
+				vertexIt.remove();
+				removedPainters.add(current);
+			}
+		}
+		
+		Iterator<EdgePainter> edgeIt = edgePainters.iterator();
+		while (edgeIt.hasNext()){
+			EdgePainter current = edgeIt.next();
+			if (elements.contains(current.getEdge())){
+				edgeIt.remove();
+				removedPainters.add(current);
+			}
+		}
+		
+		return removedPainters;
+
 	}
 
 	private void setLassoRectangle(){

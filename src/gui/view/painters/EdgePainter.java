@@ -10,7 +10,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
-public class EdgePainter {
+public class EdgePainter implements ElementPainter{
 
 	private GraphEdge edge;
 	private GeneralPath path = new GeneralPath();
