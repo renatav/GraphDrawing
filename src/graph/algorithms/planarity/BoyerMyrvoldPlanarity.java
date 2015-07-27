@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -179,16 +180,18 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					}
 
 
+
+					for (E backEdge : edgesToEmbed)
+						walkup(v, backEdge);
+
+					
 					while (edgesToEmbed.size() > 0){
+						
 						//perform walkup for every edge
 						//since blocks are changed when merging and 
 						//some kind of processing would have to be performed in any case
-
-						for (E backEdge : edgesToEmbed)
-							walkup(v, backEdge);
-
 						sortEdgesToEmbed(edgesToEmbed);
-						System.out.println(edgesToEmbed);
+						
 						E backEdge = edgesToEmbed.get(0);
 						//now perform walkdown and embed the edge
 						//if that is not possible, return false
@@ -224,8 +227,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				V endpoint1 = dfsTree.getIndex(o1.getOrigin()) > dfsTree.getIndex(o1.getDestination()) ? o1.getOrigin() : o1.getDestination();
 				V endpoint2 = dfsTree.getIndex(o2.getOrigin()) > dfsTree.getIndex(o2.getDestination()) ? o2.getOrigin() : o2.getDestination();
 
-
-				System.out.println("for edges " + o1 + " "+ o2);
 
 				Map<V,Block> pertinent1 = pertinentBlocksForEdge.get(o1);
 				Map<V,Block> pertinent2 = pertinentBlocksForEdge.get(o2);
@@ -276,10 +277,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 								break;
 						}
 					}
-
-//					System.out.println("INDEKSI");
-//					System.out.println(index1);
-//					System.out.println(index2);
 
 
 					if (stopIndex == -1){
@@ -620,8 +617,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		}
 
 
-		backEdges.remove(backEdge);
-
 
 		//now merge blocks
 		//and set the external face of the new block properly
@@ -633,8 +628,28 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 			System.out.println(newBlock);
 			endpoins.remove(endpoint);
+			
+			//update pertinent map
+			for (E edge : backEdges){
+				Map<V, Block> pertinentForEdge = pertinentBlocksForEdge.get(edge);
+				Iterator<Entry<V,Block>> entries = pertinentForEdge.entrySet().iterator();
+				boolean replaced = false;
+				while (entries.hasNext()){
+					Entry<V, Block> entry = entries.next();
+					if (blocksToBeJoined.contains(entry.getValue())){
+							entries.remove();
+							replaced = true;
+					}
+				}
+				if (replaced)
+					pertinentForEdge.put(newBlock.getRoot(), newBlock);
+			}
+			
 
 		}
+		
+		pertinentBlocksForEdge.remove(backEdge);
+		backEdges.remove(backEdge);
 
 		return true;
 
@@ -739,7 +754,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					separatedListIterator.remove();
 			}
 		}
-
+		
 		return result;
 
 	}
