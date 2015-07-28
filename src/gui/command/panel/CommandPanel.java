@@ -3,7 +3,6 @@ package gui.command.panel;
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
-import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;

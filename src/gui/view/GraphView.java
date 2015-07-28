@@ -201,6 +201,7 @@ public class GraphView extends JPanel implements Observer{
 		edgePainters.add(edgePainter);
 	}
 	
+	
 	public List<ElementPainter> removePainters(List<GraphElement> elements){
 		
 		List<ElementPainter> removedPainters = new ArrayList<ElementPainter>();

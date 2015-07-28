@@ -91,8 +91,13 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	public void removeVertex(V v){
 		vertices.remove(v);
+		List<E> adjacent = adjacentLists.get(v);
+		for (E e : adjacent){
+			edges.remove(e);
+		}
 		adjacentLists.remove(v);
 	}
+	
 
 	@SuppressWarnings("unchecked")
 	public void addEdge(E...edge){
@@ -163,6 +168,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		edges.remove(e);
 		adjacentLists.get(e.getOrigin()).remove(e);
 		adjacentLists.get(e.getDestination()).remove(e);
+	}
+	
+	public List<E> adjacentEdges(V v){
+		return adjacentLists.get(v);
 	}
 
 	/**
