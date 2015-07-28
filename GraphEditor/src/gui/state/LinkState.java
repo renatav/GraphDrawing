@@ -1,10 +1,12 @@
 package gui.state;
 
+import gui.commands.AddElementCommand;
+import gui.commands.Command;
+import gui.commands.CommandExecutor;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 import gui.view.GraphView;
-import gui.view.painters.EdgePainter;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -78,10 +80,9 @@ public class LinkState extends State{
 		GraphEdge edge = new GraphEdge(startVertex, endVertex);
 		List<Point2D> edgePoints = new ArrayList<Point2D>(linkPoints);
 		edge.setLinkNodes(edgePoints);
-		EdgePainter painter = new EdgePainter(edge);
-		view.getEdgePainters().add(painter);
+		Command command = new AddElementCommand(edge, view);
+		CommandExecutor.getInstance().execute(command);
 		clearAll();
-		view.getModel().addEdge(edge);
 	}
 	
 	private void clearAll(){

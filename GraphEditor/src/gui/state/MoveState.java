@@ -1,7 +1,11 @@
 package gui.state;
 
+import gui.commands.Command;
+import gui.commands.CommandExecutor;
+import gui.commands.MoveCommand;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
+import gui.model.GraphElement;
 import gui.model.GraphVertex;
 import gui.view.GraphView;
 
@@ -52,6 +56,14 @@ public class MoveState extends State{
 	public void mouseReleased(MouseEvent e) {
 
 		if (SwingUtilities.isLeftMouseButton(e)){
+			int moveX =  prevLocationX - startX;
+			int moveY = prevLocationY - startY;
+			move(-moveX, -moveY);
+			
+			List<GraphElement> elements = new ArrayList<GraphElement>();
+			elements.addAll(vertices);
+			Command command = new MoveCommand(view, elements, moveX, moveY);
+			CommandExecutor.getInstance().execute(command);
 			MainFrame.getInstance().changeToSelect();
 		}
 	}
@@ -84,6 +96,9 @@ public class MoveState extends State{
 	}
 
 	private void move(int moveX, int moveY){
+		
+		List<GraphElement> elements = new ArrayList<GraphElement>();
+		elements.addAll(vertices);
 
 		List<GraphEdge> processedEdges = new ArrayList<GraphEdge>();
 		for (GraphVertex v : vertices){

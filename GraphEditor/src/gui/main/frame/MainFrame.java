@@ -9,6 +9,9 @@ import gui.actions.palette.AddVertexAction;
 import gui.actions.palette.LayoutAction;
 import gui.actions.palette.LinkAction;
 import gui.actions.palette.SelectAction;
+import gui.actions.toolbar.RedoAction;
+import gui.actions.toolbar.RemoveAction;
+import gui.actions.toolbar.UndoAction;
 import gui.command.panel.CommandPanel;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
@@ -58,6 +61,12 @@ public class MainFrame extends JFrame{
 	private JToggleButton btnSelect = new JToggleButton(new SelectAction());
 	private JPanel propertiesPanel;
 	private CommandPanel commandPanel;
+	private NewGraphAction newGraphAction = new NewGraphAction();
+	private LoadAction loadAction = new LoadAction();
+	private SaveAction saveAction = new SaveAction();
+	private RemoveAction removeAction = new RemoveAction();
+	private RedoAction redoAction = new RedoAction();
+	private UndoAction undoAction = new UndoAction();
 
 	public MainFrame(){
 
@@ -111,8 +120,6 @@ public class MainFrame extends JFrame{
 		
 		palettePanel.add(new JButton(new LayoutAction()));
 		
-		
-		
 		propertiesPanel = new JPanel(new MigLayout("fill"));
 		propertiesPanel.add(new JLabel("Properties"), "dock north");
 		
@@ -139,12 +146,21 @@ public class MainFrame extends JFrame{
 
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem exitMi = new JMenuItem(new ExitAction());
-		JMenuItem saveMi = new JMenuItem(new SaveAction());
-		JMenuItem loadMi = new JMenuItem(new LoadAction());
+		JMenuItem saveMi = new JMenuItem(saveAction);
+		JMenuItem loadMi = new JMenuItem(loadAction);
 
 		JMenu editMenu = new JMenu("Edit");
-		JMenuItem newMi = new JMenuItem(new NewGraphAction());
+		JMenuItem newMi = new JMenuItem(newGraphAction);
+		JMenuItem undoMi = new JMenuItem(undoAction);
+		JMenuItem redoMi = new JMenuItem(redoAction);
+		JMenuItem removeMi = new JMenuItem(removeAction);
+		
 		editMenu.add(newMi);
+		editMenu.addSeparator();
+		editMenu.add(undoMi);
+		editMenu.add(redoMi);
+		editMenu.addSeparator();
+		editMenu.add(removeMi);
 
 		fileMenu.add(saveMi);
 		fileMenu.add(loadMi);
@@ -159,7 +175,14 @@ public class MainFrame extends JFrame{
 	private void initToolBar(){
 		toolBar = new JToolBar();
 		add(toolBar, "dock north");
-		toolBar.add(new NewGraphAction());
+		toolBar.add(newGraphAction);
+		toolBar.add(saveAction);
+		toolBar.add(loadAction);
+		toolBar.addSeparator();
+		toolBar.add(removeAction);
+		toolBar.addSeparator();
+		toolBar.add(undoAction);
+		toolBar.add(redoAction);
 	}
 
 	public static MainFrame getInstance(){

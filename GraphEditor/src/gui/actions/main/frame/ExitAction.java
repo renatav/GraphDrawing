@@ -3,6 +3,7 @@ package gui.actions.main.frame;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 
 public class ExitAction extends AbstractAction{
 
@@ -15,6 +16,7 @@ public class ExitAction extends AbstractAction{
 	public ExitAction(){
 		putValue(NAME, "Exit");
 		putValue(SHORT_DESCRIPTION, "Close application");
+		putValue(SMALL_ICON, new ImageIcon(getClass().getResource("/gui/resources/exit.png")));
 		
 	}
 	

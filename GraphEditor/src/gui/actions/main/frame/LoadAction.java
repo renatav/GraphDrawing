@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -21,6 +22,7 @@ public class LoadAction extends AbstractAction {
 
 	public LoadAction(){
 		putValue(NAME, "Load");
+		putValue(SMALL_ICON, new ImageIcon(getClass().getResource("/gui/resources/load.png")));
 		putValue(SHORT_DESCRIPTION, "Load graph");
 		xstream = new XStream(new StaxDriver());
 	}

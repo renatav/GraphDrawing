@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 
 import com.thoughtworks.xstream.XStream;
@@ -21,6 +22,7 @@ public class SaveAction extends AbstractAction {
 
 	public SaveAction(){
 		putValue(NAME, "Save");
+		putValue(SMALL_ICON, new ImageIcon(getClass().getResource("/gui/resources/save.png")));
 		putValue(SHORT_DESCRIPTION, "Save graph");
 		xstream = new XStream(new StaxDriver());
 	}

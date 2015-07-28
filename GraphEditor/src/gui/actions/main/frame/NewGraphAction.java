@@ -5,6 +5,7 @@ import gui.main.frame.MainFrame;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 
 public class NewGraphAction extends AbstractAction {
 
@@ -13,6 +14,7 @@ public class NewGraphAction extends AbstractAction {
 	public NewGraphAction(){
 		putValue(NAME, "New");
 		putValue(SHORT_DESCRIPTION, "Create new graph");
+		putValue(SMALL_ICON, new ImageIcon(getClass().getResource("/gui/resources/new.png")));
 	}
 
 	@Override

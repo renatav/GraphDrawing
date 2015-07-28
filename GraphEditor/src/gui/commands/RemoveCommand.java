@@ -19,8 +19,8 @@ public class RemoveCommand extends Command{
 	private List<ElementPainter> removedPainters;
 	
 	public RemoveCommand(List<GraphElement> elementsToRemove, GraphView view) {
+		super(view);
 		this.elementsToRemove = elementsToRemove;
-		this.view = view;
 	}
 	
 	@Override

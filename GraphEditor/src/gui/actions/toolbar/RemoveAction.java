@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 
 public class RemoveAction extends AbstractAction {
 
@@ -18,6 +19,13 @@ public class RemoveAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public RemoveAction(){
+		putValue(SMALL_ICON, new ImageIcon(getClass().getResource("/gui/resources/remove.png")));
+		putValue(NAME, "Delete");
+		putValue(SHORT_DESCRIPTION, "Delete selected elements");
+		
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {

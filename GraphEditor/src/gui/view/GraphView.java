@@ -192,13 +192,21 @@ public class GraphView extends JPanel implements Observer{
 	public GraphModel getModel(){
 		return model;
 	}
-
+	
 	public void addVertexPainter(VertexPainter vertexPainter){
 		vertexPainters.add(vertexPainter);
 	}
 
 	public void addEdgePainter(EdgePainter edgePainter){
 		edgePainters.add(edgePainter);
+	}
+	
+	public void removeVertexPainter(VertexPainter vertexPainter){
+		vertexPainters.remove(vertexPainter);
+	}
+
+	public void removeEdgePainter(EdgePainter edgePainter){
+		edgePainters.remove(edgePainter);
 	}
 	
 	

@@ -1,10 +1,12 @@
 package gui.state;
 
+import gui.commands.AddElementCommand;
+import gui.commands.Command;
+import gui.commands.CommandExecutor;
 import gui.main.frame.ElementsEnum;
 import gui.main.frame.MainFrame;
 import gui.model.GraphVertex;
 import gui.view.GraphView;
-import gui.view.painters.VertexPainter;
 
 import java.awt.event.MouseEvent;
 
@@ -27,9 +29,8 @@ public class AddState extends State{
 				int count =view.getModel().getVerticeCount();
 				String content = "v" + count;
 				GraphVertex vertex = new GraphVertex(e.getPoint(), content);
-				VertexPainter painter = new VertexPainter(vertex);
-				view.addVertexPainter(painter);
-				view.getModel().addVertex(vertex);
+				Command command = new AddElementCommand(vertex, view);
+				CommandExecutor.getInstance().execute(command);
 			}
 		}
 		else if (SwingUtilities.isRightMouseButton(e)){
