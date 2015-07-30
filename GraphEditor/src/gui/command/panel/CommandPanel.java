@@ -4,6 +4,7 @@ import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
+import graph.distance.CzekanovskiDiceDistance;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
@@ -93,6 +94,7 @@ public class CommandPanel extends JPanel{
 	
 	
 	private String processCommand(String command){
+		command = command.trim();
 		allCommands.add(command);
 		currentCommandIndex = allCommands.size();
 		if (command.equals(commands[0]))
@@ -344,6 +346,14 @@ public class CommandPanel extends JPanel{
 				return "Couldn't construct spqr tree: " + e.getMessage();
 			}
 		}
+		
+		if (command.equals(commands[16])){
+			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
+			
+			CzekanovskiDiceDistance<GraphVertex, GraphEdge> distance= new CzekanovskiDiceDistance<GraphVertex, GraphEdge>(graph);
+			distance.calculateVerticeDistances();
+				
+		}
 
 
 		if (command.equals(commands[15])){
@@ -372,7 +382,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[16];
+		commands = new String[17];
 		commands[0] = "quit";
 		commands[1] = "create graph";
 		commands[2] = "add vertex";
@@ -389,6 +399,7 @@ public class CommandPanel extends JPanel{
 		commands[13] = "maximal split pairs";
 		commands[14] = "construct spqr";
 		commands[15] = "help";
+		commands[16] = "distance";
 
 	}
 		

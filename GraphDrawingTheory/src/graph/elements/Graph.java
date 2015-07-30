@@ -26,6 +26,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	protected List<V> vertices;
 	protected List<E> edges;
 	protected boolean directed = false;
+	
+	//TODO mozda u svakom slucaju 2 adjacency liste
+	//po jedna  za direcred i undirected
+	//iako je directed, nekada treba obradjivati sve susedne...
 
 	/**
 	 * An adjacent list contains a list of all the edges leaving the vertex
