@@ -4,11 +4,12 @@ import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
-import graph.distance.CzekanovskiDiceDistance;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
+import graph.symmetry.CzekanovskiDiceDistance;
+import graph.symmetry.DeFrayseeixHeuristic;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
@@ -350,8 +351,8 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[16])){
 			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			
-			CzekanovskiDiceDistance<GraphVertex, GraphEdge> distance= new CzekanovskiDiceDistance<GraphVertex, GraphEdge>(graph);
-			distance.calculateVerticeDistances();
+			DeFrayseeixHeuristic<GraphVertex, GraphEdge> heuristic= new DeFrayseeixHeuristic<GraphVertex, GraphEdge>();
+			heuristic.calculate(graph);;
 				
 		}
 

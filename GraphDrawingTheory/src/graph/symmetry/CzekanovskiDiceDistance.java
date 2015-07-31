@@ -1,4 +1,4 @@
-package graph.distance;
+package graph.symmetry;
 
 import graph.elements.Edge;
 import graph.elements.Graph;
@@ -16,10 +16,12 @@ import java.util.Map;
 public class CzekanovskiDiceDistance<V extends Vertex, E extends Edge<V>> {
 	
 	private Graph<V,E> graph;
+	private Map<V, Map<V,Double>> distances;
 	
 	public CzekanovskiDiceDistance(Graph<V, E> graph) {
 		super();
 		this.graph = graph;
+		distances = calculateVerticeDistances();
 	}
 	
 
@@ -31,7 +33,7 @@ public class CzekanovskiDiceDistance<V extends Vertex, E extends Edge<V>> {
 			Map<V,Double> neighborDistance = new HashMap<V, Double>();
 			for (V vj : graph.getVertices()){
 				if (vi == vj)
-					continue;
+					neighborDistance.put(vi, (double)0);
 				
 				//if (ret.get(vj).containsKey(vi))
 					//continue;
@@ -76,6 +78,10 @@ public class CzekanovskiDiceDistance<V extends Vertex, E extends Edge<V>> {
 		
 		return ret;
 		
+	}
+	
+	public double getDistance(V vi, V vj){
+		return distances.get(vi).get(vj);
 	}
 
 	
