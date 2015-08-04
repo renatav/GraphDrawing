@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
+
 /**
  * /**
  * A graph consisting of a set of vertices of type <code>V</code>
@@ -405,6 +408,35 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			}
 		}
 		return true;
+	}
+	
+	public List<Double> getEigenValues(){
+		int[][] adjacencyMatrix = adjacencyMatrix();
+		double[][] values = new double[vertices.size()][vertices.size()];
+		for (int i = 0; i <adjacencyMatrix.length; i++)
+			for (int j = 0; j <adjacencyMatrix.length; j++)
+				values[i][j] = (double)adjacencyMatrix[i][j];
+		
+		Matrix m = new Matrix(values);
+		EigenvalueDecomposition decomposition= m.eig();
+		List<Double> ret = new ArrayList<Double>();
+		for (Double d : decomposition.getRealEigenvalues())
+			ret.add(d);
+		
+		return ret;
+		
+	}
+	
+	public int[][] adjacencyMatrix(){
+		int[][] ret = new int[vertices.size()][vertices.size()];
+		for (int i = 0; i < vertices.size(); i++)
+			for (int j = 0; j < vertices.size(); j++){
+				if (hasEdge(vertices.get(i), vertices.get(j)))
+					ret[i][j] = 1;
+				else
+					ret[i][j] = 0;
+			}
+		return ret;
 	}
 
 	public V getVertexByContent(Object content){
