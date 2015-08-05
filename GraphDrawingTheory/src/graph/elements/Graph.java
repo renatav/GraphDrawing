@@ -438,12 +438,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			}
 		return ret;
 	}
-
+	
 	public V getVertexByContent(Object content){
 		return vertexByContentMap.get(content);
 	}
-
-
+	
 
 	public List<V> getVertices() {
 		return vertices;

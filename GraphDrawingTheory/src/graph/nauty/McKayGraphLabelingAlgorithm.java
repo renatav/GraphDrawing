@@ -3,26 +3,178 @@ package graph.nauty;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.util.Pair;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
-	
-	
-	private OrderedPartition<V> patition;
+
+
 	private Graph<V,E> graph;
-	
-	
+	private BinaryRepresentation<V, E> binaryRepresenatation;
+
+
 	public McKayGraphLabelingAlgorithm(Graph<V,E> graph){
 		this.graph = graph;
 	}
 	
+	public void execute(){
+		
+		OrderedPartition<V> pi = new OrderedPartition<V>(graph.getVertices());
+		binaryRepresenatation = new BinaryRepresentation<V,E>(graph);
+		OrderedPartition<V> refined = refinementProcedure(pi);
+		
+		System.out.println("After refinement: " + refined);
+	}
 	
-	private void refinementProcedure(OrderedPartition<V> pi){
+	
+	private OrderedPartition<V> refinementProcedure(OrderedPartition<V> pi){
+
 		OrderedPartition<V> tau = new OrderedPartition<V>(pi.getPartition());
+		List<Pair<List<V>,List<V>>> B = new ArrayList<Pair<List<V>, List<V>>>();
+		Map<Integer, List<V>> degreesMap = new HashMap<Integer,List<V>>();
+		
 		while (true){
-			//find B, if it's empty - break
-			//else find new vi, update tau
+			B.clear();
+			for (List<V> Vi : tau.getPartition()){
+				for (List<V> Vj : tau.getPartition()){
+					//check if Vj shatters Vi
+					int deg = deg(Vi.get(0), Vj);
+					for (int i = 1; i < Vi.size(); i++){
+						if (deg(Vi.get(i), Vj) != deg){
+							B.add(new Pair<List<V>,List<V>>(Vi, Vj));
+							break;
+						}
+					}
+				}
+			}
+			if (B.size() == 0)
+				break;
+			
+			//now find the minimum element
+			Pair<List<V>, List<V>> minimalPair = findMinimal(B);
+			
+			//now replace Vi with X1,X2,...Xt
+			degreesMap.clear();
+			List<V> Vi = minimalPair.getKey();
+			List<V> Vj = minimalPair.getValue();
+			
+			List<Integer> degrees = new ArrayList<Integer>();
+			for (V v : Vi){
+				Integer deg = deg(v, Vj);
+				List<V> verticesWithDegree = degreesMap.get(deg);
+				if (verticesWithDegree == null){
+					verticesWithDegree = new ArrayList<V>();
+					degreesMap.put(deg, verticesWithDegree);
+				}
+				verticesWithDegree.add(v);
+				if (!degrees.contains(deg))
+					degrees.add(deg);
+			}
+			
+			//sort, to insert those with lower degrees first
+			Collections.sort(degrees);
+			
+			List<List<V>> replacements = new ArrayList<List<V>>();
+			for (Integer degree : degrees){
+				replacements.add(degreesMap.get(degree));
+			}
+			
+			tau.replace(Vi, replacements);
+			
+		}
+		return tau;
+
+	}
+	
+	
+	/*
+	 * For lexicographic total order
+	 * (a,b) <= (c,d) if a<c or a=c and b<=d
+	 */
+	private Pair<List<V>, List<V>> findMinimal(List<Pair<List<V>,List<V>>> B){
+		Pair<List<V>, List<V>> minimalPair = null;
+		String minimalBinary1 = null;
+		String minimalBinary2 = null;
+
+		for (Pair<List<V>, List<V>> separationPair : B){
+
+			String binary1 = binaryRepresenatation.binaryRepresenatation(separationPair.getKey());
+
+			if (minimalPair == null){
+				minimalPair = separationPair;
+				minimalBinary1 = binary1;
+			}
+			else{
+
+				//compare current to minimal
+
+				if (binary1.compareTo(minimalBinary1) < 0){
+					minimalPair = separationPair;
+					minimalBinary1 = binary1;
+					minimalBinary2 = null;
+				}
+
+				else if (binary1.compareTo(minimalBinary1) == 0){
+					if (minimalBinary2 == null)
+						minimalBinary2 =  binaryRepresenatation.binaryRepresenatation(minimalPair.getValue());
+
+					String binary2 =  binaryRepresenatation.binaryRepresenatation(separationPair.getValue());
+					if (binary2.compareTo(minimalBinary2) <= 0){
+						minimalPair = separationPair;
+						minimalBinary1 = binary1;
+						minimalBinary2 = binary2;
+					}
+
+				}
+			}
+
 		}
 		
+		//System.out.println("Minimap pair is: " + minimalPair.getKey() + " " + minimalPair.getValue());
+		return minimalPair;
+		
+	}
+	
+	private OrderedPartition<V> splitPartition(V u, OrderedPartition<V> pi){
+		
+		//find part which contains u
+		List<V> Vi = pi.partContainingVertex(u);
+		OrderedPartition<V> piPrim = new OrderedPartition<V>();
+		int i = pi.getPartition().indexOf(Vi);
+		for (int j = 0; i < pi.getPartition().size() - 1; j++){
+			List<V> currentPart = pi.getPartition().get(j);
+			if (j != i){
+				piPrim.addPart(currentPart);
+				continue;
+			}
+			//add trivial partition {u}
+			//add Vi/u
+			List<V> uPart = new ArrayList<V>();
+			uPart.add(u);
+			piPrim.addPart(uPart);
+			List<V> ViPart = new ArrayList<V>();
+			ViPart.addAll(Vi);
+			ViPart.remove(u);
+			piPrim.addPart(ViPart);
+			
+		}
+		
+		return piPrim;
+	}
+
+
+	private int deg(V v, List<V> Vj){
+		int deg = 0;
+		for (V test : graph.adjacentVertices(v)){
+			if (Vj.contains(test))
+				deg ++;
+		}
+		return deg;
 	}
 
 }

@@ -6,10 +6,9 @@ import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
+import graph.nauty.McKayGraphLabelingAlgorithm;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
-import graph.symmetry.CzekanovskiDiceDistance;
-import graph.symmetry.DeFrayseeixHeuristic;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
@@ -350,10 +349,8 @@ public class CommandPanel extends JPanel{
 		
 		if (command.equals(commands[16])){
 			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
-			
-			DeFrayseeixHeuristic<GraphVertex, GraphEdge> heuristic= new DeFrayseeixHeuristic<GraphVertex, GraphEdge>();
-			heuristic.calculate(graph);;
-				
+			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
+			nauty.execute();
 		}
 
 
@@ -400,7 +397,7 @@ public class CommandPanel extends JPanel{
 		commands[13] = "maximal split pairs";
 		commands[14] = "construct spqr";
 		commands[15] = "help";
-		commands[16] = "distance";
+		commands[16] = "nauty";
 
 	}
 		

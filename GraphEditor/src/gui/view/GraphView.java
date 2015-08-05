@@ -78,7 +78,7 @@ public class GraphView extends JPanel implements Observer{
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
 		getActionMap().put("deleteAction", new RemoveAction());
-		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
+		//getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
 	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 	}
@@ -95,7 +95,7 @@ public class GraphView extends JPanel implements Observer{
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
 		getActionMap().put("deleteAction", new RemoveAction());
-		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
+		//getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
 	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 
