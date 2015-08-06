@@ -41,6 +41,14 @@ public class OrderedPartition<V extends Vertex> {
 				return part;
 		return null;
 	}
+	
+	public List<V> getFirstNontrivialPart(){
+		for (List<V> part : partition)
+			if (part.size() > 1)
+				return part;
+		return null;
+	}
+	
 
 	public List<List<V>> getPartition() {
 		return partition;

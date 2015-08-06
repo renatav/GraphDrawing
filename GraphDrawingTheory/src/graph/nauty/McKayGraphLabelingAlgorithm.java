@@ -27,8 +27,9 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		OrderedPartition<V> pi = new OrderedPartition<V>(graph.getVertices());
 		binaryRepresenatation = new BinaryRepresentation<V,E>(graph);
 		OrderedPartition<V> refined = refinementProcedure(pi);
+		SearchTree<V> tree = createSearchTree(refined);
+		List<SearchTreeNode<V>> terminalNodes = tree.getTerminalNodes();
 		
-		System.out.println("After refinement: " + refined);
 	}
 	
 	
@@ -140,13 +141,39 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		
 	}
 	
+	private SearchTree<V> createSearchTree(OrderedPartition<V> rootPartition){
+		SearchTree<V> tree = new SearchTree<V>(rootPartition);
+		SearchTreeNode<V> root = tree.getRoot();
+		createSearchTree(root);
+		return tree;
+		
+	}
+	
+	private void createSearchTree(SearchTreeNode<V> currentNode){
+		//split tree note, create children, process children
+		OrderedPartition<V> currentPartition = currentNode.getNodePartition();
+		List<V> firstNontrivialrPart = currentPartition.getFirstNontrivialPart();
+		if (firstNontrivialrPart == null)
+			return;
+		System.out.println("Current partition: " + currentPartition);
+		for (V u : firstNontrivialrPart){
+			OrderedPartition<V> partition = splitPartition(u, currentPartition);
+			partition = refinementProcedure(partition);
+			System.out.println(partition);
+			new SearchTreeNode<V>(partition, u, currentNode);
+		}
+		for (SearchTreeNode<V> node : currentNode.getChildren())
+			createSearchTree(node);
+	
+	}
+	
 	private OrderedPartition<V> splitPartition(V u, OrderedPartition<V> pi){
 		
 		//find part which contains u
 		List<V> Vi = pi.partContainingVertex(u);
 		OrderedPartition<V> piPrim = new OrderedPartition<V>();
 		int i = pi.getPartition().indexOf(Vi);
-		for (int j = 0; i < pi.getPartition().size() - 1; j++){
+		for (int j = 0; j < pi.getPartition().size(); j++){
 			List<V> currentPart = pi.getPartition().get(j);
 			if (j != i){
 				piPrim.addPart(currentPart);
@@ -165,6 +192,19 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		}
 		
 		return piPrim;
+	}
+	
+	private Map<Integer, Integer> permutation(OrderedPartition<V> discretePartition){
+		Map<Integer, Integer> permutation = new HashMap<Integer, Integer>();
+		for (int i = 0; i < discretePartition.getPartition().size(); i++){
+			List<V> part = discretePartition.getPartition().get(i);
+			V v = part.get(0); //the only one
+			Integer vertexIndex = graph.getVertices().indexOf(v);
+			permutation.put(vertexIndex, i);
+		}
+		return permutation;
+		
+		
 	}
 
 
