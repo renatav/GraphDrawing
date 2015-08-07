@@ -21,6 +21,7 @@ public class BinaryRepresentation<V extends Vertex, E extends Edge<V>> {
 			V v1 = verticeList.get(i);
 			for (int j = i + 1; j < verticeList.size(); j++){
 				V v2 = verticeList.get(j);
+				System.out.println("checking between " + v1 + " and " + v2 );
 				if (graph.edgeBetween(v1, v2) != null)
 					representation += "1";
 				else

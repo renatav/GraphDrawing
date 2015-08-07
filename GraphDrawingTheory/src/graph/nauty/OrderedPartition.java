@@ -49,6 +49,13 @@ public class OrderedPartition<V extends Vertex> {
 		return null;
 	}
 	
+	public List<V> getVerticesInOrder(){
+		List<V> ret = new ArrayList<V>();
+		for (List<V> part : partition)
+			ret.addAll(part);
+		return ret;
+	}
+	
 
 	public List<List<V>> getPartition() {
 		return partition;

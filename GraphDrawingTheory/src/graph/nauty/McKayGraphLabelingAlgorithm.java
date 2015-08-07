@@ -29,6 +29,7 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		OrderedPartition<V> refined = refinementProcedure(pi);
 		SearchTree<V> tree = createSearchTree(refined);
 		List<SearchTreeNode<V>> terminalNodes = tree.getTerminalNodes();
+		canonicalIsomorphism(terminalNodes);
 		
 	}
 	
@@ -194,7 +195,30 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		return piPrim;
 	}
 	
-	private Map<Integer, Integer> permutation(OrderedPartition<V> discretePartition){
+	
+	private OrderedPartition<V> canonicalIsomorphism(List<SearchTreeNode<V>> terminalNodes){
+		OrderedPartition<V> maxPartition = null;
+		String maxBinary = null;
+		for (SearchTreeNode<V> node : terminalNodes){
+			OrderedPartition<V> partition = node.getNodePartition();
+			String binary = binaryRepresenatation.binaryRepresenatation(partition.getVerticesInOrder());
+			if (maxBinary != null)
+				System.out.println(binary.compareTo(maxBinary));
+			
+			if (maxBinary == null || binary.compareTo(maxBinary) == 1){
+				maxPartition = partition;
+				maxBinary = binary;
+			}
+	
+		}
+		return maxPartition;
+	}
+	
+//	private Permutation findAutomorphisms(){
+//		//
+//	}
+	
+	private Permutation permutation(OrderedPartition<V> discretePartition){
 		Map<Integer, Integer> permutation = new HashMap<Integer, Integer>();
 		for (int i = 0; i < discretePartition.getPartition().size(); i++){
 			List<V> part = discretePartition.getPartition().get(i);
@@ -202,9 +226,7 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 			Integer vertexIndex = graph.getVertices().indexOf(v);
 			permutation.put(vertexIndex, i);
 		}
-		return permutation;
-		
-		
+		return new Permutation(permutation);
 	}
 
 
