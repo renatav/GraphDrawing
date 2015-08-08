@@ -439,6 +439,21 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 	
+	public void printAdjacencyMatrix(){
+		int[][] adjMatrix = adjacencyMatrix();
+		for (int[] row : adjMatrix){
+			System.out.print("[");
+			for (int j = 0; j < row.length; j++){
+				System.out.print(row[j]);
+				if (j < row.length - 1)
+					System.out.print(", ");
+			}
+			System.out.print("],");
+				
+		}
+		System.out.println("");
+	}
+	
 	public V getVertexByContent(Object content){
 		return vertexByContentMap.get(content);
 	}

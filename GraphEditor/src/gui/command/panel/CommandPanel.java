@@ -7,6 +7,7 @@ import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.nauty.McKayGraphLabelingAlgorithm;
+import graph.nauty.Permutation;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
 import graph.tree.spqr.SPQRTree;
@@ -44,7 +45,6 @@ public class CommandPanel extends JPanel{
 
 	public CommandPanel(){
 		setLayout(new MigLayout("fill"));
-		
 		
 		add(inputField, "dock south, growx");
 		
@@ -85,7 +85,6 @@ public class CommandPanel extends JPanel{
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -350,7 +349,12 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[16])){
 			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
-			nauty.execute();
+			List<Permutation> automorphisms = nauty.findAutomorphisms();
+			String ret = "\n";
+			for (Permutation p : automorphisms)
+				ret += p + "\n";
+
+			return ret;
 		}
 
 
@@ -397,7 +401,7 @@ public class CommandPanel extends JPanel{
 		commands[13] = "maximal split pairs";
 		commands[14] = "construct spqr";
 		commands[15] = "help";
-		commands[16] = "nauty";
+		commands[16] = "automorphisms";
 
 	}
 		
