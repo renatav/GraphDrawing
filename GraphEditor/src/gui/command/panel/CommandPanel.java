@@ -10,6 +10,7 @@ import graph.nauty.McKayGraphLabelingAlgorithm;
 import graph.nauty.Permutation;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
+import graph.symmetry.SymmetricGraphDrawing;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
@@ -351,10 +352,17 @@ public class CommandPanel extends JPanel{
 			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
 			List<Permutation> automorphisms = nauty.findAutomorphisms();
 			String ret = "\n";
-			for (Permutation p : automorphisms)
-				ret += p + "\n";
+			for (Permutation p : automorphisms){
+				ret += p.cyclicRepresenatation() + "\n";
+			}
 
 			return ret;
+		}
+		
+		if (command.equals(commands[17])){
+			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
+			SymmetricGraphDrawing<GraphVertex, GraphEdge> symmetric = new SymmetricGraphDrawing<GraphVertex, GraphEdge>(graph);
+			symmetric.execute();
 		}
 
 
@@ -384,7 +392,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[17];
+		commands = new String[18];
 		commands[0] = "quit";
 		commands[1] = "create graph";
 		commands[2] = "add vertex";
@@ -402,6 +410,7 @@ public class CommandPanel extends JPanel{
 		commands[14] = "construct spqr";
 		commands[15] = "help";
 		commands[16] = "automorphisms";
+		commands[17] = "symmetric";
 
 	}
 		

@@ -39,6 +39,27 @@ public class Permutation {
 		return new Permutation(product);
 		
 	}
+	
+	public List<List<Integer>> cyclicRepresenatation(){
+		List<List<Integer>> ret = new ArrayList<List<Integer>>();
+		List<Integer> covered = new ArrayList<Integer>();
+		for (Integer key : permutation.keySet()){
+			if (covered.contains(key))
+				continue;
+			
+			//start a cycle and add all
+			List<Integer> cycle = new ArrayList<Integer>();
+			cycle.add(key);
+			Integer next = permutation.get(key);
+			while (next != key){
+				cycle.add(next);
+				covered.add(next);
+				next = permutation.get(next);
+			}
+			ret.add(cycle);
+		}
+		return ret;
+	}
 
 	public Map<Integer, Integer> getPermutation() {
 		return permutation;
