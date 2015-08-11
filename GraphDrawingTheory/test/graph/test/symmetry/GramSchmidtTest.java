@@ -1,6 +1,6 @@
 package graph.test.symmetry;
 
-import graph.symmetry.GramSchmidt;
+import graph.math.GramSchmidt;
 import junit.framework.TestCase;
 
 import org.junit.Test;

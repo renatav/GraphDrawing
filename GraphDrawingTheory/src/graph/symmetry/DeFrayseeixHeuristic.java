@@ -3,6 +3,9 @@ package graph.symmetry;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.math.CzekanovskiDiceDistance;
+import graph.math.GramSchmidt;
+import graph.math.MatrixUtil;
 import graph.util.Pair;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package graph.symmetry;
+package graph.math;
 
 import graph.elements.Edge;
 import graph.elements.Graph;
