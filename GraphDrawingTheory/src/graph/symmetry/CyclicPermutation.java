@@ -1,7 +1,7 @@
 package graph.symmetry;
 
 import graph.elements.Vertex;
-import graph.nauty.Permutation;
+import graph.symmetry.nauty.Permutation;
 
 import java.util.ArrayList;
 import java.util.List;

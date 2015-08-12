@@ -3,8 +3,8 @@ package graph.symmetry;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.nauty.McKayGraphLabelingAlgorithm;
-import graph.nauty.Permutation;
+import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
+import graph.symmetry.nauty.Permutation;
 import graph.util.Pair;
 
 import java.util.ArrayList;
@@ -20,103 +20,139 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 	private Map<V, PermutationCycle<V>> vertexCycle = new HashMap<V, PermutationCycle<V>>();
 	private Map<Integer, Integer> maxLenghts;
-	private List<List<PermutationCycle<V>>> paths = new ArrayList<List<PermutationCycle<V>>>();
 
 	public SymmetricGraphDrawing(Graph<V,E> graph){
 		this.graph = graph;
 		this.nauty = new McKayGraphLabelingAlgorithm<V, E>(graph);
 	}
+	
+	
+	public Map<Integer, List<PermutationCycle<V>>> execute(Permutation p){
+		
+		
+	
+		
+		CyclicPermutation<V> g = new CyclicPermutation<V>(graph.getVertices(), p);
+		
+		List<PermutationCycle<V>> cyclesNotOnPaths = new ArrayList<PermutationCycle<V>>();
+		cyclesNotOnPaths.addAll(g.getCycles());
 
-	public void execute(){
+		System.out.println("Permutation " + g);
+
+		maxLenghts = maxLenghts(g);
+
+		//visited cycles are used and change in extend path
+		List<PermutationCycle<V>> visitedCycles = new ArrayList<PermutationCycle<V>>();
+		//processed cycles contains all cycles on which extend path was called
+		//extend path does not have any impact on it
+		List<PermutationCycle<V>> processedCycles = new ArrayList<PermutationCycle<V>>();
+
+
+		for (PermutationCycle<V> cycle: g.getCycles())
+			for (V v : cycle.getCycle())
+				vertexCycle.put(v, cycle);
+
+
+		//map containing best found paths, classified by lengths of the cycles contained within them
+		Map<Integer, List<PermutationCycle<V>>> bestPathForLength = 
+				new HashMap<Integer,List<PermutationCycle<V>>>();
+
+
+		for (PermutationCycle<V> cycle: g.getCycles()){
+			System.out.println("current cycle: " + cycle);
+
+			Integer baseLength = cycle.size();
+
+			//found best bath for cycles of this length
+			if (bestPathForLength.get(baseLength) != null)
+				if (bestPathForLength.get(baseLength).size() * baseLength == maxLenghts.get(baseLength))
+					continue;
+
+			List<PermutationCycle<V>> bestPath = new ArrayList<PermutationCycle<V>>();
+			
+			if (cycle.size() > 1){
+				
+				visitedCycles.clear();
+				visitedCycles.addAll(processedCycles);
+				
+				boolean done = extendPath(cycle, cycle, visitedCycles, new ArrayList<PermutationCycle<V>>(), bestPath);
+				
+				processedCycles.add(cycle);
+
+				if (bestPathForLength.get(baseLength) == null || bestPath.size() > bestPathForLength.get(baseLength).size()){
+					bestPathForLength.put(baseLength, bestPath);
+				}
+
+				if (!done){
+					maxLenghts.put(baseLength, maxLenghts.get(baseLength) - baseLength);;
+				}
+			}
+
+		}
+		
+		//determine which cycles are not in any of the found paths
+		for (Integer key : bestPathForLength.keySet())
+			cyclesNotOnPaths.removeAll(bestPathForLength.get(key));
+		
+		//add those to the map of paths
+		bestPathForLength.put(new Integer(-1), cyclesNotOnPaths);
+		
+		return bestPathForLength;
+
+	}
+	
+
+	public Map<Integer, List<PermutationCycle<V>>> execute(){
 
 
 		System.out.println("executing");
-
-		List<PermutationCycle<V>> visitedCycles = new ArrayList<PermutationCycle<V>>();
 
 		//find suitable permutation
 		//consider permutations which contain more than
 		//one cycles of the same length
 		//Pair<List<List<Integer>>,Integer> cycleAndLength = findPermutation();
 		//List<List<Integer>> g = cycleAndLength.getKey();
+		
+		Map<Integer, List<PermutationCycle<V>>> bestFoundPaths 
+			= new HashMap<Integer, List<PermutationCycle<V>>>();
+		Map<Integer, List<PermutationCycle<V>>> permutationFoundPaths; 
 
 		List<Permutation> automorphisms = nauty.findAutomorphisms();
 		for (Permutation p : automorphisms){
-			
-			CyclicPermutation<V> g = new CyclicPermutation<V>(graph.getVertices(), p);
-
-			System.out.println("Permutation " + g);
-
-			maxLenghts = maxLenghts(g);
-			
-			System.out.println("Max lenghts : " +maxLenghts);
-
-			//extract all cycles of the defined length
-
-
-			for (PermutationCycle<V> cycle: g.getCycles())
-				for (V v : cycle.getCycle())
-					vertexCycle.put(v, cycle);
-
-			
-			Map<Integer, List<PermutationCycle<V>>> bestPathForLength = 
-					new HashMap<Integer,List<PermutationCycle<V>>>();
-
-			
-			//TODO 
-			//kako naci najbolju kombinaciju, recimo, mozda mogu sve
-			//ako se krene od nekog drugog ciklusa, drugim redosledom...
-			//tipa krenuti u obilazak
-			//kada se dodje drugi put do nekog, pogledati za njega da li je 
-			//to najbolja moguca putanja, i tako
-			
-			for (PermutationCycle<V> cycle: g.getCycles()){
-				System.out.println("current cycle: " + cycle);
-				
-				Integer baseLenght = cycle.size();
-				
-				if (bestPathForLength.get(baseLenght) != null)
-					continue;
-				
-				List<PermutationCycle<V>> bestPath = new ArrayList<PermutationCycle<V>>(); 
-				if (cycle.size() > 1 && !visitedCycles.contains(cycle)){
-					boolean done = extendPath(cycle, cycle, visitedCycles, new ArrayList<PermutationCycle<V>>(), bestPath);
-					if (!done){
-						visitedCycles.add(cycle);
-						maxLenghts.put(baseLenght, maxLenghts.get(baseLenght) - baseLenght);;
-					}
-					else{
-						bestPathForLength.put(baseLenght, bestPath);
-					}
-						
-				}
-					
+			permutationFoundPaths = execute(p);
+			if (bestFoundPaths.size() == 0 || permutationFoundPaths.get(-1).size() < bestFoundPaths.get(-1).size()){
+				bestFoundPaths.clear();
+				bestFoundPaths.putAll(permutationFoundPaths);
 			}
 		}
+		
+		return bestFoundPaths;
 
+		
 	}
-	
-	
-	
+
+
+
+
 	private boolean extendPath(PermutationCycle<V> currentCycle, PermutationCycle<V> baseCycle, 
 			List<PermutationCycle<V>> visitedCycles, List<PermutationCycle<V>> path, List<PermutationCycle<V>> bestPath){
-		
-		
+
+
 		path.add(currentCycle);
-		
+
 		//there is only one cycle
 		if (currentCycle.size() == maxLenghts.get(currentCycle.size())){
 			bestPath.add(currentCycle);
 			return true;
 		}
-		
+
 		System.out.println("Current path: " + path);
-		
-		
+
+
 		System.out.println("visiting cycle " + currentCycle);
-		
+
 		List<PermutationCycle<V>> linkedCycles = new ArrayList<PermutationCycle<V>>();
-		
+
 		//find links between this cycle and others
 		for (V v : currentCycle.getCycle()){
 			for (E e : graph.allEdges(v)){
@@ -128,53 +164,53 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 					linkedCycles.add(cycle);
 			}
 		}
-		
+
 		System.out.println("Linked cycles: " + linkedCycles);
-		
+
 		for (PermutationCycle<V> linkedCycle : linkedCycles){
-			
+
 			if (linkedCycle.size() != baseCycle.size())
 				continue;
-			
-			
-			
+
+
+
 			if (linkedCycle == baseCycle){
 				System.out.println("back to base cycle");
-				
-				
+
+
 				if (path.size() == 2) //ignore cycle of lenght 2
 					continue;
-				
+
 				//save this as best path if it's better than the current one
 				if (path.size() > bestPath.size()){
 					bestPath.clear();
 					bestPath.addAll(path);
 					System.out.println("Best path: " + bestPath);
 				}
-				
-				
+
+
 				//see if the maximal covered path was taken
 				int covered = path.size() * baseCycle.size();
 				if (covered == maxLenghts.get(baseCycle.size())){
-						return true;
+					return true;
 				}
-				
+
 			}
-			
+
 			else{
 				visitedCycles.add(linkedCycle);
 				if (extendPath(linkedCycle, baseCycle, visitedCycles, path, bestPath))
 					return true;
-				
+
 				System.out.println("removing " + linkedCycle);
-				
+
 				//else reset for next iteration
 				visitedCycles.remove(linkedCycle);
 				path.remove(linkedCycle);
 			}
 		}
-		
-		
+
+
 		return false;
 	}
 

@@ -18,6 +18,20 @@ public interface PropertyEnums {
 		
 	}
 	
+	public enum ConcentricCircleProperties implements PropertyEnums{
+		VERTICES_CIRCLES_MAP("Vertices on circles map");
+		
+		private String name;
+		
+		ConcentricCircleProperties(String name){
+			this.name = name;
+		}
+		
+		public String getName(){
+			return name;
+		}
+	}
+	
 	public enum BoxProperties implements PropertyEnums{
 		PROPERY("Test property");
 		

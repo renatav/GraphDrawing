@@ -1,4 +1,4 @@
-package graph.nauty;
+package graph.symmetry.nauty;
 
 import java.util.ArrayList;
 import java.util.Collections;

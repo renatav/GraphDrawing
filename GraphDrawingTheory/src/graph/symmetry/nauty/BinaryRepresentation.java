@@ -1,4 +1,4 @@
-package graph.nauty;
+package graph.symmetry.nauty;
 
 import graph.elements.Edge;
 import graph.elements.Graph;
