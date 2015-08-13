@@ -22,9 +22,18 @@ public class ConcentricCircleLayouter <V extends Vertex, E extends Edge<V>> exte
 	@Override
 	public Drawing<V, E> layout() {
 	
-		//pass which vertices are in which circle
-		Map<Integer, List<V>> verticesInCircles = (Map<Integer, List<V>>) layoutProperties.getProperty(ConcentricCircleProperties.VERTICES_CIRCLES_MAP);
 		
+		CircleLayoutCalc calc = new CircleLayoutCalc<Vertex>();
+		
+		//pass which vertices are in which circle
+		
+		List<List<V>> verticesInCircles 
+			= (List<List<V>>) layoutProperties.getProperty(ConcentricCircleProperties.VERTICES_CIRCLES_LIST);
+		
+		
+		for (List<V> circle : verticesInCircles){
+			calc.organizeVerticesAndDetermineRadius(circle, true);
+		}
 		
 		
 		return null;

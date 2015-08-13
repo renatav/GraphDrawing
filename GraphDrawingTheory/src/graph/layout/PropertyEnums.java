@@ -19,7 +19,7 @@ public interface PropertyEnums {
 	}
 	
 	public enum ConcentricCircleProperties implements PropertyEnums{
-		VERTICES_CIRCLES_MAP("Vertices on circles map");
+		VERTICES_CIRCLES_LIST("Vertices on circles list");
 		
 		private String name;
 		
