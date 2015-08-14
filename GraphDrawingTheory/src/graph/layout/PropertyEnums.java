@@ -18,12 +18,12 @@ public interface PropertyEnums {
 		
 	}
 	
-	public enum ConcentricCircleProperties implements PropertyEnums{
-		VERTICES_CIRCLES_LIST("Vertices on circles list");
+	public enum SymmetricCircleProperties implements PropertyEnums{
+		DISTANCE("Distance"), PERMUTATION("Permutation");
 		
 		private String name;
 		
-		ConcentricCircleProperties(String name){
+		SymmetricCircleProperties(String name){
 			this.name = name;
 		}
 		
@@ -47,7 +47,7 @@ public interface PropertyEnums {
 	}
 	
 	public enum CircleProperties implements PropertyEnums{
-		PROPERY("Test property");
+		DISTANCE("Distance");
 		
 		private String name;
 		

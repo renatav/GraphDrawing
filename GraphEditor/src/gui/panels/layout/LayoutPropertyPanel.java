@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -18,12 +17,11 @@ import net.miginfocom.swing.MigLayout;
 public class LayoutPropertyPanel extends JPanel	{
 
 	private static final long serialVersionUID = 1L;
-	private Map<Object, JTextField> textFieldsMap  = new HashMap<Object, JTextField>();
+	protected Map<Object, JTextField> textFieldsMap  = new HashMap<Object, JTextField>();
 
 	public LayoutPropertyPanel (Class<?> enumClass){
 
 		setLayout(new MigLayout());
-		setBorder(BorderFactory.createTitledBorder("Layout properties"));
 		
 		//analyze enum and generate panel
 		Object[] consts = enumClass.getEnumConstants();
@@ -74,8 +72,7 @@ public class LayoutPropertyPanel extends JPanel	{
 			}
 			catch(Exception ex){
 			}
-			if (doubleValue != null)
-				layoutProperties.setProperty((PropertyEnums) key, doubleValue);
+			layoutProperties.setProperty((PropertyEnums) key, doubleValue);
 		}
 		return layoutProperties;
 	}

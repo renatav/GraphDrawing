@@ -30,8 +30,6 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	public Map<Integer, List<PermutationCycle<V>>> execute(Permutation p){
 		
 		
-	
-		
 		CyclicPermutation<V> g = new CyclicPermutation<V>(graph.getVertices(), p);
 		
 		List<PermutationCycle<V>> cyclesNotOnPaths = new ArrayList<PermutationCycle<V>>();
@@ -102,7 +100,7 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 	
 
-	public Map<Integer, List<PermutationCycle<V>>> execute(){
+	public List<List<V>> execute(){
 
 
 		System.out.println("executing");
@@ -126,7 +124,7 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 			}
 		}
 		
-		return bestFoundPaths;
+		return formVerticeLists(bestFoundPaths);
 
 		
 	}
@@ -212,6 +210,21 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 		return false;
+	}
+	
+	private List<List<V>> formVerticeLists(Map<Integer, List<PermutationCycle<V>>> map){
+		
+		List<List<V>> ret = new ArrayList<List<V>>();
+		
+		for (List<PermutationCycle<V>> cycles : map.values()){
+			List<V> verticesinCycle = new ArrayList<V>();
+			for (PermutationCycle<V> cycle : cycles)
+				verticesinCycle.addAll(cycle.getCycle());
+			ret.add(verticesinCycle);
+		}
+		
+		return ret;
+		
 	}
 
 

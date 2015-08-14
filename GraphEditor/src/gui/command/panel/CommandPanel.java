@@ -6,10 +6,6 @@ import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
-import graph.layout.GraphLayoutProperties;
-import graph.layout.PropertyEnums.ConcentricCircleProperties;
-import graph.layout.circle.CircleLayouter;
-import graph.layout.circle.ConcentricCircleLayouter;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
 import graph.symmetry.SymmetricGraphDrawing;
@@ -369,19 +365,6 @@ public class CommandPanel extends JPanel{
 			symmetric.execute();
 		}
 		
-		if (command.equals(commands[18])){
-			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
-			List<List<GraphVertex>> verticesInCircles = new ArrayList<List<GraphVertex>>();
-			verticesInCircles.add(graph.getVertices());
-			
-			GraphLayoutProperties layoutProp = new GraphLayoutProperties();
-			layoutProp.setProperty(ConcentricCircleProperties.VERTICES_CIRCLES_LIST, verticesInCircles);
-			
-			ConcentricCircleLayouter<GraphVertex, GraphEdge> concentricLayouter = 
-					new ConcentricCircleLayouter<GraphVertex, GraphEdge>(graph, layoutProp);
-			concentricLayouter.layout();
-		}
-
 
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
@@ -402,7 +385,6 @@ public class CommandPanel extends JPanel{
 			builder.append("construct spqr tree {e1, e2} graph\n");
 			return builder.toString();
 		}
-
 
 		return "Unknown command";
 	}
@@ -429,7 +411,6 @@ public class CommandPanel extends JPanel{
 		commands[15] = "help";
 		commands[16] = "automorphisms";
 		commands[17] = "symmetric";
-		commands[18] = "layout circular";
 	}
 		
 

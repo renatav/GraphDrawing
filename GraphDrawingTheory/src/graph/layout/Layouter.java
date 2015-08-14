@@ -6,6 +6,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.box.BoxLayouter;
 import graph.layout.circle.CircleLayouter;
+import graph.layout.circle.SymmetricCircleLayouter;
 import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
 import graph.layout.force.directed.SpringLayouter;
@@ -35,7 +36,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		this.vertices = vertices;
 		this.algorithm = algorithm;
 	}
-	
+
 	public Layouter(List<V> vertices, List<E> edges, LayoutAlgorithms algorithm, GraphLayoutProperties layoutProperties){
 		this(vertices, edges, algorithm);
 		this.layoutProperties = layoutProperties;
@@ -131,65 +132,73 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		int maxYInRow = 0;
 
 		Drawing<V,E> ret =  new Drawing<V,E>();
-		
+
 		Drawing<V,E> drawing = null;
 
 		AbstractLayouter<V, E> layouter;
-
+		
+		
 		if (algorithm == LayoutAlgorithms.BOX){
 			layouter = new BoxLayouter<>(formOneGraph(vertices, edges), layoutProperties);
 			drawing = layouter.layout();
+			drawing.positionEdges(edges);
 			return drawing;
 		}
-
+		
+		else if (algorithm == LayoutAlgorithms.CONCENTRIC){
+			layouter = new SymmetricCircleLayouter<V,E>(formOneGraph(vertices, edges), layoutProperties);
+			drawing = layouter.layout();
+			drawing.positionEdges(edges);
+			return drawing;
+		}
+		
 		else{
 			for (Graph<V,E> graph : formGraphs(vertices, edges)){
 
-
 				if (algorithm == LayoutAlgorithms.KAMADA_KAWAI)
 					layouter = new KamadaKawaiLayouter<>(graph, layoutProperties);
-					else if (algorithm == LayoutAlgorithms.FRUCHTERMAN_REINGOLD)
-						layouter= new FruchtermanReingoldLayouter<>(graph, layoutProperties);
-						else if (algorithm == LayoutAlgorithms.CIRCLE)
-							layouter = new CircleLayouter<>(graph, layoutProperties);
-							else
-								layouter = new SpringLayouter<>(graph, layoutProperties);
+				else if (algorithm == LayoutAlgorithms.FRUCHTERMAN_REINGOLD)
+					layouter= new FruchtermanReingoldLayouter<>(graph, layoutProperties);
+				else if (algorithm == LayoutAlgorithms.CIRCLE)
+					layouter = new CircleLayouter<>(graph, layoutProperties);
+				else
+					layouter = new SpringLayouter<>(graph, layoutProperties);
 
 
-								drawing = layouter.layout();
-								int currentLeftmost = drawing.findLeftmostPosition();
-								int currentTop = drawing.findTop();
+				drawing = layouter.layout();
+				int currentLeftmost = drawing.findLeftmostPosition();
+				int currentTop = drawing.findTop();
 
 
-								//leftmost should start at point currentStartPositionX
-								int moveByX = currentStartPositionX - currentLeftmost;
+				//leftmost should start at point currentStartPositionX
+				int moveByX = currentStartPositionX - currentLeftmost;
 
-								//top should start at point currentStartPositionY
-								int moveByY = currentStartPositionY - currentTop;
+				//top should start at point currentStartPositionY
+				int moveByY = currentStartPositionY - currentTop;
 
-								drawing.moveBy(moveByX, moveByY);
+				drawing.moveBy(moveByX, moveByY);
 
-								int[] bounds = drawing.getBounds();
-								if (bounds[1] > maxYInRow)
-									maxYInRow = bounds[1];
+				int[] bounds = drawing.getBounds();
+				if (bounds[1] > maxYInRow)
+					maxYInRow = bounds[1];
 
-								currentStartPositionX += bounds[0] + spaceX;
+				currentStartPositionX += bounds[0] + spaceX;
 
-								if (currentIndex % numInRow == 0){
-									currentStartPositionY += maxYInRow + spaceY;
-									maxYInRow = 0;
-									currentStartPositionX = startX;
-								}
-								
-								ret.getVertexMappings().putAll(drawing.getVertexMappings());
+				if (currentIndex % numInRow == 0){
+					currentStartPositionY += maxYInRow + spaceY;
+					maxYInRow = 0;
+					currentStartPositionX = startX;
+				}
 
-								currentIndex ++;
+				ret.getVertexMappings().putAll(drawing.getVertexMappings());
+
+				currentIndex ++;
 			}
-			ret.positionEdges(edges);
-			return ret;
+			drawing.positionEdges(edges);
+			return drawing;
 		}
-
 	}
+
 
 
 

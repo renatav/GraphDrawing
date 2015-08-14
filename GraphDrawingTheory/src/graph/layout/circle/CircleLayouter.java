@@ -1,18 +1,17 @@
 package graph.layout.circle;
 
-import java.awt.geom.Point2D;
-import java.util.List;
-
-import edu.uci.ics.jung.algorithms.layout.CircleLayout;
-import edu.uci.ics.jung.graph.UndirectedSparseGraph;
-import edu.uci.ics.jung.visualization.DefaultVisualizationModel;
 import graph.drawing.Drawing;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
+import graph.layout.PropertyEnums.CircleProperties;
 import graph.ordering.circular.Circular;
+
+import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.Map;
 
 public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>
 {
@@ -21,35 +20,31 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 		super(graph, layoutProperties);
 	}
 
-
 	@Override
 	public Drawing<V, E> layout() {
+		
+		//TODO sta raditi sa cvorovima koji nisu povezani
+		
 		Circular<V,E> circular = new Circular<V,E>(graph);
 		List<V> ordering = circular.circularOrdering();
-		//just changes the order
-		graph.setVertices(ordering);
+		
+		Double distance = 0D;
+		if (layoutProperties.getProperty(CircleProperties.DISTANCE) != null)
+			distance =  (Double) layoutProperties.getProperty(CircleProperties.DISTANCE);
+		
+		//graph.setVertices(ordering);
 
-		UndirectedSparseGraph<V, E> jungGraph =  new UndirectedSparseGraph<V, E>();
+		CircleLayoutCalc<V> calc = new CircleLayoutCalc<V>();
+		
+		double radius = calc.calculateRadius(graph.getVertices(), distance);
 
-		for (V v : graph.getVertices())
-			jungGraph.addVertex(v);
-
-		for (E e : graph.getEdges())
-			jungGraph.addEdge(e, e.getOrigin(), e.getDestination());
-
-
-		CircleLayout<V,E> layouter = new CircleLayout<V,E>(jungGraph);
-		//triggers layouting
-		new DefaultVisualizationModel<V, E>(layouter);
-
+		Map<V, Point2D> vertexPositions = calc.calculatePosition(ordering, radius, new Point2D.Double(0,0));
+		
 		Drawing<V, E> drawing = new Drawing<>();
-
-
-		for (V v : graph.getVertices()){
-			Point2D p = layouter.transform(v);
-			drawing.setVertexPosition(v, p);
-		}
-		//drawing.separate(100, 100);
+		drawing.setVertexMappings(vertexPositions);
+		
+		drawing.positionEdges(graph.getEdges());
+		
 		return drawing;
 	}
 }
