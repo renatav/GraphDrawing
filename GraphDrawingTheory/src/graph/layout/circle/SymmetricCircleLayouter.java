@@ -8,6 +8,7 @@ import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.SymmetricCircleProperties;
 import graph.symmetry.SymmetricGraphDrawing;
+import graph.symmetry.nauty.Permutation;
 
 import java.awt.geom.Point2D;
 import java.util.Collections;
@@ -28,13 +29,16 @@ public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> exten
 
 		CircleLayoutCalc<V> calc = new CircleLayoutCalc<V>();
 
-
+		Permutation p = null;
 		Double distance = null;
 		if (layoutProperties.getProperty(SymmetricCircleProperties.DISTANCE) != null)
 			distance =  (Double) layoutProperties.getProperty(SymmetricCircleProperties	.DISTANCE);
-
+		if (layoutProperties.getProperty(SymmetricCircleProperties.PERMUTATION)!= null){
+			p = (Permutation) layoutProperties.getProperty(SymmetricCircleProperties.PERMUTATION);
+		}
+		
 		if (distance == null){
-			//find largest element bu x or y
+			//find largest element by x or y
 			distance = 0D;
 			for (V v : graph.getVertices()){
 
@@ -49,7 +53,12 @@ public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> exten
 
 
 		SymmetricGraphDrawing<V, E> symmetricDrawing = new SymmetricGraphDrawing<V,E>(graph);
-		List<List<V>> circles = symmetricDrawing.execute();
+		List<List<V>> circles;
+		if (p == null || p.getPermutation().size() == 0)
+			circles = symmetricDrawing.execute();
+		else
+			circles = symmetricDrawing.execute(p);
+		
 		Drawing<V, E> drawing = new Drawing<>();
 
 		Collections.sort(circles, new Comparator<List<V>>() {

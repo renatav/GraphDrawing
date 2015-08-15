@@ -173,8 +173,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	public void removeEdge(E e){
 		edges.remove(e);
-		adjacentLists.get(e.getOrigin()).remove(e);
-		adjacentLists.get(e.getDestination()).remove(e);
+		if (adjacentLists.get(e.getOrigin()) != null)
+			adjacentLists.get(e.getOrigin()).remove(e);
+		if (adjacentLists.get(e.getDestination()) != null)
+			adjacentLists.get(e.getDestination()).remove(e);
 	}
 	
 	public List<E> adjacentEdges(V v){

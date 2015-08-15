@@ -27,7 +27,7 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	
-	public Map<Integer, List<PermutationCycle<V>>> execute(Permutation p){
+	private Map<Integer, List<PermutationCycle<V>>> executeForPermutation(Permutation p){
 		
 		
 		CyclicPermutation<V> g = new CyclicPermutation<V>(graph.getVertices(), p);
@@ -99,11 +99,13 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 	}
 	
+	public List<List<V>> execute(Permutation p){
+		return formVerticeLists(executeForPermutation(p));
+	}
+	
 
 	public List<List<V>> execute(){
 
-
-		System.out.println("executing");
 
 		//find suitable permutation
 		//consider permutations which contain more than
@@ -117,7 +119,7 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 		List<Permutation> automorphisms = nauty.findAutomorphisms();
 		for (Permutation p : automorphisms){
-			permutationFoundPaths = execute(p);
+			permutationFoundPaths = executeForPermutation(p);
 			if (bestFoundPaths.size() == 0 || permutationFoundPaths.get(-1).size() < bestFoundPaths.get(-1).size()){
 				bestFoundPaths.clear();
 				bestFoundPaths.putAll(permutationFoundPaths);

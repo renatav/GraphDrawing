@@ -1,6 +1,7 @@
 package gui.panels.layout;
 
 import graph.elements.Graph;
+import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.SymmetricCircleProperties;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.symmetry.nauty.Permutation;
@@ -34,14 +35,23 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 		
 		List<Permutation> permutations = nauty.findAutomorphisms();
 		
-		Permutation[] permutationArray = new Permutation[permutations.size()];
+		Permutation[] permutationArray = new Permutation[permutations.size() +1];
+		permutationArray[0] = new Permutation();
 		for (int i = 0; i < permutations.size(); i++)
-			permutationArray[i] = permutations.get(i);
+			permutationArray[i + 1] = permutations.get(i);
 		
 		cbPermutations = new JComboBox<Permutation>(permutationArray);
 		add(cbPermutations);
 		
+	}
+	
+	public GraphLayoutProperties getEnteredLayoutProperties(){
 		
+		GraphLayoutProperties layoutProperties = super.getEnteredLayoutProperties();
+		
+		layoutProperties.setProperty(SymmetricCircleProperties.PERMUTATION, cbPermutations.getSelectedItem());
+		
+		return layoutProperties;
 	}
 	
 	

@@ -12,6 +12,11 @@ public class Permutation {
 
 	private Map<Integer, Integer> permutation;
 	
+	
+	public Permutation(){
+		permutation = new HashMap<Integer, Integer>();
+	}
+	
 	public Permutation(Map<Integer, Integer> permutation){
 		this.permutation = permutation;
 	}
@@ -71,6 +76,8 @@ public class Permutation {
 	
 	@Override
 	public String toString() {
+		if (permutation.size() == 0)
+			return "";
 		String ret = "(";
 		Set<Integer> keys = permutation.keySet(); 
 		List<Integer> list = new ArrayList<Integer>(keys);
@@ -97,6 +104,9 @@ public class Permutation {
 		if (getClass() != obj.getClass())
 			return false;
 		Permutation other = (Permutation) obj;
+		
+		if (other.getPermutation().size() != permutation.size())
+			return false;
 		
 		for (Integer key : permutation.keySet()){
 			if (!other.getPermutation().containsKey(key))
