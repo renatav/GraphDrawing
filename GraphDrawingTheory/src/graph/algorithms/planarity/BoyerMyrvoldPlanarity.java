@@ -153,6 +153,9 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		//to embed all back edges which can be embedded and to isolate
 		//Kuratowski subgraph
 		//don't return false, just keep going
+		
+		System.out.println("Externally active: " + externallyActive);
+		
 		return true;
 	}
 

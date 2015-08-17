@@ -2,13 +2,14 @@ package gui.command.panel;
 
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
+import graph.algorithm.cycles.JohnsonSimpleCycles;
+import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
-import graph.symmetry.SymmetricGraphDrawing;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.symmetry.nauty.Permutation;
 import graph.tree.spqr.SPQRTree;
@@ -97,6 +98,9 @@ public class CommandPanel extends JPanel{
 		command = command.trim();
 		allCommands.add(command);
 		currentCommandIndex = allCommands.size();
+		
+		Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
+		
 		if (command.equals(commands[0]))
 			System.exit(0);
 		if (command.startsWith(commands[1])){ //create graph
@@ -210,7 +214,6 @@ public class CommandPanel extends JPanel{
 		}	
 
 		if (command.startsWith(commands[11])){
-			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			if (!graph.isBiconnected())
 				return "Graph is not biconnected.";
 			String[] split = command.split(",");
@@ -237,7 +240,6 @@ public class CommandPanel extends JPanel{
 			if (split.length < 2)
 				return "Please enter split pair and edge";
 
-			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			if (!graph.isBiconnected())
 				return "Graph is not biconnected.";
 
@@ -284,8 +286,6 @@ public class CommandPanel extends JPanel{
 			if (split.length < 1)
 				return "Please enter one edge";
 
-
-			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			if (!graph.isBiconnected())
 				return "Graph is not biconnected.";
 
@@ -316,8 +316,6 @@ public class CommandPanel extends JPanel{
 			if (split.length < 1)
 				return "Please enter one edge";
 
-
-			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			if (!graph.isBiconnected())
 				return "Graph is not biconnected.";
 
@@ -348,7 +346,6 @@ public class CommandPanel extends JPanel{
 		}
 		
 		if (command.equals(commands[16])){
-			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
 			List<Permutation> automorphisms = nauty.findAutomorphisms();
 			String ret = "\n";
@@ -360,10 +357,11 @@ public class CommandPanel extends JPanel{
 		}
 		
 		if (command.equals(commands[17])){
-			Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
-			SymmetricGraphDrawing<GraphVertex, GraphEdge> symmetric = new SymmetricGraphDrawing<GraphVertex, GraphEdge>(graph);
-			symmetric.execute();
+				SimpleCyclesFinder<GraphVertex, GraphEdge> jcycles = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
+				System.out.println(jcycles.findCycles(graph));
 		}
+		
+		
 		
 
 		if (command.equals(commands[15])){
@@ -391,7 +389,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[19];
+		commands = new String[18];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -410,7 +408,7 @@ public class CommandPanel extends JPanel{
 		commands[14] = "construct spqr";
 		commands[15] = "help";
 		commands[16] = "automorphisms";
-		commands[17] = "symmetric";
+		commands[17] = "list cycles";
 	}
 		
 

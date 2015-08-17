@@ -29,7 +29,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	protected List<V> vertices;
 	protected List<E> edges;
 	protected boolean directed = false;
-	
+
 	//TODO mozda u svakom slucaju 2 adjacency liste
 	//po jedna  za direcred i undirected
 	//iako je directed, nekada treba obradjivati sve susedne...
@@ -104,7 +104,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 		adjacentLists.remove(v);
 	}
-	
+
 
 	@SuppressWarnings("unchecked")
 	public void addEdge(E...edge){
@@ -130,13 +130,18 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return true if there is and edge between v1 and v2, otherwise false
 	 */
 	public boolean hasEdge(V v1, V v2){
-		for (E e : adjacentLists.get(v1))
-			if (e.getDestination() == v2)
+
+		for (E e : adjacentLists.get(v1)){
+			V other =  e.getOrigin() == v1 ?  e.getDestination() : e.getOrigin();
+			if (other == v2)
 				return true;
+		}
 		if (!directed)
-			for (E e : adjacentLists.get(v2))
-				if (e.getDestination() == v1)
+			for (E e : adjacentLists.get(v2)){
+				V other =  e.getOrigin() == v2 ?  e.getDestination() : e.getOrigin();
+				if (other == v1)
 					return true;
+			}
 		return false;
 	}
 
@@ -178,7 +183,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		if (adjacentLists.get(e.getDestination()) != null)
 			adjacentLists.get(e.getDestination()).remove(e);
 	}
-	
+
 	public List<E> adjacentEdges(V v){
 		return adjacentLists.get(v);
 	}
@@ -411,24 +416,24 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 		return true;
 	}
-	
+
 	public List<Double> getEigenValues(){
 		int[][] adjacencyMatrix = adjacencyMatrix();
 		double[][] values = new double[vertices.size()][vertices.size()];
 		for (int i = 0; i <adjacencyMatrix.length; i++)
 			for (int j = 0; j <adjacencyMatrix.length; j++)
 				values[i][j] = (double)adjacencyMatrix[i][j];
-		
+
 		Matrix m = new Matrix(values);
 		EigenvalueDecomposition decomposition= m.eig();
 		List<Double> ret = new ArrayList<Double>();
 		for (Double d : decomposition.getRealEigenvalues())
 			ret.add(d);
-		
+
 		return ret;
-		
+
 	}
-	
+
 	public int[][] adjacencyMatrix(){
 		int[][] ret = new int[vertices.size()][vertices.size()];
 		for (int i = 0; i < vertices.size(); i++)
@@ -437,10 +442,12 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 					ret[i][j] = 1;
 				else
 					ret[i][j] = 0;
+
+				System.out.println("has edge: " + vertices.get(i) + " and " + vertices.get(j) +  " " + hasEdge(vertices.get(i), vertices.get(j)));
 			}
 		return ret;
 	}
-	
+
 	public void printAdjacencyMatrix(){
 		int[][] adjMatrix = adjacencyMatrix();
 		for (int[] row : adjMatrix){
@@ -451,15 +458,15 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 					System.out.print(", ");
 			}
 			System.out.print("],");
-				
+
 		}
 		System.out.println("");
 	}
-	
+
 	public V getVertexByContent(Object content){
 		return vertexByContentMap.get(content);
 	}
-	
+
 
 	public List<V> getVertices() {
 		return vertices;
