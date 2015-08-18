@@ -4,6 +4,7 @@ import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.JohnsonSimpleCycles;
 import graph.algorithm.cycles.SimpleCyclesFinder;
+import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
@@ -359,11 +360,14 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[17])){
 				SimpleCyclesFinder<GraphVertex, GraphEdge> jcycles = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
 				System.out.println(jcycles.findCycles(graph));
+				return (jcycles.toString());
+		}
+		if (command.equals(commands[18])){
+			SimpleUndirectedCyclesFinder<GraphVertex, GraphEdge> cycles = 
+					new SimpleUndirectedCyclesFinder<GraphVertex, GraphEdge>(graph);
+			return cycles.findAllCycles().toString();
 		}
 		
-		
-		
-
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
@@ -389,7 +393,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[18];
+		commands = new String[19];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -408,7 +412,8 @@ public class CommandPanel extends JPanel{
 		commands[14] = "construct spqr";
 		commands[15] = "help";
 		commands[16] = "automorphisms";
-		commands[17] = "list cycles";
+		commands[17] = "list base cycles";
+		commands[18] = "list all cycles";
 	}
 		
 
