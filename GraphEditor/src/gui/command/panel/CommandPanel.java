@@ -365,7 +365,10 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[18])){
 			SimpleUndirectedCyclesFinder<GraphVertex, GraphEdge> cycles = 
 					new SimpleUndirectedCyclesFinder<GraphVertex, GraphEdge>(graph);
-			return cycles.findAllCycles().toString();
+			String ret = "\n";
+			for (List<GraphVertex> cycle : cycles.findAllCycles())
+				ret += cycle + "\n";
+			return ret;
 		}
 		
 		if (command.equals(commands[15])){
