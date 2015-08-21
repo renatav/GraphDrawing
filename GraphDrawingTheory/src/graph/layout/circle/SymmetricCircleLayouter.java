@@ -7,8 +7,8 @@ import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.SymmetricCircleProperties;
+import graph.symmetry.Permutation;
 import graph.symmetry.SymmetricGraphDrawing;
-import graph.symmetry.nauty.Permutation;
 
 import java.awt.geom.Point2D;
 import java.util.Collections;

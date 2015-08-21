@@ -1,8 +1,6 @@
 package graph.elements;
 
-import graph.traversal.DFSTreeTraversal;
-import graph.traversal.DijkstraAlgorithm;
-import graph.trees.DFSTree;
+import graph.properties.GraphProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,9 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
 
 /**
  * /**
@@ -29,6 +24,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	protected List<V> vertices;
 	protected List<E> edges;
 	protected boolean directed = false;
+	protected GraphProperties<V,E> properties;
 
 	//TODO mozda u svakom slucaju 2 adjacency liste
 	//po jedna  za direcred i undirected
@@ -49,6 +45,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		edges = new ArrayList<E>();
 		adjacentLists = new HashMap<V, LinkedList<E>>();
 		vertexByContentMap = new HashMap<Object,V>();
+		properties = new GraphProperties<V, E>(this);
 	}
 
 
@@ -352,15 +349,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public boolean isConnected(){
-		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<>(this);
-		for (V v1 : vertices)
-			for (V v2 : vertices){
-				if (v1 == v2)
-					continue;
-				if (dijkstra.getPath(v1, v2) == null) 
-					return false;
-			}
-		return true;
+		return properties.isConnected();
 	}
 
 	/**
@@ -368,28 +357,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public boolean isConnected(List<V> excluding){
-		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<>(this);
-		for (V v1 : vertices){
-			if (excluding.contains(v1))
-				continue;
-			for (V v2 : vertices){
-				if (v1 == v2)
-					continue;
-				if (excluding.contains(v2))
-					continue;
-				if (dijkstra.getPath(v1, v2, excluding) == null) 
-					return false;
-			}
-		}
-		return true;
+		return properties.isConnected(excluding);
 	}
 
 	public boolean isCyclic(){
-		//TODO umesto pravljenja celog stabla, prekinuti kada se naidje na back ivivu
-		//proveriti da li je ok i za directed i za undirected 
-		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(this);
-		DFSTree<V, E> tree = traversal.formDFSTree(getVertices().get(0));
-		return tree.getBackEdges().size() > 0;
+		return properties.isCyclic();
 	}
 
 	public List<V> getAllSinks(){
@@ -406,32 +378,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return true if graph is biconnected, otherwise false
 	 */
 	public boolean isBiconnected(){
-		List<V> excluding = new ArrayList<V>();
-		for (V v : vertices){
-			excluding.clear();
-			excluding.add(v);
-			if (!isConnected(excluding)){
-				return false;
-			}
-		}
-		return true;
+		return properties.isBiconnected();
 	}
-
-	public List<Double> getEigenValues(){
-		int[][] adjacencyMatrix = adjacencyMatrix();
-		double[][] values = new double[vertices.size()][vertices.size()];
-		for (int i = 0; i <adjacencyMatrix.length; i++)
-			for (int j = 0; j <adjacencyMatrix.length; j++)
-				values[i][j] = (double)adjacencyMatrix[i][j];
-
-		Matrix m = new Matrix(values);
-		EigenvalueDecomposition decomposition= m.eig();
-		List<Double> ret = new ArrayList<Double>();
-		for (Double d : decomposition.getRealEigenvalues())
-			ret.add(d);
-
-		return ret;
-
+	
+	public List<V> listCutVertices(){
+		return properties.getCutVertices();
 	}
 
 	public int[][] adjacencyMatrix(){

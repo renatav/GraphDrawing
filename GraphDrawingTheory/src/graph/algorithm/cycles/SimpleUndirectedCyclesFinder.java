@@ -379,9 +379,7 @@ public class SimpleUndirectedCyclesFinder<V extends Vertex, E extends Edge<V>> {
 				//System.out.println(newCycle + " is permutation of " + cycle);
 				return cycle;
 			}
-
 		}
-
 
 		return null;
 	}

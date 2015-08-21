@@ -2,7 +2,6 @@ package gui.command.panel;
 
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
-import graph.algorithm.cycles.JohnsonSimpleCycles;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
@@ -11,8 +10,8 @@ import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
+import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
-import graph.symmetry.nauty.Permutation;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
@@ -197,9 +196,10 @@ public class CommandPanel extends JPanel{
 		}
 
 		if (command.startsWith(commands[8])){
-			if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
-				return "Graph is biconnected.";
-			return splitting.findAllCutVertices(MainFrame.getInstance().getCurrentView().getModel().getGraph()).toString(); 
+		//	if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
+			//	return "Graph is biconnected.";
+			//return splitting.findAllCutVertices(MainFrame.getInstance().getCurrentView().getModel().getGraph()).toString();
+			return graph.listCutVertices().toString();
 		}		
 
 		if (command.startsWith(commands[9])){

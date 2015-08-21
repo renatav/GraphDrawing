@@ -3,6 +3,7 @@ package graph.symmetry.nauty;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.symmetry.Permutation;
 import graph.util.Pair;
 
 import java.util.ArrayList;

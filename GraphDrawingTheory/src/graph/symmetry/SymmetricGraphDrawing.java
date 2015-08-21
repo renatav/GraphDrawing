@@ -4,7 +4,6 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
-import graph.symmetry.nauty.Permutation;
 import graph.util.Pair;
 
 import java.util.ArrayList;

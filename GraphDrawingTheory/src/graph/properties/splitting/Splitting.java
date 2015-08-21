@@ -17,16 +17,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	public List<V> findAllCutVertices(Graph<V,E> graph){
-		List<V> ret = new ArrayList<V>();
-		List<V> excluding = new ArrayList<V>();
-
-		for (V v :  graph.getVertices()){
-			excluding.clear();
-			excluding.add(v);
-			if (!graph.isConnected(excluding))
-				ret.add(v);
-		}
-		return ret;
+		return graph.listCutVertices();
 	}
 
 
