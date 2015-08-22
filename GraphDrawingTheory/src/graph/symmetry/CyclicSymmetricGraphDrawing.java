@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
+public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 	private Graph<V,E> graph;
@@ -20,7 +20,7 @@ public class SymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	private Map<V, PermutationCycle<V>> vertexCycle = new HashMap<V, PermutationCycle<V>>();
 	private Map<Integer, Integer> maxLenghts;
 
-	public SymmetricGraphDrawing(Graph<V,E> graph){
+	public CyclicSymmetricGraphDrawing(Graph<V,E> graph){
 		this.graph = graph;
 		this.nauty = new McKayGraphLabelingAlgorithm<V, E>(graph);
 	}

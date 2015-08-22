@@ -7,9 +7,28 @@ import java.util.Set;
 public class PermutationGroup {
 
 	private List<Permutation> permutations;
+	private Permutation reflection, rotation;
 	
-	public PermutationGroup(){
+	public PermutationGroup(Permutation reflection, Permutation rotation){
 		permutations = new ArrayList<Permutation>();
+		this.reflection = reflection;
+		this.rotation = rotation;
+		initPermutations();
+	}
+	
+	private void initPermutations(){
+		if (reflection != null && rotation == null){
+			permutations.add(reflection);
+			permutations.add(reflection.mul(reflection));
+		}
+		if (reflection == null && rotation != null){
+			Permutation mul = new Permutation(rotation.getPermutation());
+			while (!mul.isIdentityPermutation()){
+				permutations.add(mul);
+				mul = mul.mul(rotation);
+			}
+			permutations.add(mul);
+		}
 	}
 	
 	
@@ -57,18 +76,7 @@ public class PermutationGroup {
 		return ret;
 	}
 	
-	/**For each automorphism β we denote {u ∈ V | β(u) = u} by fixβ
-	 * */
-	public List<Integer> fixOnePermutation(Permutation beta){
-		List<Integer> ret = new ArrayList<Integer>();
-		
-		for (Integer key : beta.getPermutation().keySet())
-			if (key == beta.getPermutation().get(key))
-				ret.add(key);
-		
-		return ret;
-	}
-	
+
 	/**
 	 * The set of vertices
 	 * that are fixed elementwise by every element of A is denoted by fixA, that is,
@@ -93,4 +101,31 @@ public class PermutationGroup {
 		}
 		return ret;
 	}
+	
+	/**the orbit of u under A is
+	 *orbitA(u) = {β(u) | β ∈ A} */
+   	public List<Integer> orbit(Integer u){
+   		
+   		List<Integer> ret = new ArrayList<Integer>();
+   		for (Permutation perm : permutations)
+   			ret.add(perm.getPermutation().get(u));
+   		return ret;
+	}
+   	
+   	/**
+   	 * Group is semiregular if no permutation which is not an identity
+   	 * has fixed points
+   	 * @return
+   	 */
+   	public boolean isSemiRegular(){
+   		for (Permutation p : permutations)
+   			if (!p.isIdentityPermutation())
+   				if (p.fix().size() > 0)
+   					return false;
+   		return true;
+   	}
+   	
+   	public int size(){
+   		return permutations.size();
+   	}
 }

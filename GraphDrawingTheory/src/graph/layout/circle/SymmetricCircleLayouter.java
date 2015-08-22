@@ -8,7 +8,7 @@ import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.SymmetricCircleProperties;
 import graph.symmetry.Permutation;
-import graph.symmetry.SymmetricGraphDrawing;
+import graph.symmetry.CyclicSymmetricGraphDrawing;
 
 import java.awt.geom.Point2D;
 import java.util.Collections;
@@ -52,7 +52,7 @@ public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> exten
 		}
 
 
-		SymmetricGraphDrawing<V, E> symmetricDrawing = new SymmetricGraphDrawing<V,E>(graph);
+		CyclicSymmetricGraphDrawing<V, E> symmetricDrawing = new CyclicSymmetricGraphDrawing<V,E>(graph);
 		List<List<V>> circles;
 		if (p == null || p.getPermutation().size() == 0)
 			circles = symmetricDrawing.execute();
