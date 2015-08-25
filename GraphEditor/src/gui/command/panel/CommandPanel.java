@@ -11,6 +11,7 @@ import graph.exception.CannotBeAppliedException;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
 import graph.symmetry.Permutation;
+import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
@@ -371,6 +372,16 @@ public class CommandPanel extends JPanel{
 			return ret;
 		}
 		
+		if (command.equals(commands[19])){
+			String ret = "";
+			PermutationAnalyzator<GraphVertex, GraphEdge> analyzator =new PermutationAnalyzator<GraphVertex,GraphEdge>(graph);
+			ret += analyzator.findReflectionGroups() + "\n";
+			ret += analyzator.findRotationGroups() + "\n";
+			ret += analyzator.findDihedralGroups();
+			return ret;
+			
+		}
+		
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
@@ -396,7 +407,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[19];
+		commands = new String[20];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -417,6 +428,7 @@ public class CommandPanel extends JPanel{
 		commands[16] = "automorphisms";
 		commands[17] = "list base cycles";
 		commands[18] = "list all cycles";
+		commands[19] = "groups";
 	}
 		
 

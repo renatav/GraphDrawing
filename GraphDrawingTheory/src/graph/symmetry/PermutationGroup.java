@@ -7,6 +7,7 @@ import java.util.Set;
 public class PermutationGroup {
 
 	private List<Permutation> permutations;
+	
 	private Permutation reflection, rotation;
 	
 	public PermutationGroup(Permutation reflection, Permutation rotation){
@@ -17,17 +18,25 @@ public class PermutationGroup {
 	}
 	
 	private void initPermutations(){
-		if (reflection != null && rotation == null){
+		if (reflection != null){
 			permutations.add(reflection);
 			permutations.add(reflection.mul(reflection));
 		}
-		if (reflection == null && rotation != null){
+		if (rotation != null){
 			Permutation mul = new Permutation(rotation.getPermutation());
 			while (!mul.isIdentityPermutation()){
 				permutations.add(mul);
 				mul = mul.mul(rotation);
 			}
 			permutations.add(mul);
+		}
+		if (reflection != null && rotation != null) {
+			Permutation prod = rotation.mul(reflection);
+			Permutation mul = new Permutation(prod.getPermutation());
+			while (!mul.isIdentityPermutation()){
+				permutations.add(mul);
+				mul = mul.mul(prod);
+			}
 		}
 	}
 	
@@ -128,4 +137,28 @@ public class PermutationGroup {
    	public int size(){
    		return permutations.size();
    	}
+   	
+	public List<Permutation> getPermutations() {
+		return permutations;
+	}
+
+	public void setPermutations(List<Permutation> permutations) {
+		this.permutations = permutations;
+	}
+	
+	@Override
+	public String toString() {
+		String ret = "";
+		if (reflection != null && rotation == null)
+			ret += "Reflection ";
+		else if (reflection == null && rotation != null)
+			ret += "Rotation ";
+		else
+			ret += "Dihedral ";
+		
+		ret += permutations;
+		
+		return ret;
+	}
+
 }

@@ -154,7 +154,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		//Kuratowski subgraph
 		//don't return false, just keep going
 		
-		System.out.println("Externally active: " + externallyActive);
+		System.out.println(blocks);
 		
 		return true;
 	}
@@ -587,7 +587,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					}
 				}
 
-
+				System.out.println("Has externally active: " + hasExternallyActive);
+				System.out.println("Has other to be embedded " + hasOtherToBeEmbedded);
 				flip = hasExternallyActive || hasOtherToBeEmbedded;
 
 				if (!flip){
@@ -781,6 +782,14 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 		return ret;
 	}
+	
+	public List<V> getOutsideFace(){
+		List<V> ret = new ArrayList<V>();
+		for (Block b : blocks)
+			ret.addAll(b.getBoundaryVertices());
+		return ret;
+	}
+
 
 
 	public class Block{
@@ -826,7 +835,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					boundaryVertices.add(boundaryCopy.get(i));
 			}
 		}
-
+		
 		public List<V> getVertices() {
 			return vertices;
 		}

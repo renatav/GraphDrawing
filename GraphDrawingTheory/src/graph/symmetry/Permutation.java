@@ -1,17 +1,13 @@
 package graph.symmetry;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class Permutation {
 	
-
 	private Map<Integer, Integer> permutation;
-	
 	
 	public Permutation(){
 		permutation = new HashMap<Integer, Integer>();
@@ -54,7 +50,6 @@ public class Permutation {
 			order ++;
 		}
 		return order;
-		
 	
 	}
 	
