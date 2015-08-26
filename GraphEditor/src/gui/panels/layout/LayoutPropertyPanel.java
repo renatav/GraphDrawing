@@ -22,12 +22,14 @@ public class LayoutPropertyPanel extends JPanel	{
 	public LayoutPropertyPanel (Class<?> enumClass){
 
 		setLayout(new MigLayout());
-		
+
 		//analyze enum and generate panel
 		Object[] consts = enumClass.getEnumConstants();
 		Method m = null;
+		Method hidden = null;
 		try {
 			m = enumClass.getMethod("getName");
+			hidden = enumClass.getMethod("isHidden");
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -35,18 +37,22 @@ public class LayoutPropertyPanel extends JPanel	{
 		}
 
 		for (Object enumC : consts){
-			if (m == null)
-				add(new JLabel(enumC.toString()));
-			else
-				try {
+
+			try{
+				if (hidden != null && (boolean) hidden.invoke(enumC))
+					continue;
+
+				if (m == null)
+					add(new JLabel(enumC.toString()));
+				else
 					add(new JLabel((String) m.invoke(enumC) + ":"));
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-				}
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
 			JTextField tf = new JTextField(10);
 			add(tf, "wrap");
 			textFieldsMap.put(enumC, tf);
@@ -61,7 +67,7 @@ public class LayoutPropertyPanel extends JPanel	{
 				textFieldsMap.get(key).setText(properties.getProperty((PropertyEnums) key).toString());
 		}
 	}
-	
+
 	public GraphLayoutProperties getEnteredLayoutProperties(){
 		GraphLayoutProperties layoutProperties = new GraphLayoutProperties();
 		for (Object key : textFieldsMap.keySet()){

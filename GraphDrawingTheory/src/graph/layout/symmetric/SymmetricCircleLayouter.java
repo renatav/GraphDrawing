@@ -1,13 +1,10 @@
-package graph.layout.circle;
+package graph.layout.symmetric;
 
 import graph.drawing.Drawing;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
-import graph.layout.PropertyEnums.SymmetricCircleProperties;
-import graph.symmetry.Permutation;
 import graph.symmetry.CyclicSymmetricGraphDrawing;
 
 import java.awt.geom.Point2D;
@@ -16,7 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
+public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> extends SymmetricLayouter<V, E>{
 
 	public SymmetricCircleLayouter(Graph<V, E> graph,
 			GraphLayoutProperties layoutProperties) {
@@ -25,32 +22,6 @@ public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> exten
 
 	@Override
 	public Drawing<V, E> layout() {
-
-
-		CircleLayoutCalc<V> calc = new CircleLayoutCalc<V>();
-
-		Permutation p = null;
-		Double distance = null;
-		if (layoutProperties.getProperty(SymmetricCircleProperties.DISTANCE) != null)
-			distance =  (Double) layoutProperties.getProperty(SymmetricCircleProperties	.DISTANCE);
-		if (layoutProperties.getProperty(SymmetricCircleProperties.PERMUTATION)!= null){
-			p = (Permutation) layoutProperties.getProperty(SymmetricCircleProperties.PERMUTATION);
-		}
-		
-		if (distance == null){
-			//find largest element by x or y
-			distance = 0D;
-			for (V v : graph.getVertices()){
-
-				if (v.getSize().getHeight() > distance)
-					distance = v.getSize().getHeight();
-
-				if (v.getSize().getWidth() > distance)
-					distance = v.getSize().getWidth();
-			}
-			distance *= 1.1;
-		}
-
 
 		CyclicSymmetricGraphDrawing<V, E> symmetricDrawing = new CyclicSymmetricGraphDrawing<V,E>(graph);
 		List<List<V>> circles;
@@ -85,7 +56,7 @@ public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> exten
 			else
 				totalRadius = radius;
 
-			Map<V, Point2D> vertexPositions = calc.calculatePosition(circle, totalRadius, new Point2D.Double(0,0));
+			Map<V, Point2D> vertexPositions = calc.calculatePosition(circle, totalRadius, center);
 
 			drawing.getVertexMappings().putAll(vertexPositions);
 

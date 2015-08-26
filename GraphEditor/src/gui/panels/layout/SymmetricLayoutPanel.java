@@ -2,7 +2,7 @@ package gui.panels.layout;
 
 import graph.elements.Graph;
 import graph.layout.GraphLayoutProperties;
-import graph.layout.PropertyEnums.SymmetricCircleProperties;
+import graph.layout.PropertyEnums.SymmetricProperties;
 import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import gui.main.frame.MainFrame;
@@ -26,8 +26,9 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 	public SymmetricLayoutPanel(Class<?> enumClass){
 		super(enumClass);
 		
-		JTextField tf = textFieldsMap.remove(SymmetricCircleProperties.PERMUTATION);
+		JTextField tf = textFieldsMap.remove(SymmetricProperties.PERMUTATION);
 		remove(tf);
+		
 		
 		Graph<GraphVertex,GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 		McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty =
@@ -49,7 +50,7 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 		
 		GraphLayoutProperties layoutProperties = super.getEnteredLayoutProperties();
 		
-		layoutProperties.setProperty(SymmetricCircleProperties.PERMUTATION, cbPermutations.getSelectedItem());
+		layoutProperties.setProperty(SymmetricProperties.PERMUTATION, cbPermutations.getSelectedItem());
 		
 		return layoutProperties;
 	}

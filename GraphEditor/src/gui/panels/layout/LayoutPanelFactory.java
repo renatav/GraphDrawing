@@ -6,7 +6,7 @@ import graph.layout.PropertyEnums.CircleProperties;
 import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.SpringProperties;
-import graph.layout.PropertyEnums.SymmetricCircleProperties;
+import graph.layout.PropertyEnums.SymmetricProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,9 @@ public class LayoutPanelFactory {
 		if (al == LayoutAlgorithms.KAMADA_KAWAI)
 			panel = new LayoutPropertyPanel(KamadaKawaiProperties.class);
 		else if (al == LayoutAlgorithms.CONCENTRIC)
-			panel = new SymmetricLayoutPanel(SymmetricCircleProperties.class);
+			panel = new SymmetricLayoutPanel(SymmetricProperties.class);
+		else if (al == LayoutAlgorithms.TUTTE)
+			panel = new SymmetricLayoutPanel(SymmetricProperties.class);
 		else if (al == LayoutAlgorithms.BOX)
 			panel = new LayoutPropertyPanel(BoxProperties.class);
 		else if (al == LayoutAlgorithms.CIRCLE)

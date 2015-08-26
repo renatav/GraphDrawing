@@ -4,7 +4,8 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.circle.CircleLayoutCalc;
-import graph.util.Matrix;
+import graph.math.CramersRule;
+import graph.math.Matrix;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 	public Map<V, Point2D> execute (List<V> J, Point2D center, double treshold) throws NotPlanarException{
 
 
+		System.out.println("FACE " + J);
+		
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
 		//		BoyerMyrvoldPlanarity<V, E> planarity = new BoyerMyrvoldPlanarity<V,E>();
@@ -37,7 +40,10 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 		CircleLayoutCalc<V> circleCalc = new CircleLayoutCalc<V>();
 		
 		double radius = circleCalc.calculateRadius(J, treshold);
+		System.out.println("radius " + radius);
 		Map<V,Point2D> positions = circleCalc.calculatePosition(J, radius, center);
+		ret.putAll(positions);
+		System.out.println("POSITIONS: " + positions);
 
 		//now calculate barycentric coordinates of the other vertices
 		//order vertices in such way that those on the orside face - J are placed first
@@ -51,12 +57,18 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 			if (!J.contains(v))
 				orderedVertices.add(v);
 
+		
+		System.out.println("ORDERED VERTICES: " + orderedVertices);
+		
+		
 		//form matrix K
 
 		int m = orderedVertices.size();
 		int n = J.size();
+		if (n == m)
+			return ret;
 
-		Matrix<Integer> K = new Matrix<Integer>(m, m);
+		Matrix K = new Matrix(m, m);
 
 		for (int i = 0; i < m; i++)
 			for (int j = 0; j < m; j++){
@@ -64,13 +76,16 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 				V vi = orderedVertices.get(i);
 				V vj = orderedVertices.get(j);
 				if (vi == vj){
-					K.set(i, j, graph.vertexDegree(vi));
+					K.set(i, j, (double) graph.vertexDegree(vi));
 				}
 				else{
 					int numOfEdges = graph.edgeesBetween(vi,vj).size();
-					K.set(i,j,-numOfEdges);
+					K.set(i,j, (double) -numOfEdges);
 				}
 			}
+		
+		System.out.println("K:");
+		K.printMatrix();
 
 		//form equesions
 		//we know Vix and Viy for i <=n
@@ -78,15 +93,14 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 		
 		int numOfInner = m - n;
 		
-		double[][] coefficientsX = new double[numOfInner][numOfInner + 1];
-		double[][] coefficientsY = new double[numOfInner][numOfInner + 1];
+		Matrix aX = new Matrix(numOfInner, numOfInner);
+		Matrix aY = new Matrix(numOfInner, numOfInner);
+		Matrix bX = new Matrix(1, numOfInner);
+		Matrix bY = new Matrix(1, numOfInner);
 		
 		int eqesionIndex = 0;
 		
 		for (int p = n; p < m; p++){
-			
-			double[] coefficientX = new double[numOfInner + 1]; //how number of inside vertices
-			double[] coefficientY = new double[numOfInner + 1]; //how number of inside vertices
 			
 			double kx = 0;
 			double ky = 0;
@@ -99,24 +113,58 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 				ky += K.get(p, i) * vy;
 			}
 			
-			coefficientX[numOfInner - 1] = kx;
-			coefficientY[numOfInner - 1] = ky;
+			System.out.println("kx " + kx);
+			System.out.println("ky " + ky);
+			
+			bX.set(0, eqesionIndex, kx);
+			bY.set(0, eqesionIndex, ky);
+			//coefficientX[numOfInner - 1] = kx;
+			//coefficientY[numOfInner - 1] = ky;
 			
 			int index = 0;
 			for (int i = n; i < m; i++){
 				double c = K.get(p, i);
-				coefficientX[index] = c;
-				coefficientY[index] = c;
+				aX.set(eqesionIndex, index, c);
+				aY.set(eqesionIndex, index, c);
 				index ++;
 			}
 			
-			coefficientsX[eqesionIndex] = coefficientX;
-			coefficientsY[eqesionIndex] = coefficientY;
-				
 			eqesionIndex ++;
 		}
 		
+		
+		System.out.println("Coefficient x");
+		aX.printMatrix();
+		bX.printMatrix();
+		System.out.println("Coefficient y");
+		aY.printMatrix();
+		bY.printMatrix();
+		
+		
 		//now solve using Cramer's rule
+		double[] xCoords = CramersRule.cramers(aX.values(), bX.values()[0]);
+		double[] yCoords = CramersRule.cramers(aY.values(), bY.values()[0]);
+		System.out.println(xCoords);
+		System.out.println(yCoords);
+		System.out.println(xCoords.length);
+		System.out.println(xCoords.length);
+		
+		for (double d : xCoords)
+			System.out.println(d);
+		
+		
+		
+		int index = 0;
+		for (int i = n; i < m; i++){
+			V v = orderedVertices.get(i);
+			Point2D position = new Point2D.Double(xCoords[index], yCoords[index]);
+			ret.put(v, position);
+			index++;
+			
+		}
+		
+		
+		System.out.println(ret);
 		
 
 		return ret;

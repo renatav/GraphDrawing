@@ -18,6 +18,16 @@ public class CircleLayoutCalc<V extends Vertex> {
 
 		Map<V,Point2D> ret = new HashMap<V,Point2D>();
 
+		if (vertices.size() == 1){
+			ret.put(vertices.get(0), center);
+			return ret;
+		}
+		
+		if (vertices.size() == 2){
+			ret.put(vertices.get(0), new Point2D.Double(center.getX() - radius/2, center.getY()));
+			ret.put(vertices.get(1), new Point2D.Double(center.getX() + radius/2, center.getY()));
+			return ret;
+		}
 
 		double slice = 2 * Math.PI / vertices.size();
 		for (int i = 0; i < vertices.size(); i++){
@@ -28,6 +38,8 @@ public class CircleLayoutCalc<V extends Vertex> {
 			Point p = new Point(newX, newY);
 			ret.put(vertices.get(i), p);
 		}
+		
+		
 		
 		return ret;
 	}
@@ -99,6 +111,11 @@ public class CircleLayoutCalc<V extends Vertex> {
 	public double calculateRadius(List<V> vertices,  double treshold){
 
 		double radius = 0D;
+		
+		if (vertices.size() == 2){
+			return vertices.get(0).getSize().getWidth() + vertices.get(1).getSize().getWidth() + treshold;
+		}
+		
 
 		double slice = 2 * Math.PI / vertices.size();
 		V currentV = null;

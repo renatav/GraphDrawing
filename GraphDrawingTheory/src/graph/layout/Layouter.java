@@ -6,10 +6,11 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.box.BoxLayouter;
 import graph.layout.circle.CircleLayouter;
-import graph.layout.circle.SymmetricCircleLayouter;
 import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
 import graph.layout.force.directed.SpringLayouter;
+import graph.layout.symmetric.SymmetricCircleLayouter;
+import graph.layout.symmetric.TutteLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,6 +148,12 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		
 		else if (algorithm == LayoutAlgorithms.CONCENTRIC){
 			layouter = new SymmetricCircleLayouter<V,E>(formOneGraph(vertices, edges), layoutProperties);
+			drawing = layouter.layout();
+			drawing.positionEdges(edges);
+			return drawing;
+		}
+		else if (algorithm == LayoutAlgorithms.TUTTE){
+			layouter = new TutteLayout<V,E>(formOneGraph(vertices, edges), layoutProperties);
 			drawing = layouter.layout();
 			drawing.positionEdges(edges);
 			return drawing;
