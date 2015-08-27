@@ -1,15 +1,14 @@
 package graph.layout.symmetric;
 
-import java.awt.geom.Point2D;
-
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
-import graph.layout.PropertyEnums.SymmetricProperties;
 import graph.layout.circle.CircleLayoutCalc;
 import graph.symmetry.Permutation;
+
+import java.awt.geom.Point2D;
 
 public abstract class SymmetricLayouter <V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
 
@@ -21,21 +20,13 @@ public abstract class SymmetricLayouter <V extends Vertex, E extends Edge<V>> ex
 	public SymmetricLayouter(Graph<V, E> graph,
 			GraphLayoutProperties layoutProperties) {
 		super(graph, layoutProperties);
-		init();
 	}
 	
 	protected void init(){
-		
-		if (layoutProperties.getProperty(SymmetricProperties.DISTANCE) != null)
-			distance =  (Double) layoutProperties.getProperty(SymmetricProperties	.DISTANCE);
-		if (layoutProperties.getProperty(SymmetricProperties.PERMUTATION)!= null)
-			p = (Permutation) layoutProperties.getProperty(SymmetricProperties.PERMUTATION);
-		if (layoutProperties.getProperty(SymmetricProperties.CENTER) != null)
-			p = (Permutation) layoutProperties.getProperty(SymmetricProperties.CENTER);
-		else
-			center = new Point2D.Double(0,0);
+	
+		if (center == null)
+			center = new Point2D.Double(0, 0);
 			
-		
 		if (distance == null){
 			//find largest element by x or y
 			distance = 0D;

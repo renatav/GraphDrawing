@@ -1,18 +1,18 @@
 package gui.panels.layout;
 
 import graph.elements.Graph;
-import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
+import graph.layout.PropertyEnums.TutteProperties;
 import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 
+import java.awt.Component;
 import java.util.List;
 
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 
 public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 	
@@ -26,8 +26,18 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 	public SymmetricLayoutPanel(Class<?> enumClass){
 		super(enumClass);
 		
-		JTextField tf = textFieldsMap.remove(SymmetricProperties.PERMUTATION);
-		remove(tf);
+		
+		Component tf = null;
+		if (enumClass == SymmetricProperties.class){
+			 tf = componentsMap.remove(SymmetricProperties.PERMUTATION);
+			 componentsMap.put(SymmetricProperties.PERMUTATION, tf);
+		}
+		else if (enumClass == TutteProperties.class){
+			tf = componentsMap.remove(TutteProperties.PERMUTATION);
+			componentsMap.put(TutteProperties.PERMUTATION, tf);
+		}
+		if (tf != null)
+			remove(tf);
 		
 		
 		Graph<GraphVertex,GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
@@ -44,20 +54,7 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 		cbPermutations = new JComboBox<Permutation>(permutationArray);
 		add(cbPermutations);
 		
+		
 	}
 	
-	public GraphLayoutProperties getEnteredLayoutProperties(){
-		
-		GraphLayoutProperties layoutProperties = super.getEnteredLayoutProperties();
-		
-		layoutProperties.setProperty(SymmetricProperties.PERMUTATION, cbPermutations.getSelectedItem());
-		
-		return layoutProperties;
-	}
-	
-	
-	
-	
-
-
 }

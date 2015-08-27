@@ -7,6 +7,7 @@ import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.SpringProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
+import graph.layout.PropertyEnums.TutteProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class LayoutPanelFactory {
 		else if (al == LayoutAlgorithms.CONCENTRIC)
 			panel = new SymmetricLayoutPanel(SymmetricProperties.class);
 		else if (al == LayoutAlgorithms.TUTTE)
-			panel = new SymmetricLayoutPanel(SymmetricProperties.class);
+			panel = new SymmetricLayoutPanel(TutteProperties.class);
 		else if (al == LayoutAlgorithms.BOX)
 			panel = new LayoutPropertyPanel(BoxProperties.class);
 		else if (al == LayoutAlgorithms.CIRCLE)

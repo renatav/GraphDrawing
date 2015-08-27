@@ -22,10 +22,8 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 
-	public Map<V, Point2D> execute (List<V> J, Point2D center, double treshold) throws NotPlanarException{
+	public Map<V, Point2D> execute (List<V> J, Point2D center, double treshold) {
 
-
-		System.out.println("FACE " + J);
 		
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
@@ -39,11 +37,10 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 
 		CircleLayoutCalc<V> circleCalc = new CircleLayoutCalc<V>();
 		
+		
 		double radius = circleCalc.calculateRadius(J, treshold);
-		System.out.println("radius " + radius);
 		Map<V,Point2D> positions = circleCalc.calculatePosition(J, radius, center);
 		ret.putAll(positions);
-		System.out.println("POSITIONS: " + positions);
 
 		//now calculate barycentric coordinates of the other vertices
 		//order vertices in such way that those on the orside face - J are placed first
@@ -57,9 +54,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 			if (!J.contains(v))
 				orderedVertices.add(v);
 
-		
-		System.out.println("ORDERED VERTICES: " + orderedVertices);
-		
 		
 		//form matrix K
 
@@ -84,8 +78,8 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 		
-		System.out.println("K:");
-		K.printMatrix();
+	//	System.out.println("K:");
+		//K.printMatrix();
 
 		//form equesions
 		//we know Vix and Viy for i <=n
@@ -111,15 +105,14 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 				double vy = vPosition.getY();
 				kx += K.get(p, i) * vx;
 				ky += K.get(p, i) * vy;
+				
 			}
 			
-			System.out.println("kx " + kx);
-			System.out.println("ky " + ky);
+		//	System.out.println("kx " + kx);
+		//	System.out.println("ky " + ky);
 			
-			bX.set(0, eqesionIndex, kx);
-			bY.set(0, eqesionIndex, ky);
-			//coefficientX[numOfInner - 1] = kx;
-			//coefficientY[numOfInner - 1] = ky;
+			bX.set(0, eqesionIndex, -kx);
+			bY.set(0, eqesionIndex, -ky);
 			
 			int index = 0;
 			for (int i = n; i < m; i++){
@@ -133,25 +126,17 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 		}
 		
 		
-		System.out.println("Coefficient x");
-		aX.printMatrix();
-		bX.printMatrix();
-		System.out.println("Coefficient y");
-		aY.printMatrix();
-		bY.printMatrix();
+//		System.out.println("Coefficient x");
+//		aX.printMatrix();
+//		bX.printMatrix();
+//		System.out.println("Coefficient y");
+//		aY.printMatrix();
+//		bY.printMatrix();
 		
 		
 		//now solve using Cramer's rule
 		double[] xCoords = CramersRule.cramers(aX.values(), bX.values()[0]);
 		double[] yCoords = CramersRule.cramers(aY.values(), bY.values()[0]);
-		System.out.println(xCoords);
-		System.out.println(yCoords);
-		System.out.println(xCoords.length);
-		System.out.println(xCoords.length);
-		
-		for (double d : xCoords)
-			System.out.println(d);
-		
 		
 		
 		int index = 0;
@@ -162,10 +147,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 			index++;
 			
 		}
-		
-		
-		System.out.println(ret);
-		
 
 		return ret;
 

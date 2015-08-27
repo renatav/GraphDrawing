@@ -3,11 +3,13 @@ package gui.panels.layout;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums;
 
+import java.awt.Component;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -17,7 +19,7 @@ import net.miginfocom.swing.MigLayout;
 public class LayoutPropertyPanel extends JPanel	{
 
 	private static final long serialVersionUID = 1L;
-	protected Map<Object, JTextField> textFieldsMap  = new HashMap<Object, JTextField>();
+	protected Map<Object, Component> componentsMap  = new HashMap<Object, Component>();
 
 	public LayoutPropertyPanel (Class<?> enumClass){
 
@@ -55,30 +57,41 @@ public class LayoutPropertyPanel extends JPanel	{
 			}
 			JTextField tf = new JTextField(10);
 			add(tf, "wrap");
-			textFieldsMap.put(enumC, tf);
+			componentsMap.put(enumC, tf);
 		}
 	}
 
 	public void setDefaultValue(GraphLayoutProperties properties){
 		if (properties == null)
 			return;
-		for (Object key : textFieldsMap.keySet()){
+		for (Object key : componentsMap.keySet()){
 			if (properties.getProperty((PropertyEnums) key) != null)
-				textFieldsMap.get(key).setText(properties.getProperty((PropertyEnums) key).toString());
+				if (componentsMap.get(key) instanceof JTextField)
+					((JTextField)componentsMap.get(key)).setText(properties.getProperty((PropertyEnums) key).toString());
 		}
 	}
 
 	public GraphLayoutProperties getEnteredLayoutProperties(){
 		GraphLayoutProperties layoutProperties = new GraphLayoutProperties();
-		for (Object key : textFieldsMap.keySet()){
-			String content = textFieldsMap.get(key).getText();
-			Double doubleValue = null;
-			try{
-				doubleValue = Double.parseDouble(content);
+		for (Object key : componentsMap.keySet()){
+
+			if (componentsMap.get(key) instanceof JComboBox<?>)
+				layoutProperties.setProperty((PropertyEnums)key, ((JComboBox<?>)componentsMap.get(key)).getSelectedItem());
+			else if (componentsMap.get(key) instanceof JTextField){
+
+				String content = ((JTextField)componentsMap.get(key)).getText();
+				Double doubleValue = null;
+				try{
+					doubleValue = Double.parseDouble(content);
+					layoutProperties.setProperty((PropertyEnums) key, doubleValue);
+				}
+				catch(Exception ex){
+					if (!content.equals(""))
+						layoutProperties.setProperty((PropertyEnums)key, content);
+				}
 			}
-			catch(Exception ex){
-			}
-			layoutProperties.setProperty((PropertyEnums) key, doubleValue);
+
+
 		}
 		return layoutProperties;
 	}
