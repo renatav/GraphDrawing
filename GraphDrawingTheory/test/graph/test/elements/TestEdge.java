@@ -1,4 +1,4 @@
-package graph.application.elements;
+package graph.test.elements;
 
 import graph.elements.Edge;
 

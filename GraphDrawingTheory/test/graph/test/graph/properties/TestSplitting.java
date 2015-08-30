@@ -1,10 +1,10 @@
 package graph.test.graph.properties;
 
-import graph.application.elements.TestEdge;
-import graph.application.elements.TestVertex;
 import graph.elements.Graph;
 import graph.properties.splitting.SplitPair;
 import graph.properties.splitting.Splitting;
+import graph.test.elements.TestEdge;
+import graph.test.elements.TestVertex;
 
 import java.util.List;
 

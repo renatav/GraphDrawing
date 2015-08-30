@@ -1,7 +1,7 @@
 package graph.test.algorithms;
 
-import graph.application.elements.TestEdge;
-import graph.application.elements.TestVertex;
+import graph.test.elements.TestEdge;
+import graph.test.elements.TestVertex;
 import graph.traversal.DijkstraAlgorithm;
 
 import org.junit.Test;

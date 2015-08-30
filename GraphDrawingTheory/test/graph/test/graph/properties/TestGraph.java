@@ -1,9 +1,9 @@
 package graph.test.graph.properties;
 
-import graph.application.elements.TestEdge;
-import graph.application.elements.TestVertex;
 import graph.elements.Graph;
 import graph.properties.bipartite.Bipartite;
+import graph.test.elements.TestEdge;
+import graph.test.elements.TestVertex;
 import graph.traversal.GraphTraversal;
 import junit.framework.TestCase;
 

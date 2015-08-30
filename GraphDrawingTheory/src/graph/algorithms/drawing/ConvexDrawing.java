@@ -183,7 +183,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	private List<List<V>> findExtendableFacialCycles(){
-		
+		return null;
 	}
 
 }

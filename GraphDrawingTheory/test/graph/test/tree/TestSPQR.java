@@ -1,9 +1,9 @@
 package graph.test.tree;
 
-import graph.application.elements.TestEdge;
-import graph.application.elements.TestVertex;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
+import graph.test.elements.TestEdge;
+import graph.test.elements.TestVertex;
 import graph.tree.spqr.ProtoSPQRTree;
 import graph.tree.spqr.SPQRTree;
 import junit.framework.TestCase;
