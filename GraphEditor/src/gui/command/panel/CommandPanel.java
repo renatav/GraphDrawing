@@ -4,6 +4,7 @@ import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
+import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
@@ -382,6 +383,11 @@ public class CommandPanel extends JPanel{
 			
 		}
 		
+		if (command.equals(commands[20])){
+			System.out.println("convex");
+			ConvexDrawing<GraphVertex, GraphEdge> drawing = new ConvexDrawing<GraphVertex,GraphEdge>(graph);
+		}
+		
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
@@ -407,7 +413,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[20];
+		commands = new String[21];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -429,6 +435,7 @@ public class CommandPanel extends JPanel{
 		commands[17] = "list base cycles";
 		commands[18] = "list all cycles";
 		commands[19] = "groups";
+		commands[20] = "convex";
 	}
 		
 

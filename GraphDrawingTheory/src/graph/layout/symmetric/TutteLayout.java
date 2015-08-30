@@ -1,6 +1,5 @@
 package graph.layout.symmetric;
 
-import graph.algorithms.drawing.NotPlanarException;
 import graph.algorithms.drawing.TutteEmbedding;
 import graph.drawing.Drawing;
 import graph.elements.Edge;
@@ -79,14 +78,8 @@ public class TutteLayout <V extends Vertex, E extends Edge<V>> extends Symmetric
 		Drawing<V,E> drawing = new Drawing<V,E>();
 
 		Map<V, Point2D> vertexPositions;
-		try {
-			vertexPositions = tutteEmbedding.execute(face, center, distance);
-			drawing.getVertexMappings().putAll(vertexPositions);
-		} catch (NotPlanarException e) {
-			e.printStackTrace();
-		}
-
-
+		vertexPositions = tutteEmbedding.execute(face, center, distance);
+		drawing.getVertexMappings().putAll(vertexPositions);
 
 		return drawing;
 	}

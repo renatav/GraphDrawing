@@ -19,6 +19,10 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 		
 	}
 	
+	public GraphEdge(){
+		
+	}
+	
 	public void setNodesBasedOnVertices(){
 		linkNodes.add(origin.getPosition());
 		linkNodes.add(destination.getPosition());

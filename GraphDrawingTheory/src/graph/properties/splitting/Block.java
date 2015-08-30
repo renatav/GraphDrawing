@@ -17,6 +17,8 @@ public class Block<V extends Vertex, E extends Edge<V>> extends Graph<V,E>{
 	 * Original block
 	 */
 	private Graph<V,E> graph;
+	
+	private V cutVertex;
 
 	public Block(Graph<V, E> graph) {
 		super();
@@ -29,6 +31,14 @@ public class Block<V extends Vertex, E extends Edge<V>> extends Graph<V,E>{
 
 	public void setGraph(Graph<V, E> graph) {
 		this.graph = graph;
+	}
+
+	public V getCutVertex() {
+		return cutVertex;
+	}
+
+	public void setCutVertex(V cutVertex) {
+		this.cutVertex = cutVertex;
 	}
 	
 	

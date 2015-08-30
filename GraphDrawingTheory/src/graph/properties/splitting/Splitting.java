@@ -60,6 +60,8 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 		coveredVertices.add(current);
 
 		block.addVertex(current);
+		//NEW
+		if (cutVertices.contains(current))block.setCutVertex(current);
 
 
 		for (E e : edgesInBlock(startVertex, current, graph, cutVertices, dijkstra)){

@@ -27,4 +27,19 @@ public class Util {
 		list.addAll(reverse);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static <V extends Vertex, E extends Edge<V>> E createEdge(V origin, V destination, Class<?> edgeClass){
+		try {
+			E e = (E) edgeClass.newInstance();
+			e.setDestination(destination);
+			e.setOrigin(origin);
+			return e;
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 }
