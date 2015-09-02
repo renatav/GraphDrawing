@@ -1,0 +1,57 @@
+package graph.properties.slitting.triconnected;
+
+import graph.elements.Edge;
+import graph.elements.Graph;
+import graph.elements.Vertex;
+import graph.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * Implementation of Hopcroft's and Tarjan's algorithm which divides a graph
+ * into triconnected components and finds separation pairs
+ * @author xx
+ *
+ */
+
+public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
+
+	
+	private void triconnected(Graph<V,E> graph){
+		
+		List<HopcroftSplitComponent> splitComponents = new ArrayList<HopcroftSplitComponent>();
+		
+		//remove all multiedges
+		//and create triple bonds
+		
+		Graph<V,E> gPrim= graph;
+		
+		List<List<E>> multiedges = graph.listMultiEdges();
+		if (multiedges.size() > 0){
+			
+			gPrim = Util.copyGraph(graph);
+			for (List<E> multi : multiedges){
+				
+				HopcroftSplitComponent<V, E> tripleBond = new HopcroftSplitComponent<V,E>(SplitComponentType.TRIPLE_BOND, multi, null);
+				splitComponents.add(tripleBond);
+				
+				//remove all but one edge (which represents all three)
+				for (int i = 1; i < multi.size(); i++){
+					gPrim.removeEdge(multi.get(i));
+				}
+			}
+			
+		}
+		
+		//find biconnected components of G'
+		
+		
+		
+		
+		
+		
+	}
+	
+}

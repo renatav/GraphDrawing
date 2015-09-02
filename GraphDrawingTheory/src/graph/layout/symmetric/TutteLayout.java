@@ -50,7 +50,7 @@ public class TutteLayout <V extends Vertex, E extends Edge<V>> extends Symmetric
 					face.add(v);
 			}
 		}
-		
+
 		else{
 			List<List<V>> circles;
 			CyclicSymmetricGraphDrawing<V, E> symmetricDrawing = new CyclicSymmetricGraphDrawing<V,E>(graph);
@@ -72,7 +72,7 @@ public class TutteLayout <V extends Vertex, E extends Edge<V>> extends Symmetric
 			});
 			face = circles.get(circles.size() - 1);
 		}
-		
+
 		TutteEmbedding<V, E> tutteEmbedding = new TutteEmbedding<V, E>(graph);
 
 		Drawing<V,E> drawing = new Drawing<V,E>();

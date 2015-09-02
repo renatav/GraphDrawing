@@ -142,4 +142,20 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		DFSTree<V, E> tree = traversal.formDFSTree(graph.getVertices().get(0));
 		return tree.getBackEdges().size() > 0;
 	}
+	
+	public List<List<E>> listMultiEdges(){
+		
+		List<List<E>> ret = new ArrayList<List<E>>();
+		
+		for (int i = 0; i < graph.getVertices().size(); i++)
+			for (int j = i; j < graph.getVertices().size(); j++){
+				List<E> edgesBetween = graph.edgeesBetween(graph.getVertices().get(i), graph.getVertices().get(j));
+				if (edgesBetween.size() > 1)
+					ret.add(edgesBetween);
+			}
+		
+		
+		return ret;
+	}
+	
 }

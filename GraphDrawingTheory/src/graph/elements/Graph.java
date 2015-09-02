@@ -371,6 +371,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(v);
 		return ret;
 	}
+	
+	public List<List<E>> listMultiEdges(){
+		return properties.listMultiEdges();
+	}
 
 	/**
 	 * Checks if a graph is biconnected. 

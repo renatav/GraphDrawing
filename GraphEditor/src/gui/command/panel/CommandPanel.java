@@ -59,7 +59,7 @@ public class CommandPanel extends JPanel{
 		initCommands();
 		
 		inputField.addKeyListener(new KeyListener() {
-			
+			 
 			@Override
 			public void keyTyped(KeyEvent e) {
 				
@@ -222,7 +222,7 @@ public class CommandPanel extends JPanel{
 			String[] split = command.split(",");
 			if (split.length < 2)
 				return "Please enter a split pair consisting of two vertices";
-			String v1 = split[0];
+			String v1 = split[0].substring(commands[11].length()).trim();
 			String v2 = split[1];
 
 			GraphVertex vert1 = graph.getVertexByContent(v1);

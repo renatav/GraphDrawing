@@ -60,9 +60,6 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 		coveredVertices.add(current);
 
 		block.addVertex(current);
-		//NEW
-		if (cutVertices.contains(current))block.setCutVertex(current);
-
 
 		for (E e : edgesInBlock(startVertex, current, graph, cutVertices, dijkstra)){
 			if (coveredEdges.contains(e))
@@ -316,6 +313,23 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 			if (maximal)
 				ret.add(splitPair1);
 		}
+		return ret;
+	}
+	
+	/**
+	 * A pair of vertices {x,y} of a 2-connected graph is a separation pair
+	 * if there exists two subgraphs G1' = (v1, E1') and G2' = (V2, E2')
+	 * which satisfy the following conditions
+	 * V = V1 U v2 V1 ∩ V2 = {x,y}
+	 * E = E1' U E2' E1' ∩ E2' = O |E1'| >= 2 |E2'| >= 2
+	 * @param graph
+	 * @return
+	 */
+	public List<SplitPair<V,E>> findAllSeparationPairs(Graph<V,E> graph){
+		List<SplitPair<V,E>> ret = new ArrayList<SplitPair<V,E>>();
+		
+		
+		
 		return ret;
 	}
 
