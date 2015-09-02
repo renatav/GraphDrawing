@@ -1,6 +1,7 @@
 package graph.elements;
 
 import graph.properties.GraphProperties;
+import graph.properties.components.BiconnectedComponent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -387,6 +388,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	
 	public List<V> listCutVertices(){
 		return properties.getCutVertices();
+	}
+	
+	public List<BiconnectedComponent<V,E>>listBiconnectedComponents(){
+		return properties.listBiconnectedComponents();
 	}
 
 	public int[][] adjacencyMatrix(){

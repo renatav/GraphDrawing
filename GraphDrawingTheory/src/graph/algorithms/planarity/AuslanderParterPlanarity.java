@@ -7,7 +7,7 @@ import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
-import graph.properties.bipartite.Bipartite;
+import graph.properties.Bipartite;
 import graph.traversal.GraphTraversal;
 
 import java.util.ArrayList;

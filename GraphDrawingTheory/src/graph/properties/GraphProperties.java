@@ -3,6 +3,7 @@ package graph.properties;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.properties.components.BiconnectedComponent;
 import graph.traversal.DFSTreeTraversal;
 import graph.traversal.DijkstraAlgorithm;
 import graph.trees.DFSTree;
@@ -156,6 +157,11 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		
 		
 		return ret;
+	}
+	
+	public List<BiconnectedComponent<V, E>> listBiconnectedComponents(){
+		Biconnected<V,E> biconnected = new Biconnected<V,E>(graph);
+		return biconnected.findBiconnectedComponents();
 	}
 	
 }

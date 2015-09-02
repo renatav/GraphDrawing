@@ -1,4 +1,4 @@
-package graph.properties.slitting.triconnected;
+package graph.properties.components;
 
 public enum SplitComponentType {
 	

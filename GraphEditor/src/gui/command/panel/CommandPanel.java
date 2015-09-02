@@ -9,7 +9,7 @@ import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
-import graph.properties.splitting.SplitPair;
+import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
@@ -388,6 +388,10 @@ public class CommandPanel extends JPanel{
 			ConvexDrawing<GraphVertex, GraphEdge> drawing = new ConvexDrawing<GraphVertex,GraphEdge>(graph);
 		}
 		
+		if (command.equals(commands[21])){
+			return graph.listBiconnectedComponents().toString();
+		}
+		
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
@@ -413,7 +417,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[21];
+		commands = new String[22];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -436,6 +440,7 @@ public class CommandPanel extends JPanel{
 		commands[18] = "list all cycles";
 		commands[19] = "groups";
 		commands[20] = "convex";
+		commands[21] = "list biconnected components";
 	}
 		
 

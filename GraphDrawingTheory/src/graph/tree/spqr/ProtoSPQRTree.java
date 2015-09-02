@@ -4,9 +4,9 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.operations.GraphOperations;
-import graph.properties.splitting.Block;
-import graph.properties.splitting.SplitComponent;
-import graph.properties.splitting.SplitPair;
+import graph.properties.components.Block;
+import graph.properties.components.SplitComponent;
+import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
 
 import java.util.ArrayList;

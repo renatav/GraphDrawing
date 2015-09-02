@@ -1,7 +1,7 @@
 package graph.test.graph.properties;
 
 import graph.elements.Graph;
-import graph.properties.splitting.SplitPair;
+import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;

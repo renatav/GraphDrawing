@@ -3,7 +3,7 @@ package graph.tree.bc;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.properties.splitting.Block;
+import graph.properties.components.Block;
 import graph.properties.splitting.Splitting;
 
 import java.util.List;

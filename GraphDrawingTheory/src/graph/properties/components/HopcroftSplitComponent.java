@@ -1,14 +1,13 @@
-package graph.properties.slitting.triconnected;
+package graph.properties.components;
 
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
 import java.util.List;
 
-public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> {
+public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends Component<V,E>{
 
 	private SplitComponentType type;
-	private List<E> edges;
 	private List<E> virtualEdges;
 	
 	public SplitComponentType getType() {
@@ -37,9 +36,8 @@ public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> {
 
 	public HopcroftSplitComponent(SplitComponentType type, List<E> edges,
 			List<E> virtualEdges) {
-		super();
+		super(edges);
 		this.type = type;
-		this.edges = edges;
 		this.virtualEdges = virtualEdges;
 	}
 	

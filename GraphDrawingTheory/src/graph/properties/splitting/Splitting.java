@@ -4,6 +4,9 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.operations.GraphOperations;
+import graph.properties.components.Block;
+import graph.properties.components.SplitComponent;
+import graph.properties.components.SplitPair;
 import graph.traversal.DijkstraAlgorithm;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package graph.properties.bipartite;
+package graph.properties;
 
 import graph.elements.Edge;
 import graph.elements.Graph;

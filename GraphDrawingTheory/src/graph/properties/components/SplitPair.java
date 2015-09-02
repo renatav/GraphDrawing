@@ -1,4 +1,4 @@
-package graph.properties.splitting;
+package graph.properties.components;
 
 import graph.elements.Edge;
 import graph.elements.Vertex;

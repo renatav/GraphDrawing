@@ -1,8 +1,11 @@
-package graph.properties.slitting.triconnected;
+package graph.properties.splitting;
 
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.properties.components.BiconnectedComponent;
+import graph.properties.components.HopcroftSplitComponent;
+import graph.properties.components.SplitComponentType;
 import graph.util.Util;
 
 import java.util.ArrayList;
@@ -46,6 +49,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		}
 		
 		//find biconnected components of G'
+		List<BiconnectedComponent<V, E>> biconnectedComponents = gPrim.listBiconnectedComponents();
 		
 		
 		
