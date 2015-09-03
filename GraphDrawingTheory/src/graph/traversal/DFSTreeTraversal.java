@@ -31,6 +31,7 @@ public class DFSTreeTraversal<V extends Vertex, E extends Edge<V>> {
 		return tree;
 	}
 	
+	
 	private void formDFSTree(V current, E currentEdge, DFSTree<V,E> tree, List<V> covered, List<E> visited){
 
 		if (covered.size() == graph.getVertices().size())
