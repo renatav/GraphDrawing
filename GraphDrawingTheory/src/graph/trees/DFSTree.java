@@ -30,6 +30,16 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		this.directed = false;
 
 	}
+	
+	public DFSTree(V root, int[] numbering, List<E> treeEdges, List<E> backEdges, List<V> vertices){
+		this.root = root;
+		this.verticesWithIndexes = new HashMap<V, Integer>();
+		for (V v : vertices)
+			verticesWithIndexes.put(v, numbering[vertices.indexOf(v)]);
+		this.treeEdges = treeEdges;
+		this.backEdges = backEdges;
+		
+	}
 
 
 
@@ -202,7 +212,8 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		else
 			return -1;
 	}
-
+	
+	
 	/**The lowpoint of a vertex v, denoted by lowpt(v), is the lowest DFS index of
 	 *an ancestor of v reachable through a back edge from a descendant of v
 	 * @param v
@@ -229,6 +240,52 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 			return -1;
 		return lowest;
 
+	}
+	
+	/**
+	 * Finds the lowest and second lowest ancestor 
+	 * @param v
+	 * @return
+	 */
+	public int[] lowpts(V v){
+		Integer lowpt1 = null;
+		Integer lowpt2 = null; 
+		
+		List<V> descendants = allDescendantsOf(v, true); 
+		int currentIndex = getIndex(v);
+		for (E back : getBackEdges()){
+
+			if (descendants.contains(back.getDestination()) || descendants.contains(back.getOrigin())){
+				int index;
+				if (descendants.contains(back.getDestination()))
+					index = getIndex(back.getOrigin());
+				else
+					index = getIndex(back.getDestination());
+				
+				if (index < currentIndex){
+					if (lowpt1 == null || lowpt1 > index){
+						lowpt1 = index;
+					}
+					else if (lowpt1 != null && index < lowpt1){
+						//set lowpt2
+						if (lowpt2 == null || lowpt2 > index){
+							lowpt2 = index;
+						}
+					}
+				}
+			}
+		}
+		
+		if (lowpt1 == null){
+			lowpt1 = currentIndex;
+			lowpt2 = currentIndex;
+		}
+		else if (lowpt2 == null){
+			lowpt2 = currentIndex;
+		}
+			
+		return new int[]{lowpt1, lowpt2};
+		
 	}
 
 
@@ -259,7 +316,8 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return highest;
 
 	}
-
+	
+	
 	/**
 	 * The lowpt of an edge (v, w) is its lowest
 	 * return point (or w if none exists).

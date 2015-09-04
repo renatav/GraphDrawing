@@ -11,6 +11,7 @@ import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
+import graph.properties.splitting.TriconnectedDivision;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
@@ -391,6 +392,12 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[21])){
 			return graph.listBiconnectedComponents().toString();
 		}
+		 
+		if (command.equals(commands[22])){
+			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
+			triDiv.findSeaparationPairs();
+			
+		}
 		
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
@@ -417,7 +424,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[22];
+		commands = new String[23];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -441,6 +448,7 @@ public class CommandPanel extends JPanel{
 		commands[19] = "groups";
 		commands[20] = "convex";
 		commands[21] = "list biconnected components";
+		commands[22] = "separation pairs";
 	}
 		
 
