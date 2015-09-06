@@ -3,28 +3,17 @@ package graph.properties.splitting;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.properties.components.BiconnectedComponent;
 import graph.properties.components.HopcroftSplitComponent;
-import graph.properties.components.SplitComponentType;
 import graph.trees.DFSTree;
 import graph.util.Pair;
-import graph.util.Util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
-
-/**
- * Implementation of Hopcroft's and Tarjan's algorithm which divides a graph
- * into triconnected components and finds separation pairs
- * @author xx
- *
- */
-
-public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
-
+public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 	/**
 	 * array keeping the number of descendants of vertices
@@ -90,46 +79,13 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	 * array of first sons of vertices - the first entry in the adjacency list
 	 */
 	private int[] a1;
+	/**
+	 * inverse of numbering, takes number as the index of the array and keeps numberings as values
+	 */
+	private int[] inverseNumbering;
 	private int n;
+	private int j;
 
-
-	public TriconnectedDivision(Graph<V,E> graph){
-		this.graph = graph;
-		this.vertices = graph.getVertices();
-	}
-
-	private void triconnected(Graph<V,E> graph){
-
-		List<HopcroftSplitComponent> splitComponents = new ArrayList<HopcroftSplitComponent>();
-
-		//remove all multiedges
-		//and create triple bonds
-
-		Graph<V,E> gPrim= graph;
-
-		List<List<E>> multiedges = graph.listMultiEdges();
-		if (multiedges.size() > 0){
-
-			gPrim = Util.copyGraph(graph);
-			for (List<E> multi : multiedges){
-
-				HopcroftSplitComponent<V, E> tripleBond = new HopcroftSplitComponent<V,E>(SplitComponentType.TRIPLE_BOND, multi, null);
-				splitComponents.add(tripleBond);
-
-				//remove all but one edge (which represents all three)
-				for (int i = 1; i < multi.size(); i++){
-					gPrim.removeEdge(multi.get(i));
-				}
-			}
-
-		}
-
-		//find biconnected components of G'
-		List<BiconnectedComponent<V, E>> biconnectedComponents = gPrim.listBiconnectedComponents();
-
-
-
-	}
 
 	public List<Pair<V,V>> findSeaparationPairs(Graph<V,E> graph){
 		List<Pair<V,V>> separationPairs = new ArrayList<Pair<V,V>>();
@@ -145,6 +101,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		highpt = new int[size];
 		degree = new int[size];
 		a1 = new int[size];
+		inverseNumbering = new int[size];
 
 
 		number = new int[size];
@@ -166,13 +123,13 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		//the search starts at vertex s
 		V root = graph.getVertices().get(0);
 		dfs(root,null, adjacency);
-		
+
 		//construct ordered adjacency lists
 		constructAdjacencyLists(adjacency);
-		
+
 		V s = null;
 		int m = size;
-		
+
 		//find vertex whose number is 1, start with it
 		//that will be the previously selected root vertex
 		List<List<E>> paths = new ArrayList<List<E>>();
@@ -186,34 +143,35 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		System.out.println("newnum");
 		for (int i = 0; i < newnum.length; i++)
 			System.out.print(newnum[i] + " ");
-		
-		
+
+
 		//compute degree(v), lowpt1(v) and lowpt2(v)
 		//using the new numbering
-		
+
 		DFSTree<V,E> tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
 
 		for (V v : vertices){
-		
+
 			int vIndex = vertices.indexOf(v);
 			int[] lowpts = tree.lowpts(v);
 			lowpt1[vIndex] = lowpts[0];
 			lowpt2[vIndex] = lowpts[1];
-			
+
 			System.out.println(newnum[vIndex]);
 			System.out.println("lowpt1: " + lowpt1[vIndex]);
 			System.out.println("lowpt2: " + lowpt2[vIndex]);
-			
+
 			degree[vIndex] = adjacency.get(v).size();
 			a1[vIndex] = adjacency.get(v).size();
-			
+			inverseNumbering[newnum[vIndex]] = vIndex;
+
 		}
 
 
 		return separationPairs;
 
 	}
-	
+
 
 	/**
 	 * Routine for depth-first search of a multigraph represented by adjacency list
@@ -224,7 +182,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	 */
 	private void dfs(V v, V u, Map<V,List<E>> adjacency){
 		int vIndex = vertices.indexOf(v);
-		
+
 		//n:= number(v):=n+1
 		n++;
 		number[vIndex] = n;
@@ -285,12 +243,12 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		List<V> vertices = graph.getVertices();
 		int size = vertices.size();
 		V v, w;
-		
+
 		for (E e : graph.getEdges()){
 
 			System.out.println("analyzing edge " + e);
 
-			
+
 
 			//see which one comes first
 			//v will be the one with smaller dfs index
@@ -326,13 +284,13 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 			list.add(e); // add (v,w) to bucket(fi(v,w))
 		}
-		
+
 		//clear adjacent
 		for (V vert : vertices)
 			adjacent.get(vert).clear();
-		
+
 		System.out.println("Buket: " + bucket);
-		
+
 		for (int i = 1; i <= 2*size + 1; i++){
 			if (!bucket.containsKey(i))
 				continue;
@@ -352,7 +310,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		}
 
 	}
-	
+
 	/**
 	 * Routine to generate paths in a biconnected palm tree 
 	 * with specially ordered adjacency lists
@@ -368,12 +326,12 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			List<List<E>> paths, List<E> currentPath){
 		int vIndex = vertices.indexOf(v);
 		newnum[vIndex] = m - nd[vIndex] + 1;
-		
+
 		for (E e : adjacent.get(v)){
-			
+
 			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
 			int wIndex = vertices.indexOf(w);
-			
+
 			if (s == null){
 				s = v;
 				currentPath = new ArrayList<E>();
@@ -392,5 +350,225 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
+	/**
+	 * Finds split components of a biconnected multigraph
+	 * on which the previous steps (finds lowpt1, lowpt2, etc.)
+	 * were already carried out
+	 * A graph is represented by a set of properly ordered adjacency list s A9V)
+	 * @param tstack contains triples representing possible type 2 separation pairs
+	 * @param estack contains edges backed up over during search
+	 */
+	public void split(Stack tstack, Stack estack){
 
+	}
+
+	/**
+	 * Recursive procedure which repeats the pathfinding search
+	 * finding separation pairs and splitting off components as it proceeds
+	 * @param v current vertex in the depth-first search
+	 */
+	private void pathsearch(V v, Map<V,List<E>> adjacent, List<List<E>> paths, Stack<Integer[]> tstack, 
+			List<E> estack, HopcroftSplitComponent<V, E> currentComponent, List<HopcroftSplitComponent<V, E>> components){
+
+		int vIndex = vertices.indexOf(v);
+		HopcroftSplitComponent<V, E> newComponent = null; 
+
+		for (E e : adjacent.get(v)){
+
+			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+			int wIndex = vertices.indexOf(w);
+
+			//a vertex is represented by its number (according to newnum)
+			//newnum takes index of a vertex and returns the order
+
+			if (firstEdgeOfAPath(e, paths)){
+				int y = 0;
+				int b = 0; //save last deleted
+				boolean deleted = false;
+				while (!tstack.isEmpty()){ //while (h,a,b) on tstack has a > lowpt1(w)
+					Integer[] stackCurrent = tstack.peek();
+
+					int a = stackCurrent[1];
+					if (a <= lowpt1[wIndex])
+						break;
+
+					int h = stackCurrent[0];
+					y = Math.max(y, h);
+					tstack.pop(); //remove from stack
+					deleted = true;
+					b = stackCurrent[2];
+				}
+				//if no triples deleted from tstack
+				Integer[] stackItem = new Integer[3];
+				if (!deleted){
+					stackItem[0] = newnum[wIndex] + nd[wIndex] - 1; //w + ND(w) - 1
+					stackItem[1] = lowpt1[wIndex]; //lowpt(w)
+					stackItem[2] = newnum[vIndex]; //v
+				}
+				else{
+					stackItem[0] = Math.max(y, newnum[wIndex] + nd[wIndex] - 1); //max{y,w+ND(w)-1}
+					stackItem[1] = lowpt1[wIndex];
+					stackItem[2] = b; //last deleted b
+				}
+			}
+
+
+			pathsearch(w, adjacent, paths, tstack, estack, currentComponent, components);
+			estack.add(e); //add (v,w) to estack
+
+			boolean flag = false;
+			E savedEdge = null;
+
+			while (newnum[vIndex] != 1){
+				Integer[] stackItem = tstack.peek();
+				int a = stackItem[1];
+
+				//((degree(w) = 2) and (A1(w)>w) or (h,a,b) on tstack satisfies (v=a)
+				if (!((degree[wIndex] == 2 && a1[wIndex] > newnum[wIndex]) || a == newnum[vIndex]))
+					break;
+
+				//test for type 2 pairs
+
+				int b = stackItem[2];
+				int h = stackItem[0];
+				int bIndex = inverseNumbering[b];
+				int aIndex = inverseNumbering[a];
+
+				if (a == newnum[vIndex] && father[bIndex] == aIndex) //a==v and father(b) = a
+					tstack.pop(); //delete (h,a,b) from stack
+				else{
+					if (degree[wIndex] == 2 && newnum[a1[wIndex]] > newnum[wIndex]){ //degree(w) = 2 and A1(w) > w
+
+						j++;
+
+						newComponent = new HopcroftSplitComponent<V,E>();
+						components.add(newComponent);
+						currentComponent = newComponent;
+
+						//add top two edges (v,w) and (w,x) on estack to new component
+						E e1 = estack.get(estack.size() - 1);
+						E e2 = estack.get(estack.size() - 2);
+						newComponent.getEdges().add(e1);
+						newComponent.getEdges().add(e2);
+
+						//edges are (v,w) and (w,x)
+						//add(v,x,j) to new component
+						//find x
+						V x = e.getDestination() == w ? e.getOrigin() : e.getDestination();
+						Integer[] newTriple = new Integer[3];
+						newTriple[0] = newnum[vIndex];
+						newTriple[1] = newnum[vertices.indexOf(x)];
+						newTriple[2] = j;
+
+						//is there an edge (y,z) = (x,v) on estack?
+
+						for (E edge : estack)
+							if ((edge.getOrigin() == x && edge.getDestination() == v) ||
+									(edge.getOrigin() == v && edge.getDestination() == x)){
+								flag = true;
+								estack.remove(edge); //delete (y,z) from stack and save
+								savedEdge = edge;
+								break;
+							}
+					}
+					//continue here
+					int x = 0;
+					if (a == newnum[vIndex] && father[bIndex] != aIndex){ //if v=a and father(b)!=a
+						j++;
+						//delete (h,a,b) from tstack
+						tstack.pop();
+						//simulating stack - start with the last one
+						List<E> toDelete = new ArrayList<E>();
+						for (int i = estack.size() - 1; i >= 0; i--){ //while (x,y) on estack has (a<=x<=h) and (a<=y<=h)
+							E edge = estack.get(i);
+
+							V xVert= edge.getDestination();
+							V yVert = edge.getOrigin();
+							x = newnum[vertices.indexOf(xVert)];
+							int y = newnum[vertices.indexOf(yVert)];
+
+							if (!((a <= x && x <= h) && (a <= y && y <= h)))
+								break; //simulating while 
+
+							if ((x == a  && y == b) || (y == b && x == a)){ //if (x,y) == (a,b)
+								flag = true;
+								//delete (a,b) from tstack - Isn't it already?
+								//maybe estack?
+								//delete (a,b) = delete (x,y) = delete current edge and save
+								toDelete.add(edge);
+								savedEdge = edge;
+							}
+							else{
+								//delete (x,y) from estack and add to current component
+								toDelete.add(edge);
+								currentComponent.getEdges().add(edge);
+								//decrement degree(x) and degree(y)
+								degree[vertices.indexOf(x)] --;
+								degree[vertices.indexOf(y)] --;
+							}
+						}
+						estack.removeAll(toDelete);
+
+						//add (a,b,j) to new component
+						Integer[] newTriple = new Integer[3];
+						newTriple[0] = a;
+						newTriple[1] = b;
+						newTriple[2] = j;
+
+
+						newComponent = new HopcroftSplitComponent<V,E>();
+						components.add(newComponent);
+						currentComponent = newComponent;
+						newComponent.getTriples().add(newTriple);
+						x = b;
+					}
+					
+					if (flag){
+						flag = false;
+						j++;
+						//add saved edges (x,v,j-1), (x,v,j) to new component
+
+						//TODO when to create new component
+						newComponent.getEdges().add(savedEdge);
+						Integer[] triple1 = new Integer[3];
+						triple1[0] = x;
+						triple1[1] = newnum[vIndex];
+						triple1[2] = j-1;
+
+						Integer[] triple2 = new Integer[3];
+						triple2[0] = x;
+						triple2[1] = newnum[vIndex];
+						triple2[2] = j;
+						
+						newComponent.getTriples().add(triple1);
+						newComponent.getTriples().add(triple2);
+						
+						//decrement degree(x), degree(y)
+						
+						int xIndex = inverseNumbering[x];
+						
+						degree[xIndex] --;
+						degree[vIndex] --;
+						
+					}
+
+				}
+			}
+
+
+
+		}
+
+	}
+
+
+
+
+private boolean firstEdgeOfAPath(E e, List<List<E>> paths){
+	for (List<E> path : paths)
+		if (path.get(0) == e)
+			return true;
+	return false;
+
+}
 }

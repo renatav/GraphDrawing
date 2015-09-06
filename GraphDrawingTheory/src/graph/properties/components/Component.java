@@ -3,11 +3,16 @@ package graph.properties.components;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Component<V extends Vertex, E extends Edge<V>> {
 
 	protected List<E> edges;
+	
+	public Component(){
+		edges = new ArrayList<E>();
+	}
 	
 	
 	public Component(List<E> edges) {
