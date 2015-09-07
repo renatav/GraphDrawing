@@ -395,7 +395,7 @@ public class CommandPanel extends JPanel{
 		 
 		if (command.equals(commands[22])){
 			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
-			triDiv.findSeaparationPairs();
+			//triDiv.findSeaparationPairs();
 			
 		}
 		

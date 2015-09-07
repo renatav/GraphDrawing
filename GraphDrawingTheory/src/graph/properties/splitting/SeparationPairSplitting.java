@@ -367,7 +367,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 * finding separation pairs and splitting off components as it proceeds
 	 * @param v current vertex in the depth-first search
 	 */
-	private void pathsearch(V v, Map<V,List<E>> adjacent, List<List<E>> paths, Stack<Integer[]> tstack, 
+	private void pathsearch(V v, Map<V,List<E>> adjacent, List<List<E>> paths, Stack<Triple>tstack, 
 			List<E> estack, HopcroftSplitComponent<V, E> currentComponent, List<HopcroftSplitComponent<V, E>> components){
 
 		int vIndex = vertices.indexOf(v);
@@ -383,33 +383,35 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 			if (firstEdgeOfAPath(e, paths)){
 				int y = 0;
-				int b = 0; //save last deleted
+				int b = 0; //save last deleted b
 				boolean deleted = false;
+				
 				while (!tstack.isEmpty()){ //while (h,a,b) on tstack has a > lowpt1(w)
-					Integer[] stackCurrent = tstack.peek();
+					Triple stackCurrent = tstack.peek();
 
-					int a = stackCurrent[1];
+					int a = stackCurrent.getA();
+					
 					if (a <= lowpt1[wIndex])
 						break;
 
-					int h = stackCurrent[0];
+					int h = stackCurrent.getH();
 					y = Math.max(y, h);
 					tstack.pop(); //remove from stack
 					deleted = true;
-					b = stackCurrent[2];
+					b = stackCurrent.getB();
 				}
-				//if no triples deleted from tstack
+				
+				//if no triples were deleted from tstack add (w + ND(w) - 1, lowpt1(w), v) to stack
+				//else max{y, w + ND(w) - 1}, lowpt1(w),b)
 				Integer[] stackItem = new Integer[3];
-				if (!deleted){
-					stackItem[0] = newnum[wIndex] + nd[wIndex] - 1; //w + ND(w) - 1
-					stackItem[1] = lowpt1[wIndex]; //lowpt(w)
-					stackItem[2] = newnum[vIndex]; //v
-				}
-				else{
-					stackItem[0] = Math.max(y, newnum[wIndex] + nd[wIndex] - 1); //max{y,w+ND(w)-1}
-					stackItem[1] = lowpt1[wIndex];
-					stackItem[2] = b; //last deleted b
-				}
+				Triple newPair;
+				if (!deleted)
+					newPair = new Triple(newnum[wIndex] + nd[wIndex] - 1, lowpt1[wIndex], newnum[vIndex]);
+				else 
+					newPair = new Triple(Math.max(y, newnum[wIndex] + nd[wIndex] - 1), lowpt1[wIndex], b);
+				tstack.push(newPair);
+				//add end of stack marker to tstack - let that be (h,a,b) = (-1,-1,-1)
+				tstack.push(new Triple(-1, -1, -1));
 			}
 
 
@@ -420,8 +422,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			E savedEdge = null;
 
 			while (newnum[vIndex] != 1){
-				Integer[] stackItem = tstack.peek();
-				int a = stackItem[1];
+				Triple stackItem = tstack.peek();
+				int a = stackItem.getA();
 
 				//((degree(w) = 2) and (A1(w)>w) or (h,a,b) on tstack satisfies (v=a)
 				if (!((degree[wIndex] == 2 && a1[wIndex] > newnum[wIndex]) || a == newnum[vIndex]))
@@ -429,8 +431,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 				//test for type 2 pairs
 
-				int b = stackItem[2];
-				int h = stackItem[0];
+				int b = stackItem.getB();
+				int h = stackItem.getH();
 				int bIndex = inverseNumbering[b];
 				int aIndex = inverseNumbering[a];
 
@@ -522,7 +524,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						newComponent.getTriples().add(newTriple);
 						x = b;
 					}
-					
+
 					if (flag){
 						flag = false;
 						j++;
@@ -539,17 +541,17 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						triple2[0] = x;
 						triple2[1] = newnum[vIndex];
 						triple2[2] = j;
-						
+
 						newComponent.getTriples().add(triple1);
 						newComponent.getTriples().add(triple2);
-						
+
 						//decrement degree(x), degree(y)
-						
+
 						int xIndex = inverseNumbering[x];
-						
+
 						degree[xIndex] --;
 						degree[vIndex] --;
-						
+
 					}
 
 				}
@@ -564,11 +566,11 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 
 
-private boolean firstEdgeOfAPath(E e, List<List<E>> paths){
-	for (List<E> path : paths)
-		if (path.get(0) == e)
-			return true;
-	return false;
+	private boolean firstEdgeOfAPath(E e, List<List<E>> paths){
+		for (List<E> path : paths)
+			if (path.get(0) == e)
+				return true;
+		return false;
 
-}
+	}
 }
