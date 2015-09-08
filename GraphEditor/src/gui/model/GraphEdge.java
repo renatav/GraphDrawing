@@ -11,6 +11,7 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 
 	private GraphVertex origin, destination;
 	private List<Point2D> linkNodes = new ArrayList<Point2D>();
+	private int weight;
 	
 	public GraphEdge(GraphVertex origin, GraphVertex destination){
 		this.origin = origin;
@@ -52,8 +53,7 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 
 	@Override
 	public int getWeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return weight;
 	}
 
 	public List<Point2D> getLinkNodes() {
@@ -67,6 +67,12 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 	@Override
 	public String toString() {
 		return "[" +origin + ", " + destination + "]";
+	}
+
+	@Override
+	public void setWeight(int weight) {
+		this.weight = weight;
+		
 	}
 	
 	

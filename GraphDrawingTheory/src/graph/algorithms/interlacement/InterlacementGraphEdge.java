@@ -47,4 +47,10 @@ public class InterlacementGraphEdge<V extends Vertex, E extends Edge<V>> impleme
 		
 	}
 
+	@Override
+	public void setWeight(int weight) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

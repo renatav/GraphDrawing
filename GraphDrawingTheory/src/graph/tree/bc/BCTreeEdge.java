@@ -48,4 +48,10 @@ public class BCTreeEdge implements Edge<BCTreeNode>{
 				+ "]";
 	}
 
+	@Override
+	public void setWeight(int weight) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

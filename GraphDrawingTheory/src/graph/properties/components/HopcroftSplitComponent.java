@@ -2,6 +2,7 @@ package graph.properties.components;
 
 import graph.elements.Edge;
 import graph.elements.Vertex;
+import graph.properties.splitting.Triple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends
 
 	private SplitComponentType type;
 	private List<E> virtualEdges;
-	private List<Integer[]> triples;
+	private List<Triple> triples;
 	
 	public SplitComponentType getType() {
 		return type;
@@ -41,20 +42,20 @@ public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends
 		super(edges);
 		this.type = type;
 		this.virtualEdges = virtualEdges;
-		triples = new ArrayList<Integer[]>();
+		triples = new ArrayList<Triple>();
 	}
 	
 	public HopcroftSplitComponent(){
 		super();
 		virtualEdges = new ArrayList<E>();
-		triples = new ArrayList<Integer[]>();
+		triples = new ArrayList<Triple>();
 	}
 
-	public List<Integer[]> getTriples() {
+	public List<Triple> getTriples() {
 		return triples;
 	}
 
-	public void setTriples(List<Integer[]> triples) {
+	public void setTriples(List<Triple> triples) {
 		this.triples = triples;
 	}
 	

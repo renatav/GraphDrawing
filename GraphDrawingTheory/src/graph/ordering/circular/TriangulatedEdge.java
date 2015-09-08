@@ -40,4 +40,10 @@ public class TriangulatedEdge<V extends Vertex> implements Edge<V> {
 	public void setDestination(V destination) {
 		this.destination = destination;
 	}
+
+	@Override
+	public void setWeight(int weight) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -8,5 +8,6 @@ public interface Edge<V extends Vertex> {
 	void setOrigin(V origin);
 	void setDestination(V destination);
 	int getWeight();
+	void setWeight(int weight);
 
 }

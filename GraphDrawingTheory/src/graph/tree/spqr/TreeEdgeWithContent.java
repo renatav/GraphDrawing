@@ -73,6 +73,12 @@ public class TreeEdgeWithContent<V extends Vertex, E extends Edge<V>> implements
 		return "TreeEdgeWithContent [origin=" + origin + ", destination="
 				+ destination + ", content=" + content + "]";
 	}
+
+	@Override
+	public void setWeight(int weight) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 }
