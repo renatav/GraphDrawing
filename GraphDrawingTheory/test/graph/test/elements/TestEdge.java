@@ -84,4 +84,10 @@ public class TestEdge implements Edge<TestVertex>{
 		this.destination = destination;
 	}
 
+	@Override
+	public void setWeight(int weight) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

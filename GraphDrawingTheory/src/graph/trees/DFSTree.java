@@ -7,6 +7,7 @@ import graph.elements.Path;
 import graph.elements.Vertex;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -243,7 +244,9 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 	
 	/**
-	 * Finds the lowest and second lowest ancestor 
+	 * The lowpoint of a vertex v, denoted by lowpt(v), is the lowest DFS index of
+	 * an ancestor of v reachable through a back edge from a descendant of v
+	 * lowpt1 is the lowest index, lowpt2 is the second lowest 
 	 * @param v
 	 * @return
 	 */
@@ -256,6 +259,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		for (E back : getBackEdges()){
 
 			if (descendants.contains(back.getDestination()) || descendants.contains(back.getOrigin())){
+				
 				int index;
 				if (descendants.contains(back.getDestination()))
 					index = getIndex(back.getOrigin());
@@ -264,9 +268,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 				
 				if (index < currentIndex){
 					if (lowpt1 == null || lowpt1 > index){
+						if (lowpt1 != null)
+							lowpt2 = lowpt1;
 						lowpt1 = index;
 					}
-					else if (lowpt1 != null && index < lowpt1){
+					else if (lowpt1 != null && index > lowpt1){
 						//set lowpt2
 						if (lowpt2 == null || lowpt2 > index){
 							lowpt2 = index;
@@ -596,7 +602,6 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 
 	}
-
-
+	
 
 }

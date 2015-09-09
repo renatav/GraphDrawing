@@ -32,6 +32,14 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	public TriconnectedDivision(Graph<V,E> graph){
 		this.graph = graph;
 	}
+	
+	
+	public void execute(Graph<V,E> graph){
+		SeparationPairSplitting<V, E> splitting = new SeparationPairSplitting<V,E>();
+		Class edgeClass = graph.getEdges().get(0).getClass();
+		splitting.findSeaparationPairs(graph, edgeClass);
+	}
+	
 
 	private void triconnected(Graph<V,E> graph){
 
