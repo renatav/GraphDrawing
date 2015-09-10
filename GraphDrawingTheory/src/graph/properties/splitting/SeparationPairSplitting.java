@@ -9,7 +9,6 @@ import graph.util.Pair;
 import graph.util.Util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,12 +86,12 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 * inverse of numbering, takes number as the index of the array and keeps numberings as values
 	 */
 	private int[] inverseNumbering;
-	
+
 	/**denotes the start vertex of the current path in the pathfinder phase*/ 
 	private V s;
 	/**denotes the last number assigned to a vertex in the pathfinder phase*/
 	private int m;
-	
+
 	private int n;
 	private int j;
 	private DFSTree<V,E> tree;
@@ -143,20 +142,20 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 		log.info("first dfs traversal finished");
 		tree = new DFSTree<V,E>(root, number, treeEdges, fronds, vertices);
-		System.out.println(tree.toString());
+		//	System.out.println(tree.toString());
 
-		
-		for (V v : vertices){
-			System.out.println("Adjacent for " + v + ": " + adjacency.get(v));
-		}
+
+		//		for (V v : vertices){
+		//			System.out.println("Adjacent for " + v + ": " + adjacency.get(v));
+		//		}
 
 
 		//		//construct ordered adjacency lists
 		constructAdjacencyLists(adjacency);
-		
-		for (V v : vertices){
-			System.out.println("Adjacent for " + v + ": " + adjacency.get(v));
-		}
+
+		//		for (V v : vertices){
+		//			System.out.println("Adjacent for " + v + ": " + adjacency.get(v));
+		//		}
 
 		s = null;
 		m = size;
@@ -166,46 +165,47 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		List<List<E>> paths = new ArrayList<List<E>>();
 		pathfiner(root, adjacency, paths, null);
 
-		System.out.println("number:");
-		for (int i = 0; i < number.length; i++)
-			System.out.print(number[i] + " ");
-		System.out.println("");
+		//		System.out.println("number:");
+		//		for (int i = 0; i < number.length; i++)
+		//			System.out.print(number[i] + " ");
+		//		System.out.println("");
+		//
+		//		System.out.println("newnum");
+		//		for (int i = 0; i < newnum.length; i++)
+		//			System.out.print(newnum[i] + " ");
 
-		System.out.println("newnum");
-		for (int i = 0; i < newnum.length; i++)
-			System.out.print(newnum[i] + " ");
-	
-		
-		
-				//compute degree(v), lowpt1(v) and lowpt2(v)
-				//using the new numbering
-		
-				tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
-				
-				System.out.println("treeEdges: " + treeEdges);
-				System.out.println("backEdges: " + fronds);
-		
-				for (V v : vertices){
-		
-					int vIndex = vertices.indexOf(v);
-					int[] lowpts = tree.lowpts(v);
-					lowpt1[vIndex] = lowpts[0];
-					lowpt2[vIndex] = lowpts[1];
-		
-					System.out.println(newnum[vIndex]);
-					System.out.println("lowpt1: " + lowpt1[vIndex]);
-					System.out.println("lowpt2: " + lowpt2[vIndex]);
-		
-					degree[vIndex] = adjacency.get(v).size();
-					a1[vIndex] = adjacency.get(v).size();
-					inverseNumbering[newnum[vIndex] - 1] = vIndex;
-		
-				}
-		
-				log.info("seconf dfs completed, printing dfs tree");
-				printDFSTree();
-		
-				split(adjacency, paths);
+
+
+		//compute degree(v), lowpt1(v) and lowpt2(v)
+		//using the new numbering
+
+		tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
+
+		//	System.out.println("treeEdges: " + treeEdges);
+		//	System.out.println("backEdges: " + fronds);
+
+		for (V v : vertices){
+
+			int vIndex = vertices.indexOf(v);
+			int[] lowpts = tree.lowpts(v);
+			lowpt1[vIndex] = lowpts[0];
+			lowpt2[vIndex] = lowpts[1];
+
+			//					System.out.println(newnum[vIndex]);
+			//					System.out.println("lowpt1: " + lowpt1[vIndex]);
+			//					System.out.println("lowpt2: " + lowpt2[vIndex]);
+
+			degree[vIndex] = adjacency.get(v).size();
+			a1[vIndex] = adjacency.get(v).size();
+			inverseNumbering[newnum[vIndex] - 1] = vIndex;
+
+		}
+
+		log.info("seconf dfs completed, printing dfs tree");
+		printDFSTree();
+
+		split(adjacency, paths);
+
 
 		return separationPairs;
 
@@ -285,7 +285,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 		for (E e : graph.getEdges()){
 
-			System.out.println("analyzing edge " + e);
+			//System.out.println("analyzing edge " + e);
 
 			//v is origin
 			//w is destination
@@ -304,7 +304,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			else
 				fi = 2*lowpt1[wIndex] + 1;
 
-			System.out.println("Fi " + fi);
+			//System.out.println("Fi " + fi);
 
 			List<E> list = bucket.get(fi);
 			if (list == null){
@@ -319,7 +319,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		for (V vert : vertices)
 			adjacent.get(vert).clear();
 
-		System.out.println("Buket: " + bucket);
+		//System.out.println("Buket: " + bucket);
 
 		for (int i = 1; i <= 2*size + 1; i++){
 			if (!bucket.containsKey(i))
@@ -348,11 +348,11 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 */
 	private void pathfiner(V v, Map<V,List<E>> adjacent, 
 			List<List<E>> paths, List<E> currentPath){
-		
+
 		int vIndex = vertices.indexOf(v);
 		newnum[vIndex] = m - nd[vIndex] + 1;
-		
-		System.out.println("setting newnum " +  v + " = " +  newnum[vIndex]);
+
+		//System.out.println("setting newnum " +  v + " = " +  newnum[vIndex]);
 
 		for (E e : adjacent.get(v)){
 
@@ -373,7 +373,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering start from 1, indexes from 1
 					highpt[newnum[wIndex] - 1] = newnum[vIndex];
 				//output current path
-				System.out.println("output " + currentPath);
+				//	System.out.println("output " + currentPath);
 				s = null;
 			}
 		}
@@ -398,6 +398,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		Stack<E> estack = new Stack<E>();
 
 		pathsearch(vertices.get(inverseNumbering[1]), adjacent, paths, tstack, estack, null, components, virtualEdges, j, flag);
+		System.out.println(virtualEdges);
 	}
 
 	/**
@@ -411,9 +412,6 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 		int vIndex = vertices.indexOf(v);
 
-		//TODO oprezno sa ivicama
-		//treba znati orijentaciju!
-		//uzeti to u obzir kada se preuzimaju x i y
 
 		for (E e : adjacent.get(v)){
 
@@ -448,21 +446,26 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						b = stackCurrent.getB();
 					}
 
+					
 					//if no triples were deleted from tstack add (w + ND(w) - 1, lowpt1(w), v) to stack
 					//else max{y, w + ND(w) - 1}, lowpt1(w),b)
-					Triple newPair;
+					Triple newTriple;
 					if (!deleted)
-						newPair = new Triple(newnum[wIndex] + nd[wIndex] - 1, lowpt1[wIndex], newnum[vIndex]);
+						newTriple = new Triple(newnum[wIndex] + nd[wIndex] - 1, lowpt1[wIndex], newnum[vIndex]);
 					else 
-						newPair = new Triple(Math.max(y, newnum[wIndex] + nd[wIndex] - 1), lowpt1[wIndex], b);
-					tstack.push(newPair);
+						newTriple = new Triple(Math.max(y, newnum[wIndex] + nd[wIndex] - 1), lowpt1[wIndex], b);
+					tstack.push(newTriple);
+					log.info("TSTACK: Pushing triple " + newTriple);
 					//add end of stack marker to tstack - let that be (h,a,b) = (-1,-1,-1)
 					tstack.push(new Triple(-1, -1, -1));
+					log.info("TSTACK: Pushing end of stack marker");
 				}
 
 
 				pathsearch(w, adjacent, paths, tstack, estack, currentComponent, components, virtualEdges, j, flag);
+
 				estack.add(e); //add (v,w) to estack
+				log.info("ESTACK: Adding edge " + newnum[vertices.indexOf(e.getOrigin())] + ", " + newnum[vertices.indexOf(e.getDestination())]);
 
 
 
@@ -491,7 +494,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					int h = stackItem.getH();
 					int bIndex = inverseNumbering[b - 1]; //since numbering starts from 1, indexes from 0
 					int aIndex = inverseNumbering[a - 1];
-					int x = 0;
+					int x = -1;
 
 					if (a == newnum[vIndex] && father[bIndex] == aIndex) //a==v and father(b) = a
 						tstack.pop(); //delete (h,a,b) from stack
@@ -522,7 +525,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 							//set x
 							x = newnum[vertices.indexOf(xVert)];
 
-							Triple newTriple = new Triple(newnum[vIndex], newnum[vertices.indexOf(x)], j);
+							Triple newTriple = new Triple(newnum[vIndex], x, j);
 							newComponent.getTriples().add(newTriple);
 							log.info("adding triple " + newTriple);
 
@@ -571,6 +574,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 							else{
 								//delete (x,y) from estack and add to current component
 								toDelete.add(edge);
+								if (currentComponent == null)
+									currentComponent = new HopcroftSplitComponent<V,E>();
 								currentComponent.getEdges().add(edge);
 								//decrement degree(x) and degree(y)
 								degree[vertices.indexOf(xVert)] --;
@@ -616,6 +621,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						log.info("Creating new component");
 						log.info("adding " + triple1);
 						log.info("adding " + triple2);
+						log.info("adding " + savedEdge);
 
 						//decrement degree(x), degree(v)
 
@@ -630,42 +636,45 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					//is this the virtual edge
 					//what if x was not set
 
-					int xIndex = inverseNumbering[x - 1];
-					V xVert = vertices.get(xIndex);
+					if (x > -1){
+						int xIndex = inverseNumbering[x-1];
+						V xVert = vertices.get(xIndex);
 
-					//Triple newTriple = new Triple(newnum[vIndex],x,j);
+						//Triple newTriple = new Triple(newnum[vIndex],x,j);
 
-					//add to estack
-					//TODO is it better to create a mapping, instead of using weights?
-					E newEdge = Util.createEdge(v, xVert, edgeClass);
-					newEdge.setWeight(j); //save j 
-					estack.add(newEdge);
+						//add to estack
+						//TODO is it better to create a mapping, instead of using weights?
+						E newEdge = Util.createEdge(v, xVert, edgeClass);
+						newEdge.setWeight(j); //save j 
+						estack.add(newEdge);
+						log.info("ESTACK: Adding edge " + newnum[vertices.indexOf(newEdge.getOrigin())] + ", " + newnum[vertices.indexOf(newEdge.getDestination())]);
 
-					//increment degree(x), degree(v)
+						//increment degree(x), degree(v)
 
 
-					degree[xIndex] ++;
-					degree[vIndex] ++;
-					father[xIndex] = vIndex;
+						degree[xIndex] ++;
+						degree[vIndex] ++;
+						father[xIndex] = vIndex;
 
-					//if (A1(v) ->* x then A1(v) = x
+						//if (A1(v) ->* x then A1(v) = x
 
-					//check if there is a path from A1(v) to x..
-					//meaning that x is descendant of of v
+						//check if there is a path from A1(v) to x..
+						//meaning that x is descendant of of v
 
-					V a1V = vertices.get(a1[vIndex]);
-					if (tree.allDescendantsOf(a1V, true).contains(xVert)){
-						//a1(v) = x
-						a1[vIndex] = xIndex;
+						V a1V = vertices.get(a1[vIndex]);
+						if (tree.allDescendantsOf(a1V, true).contains(xVert)){
+							//a1(v) = x
+							a1[vIndex] = xIndex;
+						}
+						w = xVert;
+						wIndex = xIndex;
 					}
-					w = xVert;
-					wIndex = xIndex;
 				}//end of while
 
 				//test for type 1 pair
-				//if lowpt2(w)>=v and (lowpt1(v)1=1 or father(v) != 1 or w > 3)
-				if ((lowpt2[wIndex] >= newnum[vIndex]) && (lowpt1[vIndex] == 1 ||
-						newnum[father[vIndex]] != 1) || newnum[wIndex] > 3){
+				//if lowpt2(w)>=v and (lowpt1(w)!=1 or father(v) != 1 or w > 3)
+				if ((lowpt2[wIndex] >= newnum[vIndex]) && (lowpt1[wIndex] != 1 ||
+						newnum[father[vIndex]] != 1 || newnum[wIndex] > 3)){
 
 					j++;
 
@@ -705,12 +714,12 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					}
 					estack.removeAll(toDelete);
 
-					//add (w, lowpt1(w), j) to new component
+					//add (v, lowpt1(w), j) to new component
 
 					HopcroftSplitComponent<V,E> newComponent = new HopcroftSplitComponent<V,E>();
 					components.add(newComponent);
 					currentComponent = newComponent;
-					Triple newTriple = new Triple(newnum[wIndex], newnum[lowpt1[wIndex]], j);
+					Triple newTriple = new Triple(newnum[vIndex], lowpt1[wIndex], j);
 					newComponent.getTriples().add(newTriple);
 
 					log.info("Creating new component");
@@ -728,8 +737,10 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						V xVert = topEdge.getOrigin();
 						V yVert = topEdge.getDestination();
 						int yIndex = vertices.indexOf(yVert);
+						int xIndex = vertices.indexOf(xVert);
 
-						if (xVert == v && yIndex == lowpt1[wIndex]){
+						if ((xVert == v && newnum[yIndex] == lowpt1[wIndex])
+								|| (yVert == v && newnum[xIndex] == lowpt1[wIndex])){
 
 							j++;
 							//add (x,y), (v,lowpt1(w),j=1), (v, lowpt1(w),j) to new component
@@ -749,30 +760,31 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 							//decrement degree(v), degree(lowpt1(w))
 							degree[vIndex] --;
-							degree[lowpt1[wIndex]] --;
+							degree[inverseNumbering[lowpt1[wIndex] - 1]] --;
 						}
 					}
 
 					//if lowpt1(w) != father(v)
-					if (lowpt1[vIndex] != father[vIndex]){
+					if (lowpt1[wIndex] != newnum[father[vIndex]]){
 
 						//TODO
-						//add (w,lowpt1(w), j) to estack -- maybe search for the edge instead of creating it
+						//add (v,lowpt1(w), j) to estack -- maybe search for the edge instead of creating it
 						//it should exist
-						E newEdge = Util.createEdge(w, vertices.get(lowpt1[wIndex]), edgeClass);
+						E newEdge = Util.createEdge(v, vertices.get(inverseNumbering[lowpt1[wIndex]-1]), edgeClass);
 						newEdge.setWeight(j); //save j
+						estack.add(newEdge);
 
-						//decrement degree(v), degree(lowpt1(w))
-						degree[vIndex] --;
-						degree[lowpt1[wIndex]] --;
+						//increment degree(v), degree(lowpt1(w))
+						degree[vIndex] ++;
+						degree[inverseNumbering[lowpt1[wIndex] - 1]] ++;
 					}
 					else{
 						j++;
 
-						//add (v, lowpt1(w), j-1), (v, lowpt1(w), j), arc (lowpt1(w), w) to new component
-						Triple triple1 = new Triple(newnum[vIndex], newnum[lowpt1[wIndex]], j-1);
-						Triple triple2 = new Triple(newnum[vIndex], newnum[lowpt1[wIndex]], j);
-						E newEdge = Util.createEdge(vertices.get(lowpt1[wIndex]), w, edgeClass);
+						//add (v, lowpt1(w), j-1), (v, lowpt1(w), j), arc (lowpt1(w), v) to new component
+						Triple triple1 = new Triple(newnum[vIndex], lowpt1[wIndex], j-1);
+						Triple triple2 = new Triple(newnum[vIndex], lowpt1[wIndex], j);
+						E newEdge = Util.createEdge(vertices.get(inverseNumbering[lowpt1[wIndex] - 1]), v, edgeClass);
 						newComponent = new HopcroftSplitComponent<V,E>();
 						components.add(newComponent);
 						currentComponent = newComponent;
@@ -783,6 +795,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						log.info("Creating new component");
 						log.info("adding " + triple1);
 						log.info("adding " + triple2);
+						log.info("adding " + newEdge);
 
 						//mark tree arc (lowpt1(w), v) as virtual edge j
 						virtualEdges.put(newEdge, j);
@@ -805,7 +818,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				//while (h,a,b) on estack has highpt(v) >h 
 				//delete (h,a,b) from tstack
 				//TODO
-				for (int i = estack.size() - 1; i >= 0; i++){
+				for (int i = estack.size() - 1; i >= 0; i--){
 					log.info("checking for triple of ednge stack? ");
 					E estackEdge = estack.get(i);
 					if (estackEdge.getWeight() == 0)
@@ -845,7 +858,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 							break;
 						//y = max(y,h)
 						y = Math.max(y, triple.getH());
-						//dekete (h,a,b) from tstack
+						//delete (h,a,b) from tstack
 						tstack.pop();
 						deleted = true;
 						lastDeleted = triple;
@@ -853,15 +866,17 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 					//if no triples were deleted from tstack
 					if (!deleted){
-						//add (v,w,w) to tstack
+						//add (v,w,v) to tstack
 						Triple triple = new Triple(newnum[vIndex], newnum[wIndex], newnum[vIndex]);
 						tstack.push(triple);
+						log.info("TSTACK: Pushing triple " + triple);
 					}
 					else{
 						//if (h,a,b) is the last triple deleted
 						//add (y,w,b) to tstack
 						Triple triple = new Triple(y,newnum[wIndex], lastDeleted.getB());
 						tstack.push(triple);
+						log.info("TSTACK: Pushing triple " + triple);
 					}
 				}
 				//if (w = father(v))
@@ -872,8 +887,6 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					HopcroftSplitComponent<V,E> newComponent = new HopcroftSplitComponent<V,E>();
 					components.add(newComponent);
 					currentComponent = newComponent;
-
-
 
 					currentComponent.getEdges().add(e); //(v,w)
 					Triple triple = new Triple(newnum[vIndex], newnum[wIndex], j);
@@ -892,6 +905,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 					log.info("Creating new component");
 					log.info("adding tree edge " + wvtreeEdge);
+					log.info("adding edge " + e);
+					log.info("adding triple " + triple );
 
 					//decrement degree(v), degree(w)
 					degree[vIndex] --;
@@ -901,7 +916,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				}
 				else{
 					//add (v,w) to estack
-					estack.add(e);;
+					estack.add(e);
+					log.info("ESTACK: Adding edge " + newnum[vertices.indexOf(e.getOrigin())] + ", " + newnum[vertices.indexOf(e.getDestination())]);
 				}
 			}
 		}
