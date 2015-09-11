@@ -37,7 +37,12 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	public void execute(Graph<V,E> graph){
 		SeparationPairSplitting<V, E> splitting = new SeparationPairSplitting<V,E>();
 		Class edgeClass = graph.getEdges().get(0).getClass();
-		splitting.findSeaparationPairs(graph, edgeClass);
+		try {
+			splitting.findSeaparationPairs(graph, edgeClass);
+		} catch (AlgorithmErrorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 

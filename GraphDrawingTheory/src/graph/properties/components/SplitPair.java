@@ -6,12 +6,20 @@ import graph.elements.Vertex;
 public class SplitPair<V extends Vertex, E extends Edge<V>> {
 	
 	private V v, u;
+	private int type;
 	
 
 	public SplitPair(V v, V u) {
 		super();
 		this.v = v;
 		this.u = u;
+	}
+	
+	public SplitPair(V v, V u, int type) {
+		super();
+		this.v = v;
+		this.u = u;
+		this.type = type;
 	}
 
 	public V getV() {
@@ -53,6 +61,14 @@ public class SplitPair<V extends Vertex, E extends Edge<V>> {
 		else if (u.equals(other.getV()))
 			return v.equals(other.getV());
 		return false;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 		
 	
