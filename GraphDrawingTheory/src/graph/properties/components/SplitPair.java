@@ -40,7 +40,7 @@ public class SplitPair<V extends Vertex, E extends Edge<V>> {
 
 	@Override
 	public String toString() {
-		return "SplitPair [v=" + v + ", u=" + u + "]";
+		return "( " + v + ", " + u + ")";
 	}
 
 	@Override

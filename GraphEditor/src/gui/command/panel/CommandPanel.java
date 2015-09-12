@@ -10,6 +10,8 @@ import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.components.SplitPair;
+import graph.properties.splitting.AlgorithmErrorException;
+import graph.properties.splitting.SeparationPairSplitting;
 import graph.properties.splitting.Splitting;
 import graph.properties.splitting.TriconnectedDivision;
 import graph.symmetry.Permutation;
@@ -396,6 +398,15 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[22])){
 			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
 			triDiv.execute(graph);
+			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting = new SeparationPairSplitting<GraphVertex, GraphEdge>();
+			try {
+				List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(graph, GraphEdge.class);
+				return separationPairs.toString();
+			} catch (AlgorithmErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return e.getMessage();
+			}
 			
 		}
 		
