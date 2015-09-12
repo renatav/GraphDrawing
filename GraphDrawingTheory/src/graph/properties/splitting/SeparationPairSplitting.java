@@ -93,7 +93,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	private int n;
 	private int j;
 	private DFSTree<V,E> tree;
-	
+
 	private Map<Integer, List<V>> lowpt1sMap = new HashMap<Integer, List<V>>();
 
 	private Class edgeClass;
@@ -164,28 +164,20 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		//that will be the previously selected root vertex
 		List<List<E>> paths = new ArrayList<List<E>>();
 		pathfiner(root, adjacency, paths, null);
-		
+
 		log.info("second dfs completed");
-		
+
 		System.out.println("CHECKING ADJACENCY: " + checkAdjacencyValidity(adjacency, newnum, treeEdges));
-		
+
 		if (!checkAdjacencyValidity(adjacency, newnum, treeEdges))
 			throw new AlgorithmErrorException("Error: adjacency structure not valid");
 
-
-		//compute degree(v), lowpt1(v) and lowpt2(v)
-		//using the new numbering
-		//create structures which will later be used in the algorithm
-		
-
 		tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
 
-		//	System.out.println("treeEdges: " + treeEdges);
-		//	System.out.println("backEdges: " + fronds);
-		
-		
+
+
 		log.info("setting lowpts, inverse numbering etc.");
-		
+
 
 		for (V v : vertices){
 
@@ -197,9 +189,9 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			degree[vIndex] = adjacency.get(v).size();
 			a1[vIndex] = adjacency.get(v).size();
 			inverseNumbering[newnum[vIndex] - 1] = vIndex;
-		
+
 			Integer lowpt1Val = lowpt1[vIndex];
-			
+
 			List<V> verticesWithLowpt;
 			if (!lowpt1sMap.containsKey(lowpt1Val)){
 				verticesWithLowpt = new ArrayList<V>();
@@ -208,7 +200,11 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			else
 				verticesWithLowpt = lowpt1sMap.get(lowpt1Val);
 			verticesWithLowpt.add(v);
-			
+
+			degree[vIndex] = adjacency.get(v).size();
+			a1[vIndex] = adjacency.get(v).size();
+			inverseNumbering[newnum[vIndex] - 1] = vIndex;
+
 		}
 
 		findTypeOneSeparationPairs();
@@ -218,7 +214,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		return separationPairs;
 
 	}
-	
+
 	/**
 	 * If there are distinct vertices r!=a,b and s!=a,b such that b->r, lowpt1(r) = a, lowpt2(r)>=b
 	 * and s is not a descendant of r, then (a,b) is a separation pair of type 1
@@ -226,38 +222,38 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 */
 	private List<SplitPair<V,E>> findTypeOneSeparationPairs(){
 		List<SplitPair<V,E>> separationPairs = new ArrayList<SplitPair<V,E>>();
-		
+
 		for (int a : lowpt1sMap.keySet()){
 
 			int aIndex = inverseNumbering[a - 1];
 			V aVert = vertices.get(aIndex);
-			
+
 			System.out.println("a: " + aVert);
-			
+
 			List<V> lowptList = lowpt1sMap.get(a); //all vertices whose lowpt1 = a - possible r
 			if (lowptList == null)
 				continue;
-			
+
 			for (V rVert : lowptList){
 				if (rVert == aVert)
 					continue;
-				
+
 				int rIndex = vertices.indexOf(rVert);
 				int r = newnum[rIndex];
-				
+
 				System.out.println("r " + rVert);
-				
+
 				if (r == 1) // //all vertices are descendants of the first vertex, therefore there isn't s that satisfied the condition
 					continue;
-						
+
 				int bIndex = father[rIndex];
 				if (lowpt2[rIndex] >= newnum[bIndex]){
-					
+
 					V bVert = vertices.get(bIndex);
 					System.out.println("b " + bVert);
-					
+
 					List<V> descendants = tree.allDescendantsOf(rVert, true); //TODO save all outgoing edges when creating dfs tree?
-					
+
 					if (vertices.size() - descendants.size() <= 2)// && !descendants.contains(aVert))
 						continue;
 
@@ -267,11 +263,11 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 		}
-				
+
 		return separationPairs;
-		
+
 	}
-	
+
 	/**
 	 * If there is a vertex r!=b such that a->r-*>b; b is a first descendant of r (i.e. a,r and b lie on a ccommon generated path);
 	 * a!=1; every frond x-->y with r<=x<b has a<=y; every frond x-->y with a<y<b and b->w-*>x has 
@@ -279,48 +275,54 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private List<SplitPair<V,E>> findTypeTwoSeparationPairs(List<List<E>> paths){
-		
+
 		List<SplitPair<V,E>> separationPairs = new ArrayList<SplitPair<V,E>>();
-		
-		
+
+
 		for (List<E> path : paths){
-			
+
 			if (path.size() == 1)
 				continue;
-			
+
 			//take an edge
 			//assume it's a->r
 			//go from there
-			
-			
+
+
 			for (E e : path){
-				
+
 				int[] indexes = getDirectedNodes(e, newnum);
 				int aIndex = indexes[0];
 				int aNum = newnum[aIndex];
 				if (aNum == 1)
 					continue;
-				
+
 				int rIndex = indexes[1];
 				int rNum = newnum[rIndex];
 				V rVert = vertices.get(rIndex);
-				
+
 				V current = rVert;
 				V bVert;
 				for (int i = path.indexOf(e) + 1; i < path.size(); i++){
 					E anEdge = path.get(i);
 					bVert = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
 					int bNum = newnum[vertices.indexOf(bVert)];
-					
+
 					//check the back edges
-					
+
 				}
-			
-			
+
+
 			}
 		}
-		
-		
+
+
+
+
+
+
+
+
 		return separationPairs;
 	}
 
@@ -385,9 +387,9 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				flag[vIndex] = false;
 		}
 	}
-	
-	
-	
+
+
+
 
 	/**
 	 * Constructs ordered adjacency lists
@@ -489,15 +491,15 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering start from 1, indexes from 1
 					highpt[newnum[wIndex] - 1] = newnum[vIndex];
 				//output current path
-					System.out.println("output " + currentPath);
+				System.out.println("output " + currentPath);
 				s = null;
 			}
 		} 
+
 	}
 
-	
-	
-	
+
+
 
 
 	private boolean firstEdgeOfAPath(E e, List<List<E>> paths){
@@ -553,10 +555,10 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		return ret;
 
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
 	 * Checks if the adjacency structure is valid according to the following lemma:
 	 * Let A(u) be the adjacency list of vertex u. Let u->v and u -> w be tree arcs
@@ -566,7 +568,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 * @return true if adjacency structure is valid, false otherwise 
 	 */
 	private boolean checkAdjacencyValidity(Map<V,List<E>> adjacency, int[] numbering, List<E> treeEdges){
-		
+
 		for (V u : adjacency.keySet()){
 			int uIndex = vertices.indexOf(u);
 			List<E> adjacent = adjacency.get(u);
@@ -583,12 +585,12 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					V w = e2.getOrigin() == u ? e2.getDestination() : e2.getOrigin();
 					int wIndex = vertices.indexOf(w);
 					if (!((numbering[uIndex] < numbering[wIndex]) && (numbering[wIndex] < numbering[vIndex])))
-							return false;
+						return false;
 				}
 			}
 		}
 		return true;
-		
+
 	}
 
 
