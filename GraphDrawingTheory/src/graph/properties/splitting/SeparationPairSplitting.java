@@ -5,13 +5,11 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.SplitPair;
 import graph.trees.DFSTree;
-import graph.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
@@ -95,14 +93,19 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	private DFSTree<V,E> tree;
 
 	private Map<Integer, List<V>> lowpt1sMap = new HashMap<Integer, List<V>>();
-
+	
+	private List<SplitPair<V,E>> separationPairs;
+	
+	private Map<V, List<SplitPair<V,E>>> separationPairStartVertices, separationPairEndVertices;
+	
+	private Map<V, List<E>> adjacency;
+	
 	private Class edgeClass;
 
 	private Logger log = Logger.getLogger(SeparationPairSplitting.class);
 
 
 	public List<SplitPair<V, E>> findSeaparationPairs(Graph<V,E> graph,  Class edgeClass) throws AlgorithmErrorException{
-		List<SplitPair<V, E>> separationPairs = new ArrayList<SplitPair<V, E>>();
 		this.edgeClass = edgeClass;
 
 		//step one: perform a depth-first search on the multigraph converting in
@@ -119,6 +122,9 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		inverseNumbering = new int[size];
 		vertices = graph.getVertices();
 		this.graph = graph;
+		separationPairEndVertices = new HashMap<V,List<SplitPair<V, E>>>();
+		separationPairStartVertices = new HashMap<V,List<SplitPair<V, E>>>();
+		separationPairs = new ArrayList<SplitPair<V,E>>();
 
 		number = new int[size];
 		flag = new boolean[size];
@@ -129,7 +135,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		treeEdges = new ArrayList<E>();
 		fronds = new ArrayList<E>();
 
-		Map<V, List<E>> adjacency = new HashMap<V, List<E>>();
+		adjacency = new HashMap<V, List<E>>();
 		for (V v : graph.getVertices()){
 			adjacency.put(v, new ArrayList<E>(graph.adjacentEdges(v)));
 		}
@@ -138,11 +144,11 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 		//the search starts at vertex s
 		V root = graph.getVertices().get(0);
-		dfs(root,null, adjacency);
+		dfs(root,null);
 
 		log.info("first dfs traversal finished");
 		tree = new DFSTree<V,E>(root, number, treeEdges, fronds, vertices);
-		System.out.println(tree);
+		//System.out.println(tree);
 	
 		constructAdjacencyLists(adjacency);
 
@@ -153,7 +159,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		//find vertex whose number is 1, start with it
 		//that will be the previously selected root vertex
 		List<List<E>> paths = new ArrayList<List<E>>();
-		pathfiner(root, adjacency, paths, null);
+		pathfiner(root,paths, null);
 
 		log.info("second dfs completed");
 
@@ -222,7 +228,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			int aIndex = inverseNumbering[a - 1];
 			V aVert = vertices.get(aIndex);
 			containedBs.clear();
-			System.out.println("a: " + aVert);
+		//	System.out.println("a: " + aVert);
 
 			List<V> lowptList = lowpt1sMap.get(a); //all vertices whose lowpt1 = a - possible r
 			if (lowptList == null)
@@ -235,7 +241,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				int rIndex = vertices.indexOf(rVert);
 				int r = newnum[rIndex];
 
-				System.out.println("r " + rVert);
+			//	System.out.println("r " + rVert);
 
 				if (r == 1) // //all vertices are descendants of the first vertex, therefore there isn't s that satisfied the condition
 					continue;
@@ -246,7 +252,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				if (lowpt2[rIndex] >= newnum[bIndex]){
 
 					V bVert = vertices.get(bIndex);
-					System.out.println("b " + bVert);
+				//	System.out.println("b " + bVert);
 
 					List<V> descendants = tree.allDescendantsOf(rVert, true); //TODO save all outgoing edges when creating dfs tree?
 
@@ -254,9 +260,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						continue;
 
 					log.info("Detected separation pair (" + aVert + ", " + bVert + ")");
-					SplitPair<V,E> newPair = new SplitPair<V,E>(aVert, bVert, 1);
-					separationPairs.add(newPair);
-					containedBs.add(bIndex);
+					if (addSeparationPair(aVert, bVert, 1))
+						containedBs.add(bIndex);
 				}
 			}
 		}
@@ -312,7 +317,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 						continue;
 					
 					
-					System.out.println("Testing " + aVert + " " + bVert);
+					//System.out.println("Testing " + aVert + " " + bVert);
 					boolean satisfiedAll = true;
 
 					//check the back edges
@@ -352,9 +357,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					}
 					if (satisfiedAll){
 						log.info("separation pair "+ aVert + " " + bVert);
-						SplitPair<V,E> newPair = new SplitPair<V,E>(aVert, bVert, 2);
-						if (!separationPairs.contains(newPair))
-							separationPairs.add(newPair);
+						addSeparationPair(aVert, bVert, 2);
 					}
 					
 					current = bVert;
@@ -376,7 +379,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 *  The graph to be searched is represented by adjacency lists A(v)
 	 *  This will be implemented with a map vertex - list of edges 
 	 */
-	private void dfs(V v, V u, Map<V,List<E>> adjacency){
+	private void dfs(V v, V u){
 		int vIndex = vertices.indexOf(v);
 
 		//n:= number(v):=n+1
@@ -394,7 +397,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			if (number[wIndex] == 0){
 				//w in as new vertex
 				treeEdges.add(e); //(v,w) is a tree arc
-				dfs(w, v, adjacency);
+				dfs(w, v);
 
 				//b:
 				if (lowpt1[wIndex] < lowpt1[vIndex]){
@@ -506,7 +509,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 * @param currentPath current path being built
 	 * @param treeEdges list of all tree edges (arcs)
 	 */
-	private void pathfiner(V v, Map<V,List<E>> adjacent, 
+	private void pathfiner(V v, 
 			List<List<E>> paths, List<E> currentPath){
 
 		int vIndex = vertices.indexOf(v);
@@ -514,7 +517,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 		//System.out.println("setting newnum " +  v + " = " +  newnum[vIndex]);
 
-		for (E e : adjacent.get(v)){
+		for (E e : adjacency.get(v)){
 
 			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
 			int wIndex = vertices.indexOf(w);
@@ -526,14 +529,14 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			}
 			currentPath.add(e);
 			if (treeEdges.contains(e)){
-				pathfiner(w, adjacent, paths, currentPath);
+				pathfiner(w, paths, currentPath);
 				m--;
 			}
 			else{
 				if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering starts from 1, indexes from 1
 					highpt[newnum[wIndex] - 1] = newnum[vIndex];
 				//output current path
-				System.out.println("output " + currentPath);
+				//System.out.println("output " + currentPath);
 				s = null;
 			}
 		} 
@@ -635,7 +638,34 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 	}
 
-
+	private boolean addSeparationPair(V start, V end, int type){
+		
+		SplitPair<V,E> newSplitPair = new SplitPair<V,E>(start, end, type);
+		if (separationPairs.contains(newSplitPair))
+			return false;
+		
+		separationPairs.add(newSplitPair);
+		
+		List<SplitPair<V,E>> list1 = separationPairStartVertices.get(start);
+		List<SplitPair<V,E>> list2 = separationPairEndVertices.get(start);
+		
+		if (list1 == null){
+			list1 = new ArrayList<SplitPair<V,E>>();
+			separationPairStartVertices.put(start, list1);
+		}
+		
+		if (list2 == null){
+			list2 = new ArrayList<SplitPair<V,E>>();
+			separationPairEndVertices.put(end, list2);
+		}
+		
+		list1.add(newSplitPair);
+		list2.add(newSplitPair);
+		
+		return true;
+	}
+	
+	
 
 	private void printDFSTree(){
 
@@ -647,6 +677,22 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					+ vertices.get(inverseNumbering[lowpt2[vIndex] -1 ]) + ")");
 
 		}
+	}
+
+	public List<SplitPair<V, E>> getSeparationPairs() {
+		return separationPairs;
+	}
+
+	public Map<V, List<E>> getAdjacency() {
+		return adjacency;
+	}
+
+	public Map<V, List<SplitPair<V, E>>> getSeparationPairStartVertices() {
+		return separationPairStartVertices;
+	}
+
+	public Map<V, List<SplitPair<V, E>>> getSeparationPairEndVertices() {
+		return separationPairEndVertices;
 	}
 
 

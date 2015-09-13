@@ -58,6 +58,11 @@ public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends
 	public void setTriples(List<Triple> triples) {
 		this.triples = triples;
 	}
+
+	@Override
+	public String toString() {
+		return "HopcroftSplitComponent [edges=" + edges + "]";
+	}
 	
 	
 	

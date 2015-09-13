@@ -396,8 +396,6 @@ public class CommandPanel extends JPanel{
 		}
 		 
 		if (command.equals(commands[22])){
-			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
-			triDiv.execute(graph);
 			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting = new SeparationPairSplitting<GraphVertex, GraphEdge>();
 			try {
 				List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(graph, GraphEdge.class);
@@ -408,6 +406,11 @@ public class CommandPanel extends JPanel{
 				return e.getMessage();
 			}
 			
+		}
+		
+		if (command.equals(commands[23])){
+			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
+			triDiv.execute(graph);
 		}
 		
 		if (command.equals(commands[15])){
@@ -435,7 +438,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[23];
+		commands = new String[24];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -460,6 +463,7 @@ public class CommandPanel extends JPanel{
 		commands[20] = "convex";
 		commands[21] = "list biconnected components";
 		commands[22] = "separation pairs";
+		commands[23] = "triconnected";
 	}
 		
 
