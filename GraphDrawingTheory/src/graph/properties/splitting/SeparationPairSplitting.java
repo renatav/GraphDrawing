@@ -169,6 +169,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			throw new AlgorithmErrorException("Error: adjacency structure not valid");
 
 		tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
+		System.out.println(tree.toString());
 
 		log.info("setting lowpts, inverse numbering etc.");
 
@@ -647,7 +648,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		separationPairs.add(newSplitPair);
 		
 		List<SplitPair<V,E>> list1 = separationPairStartVertices.get(start);
-		List<SplitPair<V,E>> list2 = separationPairEndVertices.get(start);
+		List<SplitPair<V,E>> list2 = separationPairEndVertices.get(end);
 		
 		if (list1 == null){
 			list1 = new ArrayList<SplitPair<V,E>>();
@@ -693,6 +694,22 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 	public Map<V, List<SplitPair<V, E>>> getSeparationPairEndVertices() {
 		return separationPairEndVertices;
+	}
+
+	public List<E> getTreeEdges() {
+		return treeEdges;
+	}
+
+	public List<E> getFronds() {
+		return fronds;
+	}
+
+	public int[] getLowpt1() {
+		return lowpt1;
+	}
+
+	public int[] getNewnum() {
+		return newnum;
 	}
 
 
