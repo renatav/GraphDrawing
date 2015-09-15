@@ -102,24 +102,27 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		numbering = separationPairSplitting.getNewnum();
 		vertices = graph.getVertices();
 
-
 		List<E> virtualEdges = new ArrayList<E>();
 		List<E> estack = new ArrayList<E>();
 		V start = graph.getVertices().get(0);
 		List<V> vstack = new ArrayList<V>();
-		dfs(start, estack, vstack, new ArrayList<V>());
+		dfs(start, estack, vstack, new ArrayList<V>(), new ArrayList<E>());
 
 	}
 
 
-	private void dfs(V v, List<E> estack, List<V> vstack, List<V> coveredVertices){
+	private void dfs(V v, List<E> estack, List<V> vstack, List<V> coveredVertices, List<E> coveredEdges){
 
 		System.out.println("dfs for vertex " + v);
 		if (separationPairStartVertices.containsKey(v) || separationPairEndVertices.containsKey(v))
 			vstack.add(v);
+		
+		System.out.println("current vstack" + vstack);
 
 		for (E e : adjacency.get(v)){
 
+			if (coveredEdges.contains(e))
+				continue;
 
 			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
 
@@ -128,27 +131,28 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			if (treeEdges.contains(e)){
 
 				estack.add(e);
-				
+
 				System.out.println("current estack: " + estack);
-				
+
 				if (separationPairEndVertices.containsKey(w)){ 
 					outputComponent(w, separationPairStartVertices, separationPairEndVertices, vstack, estack);
 
 				}
 
-				
+
 				//check if w is ending vertex of a split pair
 				//			if (separationPairEndVertices.containsKey(w)){
 				//				System.out.println("contains");
 				//				outputComponent(w, separationPairStartVertices, estack);
 				//				System.out.println(w);
 				//				System.out.println(estack);
-
 				if (!coveredVertices.contains(w)){
 					coveredVertices.add(w);
-					dfs(w, estack, vstack, coveredVertices);
+					dfs(w, estack, vstack, coveredVertices, coveredEdges);
 				}
+
 			}
+
 
 		}
 
@@ -160,57 +164,129 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			Map<V, List<SplitPair<V, E>>> separationPairEndVertices, List<V> vstack, List<E> estack) {
 
 
-		System.out.println("ending: " + w);
+		//System.out.println("ending: " + w);
 		//find start vertex
 		V start = null;
 
-		for (SplitPair<V,E> splitPair : separationPairEndVertices.get(w)){
+		//TODO ovo poraviti, nije dovoljno
+		//treba pogledati po ivicama, kada se dodje do pocetka...
+		for (SplitPair<V,E> splitPair : separationPairEndVertices.get(w)){ 
 			start = splitPair.getV();
 			System.out.println(splitPair);
 			if (vstack.contains(start))
 				break;
 		}
 
-		vstack.remove(start);
-		vstack.remove(w);
+//		vstack.remove(start);
+//		vstack.remove(w);
 
 		V current = w;
-		
-		System.out.println("Start: " + start);
-		
+
+		//System.out.println("Start: " + start);
+
 
 		List<E> edges = new ArrayList<E>();
 		List<E> componentEdges = new ArrayList<E>();
 		List<V> componentVertices = new ArrayList<V>();
 
-
 		for (int i = estack.size() - 1; i >= 0; i--){
 
 			E e = estack.get(i);
-			System.out.println("current edge: " + e);
-			
+			//System.out.println("current edge: " + e);
+
 			componentVertices.add(current);
 			componentEdges.add(e);
 			edges.add(e);
 			current = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
-			if (current == start)
+			//System.out.println("current: " + current);
+		
+			if (current == start){
 				break;
+			}
+
 		}
-		
+
 		estack.removeAll(edges);
+
+		int lowestpt = numbering[vertices.indexOf(start)];
+		V lowestVertex = start;
 		
-		for (V v : componentVertices)
+		//if a vertex is one of two vertices of the split pair
+		//do not add its back edges unless some other vertex
+		//is connected to endpoints of those edges as well
+		
+		List<V> addedVertices = new ArrayList<V>();
+		for (V v : componentVertices){
+			if (v == start || v == w)
+				continue;
+			
 			for (E e : adjacency.get(v))
 				if (fronds.contains(e)){
-					System.out.println("frond: " + e);
+				//	System.out.println("frond: " + e);
 					V other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
-					if (componentVertices.contains(other)){
-						componentEdges.add(e); 
+					int currentNum = numbering[vertices.indexOf(other)];
+					if (currentNum >= lowestpt)
+						componentEdges.add(e);
+					else{
+						//is there a path on estack from the other vertex to one of the vertices on the stack
+						List<E> traversedEdges = new ArrayList<E>();
+						List<V> traversedVertices = new ArrayList<V>();
+						current = lowestVertex;
+						boolean ok = false;
+						//System.out.println("checking vertex " + other);
+						V currentLow = lowestVertex;
+						for (int i = estack.size() - 1; i >= 0; i--){
+							E currentEdge = estack.get(i);
+							System.out.println(currentEdge);
+							traversedEdges.add(currentEdge);
+							V otherLow =  currentEdge.getOrigin() == currentLow ? currentEdge.getDestination() : currentEdge.getOrigin();
+							traversedVertices.add(otherLow);
+							if (vstack.contains(otherLow))
+								break;
+							if (otherLow == other){
+								ok = true;
+								break;
+							}
+							currentLow = otherLow;
+						}
+						//System.out.println(ok);
+
+						if (ok){
+							componentEdges.addAll(traversedEdges);
+							estack.removeAll(traversedEdges);
+							componentEdges.add(e);
+							lowestVertex = other;
+							lowestpt = numbering[vertices.indexOf(other)];
+							addedVertices.addAll(traversedVertices);
+						}
 					}
-					//da li neko ima back ivicu koja ide u cvor koji je preko drugih na estack-u povezan sa pocetkom?
 				}
 			
 			
+		}
+		componentVertices.addAll(addedVertices);
+		
+		//check separation pair vertices
+		for (E e : adjacency.get(start))
+			if (fronds.contains(e)){
+				V other = e.getOrigin() == start ? e.getDestination() : e.getOrigin();
+				int currentNum = numbering[vertices.indexOf(other)];
+				if (currentNum >= lowestpt)
+					componentEdges.add(e);
+			}
+		
+		for (E e : adjacency.get(w))
+			if (fronds.contains(e)){
+				V other = e.getOrigin() == w ? e.getDestination() : e.getOrigin();
+				int currentNum = numbering[vertices.indexOf(other)];
+				if (currentNum >= lowestpt)
+					componentEdges.add(e);
+			}
+		
+		
+			
+
+
 		//zapamtiti koje su su svi cvorovi na ivicama estack-a
 		//pogledati da li neki cvor direktno u komponenti ima povratnu ivicu
 		//koja se zavrsava u tim cvorovima na estack-u
@@ -220,7 +296,9 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		//imamo back ivicu ka njima...
 		//dodati negde nekako na kraju?
 		//kada se pojavi pridruziti u neku komponentu?
-		
+		//ili proci kroz adjacency end cvora pa tu nesto pogledati
+		//mozda gore ne ignorisati povratne ivice
+
 		HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
 		newComponent.getEdges().addAll(componentEdges);
 		E virtualEdge = Util.createEdge(start, w, edgeClass);

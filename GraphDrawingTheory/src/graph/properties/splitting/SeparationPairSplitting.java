@@ -204,12 +204,9 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		}
 
 		//printDFSTree();
-
 		
 		findTypeOneSeparationPairs(separationPairs);
 		findTypeTwoSeparationPairs(paths, separationPairs);
-
-
 
 		return separationPairs;
 
@@ -710,6 +707,14 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 	public int[] getNewnum() {
 		return newnum;
+	}
+
+	public int[] getHighpt() {
+		return highpt;
+	}
+
+	public int[] getInverseNumbering() {
+		return inverseNumbering;
 	}
 
 
