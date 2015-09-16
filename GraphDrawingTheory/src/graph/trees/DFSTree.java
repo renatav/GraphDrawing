@@ -7,7 +7,6 @@ import graph.elements.Path;
 import graph.elements.Vertex;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -482,6 +481,14 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return leastAncestor;
 	}
 
+	
+	public List<E> treeEdgesBetween(V first, V target){
+		System.out.println("path between: " + first  + ", " + target);
+		List<Path<V,E>> allPaths = findAllPathsDFS(first, target);
+		if (allPaths.size() == 0)
+			return null;
+		return allPaths.get(0).getPath();
+	}
 
 	public List<V> treePathBetween(V first, V target){
 		Path<V,E> path = findAllPathsDFS(first, target).get(0);

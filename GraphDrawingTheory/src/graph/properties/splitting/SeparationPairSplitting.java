@@ -717,5 +717,13 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		return inverseNumbering;
 	}
 
+	public Map<Integer, List<V>> getLowpt1sMap() {
+		return lowpt1sMap;
+	}
+
+	public DFSTree<V, E> getTree() {
+		return tree;
+	}
+
 
 }
