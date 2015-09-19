@@ -9,10 +9,9 @@ import graph.trees.DFSTree;
 import graph.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-import java.util.prefs.BackingStoreException;
 
 import org.apache.log4j.Logger;
 
@@ -38,21 +37,25 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	private List<E> fronds;
 	private List<V> vertices;
 	private int[] numbering;
-	private int[] lowpt;
 	private Map<Integer, List<V>> lowpt1sMap;
 	private DFSTree<V, E> tree;
 	private Logger log = Logger.getLogger(TriconnectedDivision.class);
 	private List<V> separationPairVertices;
+	private Map<E, List<HopcroftSplitComponent<V, E>>> componentsVirtualEdgesMap;
+	private List<HopcroftSplitComponent<V, E>> components;
 
 
 	public TriconnectedDivision(Graph<V,E> graph){
 		this.graph = graph;
 		edgeClass = graph.getEdges().get(0).getClass();
+	
 	}
 
 
-	public void execute(Graph<V,E> graph){
+	public void execute(){
 
+		componentsVirtualEdgesMap = new HashMap<E, List<HopcroftSplitComponent<V, E>>>();
+		components = new ArrayList<HopcroftSplitComponent<V, E>>();
 		triconnected(graph);
 
 		//		try {
@@ -66,7 +69,6 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 	private void triconnected(Graph<V,E> graph){
 
-		List<HopcroftSplitComponent> splitComponents = new ArrayList<HopcroftSplitComponent>();
 		//
 		//		//remove all multiedges
 		//		//and create triple bonds
@@ -106,7 +108,6 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		separationPairEndVertices = separationPairSplitting.getSeparationPairEndVertices();
 		treeEdges = separationPairSplitting.getTreeEdges();
 		fronds = separationPairSplitting.getFronds();
-		lowpt = separationPairSplitting.getLowpt1();
 		numbering = separationPairSplitting.getNewnum();
 		vertices = graph.getVertices();
 		lowpt1sMap = separationPairSplitting.getLowpt1sMap();
@@ -125,6 +126,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		V start = graph.getVertices().get(0);
 		List<V> vstack = new ArrayList<V>();
 		dfs(start, estack, vstack,  new ArrayList<E>(), virtualEdges);
+		createComponentsConsistingOfVirtualEdgesOnly(virtualEdges);
 
 	}
 
@@ -194,6 +196,8 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		int startNumber = numbering[vertices.indexOf(start)];
 		int endNumber = numbering[vertices.indexOf(end)];
 
+		List<E> coveredVirtualEdges = new ArrayList<E>();
+
 
 		List<E> edges = new ArrayList<E>();
 		List<E> componentEdges = new ArrayList<E>();
@@ -222,6 +226,10 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			componentEdges.add(e);
 			//	if (!virtualEdges.contains(e))
 			edges.add(e);
+
+			if (virtualEdges.contains(e))
+				coveredVirtualEdges.add(e);
+
 			current = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
 			if (current == start)
 				break;
@@ -336,9 +344,9 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 			List<V> verticesWithLowpt = lowpt1sMap.get(numbering[vertices.indexOf(v)]); //vertices with the highest back edges ending at vertex v
 
-			System.out.println("TESTING LOWPTSMAP");
-			System.out.println(v);
-			System.out.println(verticesWithLowpt);
+			//			System.out.println("TESTING LOWPTSMAP");
+			//			System.out.println(v);
+			//			System.out.println(verticesWithLowpt);
 
 
 			if (verticesWithLowpt != null){
@@ -375,7 +383,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 					if (!ok)
 						continue;
 
-					System.out.println("HIGH: " + high);
+					//System.out.println("HIGH: " + high);
 
 					//are there any separation pairs vertices occurring before the vertex
 
@@ -423,56 +431,38 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 							componentEdges.addAll(edgesToAdd);
 						}
 					}
-
-
 				}
 
 			}
 
-
-
 		}
 		componentVertices.addAll(addedVertices);
-
-		//		//check separation pair vertices
-		//		for (E e : adjacency.get(start))
-		//			if (fronds.contains(e)){
-		//				V other = e.getOrigin() == start ? e.getDestination() : e.getOrigin();
-		//				if (other == end)
-		//					continue;
-		//				int currentNum = numbering[vertices.indexOf(other)];
-		//				if (currentNum >= lowestpt)
-		//					componentEdges.add(e);
-		//			}
-		//
-		//		for (E e : adjacency.get(end))
-		//			if (fronds.contains(e)){
-		//				V other = e.getOrigin() == end ? e.getDestination() : e.getOrigin();
-		//				if (other == start)
-		//					continue;
-		//				int currentNum = numbering[vertices.indexOf(other)];
-		//				if (currentNum >= lowestpt)
-		//					componentEdges.add(e);
-		//			}
-
 
 		if (formingTripleBond && componentEdges.size() < 3)
 			return;
 
 		HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
 		newComponent.getEdges().addAll(componentEdges);
-		E virtualEdge = Util.createEdge(start, end, edgeClass);
+
+		E virtualEdge = createVirtualEdge(start, end, edgeClass, virtualEdges);
+
 		newComponent.getEdges().add(virtualEdge);
-		log.info("outtputing new component");
+		log.info("outputting new component");
 		System.out.println(newComponent);
+
+		addComponent(virtualEdge, newComponent);
+		addCompnentWithMultiplevVirtualEdges(coveredVirtualEdges, newComponent);
+
 		estack.add(virtualEdge);
 		virtualEdges.add(virtualEdge);
+
 
 		for (E e : componentEdges)
 			if (!coveredEdges.contains(e))
 				coveredEdges.add(e);
 
 	}
+
 
 	private List<SplitPair<V,E>> findSeparationPairsToOutput(V end, Map<V, List<SplitPair<V, E>>> separationPairStartVertices, 
 			Map<V, List<SplitPair<V, E>>> separationPairEndVertices, List<E> estack){
@@ -516,106 +506,116 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	private void outputComponentBackEdge(E backEdge, List<E> estack, Map<V, List<SplitPair<V, E>>> separationPairStartVertices, 
 			Map<V, List<SplitPair<V, E>>> separationPairEndVertices, List<E> coveredEdges, List<E> virtualEdges){
 
-		V start;
-		V other;
-
 		//check if this edge is split edge - its endpoints form a split pair
 
-		if (separationPairStartVertices.containsKey(backEdge.getOrigin()) && !separationPairStartVertices.containsKey(backEdge.getDestination())){
-			start = backEdge.getOrigin();
-			other = backEdge.getDestination();
-		}
-		else if (separationPairStartVertices.containsKey(backEdge.getDestination()) && !separationPairStartVertices.containsKey(backEdge.getOrigin()) ){
-			start = backEdge.getDestination();
-			other = backEdge.getOrigin();
-		}
-		else if (separationPairStartVertices.containsKey(backEdge.getOrigin()) && separationPairStartVertices.containsKey(backEdge.getDestination())){
-			//TODO what if both vertices are start vertices, which is start, which is end
-			//first one to be reached is end
-			//stop when both are found
-			start = backEdge.getDestination();
-			other = backEdge.getOrigin();
-		}
-		else
-			return;
+		V v1 = backEdge.getOrigin();
+		V v2 = backEdge.getDestination();
 
-		List<SplitPair<V,E>> separationPairsOfStart = separationPairStartVertices.get(start);
+		List<E> coveredVirtualEdges = new ArrayList<E>();
 
-		boolean splitEdge = false;
-		System.out.println(other);
-		if (separationPairEndVertices.containsKey(other)){
-			System.out.println("contais");
-			for (SplitPair<V,E> splitPair : separationPairsOfStart)
-				if (splitPair.getU() == other){
-					splitEdge = true;
-					break;
-				}
+		SplitPair<V,E> edgeSplitPair = splitEdgeOf(backEdge);
+		if (edgeSplitPair != null){
 
-		}
+			V start = edgeSplitPair.getV();
+			V end = edgeSplitPair.getU();
 
-
-		
-		System.out.println(splitEdge);
-		
-		//TODO da li je ok da se ovako samo pogleda da li ima ta viertuelna ivica
-		//sta ako je "potrosena"?
-		//deluje da se u primeru vise trosi nego stavlja
-		//ako se ne uklanjaju virtuelne ivice sa steka
-		//onda se mogu dobiti nekonzistentne komponente
-		if (splitEdge){
 			//try to form a triple bond
 			System.out.println("formin triple bond");
-			List<E> virtualBetween = findAllVirutalEdgesBetween(start, other, virtualEdges);
+			List<E> virtualBetween = findAllVirutalEdgesBetween(start, end, virtualEdges);
 			if (virtualBetween.size() == 0)
 				return;
 
 			HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
 			newComponent.getEdges().add(virtualBetween.get(0));
 			newComponent.getEdges().add(backEdge);
-			E virtualEdge = Util.createEdge(start, other, edgeClass);
+			E virtualEdge = virtualBetween.get(0);
 			newComponent.getEdges().add(virtualEdge);
-			log.info("outtputing new component");
+			//add virtual edge to virtual edges list might be used to form another triple bond)
+			virtualEdges.add(virtualEdge);
+			
+			log.info("outputting new component - triple bond");
 			System.out.println(newComponent);
 			estack.add(virtualEdge);
 			coveredEdges.add(backEdge);
+			addComponent(virtualEdge, newComponent);
 		}
-
 		else{
-			V end = null;
-			V current = other;
+
+			//this case is about connecting already found virtual edges 
+			//forming a component from edges on estack
+			//passed back edge
+			//and all back edges that are found to be between vertices of this component
+			//in this case, a virtual edge is not created
+
+			V backEdgeEnd, backEdgeStart;
+
+			if (numbering[vertices.indexOf(v1)] < numbering[vertices.indexOf(v2)]){
+				backEdgeEnd = v1;
+				backEdgeStart = v2;
+			}
+			else{
+				backEdgeStart = v1;
+				backEdgeEnd = v2;
+			}
+
+
+			V current = backEdgeEnd;
 
 
 			List<E> componentEdges = new ArrayList<E>();
-			for (int i = estack.size() - 1; i >= 0; i--){
-				E e = estack.get(i);
-				current = e.getDestination() == current ? e.getOrigin() : e.getDestination();
+			List<V> componentVertices = new ArrayList<V>();
 
-				if (end == null)
-					if (separationPairEndVertices.containsKey(current)){
-						for (SplitPair<V,E> splitPair : separationPairsOfStart)
-							if (splitPair.getU() == current)
-								end = current;
-					}
-				if (current == start)
-					break;
+			componentVertices.add(backEdgeStart);
+
+			for (int i = estack.size() - 1; i >= 0; i--){
+
+				E e = estack.get(i);
+
+				System.out.println("current edge "+ e);
+
+
+				current = e.getDestination() == current ? e.getOrigin() : e.getDestination();
+				componentVertices.add(current);
 
 				componentEdges.add(e);
 
+				if (virtualEdges.contains(e))
+					coveredVirtualEdges.add(e);
+
+				if (current == backEdgeEnd)
+					break;
+
 			}
 
-			if (end == null)
-				return;
+			//add all back edges
+			for (V v : componentVertices){
+				for (E e : adjacency.get(v)){
+
+					if (fronds.contains(e) && !coveredEdges.contains(e)){
+						V other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+						if (componentVertices.contains(other)){
+							componentEdges.add(e);
+							coveredEdges.add(e);
+						}
+					}
+				}
+			}
 
 			estack.removeAll(componentEdges);
-			componentEdges.add(backEdge);
 
 			HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
 			newComponent.getEdges().addAll(componentEdges);
-			E virtualEdge = Util.createEdge(start, end, edgeClass);
-			newComponent.getEdges().add(virtualEdge);
-			log.info("outtputing new component");
+			//E virtualEdge = Util.createEdge(start, end, edgeClass);
+			//already contains the virtual edge
+			//newComponent.getEdges().add(virtualEdge); //TODO is it possible that this edge wasn't on estack?
+			//estack.add(virtualEdge);
+			log.info("outputting new component");
 			System.out.println(newComponent);
-			estack.add(virtualEdge);
+			addCompnentWithMultiplevVirtualEdges(coveredVirtualEdges, newComponent);
+
+			//TODO should be be done like this (otherwise, the triple bond containing edges can't be formed...)
+			virtualEdges.addAll(coveredVirtualEdges);
+			
 			coveredEdges.add(backEdge);
 		}
 
@@ -636,6 +636,27 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 	}
 
+	/*
+	 * Checks if there is already a virtual edge between vertices
+	 * if it does not exist, create one
+	 * Important so that we could more easily later check 
+	 * which components share the same virtual edge
+	 */
+	private E createVirtualEdge(V start, V end, Class<?> edgeClass, List<E> virtualEdges) {
+
+		E virtualEdge = findVirtualEdgeBetween(start, end, virtualEdges);
+		if (virtualEdge == null)
+			virtualEdge = Util.createEdge(start, end, edgeClass);
+
+		return virtualEdge;
+	}
+
+	private E findVirtualEdgeBetween(V start, V end, List<E> virtualEdges){
+		for (E e : virtualEdges)
+			if (isSplitEdge(e, start, end))
+				return e;
+		return null;
+	}
 
 	private List<E> findAllVirutalEdgesBetween(V start, V end, List<E> virtualEdges){
 		List<E> ret = new ArrayList<E>();
@@ -652,5 +673,88 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 				|| (e.getDestination() == start && e.getOrigin() == end))
 			return true;
 		return false;
+	}
+
+	private SplitPair<V,E> splitEdgeOf(E e){
+		V v1 = e.getOrigin();
+		V v2 = e.getDestination();
+
+		if (separationPairStartVertices.containsKey(v1))
+			for (SplitPair<V, E> sp : separationPairStartVertices.get(v1))
+				if (sp.getU() == v2)
+					return sp;
+		//not else if, because both of them can be start vertices, but only one of them can be start vertex
+		//of the pair that contains both of them
+		if (separationPairStartVertices.containsKey(v2))
+			for (SplitPair<V, E> sp : separationPairStartVertices.get(v2))
+				if (sp.getU() == v1)
+					return sp;
+
+		return null;
+	}
+
+	private void addCompnentWithMultiplevVirtualEdges(List<E> virtualEdges,HopcroftSplitComponent<V, E> newComponent){
+		for (E virtualEdge : virtualEdges)
+			addComponent(virtualEdge, newComponent);
+	}
+
+	private void addComponent(E virtualEdge, HopcroftSplitComponent<V, E> newComponent) {
+
+		components.add(newComponent);
+
+		List<HopcroftSplitComponent<V, E>> virtutalEdgeComponents;
+
+		if (!componentsVirtualEdgesMap.containsKey(virtualEdge)){
+			virtutalEdgeComponents = new ArrayList<HopcroftSplitComponent<V,E>>();
+			componentsVirtualEdgesMap.put(virtualEdge, virtutalEdgeComponents);
+		}
+		else 
+			virtutalEdgeComponents = componentsVirtualEdgesMap.get(virtualEdge);
+
+		virtutalEdgeComponents.add(newComponent);
+
+	}
+
+	/*
+	 * Analyzing virtual edges, see if there are 3 or more same virtual edges
+	 * and form a triple bond containing them
+	 */
+	private void createComponentsConsistingOfVirtualEdgesOnly(List<E> virtualEdges){
+
+		Map<E, Integer> occurancesMap = new HashMap<E, Integer>();
+
+		System.out.println(virtualEdges);
+		for (E e : virtualEdges){
+
+			Integer num = occurancesMap.get(e);
+			if (num == null)
+				occurancesMap.put(e, 1);
+			else
+				occurancesMap.put(e, num + 1);
+		}
+		
+
+		for (E e : occurancesMap.keySet()){
+
+			Integer num = occurancesMap.get(e);
+			if (num >= 3){
+				int count = 1;
+				while (count <= num){
+					if (count % 3 == 0){
+						//form triple bond
+						HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
+						newComponent.getEdges().add(e);
+						newComponent.getEdges().add(e);
+						newComponent.getEdges().add(e);
+						addComponent(e, newComponent);
+						log.info("Creating triple bond composed of virtual edges");
+						System.out.println(newComponent);
+					}
+					count ++;
+				}
+			}
+
+		}
+
 	}
 }

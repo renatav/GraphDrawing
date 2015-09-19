@@ -410,7 +410,7 @@ public class CommandPanel extends JPanel{
 		
 		if (command.equals(commands[23])){
 			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
-			triDiv.execute(graph);
+			triDiv.execute();
 		}
 		
 		if (command.equals(commands[15])){
