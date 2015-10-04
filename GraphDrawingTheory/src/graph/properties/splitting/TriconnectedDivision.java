@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 
-
 	private Graph<V,E> graph;
 	private Class<?> edgeClass;
 	private List<SplitPair<V,E>> separationPairs;
@@ -755,6 +754,15 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			}
 
 		}
+	}
 
+
+	public Map<E, List<HopcroftSplitComponent<V, E>>> getComponentsVirtualEdgesMap() {
+		return componentsVirtualEdgesMap;
+	}
+
+
+	public List<SplitPair<V, E>> getSeparationPairs() {
+		return separationPairs;
 	}
 }

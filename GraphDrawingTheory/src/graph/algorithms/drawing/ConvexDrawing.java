@@ -4,7 +4,10 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.Block;
+import graph.properties.components.HopcroftSplitComponent;
+import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
+import graph.properties.splitting.TriconnectedDivision;
 import graph.util.Util;
 
 import java.awt.geom.Point2D;
@@ -168,12 +171,22 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//so we only need to find position of vertices not on S
 		//Locate the vertices in V(Si) - V(S) in the interios of the triangle
 		//v*v1*vi+1 (cut vertices + 2 connected to v at the beginning and end)
-		//in such way that the vertices adjacent to v are apices of convex polyxon Si*
-		//and the others are on thr straight line segments
+		//in such way that the vertices adjacent to v are apices of convex polygon Si*
+		//and the others are on the straight line segments
 		
 		//Step 2.2
 		//recursively call procedure Draw(bi,Si, Si*)
 
+	}
+	
+	private void testSeparationPairs(){
+		TriconnectedDivision<V, E> triconnectedDivision = new TriconnectedDivision<V,E>(graph);
+		triconnectedDivision.execute();
+		List<SplitPair<V, E>> separationPairs = triconnectedDivision.getSeparationPairs();
+		Map<E, List<HopcroftSplitComponent<V, E>>> splitComponents = triconnectedDivision.getComponentsVirtualEdgesMap();
+		
+		//for each separation pair, form its split components
+		
 	}
 
 	private V arbitraryApex(List<V> Sstar){

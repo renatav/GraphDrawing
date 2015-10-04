@@ -32,7 +32,6 @@ public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> exten
 
 		init();
 
-
 		CyclicSymmetricGraphDrawing<V, E> symmetricDrawing = new CyclicSymmetricGraphDrawing<V,E>(graph);
 		List<List<V>> circles;
 		if (p == null || p.getPermutation().size() == 0)

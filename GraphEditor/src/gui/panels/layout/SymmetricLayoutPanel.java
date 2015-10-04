@@ -30,11 +30,11 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 		Component tf = null;
 		if (enumClass == SymmetricProperties.class){
 			 tf = componentsMap.remove(SymmetricProperties.PERMUTATION);
-			 componentsMap.put(SymmetricProperties.PERMUTATION, tf);
+			 componentsMap.put(SymmetricProperties.PERMUTATION, cbPermutations);
 		}
 		else if (enumClass == TutteProperties.class){
 			tf = componentsMap.remove(TutteProperties.PERMUTATION);
-			componentsMap.put(TutteProperties.PERMUTATION, tf);
+			componentsMap.put(TutteProperties.PERMUTATION, cbPermutations);
 		}
 		if (tf != null)
 			remove(tf);
@@ -52,6 +52,8 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 			permutationArray[i + 1] = permutations.get(i);
 		
 		cbPermutations = new JComboBox<Permutation>(permutationArray);
+		
+	
 		add(cbPermutations);
 		
 		
