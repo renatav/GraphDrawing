@@ -6,12 +6,14 @@ import graph.elements.Vertex;
 import graph.properties.components.Block;
 import graph.properties.components.HopcroftSplitComponent;
 import graph.properties.components.SplitPair;
+import graph.properties.splitting.SeparationPairSplitting;
 import graph.properties.splitting.Splitting;
 import graph.properties.splitting.TriconnectedDivision;
 import graph.util.Util;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -180,12 +182,83 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	private void testSeparationPairs(){
+		
 		TriconnectedDivision<V, E> triconnectedDivision = new TriconnectedDivision<V,E>(graph);
 		triconnectedDivision.execute();
-		List<SplitPair<V, E>> separationPairs = triconnectedDivision.getSeparationPairs();
+		//List<SplitPair<V, E>> separationPairs = triconnectedDivision.getSeparationPairs();
 		Map<E, List<HopcroftSplitComponent<V, E>>> splitComponents = triconnectedDivision.getComponentsVirtualEdgesMap();
 		
-		//for each separation pair, form its split components
+		
+		for (E virtualEdge : splitComponents.keySet()){
+			
+			//create a separation pair represented by that edge
+			
+			SplitPair<V, E> separationPair = new SplitPair<V,E>(virtualEdge.getOrigin(), virtualEdge.getDestination());
+			
+			List<HopcroftSplitComponent<V, E>> pairComponents = new ArrayList<HopcroftSplitComponent<V,E>>();
+			
+			for (HopcroftSplitComponent<V, E> splitComponent : splitComponents.get(virtualEdge)){
+				
+				HopcroftSplitComponent<V, E> joinedComponent = formComponent(splitComponent, splitComponents, splitComponents.keySet(), virtualEdge);
+				System.out.println(joinedComponent);
+				if (joinedComponent != null)
+					pairComponents.add(joinedComponent);
+			}
+			
+			//now analyze components and determine the pairs type
+				
+		}
+		
+	}
+	
+	
+	private HopcroftSplitComponent<V,E> formComponent(HopcroftSplitComponent<V, E> component, Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap, 
+			Collection<E> virtualEdges, E virtualEdge){
+		
+		HopcroftSplitComponent<V, E> ret = new HopcroftSplitComponent<V,E>();
+		ret.getEdges().addAll(component.getEdges());
+		boolean hasNonVirtualEdge = false;
+		
+		boolean changes = true;
+		List<E> newEdges = new ArrayList<E>();
+		List<E> toProcess = new ArrayList<E>();
+		
+		while (changes){
+			
+			newEdges.clear();
+			changes = false;
+			Iterator<E> iter = toProcess.iterator();
+			
+			while (iter.hasNext()){
+				E e = iter.next();
+				if (!virtualEdges.contains(e)){
+					iter.remove();
+					hasNonVirtualEdge = true;
+					continue;
+				}
+				
+				//is virtual edge
+				if (ret.getEdges().contains(e)){
+					if (e != virtualEdge)
+						ret.getEdges().remove(e);
+					else
+						continue;
+				}
+				
+				for (HopcroftSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
+					ret.getEdges().addAll(componentOfEdge.getEdges());
+					newEdges.addAll(componentOfEdge.getEdges());
+					changes = true;
+				}
+			}
+			
+			toProcess.addAll(newEdges);
+		}
+			
+		if (!hasNonVirtualEdge)
+			return null;
+		
+		return ret;
 		
 	}
 

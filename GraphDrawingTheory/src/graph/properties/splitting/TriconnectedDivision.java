@@ -765,4 +765,9 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	public List<SplitPair<V, E>> getSeparationPairs() {
 		return separationPairs;
 	}
+
+
+	public List<HopcroftSplitComponent<V, E>> getComponents() {
+		return components;
+	}
 }

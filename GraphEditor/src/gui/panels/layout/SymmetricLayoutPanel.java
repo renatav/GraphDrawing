@@ -26,20 +26,6 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 	public SymmetricLayoutPanel(Class<?> enumClass){
 		super(enumClass);
 		
-		
-		Component tf = null;
-		if (enumClass == SymmetricProperties.class){
-			 tf = componentsMap.remove(SymmetricProperties.PERMUTATION);
-			 componentsMap.put(SymmetricProperties.PERMUTATION, cbPermutations);
-		}
-		else if (enumClass == TutteProperties.class){
-			tf = componentsMap.remove(TutteProperties.PERMUTATION);
-			componentsMap.put(TutteProperties.PERMUTATION, cbPermutations);
-		}
-		if (tf != null)
-			remove(tf);
-		
-		
 		Graph<GraphVertex,GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 		McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty =
 				new McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge>(graph);
@@ -52,6 +38,18 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 			permutationArray[i + 1] = permutations.get(i);
 		
 		cbPermutations = new JComboBox<Permutation>(permutationArray);
+		
+		Component tf = null;
+		if (enumClass == SymmetricProperties.class){
+			 tf = componentsMap.remove(SymmetricProperties.PERMUTATION);
+			 componentsMap.put(SymmetricProperties.PERMUTATION, cbPermutations);
+		}
+		else if (enumClass == TutteProperties.class){
+			tf = componentsMap.remove(TutteProperties.PERMUTATION);
+			componentsMap.put(TutteProperties.PERMUTATION, cbPermutations);
+		}
+		if (tf != null)
+			remove(tf);
 		
 	
 		add(cbPermutations);
