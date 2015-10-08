@@ -6,7 +6,7 @@ import graph.elements.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Component<V extends Vertex, E extends Edge<V>> {
+public class Component<V extends Vertex, E extends Edge<V>> {
 
 	protected List<E> edges;
 	
@@ -25,6 +25,12 @@ public abstract class Component<V extends Vertex, E extends Edge<V>> {
 	}
 	public void setEdges(List<E> edges) {
 		this.edges = edges;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Component [edges=" + edges + "]";
 	}
 	
 }

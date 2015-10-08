@@ -389,6 +389,7 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[20])){
 			System.out.println("convex");
 			ConvexDrawing<GraphVertex, GraphEdge> drawing = new ConvexDrawing<GraphVertex,GraphEdge>(graph);
+			drawing.execute();
 		}
 		
 		if (command.equals(commands[21])){

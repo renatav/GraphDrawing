@@ -4,6 +4,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.HopcroftSplitComponent;
+import graph.properties.components.SplitComponentType;
 import graph.properties.components.SplitPair;
 import graph.trees.DFSTree;
 import graph.util.Util;
@@ -709,7 +710,21 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		}
 		else 
 			virtutalEdgeComponents = componentsVirtualEdgesMap.get(virtualEdge);
-
+		
+		
+		//determine type of the component
+		if (newComponent.getEdges().size() > 3)
+			newComponent.setType(SplitComponentType.TRICONNECTED_GRAPH);
+		else{
+			//check if it is a bond or a triangle
+			SplitComponentType type = SplitComponentType.TRIANGLE;
+			E e1 = newComponent.getEdges().get(0);
+			E e2 = newComponent.getEdges().get(1);
+			if (e1 == e2 || (e1.getDestination() == e2.getDestination() && e1.getOrigin() == e2.getOrigin()) || (e1.getOrigin() == e2.getDestination() && e1.getDestination() == e2.getOrigin()))
+				type = SplitComponentType.TRICONNECTED_GRAPH;
+			newComponent.setType(type);
+		}
+		
 		virtutalEdgeComponents.add(newComponent);
 
 	}
@@ -755,8 +770,8 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 		}
 	}
-
-
+	
+	
 	public Map<E, List<HopcroftSplitComponent<V, E>>> getComponentsVirtualEdgesMap() {
 		return componentsVirtualEdgesMap;
 	}
