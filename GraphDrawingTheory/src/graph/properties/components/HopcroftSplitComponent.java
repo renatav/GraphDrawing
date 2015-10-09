@@ -10,7 +10,9 @@ import java.util.List;
 public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends Component<V,E>{
 
 	private SplitComponentType type;
-	private List<E> virtualEdges;
+	private SplitPair<V,E> spearaionPair;
+	private E virtualEdge;
+
 	private List<Triple> triples;
 	
 	public SplitComponentType getType() {
@@ -29,25 +31,14 @@ public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends
 		this.edges = edges;
 	}
 
-	public List<E> getVirtualEdges() {
-		return virtualEdges;
-	}
-
-	public void setVirtualEdges(List<E> virtualEdges) {
-		this.virtualEdges = virtualEdges;
-	}
-
-	public HopcroftSplitComponent(SplitComponentType type, List<E> edges,
-			List<E> virtualEdges) {
+	public HopcroftSplitComponent(SplitComponentType type, List<E> edges) {
 		super(edges);
 		this.type = type;
-		this.virtualEdges = virtualEdges;
 		triples = new ArrayList<Triple>();
 	}
 	
 	public HopcroftSplitComponent(){
 		super();
-		virtualEdges = new ArrayList<E>();
 		triples = new ArrayList<Triple>();
 	}
 
@@ -62,6 +53,22 @@ public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends
 	@Override
 	public String toString() {
 		return "HopcroftSplitComponent [edges=" + edges + "]";
+	}
+
+	public SplitPair<V, E> getSpearaionPair() {
+		return spearaionPair;
+	}
+
+	public void setSpearaionPair(SplitPair<V, E> spearaionPair) {
+		this.spearaionPair = spearaionPair;
+	}
+
+	public E getVirtualEdge() {
+		return virtualEdge;
+	}
+
+	public void setVirtualEdge(E virtualEdge) {
+		this.virtualEdge = virtualEdge;
 	}
 	
 	

@@ -450,8 +450,9 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		log.info("outputting new component");
 		System.out.println(newComponent);
 
-		addComponent(virtualEdge, newComponent);
-		addCompnentWithMultiplevVirtualEdges(coveredVirtualEdges, newComponent);
+		System.out.println("SET VIRTUAL EDGE: " + virtualEdge);
+		addCompnentWithMultiplevVirtualEdges(coveredVirtualEdges, newComponent, virtualEdge);
+		System.out.println(newComponent.getVirtualEdge());
 
 		estack.add(virtualEdge);
 		virtualEdges.add(virtualEdge);
@@ -537,7 +538,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			System.out.println(newComponent);
 			estack.add(virtualEdge);
 			coveredEdges.add(backEdge);
-			addComponent(virtualEdge, newComponent);
+			addComponent(virtualEdge, newComponent, true);
 		}
 		else{
 
@@ -611,7 +612,10 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			//estack.add(virtualEdge);
 			log.info("outputting new component");
 			System.out.println(newComponent);
-			addCompnentWithMultiplevVirtualEdges(coveredVirtualEdges, newComponent);
+			
+			//TODO kako znamo koji je to tacno separation par? koja je to ivica? da li moze biti vise virtuelnih
+			
+			addCompnentWithMultiplevVirtualEdges(coveredVirtualEdges, newComponent, coveredVirtualEdges.get(0));
 
 			//TODO should be be done like this (otherwise, the triple bond containing edges can't be formed...)
 			virtualEdges.addAll(coveredVirtualEdges);
@@ -693,12 +697,16 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		return null;
 	}
 
-	private void addCompnentWithMultiplevVirtualEdges(List<E> virtualEdges,HopcroftSplitComponent<V, E> newComponent){
-		for (E virtualEdge : virtualEdges)
-			addComponent(virtualEdge, newComponent);
+	private void addCompnentWithMultiplevVirtualEdges(List<E> virtualEdges,HopcroftSplitComponent<V, E> newComponent, E virtualEdge){
+		addComponent(virtualEdge, newComponent, true);
+		for (E v2 : virtualEdges)
+			if (v2 == virtualEdge)
+				continue;
+			else
+				addComponent(v2, newComponent, false);
 	}
 
-	private void addComponent(E virtualEdge, HopcroftSplitComponent<V, E> newComponent) {
+	private void addComponent(E virtualEdge, HopcroftSplitComponent<V, E> newComponent, boolean setVirtualEdge) {
 
 		components.add(newComponent);
 
@@ -725,7 +733,11 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			newComponent.setType(type);
 		}
 		
-		virtutalEdgeComponents.add(newComponent);
+		if (setVirtualEdge)
+			newComponent.setVirtualEdge(virtualEdge);
+		
+		if (!virtutalEdgeComponents.contains(newComponent))
+			virtutalEdgeComponents.add(newComponent);
 
 	}
 
@@ -760,7 +772,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 						newComponent.getEdges().add(e);
 						newComponent.getEdges().add(e);
 						newComponent.getEdges().add(e);
-						addComponent(e, newComponent);
+						addComponent(e, newComponent, true);
 						log.info("Creating triple bond composed of virtual edges");
 						System.out.println(newComponent);
 					}

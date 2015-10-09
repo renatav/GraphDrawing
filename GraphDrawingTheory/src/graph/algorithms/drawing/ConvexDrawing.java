@@ -36,25 +36,25 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		rand = new Random();
 		splitting = new Splitting<V,E>();
 	}
-	
-	
+
+
 	public Map<V, Point2D> execute(){
-		
+
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
-		
+
 		testSeparationPairs();
-		
-		
-		
+
+
+
 		return ret;
 	}
-	
+
 
 	@SuppressWarnings("unchecked")
 	public Map<V, Point2D> execute(List<V> S, List<V> Sstar){
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
-		
+
 		//step one - for each vertex v of degree two not on S
 		//replace v together with two edges incident to v with a 
 		//single edge joining the vertices adjacent to v
@@ -92,7 +92,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	//when calling draw for the first time, positions should already 
 	//contain positions should already contain position of vertices on S
-	
+
 	private void draw(Graph<V,E> G, List<V> S, List<V> Sstar, Map<V,Point2D> positions){
 		if (G.getVertices().size() <= 3)
 			return;
@@ -145,12 +145,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		List<V> si = new ArrayList<V>();
 		for (Block<V,E> bi : blocks){
-			
+
 			//TODO find Si
 			//find Si
-			
+
 			List<V> siApexes = new ArrayList<V>();
-			
+
 			//find vertices among v1, v2, .. vp_1 which the block contains
 			V vBorder1 = null, vBorder2 = null;
 			for (V border : vis){
@@ -163,28 +163,28 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 			}
-			
+
 			int index1 = S.indexOf(vBorder1);
 			int index2 = S.indexOf(vBorder2);
-			
+
 			for (int i = index1; i <= index2; i++){
 				si.add(S.get(i));
 			}
-			
+
 			index1 = connectedVerties.indexOf(vBorder1);
 			index2 = connectedVerties.indexOf(vBorder2);
-			
+
 			siApexes.add(vBorder1);
 			for (int i = index2 - 1; i > index1; i--){
 				si.add(connectedVerties.get(i));
 				siApexes.add(connectedVerties.get(i));
 			}
-			
+
 			siApexes.add(vBorder2);
 		}
-		
+
 		//Step 2 - Draw each block bi convex
-		
+
 		//Step 2.1 Determine Si*
 		//when S* was found, positions of its vertices were found as well
 		//so we only need to find position of vertices not on S
@@ -192,93 +192,88 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//v*v1*vi+1 (cut vertices + 2 connected to v at the beginning and end)
 		//in such way that the vertices adjacent to v are apices of convex polygon Si*
 		//and the others are on the straight line segments
-		
+
 		//Step 2.2
 		//recursively call procedure Draw(bi,Si, Si*)
 
 	}
-	
+
 	private void testSeparationPairs(){
-		
+
 		TriconnectedDivision<V, E> triconnectedDivision = new TriconnectedDivision<V,E>(graph);
 		triconnectedDivision.execute();
 		List<SplitPair<V, E>> separationPairs = triconnectedDivision.getSeparationPairs();
-		
 
-		System.out.println("SPLITTING");
-		Splitting splitting = new Splitting<V,E>();
-		for (SplitPair sp : separationPairs){
-			System.out.println(splitting.findAllSplitComponents(graph, sp));
-		}
-		
-		
-		
+
+
 		Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap = triconnectedDivision.getComponentsVirtualEdgesMap();
-		
+
 		formTriconnectedComponentsAndAnalyzeEdges(splitComponentsMap);
-		
-		
+
+
+		//System.out.println("SPLIT COMPONENTS MAP " + splitComponentsMap);
+
 		for (E virtualEdge : splitComponentsMap.keySet()){
-			
-			
-			System.out.println("CURRENT VIRTUAL EDGE " +  virtualEdge);
-			
+
+
+			//System.out.println("CURRENT VIRTUAL EDGE " +  virtualEdge);
+
 			//create a separation pair represented by that edge
-			
+
 			SplitPair<V, E> separationPair = new SplitPair<V,E>(virtualEdge.getOrigin(), virtualEdge.getDestination());
-			
+
 			List<HopcroftSplitComponent<V, E>> pairComponents = new ArrayList<HopcroftSplitComponent<V,E>>();
-			
+
 			for (HopcroftSplitComponent<V, E> splitComponent : splitComponentsMap.get(virtualEdge)){
-				
-//				HopcroftSplitComponent<V, E> joinedComponent = formComponent(splitComponent, splitComponentsMap, splitComponentsMap.keySet(), virtualEdge);
-//				System.out.println(joinedComponent);
-//				if (joinedComponent != null)
-//					pairComponents.add(joinedComponent);
+
+				HopcroftSplitComponent<V, E> joinedComponent = formComponent(splitComponent, splitComponentsMap, splitComponentsMap.keySet(), virtualEdge);
+				//System.out.println(joinedComponent);
+				if (joinedComponent != null)
+					pairComponents.add(joinedComponent);
 			}
-			
+
 			//now analyze components and determine the pairs type
-			
-				
+
+
 		}
-		
+
 	}
-	
-	
+
+
 	private HopcroftSplitComponent<V,E> formComponent(HopcroftSplitComponent<V, E> component, Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap, 
 			Collection<E> virtualEdges, E virtualEdge){
-		
-		
-		System.out.println("STARTING COMPONENT " + component);
-		
+
+
+		//System.out.println("STARTING COMPONENT " + component);
+
 		HopcroftSplitComponent<V, E> ret = new HopcroftSplitComponent<V,E>();
 		ret.getEdges().addAll(component.getEdges());
 		boolean hasNonVirtualEdge = false;
-		
+
 		boolean changes = true;
 		List<E> newEdges = new ArrayList<E>();
 		List<E> toProcess = new ArrayList<E>();
 		toProcess.addAll(component.getEdges());
 		List<HopcroftSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftSplitComponent<V, E>>();
 		processedComponents.add(component);
-		
+
 		while (changes){
-			
+
 			newEdges.clear();
 			changes = false;
 			Iterator<E> iter = toProcess.iterator();
-			
+
 			while (iter.hasNext()){
 				E e = iter.next();
 				iter.remove();
-				
+
 				//System.out.println("current edge " + e);
 				if (!virtualEdges.contains(e)){
 					hasNonVirtualEdge = true;
 					continue;
 				}
-				
-				
+
+
 				//is virtual edge
 				if (ret.getEdges().contains(e)){
 					if (e != virtualEdge)
@@ -286,7 +281,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					else
 						continue;
 				}
-				
+
 				for (HopcroftSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
 					if (componentOfEdge.getEdges().contains(virtualEdge))
 						continue;
@@ -298,25 +293,25 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					changes = true;
 				}
 			}
-			
-			
+
+
 			toProcess.addAll(newEdges);
 		}
-			
+
 		if (!hasNonVirtualEdge)
 			return null;
-		
+
 		return ret;
-		
+
 	}
-	
+
 	/**
 	 * Joins triple bonds into a bond and triangles into a ring
 	 * @return
 	 */
 	private Pair<List<Component<V,E>>, List<E>> formTriconnectedComponentsAndAnalyzeEdges(Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap){
-		
-		
+
+
 		List<HopcroftSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftSplitComponent<V, E>>();
 		for (E virtualEdge  : splitComponentsMap.keySet())
 			for (HopcroftSplitComponent<V, E> component : splitComponentsMap.get(virtualEdge))
@@ -325,87 +320,94 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						formBondOrRing(component, splitComponentsMap, processedComponents);
 
 		return null;
-		
+
 	}
-	
+
 	private Pair<Component<V,E>, List<E>> formBondOrRing(HopcroftSplitComponent<V, E> component, Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap,
 			List<HopcroftSplitComponent<V, E>> processedComponents){
-		
+
 		List<E> containedVirtualEdges = new ArrayList<E>();
 		SplitComponentType type = component.getType();
 		Collection<E> virtualEdges = splitComponentsMap.keySet();
-		
-		
+
+		//edge used for joining
+		E virtualEdge = component.getVirtualEdge();
+
+
 		Component<V, E> ret = new Component<V,E>();
 		ret.getEdges().addAll(component.getEdges());
-		
+
 		boolean changes = true;
 		List<E> newEdges = new ArrayList<E>();
 		List<E> toProcess = new ArrayList<E>();
 		toProcess.addAll(component.getEdges());
 		processedComponents.add(component);
-		
-		//TODO odvojiti spajanje trouglova i bondova
-		//kada spojiti trouglove? da li i je do toga sto je neki par cvorova separation par u nekom slucaju, a u drugom nije
-		//posto su jedinstvene triconnected komponente, mora postojati pravilo!
-		
-		System.out.println("current component " + component);
-		
-		while (changes){
-			
-			newEdges.clear();
-			changes = false;
-			Iterator<E> iter = toProcess.iterator();
-			
-			while (iter.hasNext()){
-				E e = iter.next();
-				iter.remove();
-				
-				//System.out.println("current edge " + e);
-				if (!virtualEdges.contains(e)){
-					continue;
-				}
-				
-				containedVirtualEdges.add(e);
-				
 
-				//if e is a virtual edge used to joined two components, then it should be removed
-				//other virtual edges should remain
-				
-				for (HopcroftSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
-					
-					System.out.println(" component of edgea" + componentOfEdge);
-					
-					if (componentOfEdge.getType() != type)
-						continue;
-					
-					if (processedComponents.contains(componentOfEdge))
-						continue;
-					
-					System.out.println("doslo");
-			
-					
-					processedComponents.add(componentOfEdge);
-					ret.getEdges().addAll(componentOfEdge.getEdges());
-					ret.getEdges().remove(e);
-					containedVirtualEdges.remove(e);
-					
-					newEdges.addAll(componentOfEdge.getEdges());
-					changes = true;
-				}
+
+
+		//TODO odvojiti spajanje trouglova i bondova
+		//Spajati samo komponente kojima je jednaka ta postavljena virtuelna ivica
+		//ne spajati po bilo kojoj virtuelnoj ivici!
+		//nema onda vise "rekurzivnih" prolaza
+		//ne sve moraju imati bas tu ivicu!
+
+		System.out.println("current component " + component);
+		System.out.println(component.getVirtualEdge());
+
+
+		newEdges.clear();
+		Iterator<E> iter = toProcess.iterator();
+
+		while (iter.hasNext()){
+			E e = iter.next();
+			iter.remove();
+
+			if (e != virtualEdge){
+				ret.getEdges().add(e);
+				continue;
 			}
-			
-			
-			toProcess.addAll(newEdges);                                                                                                                                                                                                                                                                                                                                                    
+
+			//TODO videti ovo
+			containedVirtualEdges.add(e);
+
+
+			//if e is a virtual edge used to joined two components, then it should be removed
+			//other virtual edges should remain
+
+
+			System.out.println("COMPONENTS: " + splitComponentsMap.get(e));
+
+			for (HopcroftSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
+
+				System.out.println(" component of edgea" + componentOfEdge);
+
+				if (componentOfEdge.getType() != type)
+					continue;
+
+				if (processedComponents.contains(componentOfEdge))
+					continue;
+
+				if (componentOfEdge.getVirtualEdge() != component.getVirtualEdge())
+					continue;
+
+				processedComponents.add(componentOfEdge);
+				ret.getEdges().addAll(componentOfEdge.getEdges());
+				ret.getEdges().remove(e);
+				containedVirtualEdges.remove(e);
+
+				newEdges.addAll(componentOfEdge.getEdges());
+			}
 		}
-			
-		
+
+
+
+
 		System.out.println("JOIN RESULT");
 		System.out.println(ret);
-		System.out.println(virtualEdges);
-		
+		//System.out.println(virtualEdges);
+
 		return null;
-		
+
 	}
 
 	private V arbitraryApex(List<V> Sstar){
@@ -413,7 +415,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		return Sstar.get(i);
 
 	}
-	
+
 	private List<List<V>> findExtendableFacialCycles(){
 		return null;
 	}
