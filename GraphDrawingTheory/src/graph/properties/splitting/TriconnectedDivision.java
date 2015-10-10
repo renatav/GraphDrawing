@@ -493,7 +493,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/*
-	 * Does adding the back edge form a path form a path from split pair start to split pair end vertex
+	 * Does adding the back edge form a path from split pair start to split pair end vertex
 	 * Such back edge is either directly between the two split pair vertices
 	 * Or is below the end edge
 	 * If end was not yet reach, it can't close the path
@@ -606,6 +606,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 			HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
 			newComponent.getEdges().addAll(componentEdges);
+			
 			//E virtualEdge = Util.createEdge(start, end, edgeClass);
 			//already contains the virtual edge
 			//newComponent.getEdges().add(virtualEdge); //TODO is it possible that this edge wasn't on estack?
@@ -729,7 +730,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			E e1 = newComponent.getEdges().get(0);
 			E e2 = newComponent.getEdges().get(1);
 			if (e1 == e2 || (e1.getDestination() == e2.getDestination() && e1.getOrigin() == e2.getOrigin()) || (e1.getOrigin() == e2.getDestination() && e1.getDestination() == e2.getOrigin()))
-				type = SplitComponentType.TRICONNECTED_GRAPH;
+				type = SplitComponentType.TRIPLE_BOND;
 			newComponent.setType(type);
 		}
 		
