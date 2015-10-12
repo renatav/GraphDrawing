@@ -3,6 +3,7 @@ package graph.algorithms.drawing;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.exception.CannotBeAppliedException;
 import graph.properties.components.Block;
 import graph.properties.components.HopcroftSplitComponent;
 import graph.properties.components.SplitComponentType;
@@ -36,6 +37,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	private List<SplitPair<V,E>> primeSeparationPairs;
 	private List<SplitPair<V,E>> forbiddenSeparationPairs;
+	private List<SplitPair<V,E>> criticalSeparationPairs;
 
 	public ConvexDrawing(Graph<V,E> graph){
 		this.graph = graph;
@@ -223,6 +225,38 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				splitPairVirtualEdgeMap.put(sp, null);
 		}
 	}
+	
+	/**
+	 * Determines if a 2-connected graph has a convex drawing
+	 * @throws CannotBeAppliedException 
+	 */
+	public void convexTesting() throws CannotBeAppliedException{
+		
+		//STEP 1 
+		//Find all separation pairs using Hopcroft-Tarjan triconnected division
+		//Form three sets: prime separation pairs, critical separation pairs and forbidden separation pairs
+		
+		boolean allCyclesExtendable = false;
+		
+		testSeparationPairs();
+		if (forbiddenSeparationPairs.size() > 0){
+			throw new CannotBeAppliedException("Forbidden separation pair found. Graph doesn't have a convex drawing");
+		}
+		else if (criticalSeparationPairs.size() == 0)
+			allCyclesExtendable = true;
+		else if (criticalSeparationPairs.size() == 0){
+			//set S based on figure 4 from Chibba's paper
+		}
+		else{
+			//STEP 2 construct graphs G1 and G2
+			//test if G2 is planar
+			//if it isn't, G doesn't have a convex drawing
+			//otherwise set S as v-cycle of planar graph G2 
+			
+		}
+		
+		
+	}
 
 	private void testSeparationPairs(){
 
@@ -239,7 +273,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		setVirtualEdgesSplitPairMap(separationPairs, virtualEdges);
 
 		Pair<List<HopcroftSplitComponent<V,E>>, List<E>> componentsAndContainedVEdges = formTriconnectedComponentsAndAnalyzeEdges(splitComponentsMap);
-		List<HopcroftSplitComponent<V,E>> triconnectedComponents = componentsAndContainedVEdges.getKey();
+		
+		//List<HopcroftSplitComponent<V,E>> triconnectedComponents = componentsAndContainedVEdges.getKey();
+		
 		List<E> containedVirtualEdges = componentsAndContainedVEdges.getValue();
 		System.out.println(containedVirtualEdges);
 
@@ -249,6 +285,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//System.out.println("SPLIT COMPONENTS MAP " + splitComponentsMap);
 
 		forbiddenSeparationPairs = new ArrayList<SplitPair<V,E>>();
+		criticalSeparationPairs = new ArrayList<SplitPair<V,E>>();
 
 		for (E virtualEdge : virtualEdges){
 
@@ -278,9 +315,15 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//i) at least four {x,y} split component
 			//ii) three {x,y} split components none of which is either a ring or a bonds
 
-			if (primeSeparationPairs.contains(separationPair)){
+			//critical separation pair is a prime separation pair which has either
+			//i) three {x,y} split components including a ring or a bond
+			//two {x,y} split components none of which is a ring
 
-				if (pairComponents.size() == 4)
+			if (primeSeparationPairs.contains(separationPair)){
+				System.out.println("Checking separation pair: " + separationPair);
+				System.out.println(pairComponents.size());
+
+				if (pairComponents.size() >= 4)
 					forbiddenSeparationPairs.add(separationPair);
 				else if (pairComponents.size() == 3){
 					boolean forbidden = true;
@@ -291,12 +334,28 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						}
 					if (forbidden)
 						forbiddenSeparationPairs.add(separationPair);
+					else
+						criticalSeparationPairs.add(separationPair);
+				}
+				else  if (pairComponents.size() == 2){
+					boolean critical = true;
+					for (HopcroftSplitComponent<V, E> component : pairComponents){
+						System.out.println(component);
+						System.out.println(component.getType());
+						if (component.getType() == SplitComponentType.RING){
+							critical = false;
+							break;
+						}
+					}
+					if (critical)
+						criticalSeparationPairs.add(separationPair);
 				}
 			}
 
 		}
 
 		System.out.println("Forbidden separation pairs: " + forbiddenSeparationPairs);
+		System.out.println("Critical separation pairs: " + criticalSeparationPairs);
 
 	}
 
@@ -498,7 +557,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		log.info("Component: " + ret);
 		log.info("Component type: " +type);
 
-		component.setType(type);
+		ret.setType(type);
 
 
 		return ret;
