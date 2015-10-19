@@ -38,6 +38,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private List<SplitPair<V,E>> primeSeparationPairs;
 	private List<SplitPair<V,E>> forbiddenSeparationPairs;
 	private List<SplitPair<V,E>> criticalSeparationPairs;
+	private Map<SplitPair<V,E>, List<HopcroftSplitComponent<V, E>>> splitComponentsOfPair;
 
 	public ConvexDrawing(Graph<V,E> graph){
 		this.graph = graph;
@@ -242,16 +243,56 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		if (forbiddenSeparationPairs.size() > 0){
 			throw new CannotBeAppliedException("Forbidden separation pair found. Graph doesn't have a convex drawing");
 		}
-		else if (criticalSeparationPairs.size() == 0)
-			allCyclesExtendable = true;
 		else if (criticalSeparationPairs.size() == 0){
+			log.info("All facial cycles are extendable");
+			allCyclesExtendable = true;
+		}
+		else if (criticalSeparationPairs.size() == 1){
 			//set S based on figure 4 from Chibba's paper
 		}
 		else{
 			//STEP 2 construct graphs G1 and G2
 			//test if G2 is planar
 			//if it isn't, G doesn't have a convex drawing
-			//otherwise set S as v-cycle of planar graph G2 
+			//otherwise set S as v-cycle of planar graph G2  ? 
+			Graph<V, E> G1 = Util.copyGraph(graph);
+			
+			for (SplitPair<V,E> criticalSeparationPair : criticalSeparationPairs){
+				V x = criticalSeparationPair.getV();
+				V y = criticalSeparationPair.getU();
+				
+				//check if e is an edge in graph
+				boolean isEdgeInGraph = false;
+				E foundEdge = null;
+				for (E graphEdge : graph.adjacentEdges(x)){
+					V other = graphEdge.getOrigin() == x ? graphEdge.getDestination() : graphEdge.getOrigin();
+					if (other == y){
+						foundEdge = graphEdge;
+						break;
+					}
+				}
+				if (foundEdge != null){
+					//delete edge {x,y} from graph
+					G1.removeEdge(foundEdge);
+				}
+				else{
+					List<HopcroftSplitComponent<V, E>> pairComponents = splitComponentsOfPair.get(criticalSeparationPair);
+					//check if there is exactly one split component which is a ring
+					int ringsCount = 0;
+					for (HopcroftSplitComponent<V, E> splitComponent : pairComponents){
+						if (splitComponent.getType() == SplitComponentType.RING){
+							ringsCount ++;
+							if (ringsCount > 1)
+								break;
+						}
+								
+					}
+					if (ringsCount == 1){
+						//delete x-y path in the component from graph
+						
+					}
+				}
+			}
 			
 		}
 		
@@ -286,6 +327,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		forbiddenSeparationPairs = new ArrayList<SplitPair<V,E>>();
 		criticalSeparationPairs = new ArrayList<SplitPair<V,E>>();
+		splitComponentsOfPair = new HashMap<SplitPair<V,E>, List<HopcroftSplitComponent<V,E>>>();
 
 		for (E virtualEdge : virtualEdges){
 
@@ -308,6 +350,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					pairComponents.add(joinedComponent);
 
 			}
+			splitComponentsOfPair.put(separationPair, pairComponents);
 
 			//now analyze components and determine the pairs type
 
@@ -687,6 +730,47 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 
+	}
+	
+	/**
+	 * Checks if S* is extendable
+	 * It is if graph and S satisfy the following condition:
+	 * G has no forbidden separation pairs
+	 * For each critical separation pair {x,y} of G there exists at most one {x,y} split component having no edge of S
+	 * Moreover, such {x,y} split component is either a bond if (x,y) in E or a ring otherwise
+	 * 
+	 * @param S
+	 * @return
+	 */
+	private boolean sIsExtendable(List<E> S){
+		
+		if (forbiddenSeparationPairs.size() > 0){
+			log.info("Has forbidden separation pairs - not extendable");
+			return false;
+		}
+		for (SplitPair<V, E> criticalSeparationPair : criticalSeparationPairs){
+			List<HopcroftSplitComponent<V, E>> splitComponents = splitComponentsOfPair.get(criticalSeparationPair);
+			int count = 0;
+			for (HopcroftSplitComponent<V, E> splitComponent : splitComponents){
+				//a component having no edge of S can only by a bond or a ring
+				if (splitComponent.getType() == SplitComponentType.BOND || splitComponent.getType() == SplitComponentType.RING){
+					//check if the component has at least one edge of S
+					boolean hasAtLeastOne = false;
+					for (E e : splitComponent.getEdges())
+						if (S.contains(e)){
+							hasAtLeastOne = true;
+							break;
+						}
+					if (!hasAtLeastOne)
+						count ++;
+					if (count > 1)
+						return false;
+					
+				}
+			}
+		}
+		return true;
+		
 	}
 
 	private V arbitraryApex(List<V> Sstar){
