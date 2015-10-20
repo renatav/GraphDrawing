@@ -25,20 +25,31 @@ import java.util.Set;
 
 public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 
-	private final List<E> edges;
+	private List<E> edges;
 	private Set<V> settledNodes;
 	private Set<V> unSettledNodes;
 	private Map<V, V> predecessors;
 	private Map<V, Integer> distance;
-	private Graph<V,E> graph;
 	private Map<V,E> predEdges;
+	private boolean directed;
+	
 
 	public DijkstraAlgorithm(Graph<V,E> graph) {
 
 		//copy edges
-		this.graph = graph;
 		this.edges = new ArrayList<E>(graph.getEdges());
+		this.directed = graph.isDirected();
 	}
+	
+	public DijkstraAlgorithm(List<E> edges, boolean directed) {
+		this.edges = new ArrayList<E>(edges);
+		this.directed = directed;
+	}
+	
+	public DijkstraAlgorithm(){
+		this.directed = false;
+	}
+	
 
 	public Path<V,E> getPath(V source, V target){
 		return getPath(source, target, null);
@@ -127,7 +138,7 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 					minEdge = edge;
 				}
 			}
-			if (!graph.isDirected()){
+			if (!directed){
 				if (edge.getDestination().equals(node)
 						&& edge.getOrigin().equals(target)) {
 					if (min == null || edge.getWeight() < min){
@@ -148,7 +159,7 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 				neighbors.add(edge.getDestination());
 				continue;
 			}
-			if (!graph.isDirected()){
+			if (!directed){
 				if (edge.getDestination().equals(node)
 						&& !isSettled(edge.getOrigin())) {
 					neighbors.add(edge.getOrigin());
@@ -183,6 +194,14 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 		} else {
 			return d;
 		}
+	}
+
+	public void setEdges(List<E> edges) {
+		this.edges = edges;
+	}
+
+	public void setDirected(boolean directed) {
+		this.directed = directed;
 	}
 
 

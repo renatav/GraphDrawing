@@ -26,7 +26,7 @@ public class Util {
 		list.clear();
 		list.addAll(reverse);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <V extends Vertex, E extends Edge<V>> E createEdge(V origin, V destination, Class<?> edgeClass){
 		try {
@@ -41,5 +41,18 @@ public class Util {
 		}
 		return null;
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public static <V extends Vertex> V createVertex(Class<?> vertexClass){
+		try{
+			V v = (V) vertexClass.newInstance();
+			return v;
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }

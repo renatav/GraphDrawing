@@ -1,5 +1,7 @@
 package graph.algorithms.drawing;
 
+import graph.algorithms.planarity.FraysseixMendezPlanarity;
+import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
@@ -8,9 +10,9 @@ import graph.properties.components.Block;
 import graph.properties.components.HopcroftSplitComponent;
 import graph.properties.components.SplitComponentType;
 import graph.properties.components.SplitPair;
-import graph.properties.splitting.SeparationPairSplitting;
 import graph.properties.splitting.Splitting;
 import graph.properties.splitting.TriconnectedDivision;
+import graph.traversal.DijkstraAlgorithm;
 import graph.util.Pair;
 import graph.util.Util;
 
@@ -28,7 +30,7 @@ import org.apache.log4j.Logger;
 public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	private Graph<V,E> graph;
-	private Class<?> edgeClass;
+	private Class<?> edgeClass, vertexClass;
 	private Random rand;
 	private Splitting<V, E> splitting;
 	private Map<SplitPair<V,E>, E>  splitPairVirtualEdgeMap;
@@ -39,10 +41,14 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private List<SplitPair<V,E>> forbiddenSeparationPairs;
 	private List<SplitPair<V,E>> criticalSeparationPairs;
 	private Map<SplitPair<V,E>, List<HopcroftSplitComponent<V, E>>> splitComponentsOfPair;
+	private PlanarityTestingAlgorithm<V, E> planarityTesting = new FraysseixMendezPlanarity<V,E>();
+	
+	private DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>();
 
 	public ConvexDrawing(Graph<V,E> graph){
 		this.graph = graph;
 		edgeClass = graph.getEdges().get(0).getClass();
+		vertexClass = graph.getVertices().get(0).getClass();
 		rand = new Random();
 		splitting = new Splitting<V,E>();
 	}
@@ -231,6 +237,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * Determines if a 2-connected graph has a convex drawing
 	 * @throws CannotBeAppliedException 
 	 */
+	@SuppressWarnings("unchecked")
 	public void convexTesting() throws CannotBeAppliedException{
 		
 		//STEP 1 
@@ -248,6 +255,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			allCyclesExtendable = true;
 		}
 		else if (criticalSeparationPairs.size() == 1){
+			//TODO
 			//set S based on figure 4 from Chibba's paper
 		}
 		else{
@@ -255,6 +263,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//test if G2 is planar
 			//if it isn't, G doesn't have a convex drawing
 			//otherwise set S as v-cycle of planar graph G2  ? 
+			log.info("Creating graph G1");
 			Graph<V, E> G1 = Util.copyGraph(graph);
 			
 			for (SplitPair<V,E> criticalSeparationPair : criticalSeparationPairs){
@@ -262,7 +271,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				V y = criticalSeparationPair.getU();
 				
 				//check if e is an edge in graph
-				boolean isEdgeInGraph = false;
 				E foundEdge = null;
 				for (E graphEdge : graph.adjacentEdges(x)){
 					V other = graphEdge.getOrigin() == x ? graphEdge.getDestination() : graphEdge.getOrigin();
@@ -273,14 +281,17 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				}
 				if (foundEdge != null){
 					//delete edge {x,y} from graph
+					log.info("Deleting edge " + foundEdge);
 					G1.removeEdge(foundEdge);
 				}
 				else{
 					List<HopcroftSplitComponent<V, E>> pairComponents = splitComponentsOfPair.get(criticalSeparationPair);
 					//check if there is exactly one split component which is a ring
 					int ringsCount = 0;
+					HopcroftSplitComponent<V, E> ring = null;
 					for (HopcroftSplitComponent<V, E> splitComponent : pairComponents){
 						if (splitComponent.getType() == SplitComponentType.RING){
+							ring = splitComponent;
 							ringsCount ++;
 							if (ringsCount > 1)
 								break;
@@ -289,12 +300,67 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					}
 					if (ringsCount == 1){
 						//delete x-y path in the component from graph
-						
+						log.info("Removing x-y path of component from G1");
+						dijkstra.setEdges(new ArrayList<E>(ring.getEdges()));
+						List<E> edges = dijkstra.getPath(x, y).getPath();
+						log.info("Edges: " + edges);
+						for (E e : edges)
+							G1.removeEdge(e);
 					}
 				}
 			}
 			
+			log.info("Created graph G1 " + G1.toString());
+			
+			//create graph G2 by adding a vertex v and joining it to all vertices of critical separation pairs
+			//no need to copy, we don't need G1
+		
+			Graph<V,E> G2 = G1;
+			log.info("Creating graph G2");
+			V v = Util.createVertex(vertexClass);
+			G2.addVertex(v);
+
+			//if one vertex belongs to two or more separation pairs, only create one edge between it and v
+			List<V> joinedVertices = new ArrayList<V>();
+			for (SplitPair<V,E> criticalSeparationPair : criticalSeparationPairs){
+				V v1 = criticalSeparationPair.getV();
+				V v2 = criticalSeparationPair.getU();
+				if (!joinedVertices.contains(v1)){
+					E e1 = Util.createEdge(v, v1, edgeClass);
+					G2.addEdge(e1);
+					joinedVertices.add(v1);
+				}
+				if (!joinedVertices.contains(v2)){
+					E e2 = Util.createEdge(v, v2, edgeClass);
+					G2.addEdge(e2);
+					joinedVertices.add(v2);
+				}
+			}
+			
+			log.info("Created graph G2 " + G2.toString());
+			
+			//now check if G2 is planar
+			log.info("Checking planarity of G2");
+			boolean planar = planarityTesting.isPlannar(G2);
+			log.info("planar? " + planar);
+			
+			if (!planar)
+				throw new CannotBeAppliedException("Graph G2 is not planar. Graph doesn't have a convex drawing");
+			
+			//S is v-cycle of plane graph G2
+			
 		}
+		
+		//STEP 3
+		//Graph has a convex drawing
+		//TODO naci S - v-ciklus
+		//the  v-cycle is the cycle of plane subgraph of G1 of G2 which bounds the face of G1 in which v lay
+		//G1 = G2 - v
+		//napraviti ciklus koji spaja sve cvorove u G1 koji su spojeni sa v
+		
+		
+		
+		
 		
 		
 	}
@@ -604,11 +670,13 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 		return ret;
-
 	}
-
+	
 
 	//TODO spajanje u ring?
+	//da li po ovoj logici dobijamo ciklus?
+	//da li je dobro odradjeno to da odredimo koje mozemo spajati
+	//tj. nije dovoljno da dele virutlenu ivicu nego su bas nastale od tog separation para?
 	/**
 	 * Joins triple bonds into a bond and triangles into a ring
 	 * @return
@@ -779,8 +847,5 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	}
 
-	private List<List<V>> findExtendableFacialCycles(){
-		return null;
-	}
 
 }
