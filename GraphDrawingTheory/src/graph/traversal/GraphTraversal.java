@@ -7,6 +7,7 @@ import graph.elements.Path;
 import graph.elements.Vertex;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -42,6 +43,27 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		return paths;
 	}
 	
+	/**
+	 * Finds all paths between first and target which contains all specified vertices
+	 * @param first
+	 * @param target
+	 * @param containing
+	 * @return
+	 */
+	public List<Path<V,E>> findAllPathsDFSContaining(V first, V target, List<V> containing){
+		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
+		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
+		Iterator<Path<V,E>> pathsIter = paths.iterator();
+		while (pathsIter.hasNext()){
+			Path<V,E> path = pathsIter.next();
+			for (V v : containing)
+				if (!path.getUniqueVertices().contains(v))
+					pathsIter.remove();
+		}
+		
+		return paths;
+	}
+	
 
 
 	public List<Path<V, E>> findAllPathsDFS(V first, V target, List<V> excluding){
@@ -49,6 +71,8 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, excluding);
 		return paths;
 	}
+	
+	
 	
 
 
@@ -94,6 +118,9 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 			findAllPathsDFS(temp, directionsTemp, paths, nextVert, start, end, excluding);
 		}
 	}
+	
+	
+	
 
 
 	

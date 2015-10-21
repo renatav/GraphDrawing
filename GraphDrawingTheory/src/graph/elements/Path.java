@@ -9,6 +9,7 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 	
 	private List<E> path = new ArrayList<E>();
 	private List<EdgeDirection> directions = new ArrayList<EdgeDirection>();
+	private List<V> uniqueVertices = new ArrayList<V>();
 
 	public Path(){
 		
@@ -26,10 +27,15 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	
-	
 	public void addEdge(E e, EdgeDirection direction){
 		path.add(e);
 		directions.add(direction);
+		V v1 = e.getDestination();
+		V v2 = e.getOrigin();
+		if (!uniqueVertices.contains(v1))
+			uniqueVertices.add(v1);
+		if (!uniqueVertices.contains(v2))
+			uniqueVertices.add(v2);
 	}
 	
 	public boolean containsEdge(E e){
@@ -139,6 +145,10 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 //		}
 //		return ret;
 		return path.toString();
+	}
+
+	public List<V> getUniqueVertices() {
+		return uniqueVertices;
 	}
 
 

@@ -4,6 +4,7 @@ import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Edge;
 import graph.elements.Graph;
+import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.components.Block;
@@ -13,6 +14,7 @@ import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
 import graph.properties.splitting.TriconnectedDivision;
 import graph.traversal.DijkstraAlgorithm;
+import graph.traversal.GraphTraversal;
 import graph.util.Pair;
 import graph.util.Util;
 
@@ -42,7 +44,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private List<SplitPair<V,E>> criticalSeparationPairs;
 	private Map<SplitPair<V,E>, List<HopcroftSplitComponent<V, E>>> splitComponentsOfPair;
 	private PlanarityTestingAlgorithm<V, E> planarityTesting = new FraysseixMendezPlanarity<V,E>();
-	
+
 	private DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>();
 
 	public ConvexDrawing(Graph<V,E> graph){
@@ -232,20 +234,20 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				splitPairVirtualEdgeMap.put(sp, null);
 		}
 	}
-	
+
 	/**
 	 * Determines if a 2-connected graph has a convex drawing
 	 * @throws CannotBeAppliedException 
 	 */
 	@SuppressWarnings("unchecked")
-	public void convexTesting() throws CannotBeAppliedException{
-		
+	public List<List<E>> convexTesting() throws CannotBeAppliedException{
+
 		//STEP 1 
 		//Find all separation pairs using Hopcroft-Tarjan triconnected division
 		//Form three sets: prime separation pairs, critical separation pairs and forbidden separation pairs
-		
+
 		boolean allCyclesExtendable = false;
-		
+
 		testSeparationPairs();
 		if (forbiddenSeparationPairs.size() > 0){
 			throw new CannotBeAppliedException("Forbidden separation pair found. Graph doesn't have a convex drawing");
@@ -257,6 +259,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		else if (criticalSeparationPairs.size() == 1){
 			//TODO
 			//set S based on figure 4 from Chibba's paper
+			//finds those four possible cycles
 		}
 		else{
 			//STEP 2 construct graphs G1 and G2
@@ -265,11 +268,20 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//otherwise set S as v-cycle of planar graph G2  ? 
 			log.info("Creating graph G1");
 			Graph<V, E> G1 = Util.copyGraph(graph);
-			
+
+			List<V> criticalSeparationPairVertices = new ArrayList<V>();
+
+
 			for (SplitPair<V,E> criticalSeparationPair : criticalSeparationPairs){
 				V x = criticalSeparationPair.getV();
 				V y = criticalSeparationPair.getU();
-				
+
+				if (!criticalSeparationPairVertices.contains(x))
+					criticalSeparationPairVertices.add(x);
+
+				if (!criticalSeparationPairVertices.contains(y))
+					criticalSeparationPairVertices.add(y);
+
 				//check if e is an edge in graph
 				E foundEdge = null;
 				for (E graphEdge : graph.adjacentEdges(x)){
@@ -296,7 +308,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 							if (ringsCount > 1)
 								break;
 						}
-								
+
 					}
 					if (ringsCount == 1){
 						//delete x-y path in the component from graph
@@ -309,12 +321,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 			}
-			
+
 			log.info("Created graph G1 " + G1.toString());
-			
+
 			//create graph G2 by adding a vertex v and joining it to all vertices of critical separation pairs
 			//no need to copy, we don't need G1
-		
+
 			Graph<V,E> G2 = G1;
 			log.info("Creating graph G2");
 			V v = Util.createVertex(vertexClass);
@@ -336,33 +348,57 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					joinedVertices.add(v2);
 				}
 			}
-			
+
 			log.info("Created graph G2 " + G2.toString());
-			
+
 			//now check if G2 is planar
 			log.info("Checking planarity of G2");
 			boolean planar = planarityTesting.isPlannar(G2);
 			log.info("planar? " + planar);
-			
+
 			if (!planar)
 				throw new CannotBeAppliedException("Graph G2 is not planar. Graph doesn't have a convex drawing");
-			
+
 			//S is v-cycle of plane graph G2
+
+
+			//STEP 3
+			//Graph has a convex drawing
+			//TODO naci S - v-ciklus
+			//the  v-cycle is the cycle of plane subgraph of G1 of G2 which bounds the face of G1 in which v lay
+			//G1 = G2 - v
+			//napraviti ciklus koji spaja sve cvorove u G1 koji su spojeni sa v
+
+
+			//approach based on based on theorem 3 and condition 2
+			//find all cycles in G1 containing all vertices of critical separation pairs
+			//then see which satisfy condition 2
+
+			List<List<E>> extendableFacialCycles = new ArrayList<List<E>>();
+			GraphTraversal<V, E> traversal = new GraphTraversal<V, E>(G1);
+
+			//arbitrary start
+			V start = criticalSeparationPairVertices.get(0);
+			//finds one adjacent to it in G1
+			//mark it as end
+			//path containing an edge between them is not acceptable, so if it is a cycle, it would go the other way around
+			//with that edge at the end, we have a cycle
+			V end = G1.adjacentVertices(start).get(0);
+			//G1 is biconnected, so this should not throw null pointer...
+
+			List<Path<V,E>> paths = traversal.findAllPathsDFSContaining(start, end, criticalSeparationPairVertices);
+			for (Path<V,E> path : paths){
+				List<E> edges = path.getPath();
+				if (isIsExtendable(edges))
+					extendableFacialCycles.add(edges);
+			}
 			
+			//TODO should this return all
+			return extendableFacialCycles;
 		}
-		
-		//STEP 3
-		//Graph has a convex drawing
-		//TODO naci S - v-ciklus
-		//the  v-cycle is the cycle of plane subgraph of G1 of G2 which bounds the face of G1 in which v lay
-		//G1 = G2 - v
-		//napraviti ciklus koji spaja sve cvorove u G1 koji su spojeni sa v
-		
-		
-		
-		
-		
-		
+
+		return null;
+
 	}
 
 	private void testSeparationPairs(){
@@ -380,9 +416,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		setVirtualEdgesSplitPairMap(separationPairs, virtualEdges);
 
 		Pair<List<HopcroftSplitComponent<V,E>>, List<E>> componentsAndContainedVEdges = formTriconnectedComponentsAndAnalyzeEdges(splitComponentsMap);
-		
+
 		//List<HopcroftSplitComponent<V,E>> triconnectedComponents = componentsAndContainedVEdges.getKey();
-		
+
 		List<E> containedVirtualEdges = componentsAndContainedVEdges.getValue();
 		System.out.println(containedVirtualEdges);
 
@@ -671,7 +707,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		return ret;
 	}
-	
+
 
 	//TODO spajanje u ring?
 	//da li po ovoj logici dobijamo ciklus?
@@ -799,7 +835,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 	}
-	
+
 	/**
 	 * Checks if S* is extendable
 	 * It is if graph and S satisfy the following condition:
@@ -810,8 +846,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @param S
 	 * @return
 	 */
-	private boolean sIsExtendable(List<E> S){
-		
+	private boolean isIsExtendable(List<E> S){
+
 		if (forbiddenSeparationPairs.size() > 0){
 			log.info("Has forbidden separation pairs - not extendable");
 			return false;
@@ -833,12 +869,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						count ++;
 					if (count > 1)
 						return false;
-					
+
 				}
 			}
 		}
 		return true;
-		
+
 	}
 
 	private V arbitraryApex(List<V> Sstar){
