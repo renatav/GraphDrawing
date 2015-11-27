@@ -17,20 +17,16 @@ import java.util.Map;
 
 public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> extends SymmetricLayouter<V, E>{
 
-	public SymmetricCircleLayouter(Graph<V, E> graph,
-			GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
 
 	@Override
-	public Drawing<V, E> layout() {
+	public Drawing<V, E> layout(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
 
 
 		distance =  (Double) layoutProperties.getProperty(SymmetricProperties.DISTANCE);
 		p = (Permutation) layoutProperties.getProperty(SymmetricProperties.PERMUTATION);
 		center = (Point2D) layoutProperties.getProperty(SymmetricProperties.CENTER);
 
-		init();
+		init(graph);
 
 		CyclicSymmetricGraphDrawing<V, E> symmetricDrawing = new CyclicSymmetricGraphDrawing<V,E>(graph);
 		List<List<V>> circles;

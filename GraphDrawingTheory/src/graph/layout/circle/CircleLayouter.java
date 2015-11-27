@@ -16,12 +16,9 @@ import java.util.Map;
 public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>
 {
 
-	public CircleLayouter(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
 
 	@Override
-	public Drawing<V, E> layout() {
+	public Drawing<V, E> layout(Graph<V, E> graph,GraphLayoutProperties layoutProperties) {
 		
 		//TODO sta raditi sa cvorovima koji nisu povezani
 		
@@ -47,4 +44,5 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 		
 		return drawing;
 	}
+
 }

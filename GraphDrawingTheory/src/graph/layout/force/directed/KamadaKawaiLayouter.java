@@ -2,7 +2,6 @@ package graph.layout.force.directed;
 
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import graph.elements.Edge;
-import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
@@ -10,12 +9,8 @@ import graph.layout.PropertyEnums.KamadaKawaiProperties;
 public class KamadaKawaiLayouter<V extends Vertex, E extends Edge<V>> extends AbstractForceDirectedLayouter<V,E> {
 
 
-	public KamadaKawaiLayouter(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
-
 	@Override
-	protected void initLayouter() {
+	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 		KKLayout<V, E> kkLayout = new KKLayout<>(jungGraph);
 
 		kkLayout.setAdjustForGravity(true);

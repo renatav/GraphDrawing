@@ -9,17 +9,15 @@ import graph.layout.GraphLayoutProperties;
 
 public abstract class AbstractForceDirectedLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V,E>{
 	
-	
-	public AbstractForceDirectedLayouter(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
 
 	@Override
-	protected void createJungGraph(){
+	protected void createJungGraph(Graph<V,E> graph){
 		jungGraph = new UndirectedSparseGraph<V,E>();
-		super.createJungGraph();
+		super.createJungGraph(graph);
 	}
-	protected abstract void initLayouter();
+	
+	
+	protected abstract void initLayouter(GraphLayoutProperties layoutProperties);
 		
 
 

@@ -17,22 +17,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class TutteLayout <V extends Vertex, E extends Edge<V>> extends SymmetricLayouter<V, E>{
+public class TutteLayouter <V extends Vertex, E extends Edge<V>> extends SymmetricLayouter<V, E>{
 
-	public TutteLayout(Graph<V, E> graph,
-			GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
 
 	@Override
-	public Drawing<V, E> layout() {
+	public Drawing<V, E> layout(Graph<V, E> graph,
+			GraphLayoutProperties layoutProperties) {
 
 
 		distance =  (Double) layoutProperties.getProperty(TutteProperties.DISTANCE);
 		center = (Point2D) layoutProperties.getProperty(TutteProperties.CENTER);
 		p = (Permutation) layoutProperties.getProperty(TutteProperties.PERMUTATION);
 
-		init();
+		init(graph);
 
 
 		//for now, before implementing a better way to detect a face

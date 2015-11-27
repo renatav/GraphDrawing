@@ -11,18 +11,15 @@ import graph.layout.GraphLayoutProperties;
 
 public class RadialTreeLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V, E>{
 
-	public RadialTreeLayouter(Graph<V, E> graph,
-			GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
 
 	@Override
-	protected void createJungGraph(){
+	protected void createJungGraph(Graph<V,E> graph){
 		jungGraph = new DelegateForest<>();
+		super.createJungGraph(graph);
 	}
 	
 	@Override
-	protected void initLayouter() {
+	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 		RadialTreeLayout<V,E> radialTreeLayout = new RadialTreeLayout<V, E>((Forest<V, E>) jungGraph);
 		layouter = radialTreeLayout;
 		

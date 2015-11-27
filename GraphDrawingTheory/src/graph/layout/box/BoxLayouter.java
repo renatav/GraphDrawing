@@ -23,13 +23,9 @@ public class BoxLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLa
 	private int xStart = 200, yStart = 200, xOffset = 100, yOffset = 50;
 	private List<V> elementsToLayout;
 	
-	public BoxLayouter(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
-
 
 	@Override
-	public Drawing<V,E> layout() {
+	public Drawing<V,E> layout(Graph<V,E> graph, GraphLayoutProperties layoutProperties) {
 		
 		elementsToLayout = graph.getVertices();
 		

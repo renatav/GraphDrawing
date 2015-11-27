@@ -4,7 +4,6 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
-import graph.layout.GraphLayoutProperties;
 import graph.layout.circle.CircleLayoutCalc;
 import graph.symmetry.Permutation;
 
@@ -17,12 +16,7 @@ public abstract class SymmetricLayouter <V extends Vertex, E extends Edge<V>> ex
 	protected CircleLayoutCalc<V> calc = new CircleLayoutCalc<V>();
 	protected Point2D center;
 	
-	public SymmetricLayouter(Graph<V, E> graph,
-			GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
-	
-	protected void init(){
+	protected void init(Graph<V,E> graph){
 	
 		if (center == null)
 			center = new Point2D.Double(0, 0);

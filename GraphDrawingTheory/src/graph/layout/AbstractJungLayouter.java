@@ -1,10 +1,10 @@
 package graph.layout;
 
 import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.DefaultVisualizationModel;
 import graph.drawing.Drawing;
 import graph.elements.Edge;
+import graph.elements.Graph;
 import graph.elements.Vertex;
 
 import java.awt.geom.Point2D;
@@ -12,15 +12,10 @@ import java.awt.geom.Point2D;
 public abstract class AbstractJungLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
 
 
-	public AbstractJungLayouter(graph.elements.Graph<V, E> graph,
-			GraphLayoutProperties layoutProperties) {
-		super(graph, layoutProperties);
-	}
-
 	protected Layout<V,E> layouter;
-	protected Graph<V,E> jungGraph;
+	protected edu.uci.ics.jung.graph.Graph<V,E> jungGraph;
 
-	protected void createJungGraph(){
+	protected void createJungGraph(Graph<V,E> graph){
 		
 		for (V v : graph.getVertices())
 			jungGraph.addVertex(v);
@@ -30,14 +25,14 @@ public abstract class AbstractJungLayouter<V extends Vertex, E extends Edge<V>> 
 	}
 
 
-	public Drawing<V,E> layout(){
-		createJungGraph();
-		initLayouter();
-		return createDrawing();
+	public Drawing<V,E> layout(Graph<V,E> graph, GraphLayoutProperties layoutProperties){
+		createJungGraph(graph);
+		initLayouter(layoutProperties);
+		return createDrawing(graph);
 
 	}
 
-	protected Drawing<V,E> createDrawing(){
+	protected Drawing<V,E> createDrawing(Graph<V,E> graph){
 
 		//triggers layouting
 		new DefaultVisualizationModel<V, E>(layouter);
@@ -52,6 +47,6 @@ public abstract class AbstractJungLayouter<V extends Vertex, E extends Edge<V>> 
 		drawing.separate(100, 100);
 		return drawing;
 	}
-	protected abstract void initLayouter();
+	protected abstract void initLayouter(GraphLayoutProperties layoutProperties);
 	
 }
