@@ -2,6 +2,7 @@ package gui.actions.palette;
 
 import graph.drawing.Drawing;
 import graph.elements.Graph;
+import graph.exception.CannotBeAppliedException;
 import graph.layout.LayoutAlgorithms;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.Layouter;
@@ -16,6 +17,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 
 public class LayoutAction extends AbstractAction{
 	
@@ -42,15 +44,20 @@ public class LayoutAction extends AbstractAction{
 			Graph<GraphVertex, GraphEdge> graph = view.getModel().getGraph();
 			Layouter<GraphVertex, GraphEdge> layouter = new Layouter<>(graph.getVertices(), graph.getEdges(), 
 					algorithm, layoutProeprties);
-			Drawing<GraphVertex, GraphEdge> drawing = layouter.layout();
-			for (GraphVertex vert : graph.getVertices()){
-				vert.setPosition(drawing.getVertexMappings().get(vert));
+			try{
+				Drawing<GraphVertex, GraphEdge> drawing = layouter.layout();
+				for (GraphVertex vert : graph.getVertices()){
+					vert.setPosition(drawing.getVertexMappings().get(vert));
+				}
+				for (GraphEdge edge : graph.getEdges()){
+					List<Point2D> points = drawing.getEdgeMappings().get(edge);
+					edge.setLinkNodes(points);
+				}
+				view.repaint();
 			}
-			for (GraphEdge edge : graph.getEdges()){
-				List<Point2D> points = drawing.getEdgeMappings().get(edge);
-				edge.setLinkNodes(points);
+			catch (CannotBeAppliedException ex){
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), ex.getMessage());
 			}
-			view.repaint();
 		}
 		
 		

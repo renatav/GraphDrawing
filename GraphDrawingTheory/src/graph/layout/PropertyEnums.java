@@ -147,13 +147,13 @@ public interface PropertyEnums {
 		}
 	}
 	
-	public enum BaloonProperties implements PropertyEnums{
+	public enum BalloonProperties implements PropertyEnums{
 		PROPERY("Test property", false);
 		
 		private String name;
 		private boolean hidden;
 		
-		BaloonProperties (String name, boolean hidden){
+		BalloonProperties (String name, boolean hidden){
 			this.name = name;
 			this.hidden = hidden;
 		}
@@ -168,7 +168,7 @@ public interface PropertyEnums {
 	}
 	
 	public enum RadialTreeProperties implements PropertyEnums{
-		PROPERY("Test property", false);
+		X_DISTANCE("X distance", false), Y_DISTANCE("Y distance", false);
 		
 		private String name;
 		private boolean hidden;
@@ -188,7 +188,8 @@ public interface PropertyEnums {
 	}
 	
 	public enum TreeProperties implements PropertyEnums{
-		PROPERY("Test property", false);
+		X_DISTANCE("X distance", false), Y_DISTANCE("Y distance", false);
+		
 		
 		private String name;
 		private boolean hidden;

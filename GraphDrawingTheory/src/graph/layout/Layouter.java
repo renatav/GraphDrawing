@@ -4,6 +4,7 @@ import graph.drawing.Drawing;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.exception.CannotBeAppliedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,8 +112,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 
-	public Drawing<V,E> layout(){
-
+	public Drawing<V,E> layout() throws CannotBeAppliedException{
 
 		int startX = 200;
 		int startY = 200;
@@ -134,15 +134,24 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		AbstractLayouter<V, E> layouter = layouterFactory.createLayouter(algorithm);
 
 		if (AlgorithmProperties.isOneGraph(algorithm)){
-			drawing = layouter.layout(formOneGraph(vertices, edges),layoutProperties);
+			try{
+				drawing = layouter.layout(formOneGraph(vertices, edges),layoutProperties);
+			}
+			catch(Exception ex){
+				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
+			}
 			drawing.positionEdges(edges);
 			return drawing;
 		}
 
 
 		for (Graph<V,E> graph : formGraphs(vertices, edges)){
-
-			drawing = layouter.layout(graph, layoutProperties);
+			try{
+				drawing = layouter.layout(graph, layoutProperties);
+			}
+			catch(Exception ex){
+				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
+			}
 			int currentLeftmost = drawing.findLeftmostPosition();
 			int currentTop = drawing.findTop();
 

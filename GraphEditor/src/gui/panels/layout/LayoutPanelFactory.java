@@ -1,12 +1,15 @@
 package gui.panels.layout;
 
 import graph.layout.LayoutAlgorithms;
+import graph.layout.PropertyEnums.BalloonProperties;
 import graph.layout.PropertyEnums.BoxProperties;
 import graph.layout.PropertyEnums.CircleProperties;
 import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
+import graph.layout.PropertyEnums.RadialTreeProperties;
 import graph.layout.PropertyEnums.SpringProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
+import graph.layout.PropertyEnums.TreeProperties;
 import graph.layout.PropertyEnums.TutteProperties;
 
 import java.util.HashMap;
@@ -35,6 +38,13 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(FruchtermanReingoldProperties.class);
 		else if (al == LayoutAlgorithms.SPRING)
 			panel = new LayoutPropertyPanel(SpringProperties.class);
+		else if (al == LayoutAlgorithms.BALLOON)
+			panel = new LayoutPropertyPanel(BalloonProperties.class);
+		else if (al == LayoutAlgorithms.TREE)
+			panel = new LayoutPropertyPanel(TreeProperties.class);
+		else if (al == LayoutAlgorithms.RADIAL_TREE)
+			panel = new LayoutPropertyPanel(RadialTreeProperties.class);
+		
 		panelsMap.put(al, panel);
 		return panel;
 	}

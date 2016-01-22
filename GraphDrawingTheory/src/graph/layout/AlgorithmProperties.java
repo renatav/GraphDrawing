@@ -9,16 +9,16 @@ public class AlgorithmProperties {
 	
 	static {
 		oneGraph = new HashMap<LayoutAlgorithms, Boolean>();
-		oneGraph.put(LayoutAlgorithms.BALLOON, false);
+		oneGraph.put(LayoutAlgorithms.BALLOON, true);
 		oneGraph.put(LayoutAlgorithms.BOX, true);
 		oneGraph.put(LayoutAlgorithms.CIRCLE, false);
 		oneGraph.put(LayoutAlgorithms.CONCENTRIC, true);
 		oneGraph.put(LayoutAlgorithms.FRUCHTERMAN_REINGOLD, false);
 		oneGraph.put(LayoutAlgorithms.KAMADA_KAWAI, false);
-		oneGraph.put(LayoutAlgorithms.RADIAL_TREE, false);
+		oneGraph.put(LayoutAlgorithms.RADIAL_TREE, true);
 		oneGraph.put(LayoutAlgorithms.RANDOM, false);
 		oneGraph.put(LayoutAlgorithms.SPRING, false);
-		oneGraph.put(LayoutAlgorithms.TREE, false);
+		oneGraph.put(LayoutAlgorithms.TREE, true);
 		oneGraph.put(LayoutAlgorithms.TUTTE, true);
 		
 	}
