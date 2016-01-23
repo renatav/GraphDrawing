@@ -3,8 +3,14 @@ package graph.layout;
 public interface PropertyEnums {
 	
 	
+	//TODO ubaciti ovde tip
+	//pa onda adjust for gravity za ovaj properties
+	//da moze da bude check box
+	//
+	
 	public enum KamadaKawaiProperties implements PropertyEnums{
-		DISCONNECTED_DISTANCE_MULTIPLIER("Disconnected distance multiplier", false), LENGTH_FACTOR ("Length factor", false);
+		DISCONNECTED_DISTANCE_MULTIPLIER("Disconnected distance multiplier", false), LENGTH_FACTOR ("Length factor", false),
+		MAXIMUM_ITERATIONS("Maximum itterations", false);
 		
 		private String name;
 		private boolean hidden;
@@ -108,7 +114,8 @@ public interface PropertyEnums {
 	
 	
 	public enum FruchtermanReingoldProperties implements PropertyEnums{
-		PROPERY("Test property", false);
+		ATTRACTION_MULTIPLIER("Attraction multiplier", false), REPULSION_MULTIPLIER("Repulsion multiplier", false),
+		MAXIMUM_ITERATIONS("Maximum iterations", false);
 		
 		private String name;
 		private boolean hidden;
@@ -128,7 +135,8 @@ public interface PropertyEnums {
 	}
 	
 	public enum SpringProperties implements PropertyEnums{
-		PROPERY("Test property", false);
+		STRETCH("Stretch", false), REPULSION_RANGE("Repulsion range", false),
+		FORCE_MULTIPLIER("Force multiplier", false);
 		
 		private String name;
 		private boolean hidden;

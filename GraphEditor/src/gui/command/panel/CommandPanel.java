@@ -175,7 +175,7 @@ public class CommandPanel extends JPanel{
 			GraphEdge edge = new GraphEdge(vert1, vert2);
 			edge.setNodesBasedOnVertices();
 			MainFrame.getInstance().getCurrentView().getModel().addEdge(edge);
-			MainFrame.getInstance().getCurrentView().addEdgePainter(new EdgePainter(edge));
+			MainFrame.getInstance().getCurrentView().addEdgePainter(new EdgePainter(edge, MainFrame.getInstance().getCurrentView().getModel().getGraph()));
 			return "Edge " + v1 + ", " + v2 + " added";
 		}
 		

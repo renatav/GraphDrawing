@@ -7,13 +7,18 @@ import gui.model.IGraphElement;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -27,6 +32,7 @@ public class GraphModelPropertiesPanel extends PropertiesPanel{
 	
 	private GraphModel model;
 	private JTextField tfName;
+	private JCheckBox chDirected;
 	
 	
 	public GraphModelPropertiesPanel(){
@@ -46,6 +52,24 @@ public class GraphModelPropertiesPanel extends PropertiesPanel{
 
 		});
 
+		
+		JLabel lblDirected = new JLabel("Directed:");
+		chDirected = new JCheckBox();
+		add(lblDirected);
+		add(chDirected, "wrap");
+		
+		chDirected.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean directed = chDirected.isSelected();
+				model.getGraph().setDirected(directed);
+				MainFrame.getInstance().getCurrentView().repaint();
+			}
+		});
+		
+		
+		
 		JLabel lblColor = new JLabel("Color:");
 		JButton btnColor = new JButton("Choose");
 		add(lblColor);
@@ -59,7 +83,6 @@ public class GraphModelPropertiesPanel extends PropertiesPanel{
 					model.setColor(c);
 					MainFrame.getInstance().getCurrentView().repaint();
 				}
-
 			}
 		});
 

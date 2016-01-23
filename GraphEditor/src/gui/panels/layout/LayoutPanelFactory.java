@@ -38,6 +38,8 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(FruchtermanReingoldProperties.class);
 		else if (al == LayoutAlgorithms.SPRING)
 			panel = new LayoutPropertyPanel(SpringProperties.class);
+		else if (al == LayoutAlgorithms.DAG)
+			panel = new LayoutPropertyPanel(SpringProperties.class);
 		else if (al == LayoutAlgorithms.BALLOON)
 			panel = new LayoutPropertyPanel(BalloonProperties.class);
 		else if (al == LayoutAlgorithms.TREE)

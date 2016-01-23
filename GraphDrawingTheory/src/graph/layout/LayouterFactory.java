@@ -4,6 +4,7 @@ import graph.elements.Edge;
 import graph.elements.Vertex;
 import graph.layout.box.BoxLayouter;
 import graph.layout.circle.CircleLayouter;
+import graph.layout.force.directed.DAGLayouter;
 import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
 import graph.layout.force.directed.SpringLayouter;
@@ -28,6 +29,8 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new CircleLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.SPRING)
 			layouter = new SpringLayouter<V,E>();
+		else if (algorithm == LayoutAlgorithms.DAG)
+			layouter = new DAGLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.BALLOON)
 			layouter = new BalloonLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.RADIAL_TREE)

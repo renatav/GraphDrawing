@@ -13,7 +13,7 @@ import gui.state.SelectState;
 import gui.state.State;
 import gui.view.GraphView.GraphController.CancelAction;
 import gui.view.painters.EdgePainter;
-import gui.view.painters.ElementPainter;
+import gui.view.painters.IElementPainter;
 import gui.view.painters.VertexPainter;
 
 import java.awt.BasicStroke;
@@ -23,7 +23,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -40,7 +39,6 @@ import java.util.Observer;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 
 public class GraphView extends JPanel implements Observer{
 
@@ -103,7 +101,7 @@ public class GraphView extends JPanel implements Observer{
 		for (GraphVertex vertex : model.getGraph().getVertices())
 			vertexPainters.add(new VertexPainter(vertex));
 		for (GraphEdge edge : model.getGraph().getEdges())
-			edgePainters.add(new EdgePainter(edge));
+			edgePainters.add(new EdgePainter(edge, model.getGraph()));
 		
 	}
 
@@ -210,9 +208,9 @@ public class GraphView extends JPanel implements Observer{
 	}
 	
 	
-	public List<ElementPainter> removePainters(List<GraphElement> elements){
+	public List<IElementPainter> removePainters(List<GraphElement> elements){
 		
-		List<ElementPainter> removedPainters = new ArrayList<ElementPainter>();
+		List<IElementPainter> removedPainters = new ArrayList<IElementPainter>();
 		
 		Iterator<VertexPainter> vertexIt =vertexPainters.iterator();
 		while (vertexIt.hasNext()){

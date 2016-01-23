@@ -14,30 +14,37 @@ public class KamadaKawaiLayouter<V extends Vertex, E extends Edge<V>> extends Ab
 		KKLayout<V, E> kkLayout = new KKLayout<>(jungGraph);
 
 		kkLayout.setAdjustForGravity(true);
+		
+		Object lengthFactor = layoutProperties.getProperty(KamadaKawaiProperties.LENGTH_FACTOR);
+		Object distanceMultiplier = layoutProperties.getProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER);
+		Object maxIterations = layoutProperties.getProperty(KamadaKawaiProperties.MAXIMUM_ITERATIONS);
+		
 		if (layoutProperties != null){
-			if (layoutProperties.getProperty(KamadaKawaiProperties.LENGTH_FACTOR) != null)
-				kkLayout.setLengthFactor((double) layoutProperties.getProperty(KamadaKawaiProperties.LENGTH_FACTOR));
-			if (layoutProperties.getProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER) != null)
-				kkLayout.setDisconnectedDistanceMultiplier((double) layoutProperties.getProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER));
+			if (lengthFactor != null && lengthFactor instanceof Double)
+				kkLayout.setLengthFactor((double)lengthFactor);
+			if (distanceMultiplier != null && distanceMultiplier instanceof Double)
+				kkLayout.setDisconnectedDistanceMultiplier((double)distanceMultiplier);
+			if (maxIterations != null && maxIterations instanceof Double)
+				kkLayout.setMaxIterations(((Double)maxIterations).intValue()) ;
 		}
-		else{
-			if (jungGraph.getVertexCount() < 4){
-				kkLayout.setLengthFactor(0.9);
-				kkLayout.setDisconnectedDistanceMultiplier(0.8);
-			}
-			else if (jungGraph.getVertexCount() < 10){
-				kkLayout.setLengthFactor(1.5);
-				kkLayout.setDisconnectedDistanceMultiplier(3);
-			}
-			else if (jungGraph.getVertexCount() < 20){
-				kkLayout.setLengthFactor(2);
-				kkLayout.setDisconnectedDistanceMultiplier(5);
-			}
-			else {
-				kkLayout.setLengthFactor(3);
-				kkLayout.setDisconnectedDistanceMultiplier(10);
-			}
-		}
+//		else{
+//			if (jungGraph.getVertexCount() < 4){
+//				kkLayout.setLengthFactor(0.9);
+//				kkLayout.setDisconnectedDistanceMultiplier(0.8);
+//			}
+//			else if (jungGraph.getVertexCount() < 10){
+//				kkLayout.setLengthFactor(1.5);
+//				kkLayout.setDisconnectedDistanceMultiplier(3);
+//			}
+//			else if (jungGraph.getVertexCount() < 20){
+//				kkLayout.setLengthFactor(2);
+//				kkLayout.setDisconnectedDistanceMultiplier(5);
+//			}
+//			else {
+//				kkLayout.setLengthFactor(3);
+//				kkLayout.setDisconnectedDistanceMultiplier(10);
+//			}
+//		}
 		layouter = kkLayout;
 
 	}

@@ -18,8 +18,10 @@ public class AlgorithmProperties {
 		oneGraph.put(LayoutAlgorithms.RADIAL_TREE, true);
 		oneGraph.put(LayoutAlgorithms.RANDOM, false);
 		oneGraph.put(LayoutAlgorithms.SPRING, false);
+		oneGraph.put(LayoutAlgorithms.DAG, false);
 		oneGraph.put(LayoutAlgorithms.TREE, true);
 		oneGraph.put(LayoutAlgorithms.TUTTE, true);
+		
 		
 	}
 	

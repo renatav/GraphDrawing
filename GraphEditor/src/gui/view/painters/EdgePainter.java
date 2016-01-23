@@ -1,5 +1,6 @@
 package gui.view.painters;
 
+import graph.elements.Graph;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 
@@ -10,15 +11,17 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
-public class EdgePainter implements ElementPainter{
+public class EdgePainter implements IElementPainter{
 
 	private GraphEdge edge;
+	private Graph<GraphVertex, GraphEdge> graph;
 	private GeneralPath path = new GeneralPath();
 	private double selectionMaxDistance=8;
 	private BasicStroke stroke = new BasicStroke();
 
-	public EdgePainter(GraphEdge edge){
+	public EdgePainter(GraphEdge edge, Graph<GraphVertex, GraphEdge> graph){
 		this.edge = edge;
+		this.graph = graph;
 	}
 	
 	public void paint(Graphics2D g){
@@ -44,7 +47,9 @@ public class EdgePainter implements ElementPainter{
 
 		g.setColor(edge.getColor());
 		g.draw(path);
-		drawArrow(g, (int) p1.getX(), (int) p1.getY(), (int) intersection.getX(), (int) intersection.getY());
+		
+		if (graph.isDirected())
+			drawArrow(g, (int) p1.getX(), (int) p1.getY(), (int) intersection.getX(), (int) intersection.getY());
 
 	}
 

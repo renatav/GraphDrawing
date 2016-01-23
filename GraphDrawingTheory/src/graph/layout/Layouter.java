@@ -150,6 +150,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				drawing = layouter.layout(graph, layoutProperties);
 			}
 			catch(Exception ex){
+				ex.printStackTrace();
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
 			int currentLeftmost = drawing.findLeftmostPosition();

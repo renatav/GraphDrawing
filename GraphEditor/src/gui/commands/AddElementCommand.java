@@ -6,13 +6,13 @@ import gui.model.GraphModel;
 import gui.model.GraphVertex;
 import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
-import gui.view.painters.ElementPainter;
+import gui.view.painters.IElementPainter;
 import gui.view.painters.VertexPainter;
 
 public class AddElementCommand extends Command{
 
 	private GraphElement element;
-	private ElementPainter painter;
+	private IElementPainter painter;
 	
 	public AddElementCommand(GraphElement element, GraphView view) {
 		super(view);
@@ -30,7 +30,7 @@ public class AddElementCommand extends Command{
 		}
 		else if (element instanceof GraphEdge){
 			model.getGraph().addEdge((GraphEdge)element);
-			painter = new EdgePainter((GraphEdge)element);
+			painter = new EdgePainter((GraphEdge)element, model.getGraph());
 			view.addEdgePainter((EdgePainter) painter);
 		}
 		view.repaint();

@@ -6,7 +6,7 @@ import gui.model.GraphModel;
 import gui.model.GraphVertex;
 import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
-import gui.view.painters.ElementPainter;
+import gui.view.painters.IElementPainter;
 import gui.view.painters.VertexPainter;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class RemoveCommand extends Command{
 
 	
 	private List<GraphElement> elementsToRemove;
-	private List<ElementPainter> removedPainters;
+	private List<IElementPainter> removedPainters;
 	
 	public RemoveCommand(List<GraphElement> elementsToRemove, GraphView view) {
 		super(view);
@@ -59,7 +59,7 @@ public class RemoveCommand extends Command{
 			if (el instanceof GraphEdge)
 				model.addEdge((GraphEdge) el);
 		
-		for (ElementPainter painter : removedPainters){
+		for (IElementPainter painter : removedPainters){
 			if (painter instanceof EdgePainter)
 				view.addEdgePainter((EdgePainter)painter);
 			else
