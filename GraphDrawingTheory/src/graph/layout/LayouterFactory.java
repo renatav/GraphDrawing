@@ -8,6 +8,7 @@ import graph.layout.force.directed.DAGLayouter;
 import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
 import graph.layout.force.directed.SpringLayouter;
+import graph.layout.isom.ISOMLayouter;
 import graph.layout.symmetric.SymmetricCircleLayouter;
 import graph.layout.symmetric.TutteLayouter;
 import graph.layout.tree.BalloonLayouter;
@@ -43,6 +44,8 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new TutteLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.CONCENTRIC)
 			layouter = new SymmetricCircleLayouter<V,E>();
+		else if (algorithm == LayoutAlgorithms.ISOM)
+			layouter = new ISOMLayouter<V,E>();
 			
 		return layouter;
 

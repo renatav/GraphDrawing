@@ -21,6 +21,7 @@ public class AlgorithmProperties {
 		oneGraph.put(LayoutAlgorithms.DAG, false);
 		oneGraph.put(LayoutAlgorithms.TREE, true);
 		oneGraph.put(LayoutAlgorithms.TUTTE, true);
+		oneGraph.put(LayoutAlgorithms.ISOM, true);
 		
 		
 	}

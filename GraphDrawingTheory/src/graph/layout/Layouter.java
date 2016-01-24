@@ -138,6 +138,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				drawing = layouter.layout(formOneGraph(vertices, edges),layoutProperties);
 			}
 			catch(Exception ex){
+				ex.printStackTrace();
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
 			drawing.positionEdges(edges);
