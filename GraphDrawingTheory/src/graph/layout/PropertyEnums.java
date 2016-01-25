@@ -9,15 +9,17 @@ public interface PropertyEnums {
 	//
 	
 	public enum KamadaKawaiProperties implements PropertyEnums{
-		DISCONNECTED_DISTANCE_MULTIPLIER("Disconnected distance multiplier", false), LENGTH_FACTOR ("Length factor", false),
-		MAXIMUM_ITERATIONS("Maximum itterations", false);
+		DISCONNECTED_DISTANCE_MULTIPLIER("Disconnected distance multiplier", false, Double.class), LENGTH_FACTOR ("Length factor", false, Double.class),
+		MAXIMUM_ITERATIONS("Maximum itterations", false, Integer.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		KamadaKawaiProperties(String name, boolean hidden){
+		KamadaKawaiProperties(String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -26,19 +28,25 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 		
 	}
 	
 	public enum SymmetricProperties implements PropertyEnums{
-		DISTANCE("Distance", false), PERMUTATION("Permutation", false), CENTER("Center", true);
+		DISTANCE("Distance", false, Double.class), PERMUTATION("Permutation", false, String.class), CENTER("Center", true, String.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		SymmetricProperties(String name, boolean hidden){
+		SymmetricProperties(String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -47,18 +55,25 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	
 	public enum TutteProperties implements PropertyEnums{
-		DISTANCE("Distance", false), FACE("Face", false), PERMUTATION("Permutation", false), CENTER("Center", true);
+		DISTANCE("Distance", false, Double.class), FACE("Face", false, String.class),
+		PERMUTATION("Permutation", false, String.class), CENTER("Center", true, String.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		TutteProperties(String name, boolean hidden){
+		TutteProperties(String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -67,20 +82,26 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	
 
 	
 	public enum BoxProperties implements PropertyEnums{
-		PROPERY("Test property", false);
+		COLUMNS("Number of columns", false, Integer.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		BoxProperties (String name, boolean hidden){
+		BoxProperties (String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -89,18 +110,24 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	
 	public enum CircleProperties implements PropertyEnums{
-		DISTANCE("Distance", false);
+		DISTANCE("Distance", false, Integer.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		CircleProperties (String name, boolean hidden){
+		CircleProperties (String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -109,20 +136,26 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	
 	
 	public enum FruchtermanReingoldProperties implements PropertyEnums{
-		ATTRACTION_MULTIPLIER("Attraction multiplier", false), REPULSION_MULTIPLIER("Repulsion multiplier", false),
-		MAXIMUM_ITERATIONS("Maximum iterations", false);
+		ATTRACTION_MULTIPLIER("Attraction multiplier", false, Double.class), REPULSION_MULTIPLIER("Repulsion multiplier", false, Double.class),
+		MAXIMUM_ITERATIONS("Maximum iterations", false, Integer.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		FruchtermanReingoldProperties (String name, boolean hidden){
+		FruchtermanReingoldProperties (String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -131,19 +164,25 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	
 	public enum SpringProperties implements PropertyEnums{
-		STRETCH("Stretch", false), REPULSION_RANGE("Repulsion range", false),
-		FORCE_MULTIPLIER("Force multiplier", false);
+		STRETCH("Stretch", false, Double.class), REPULSION_RANGE("Repulsion range", false, Integer.class),
+		FORCE_MULTIPLIER("Force multiplier", false, Double.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		SpringProperties (String name, boolean hidden){
+		SpringProperties (String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -152,38 +191,25 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	
-	public enum BalloonProperties implements PropertyEnums{
-		PROPERY("Test property", false);
-		
-		private String name;
-		private boolean hidden;
-		
-		BalloonProperties (String name, boolean hidden){
-			this.name = name;
-			this.hidden = hidden;
-		}
-		
-		public String getName(){
-			return name;
-		}
-		
-		public boolean isHidden(){
-			return hidden;
-		}
-	}
 	
 	public enum RadialTreeProperties implements PropertyEnums{
-		X_DISTANCE("X distance", false), Y_DISTANCE("Y distance", false);
+		X_DISTANCE("X distance", false, Integer.class), Y_DISTANCE("Y distance", false, Integer.class);
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		RadialTreeProperties (String name, boolean hidden){
+		RadialTreeProperties (String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -192,19 +218,25 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	
 	public enum TreeProperties implements PropertyEnums{
-		X_DISTANCE("X distance", false), Y_DISTANCE("Y distance", false);
+		X_DISTANCE("X distance", false, Integer.class), Y_DISTANCE("Y distance", false, Integer.class);
 		
 		
 		private String name;
 		private boolean hidden;
+		private Class<?> type;
 		
-		TreeProperties (String name, boolean hidden){
+		TreeProperties (String name, boolean hidden, Class<?> type){
 			this.name = name;
 			this.hidden = hidden;
+			this.type = type;
 		}
 		
 		public String getName(){
@@ -213,6 +245,39 @@ public interface PropertyEnums {
 		
 		public boolean isHidden(){
 			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
+		}
+	}
+	
+	public enum CompactTreeProperties implements PropertyEnums{
+		HORIZONTAL("Horizontal", false, Boolean.class), INVERT("Invert", false, Boolean.class),
+		RESIZE_PARENTS("Resize parents", false, Boolean.class), LEVEL_DISTANCE("Level distance", false, Integer.class),
+		NODE_DISTANCE("Node distance", false, Integer.class);
+		
+		
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+		
+		CompactTreeProperties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+		
+		public String getName(){
+			return name;
+		}
+		
+		public boolean isHidden(){
+			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
 		}
 	}
 	

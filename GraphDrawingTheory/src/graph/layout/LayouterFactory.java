@@ -13,7 +13,7 @@ import graph.layout.symmetric.SymmetricCircleLayouter;
 import graph.layout.symmetric.TutteLayouter;
 import graph.layout.tree.BalloonLayouter;
 import graph.layout.tree.RadialTreeLayouter;
-import graph.layout.tree.TreeLayouter;
+import graph.layout.tree.JungTreeLayouter;
 
 public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 
@@ -37,7 +37,7 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 		else if (algorithm == LayoutAlgorithms.RADIAL_TREE)
 			layouter = new RadialTreeLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.TREE)
-			layouter = new TreeLayouter<>();
+			layouter = new JungTreeLayouter<>();
 		else if (algorithm == LayoutAlgorithms.BOX)
 			layouter = new BoxLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.TUTTE)

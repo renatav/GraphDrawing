@@ -1,7 +1,6 @@
 package gui.panels.layout;
 
 import graph.layout.LayoutAlgorithms;
-import graph.layout.PropertyEnums.BalloonProperties;
 import graph.layout.PropertyEnums.BoxProperties;
 import graph.layout.PropertyEnums.CircleProperties;
 import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
@@ -40,8 +39,6 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(SpringProperties.class);
 		else if (al == LayoutAlgorithms.DAG)
 			panel = new LayoutPropertyPanel(SpringProperties.class);
-		else if (al == LayoutAlgorithms.BALLOON)
-			panel = new LayoutPropertyPanel(BalloonProperties.class);
 		else if (al == LayoutAlgorithms.TREE)
 			panel = new LayoutPropertyPanel(TreeProperties.class);
 		else if (al == LayoutAlgorithms.RADIAL_TREE)
