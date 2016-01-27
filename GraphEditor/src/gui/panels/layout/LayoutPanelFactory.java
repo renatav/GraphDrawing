@@ -3,6 +3,7 @@ package gui.panels.layout;
 import graph.layout.LayoutAlgorithms;
 import graph.layout.PropertyEnums.BoxProperties;
 import graph.layout.PropertyEnums.CircleProperties;
+import graph.layout.PropertyEnums.CompactTreeProperties;
 import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
@@ -43,7 +44,8 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(TreeProperties.class);
 		else if (al == LayoutAlgorithms.RADIAL_TREE)
 			panel = new LayoutPropertyPanel(RadialTreeProperties.class);
-		
+		else if (al == LayoutAlgorithms.COMPACT_TREE)
+			panel = new LayoutPropertyPanel(CompactTreeProperties.class);
 		panelsMap.put(al, panel);
 		return panel;
 	}

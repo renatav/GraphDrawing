@@ -22,6 +22,7 @@ public class AlgorithmProperties {
 		oneGraph.put(LayoutAlgorithms.TREE, true);
 		oneGraph.put(LayoutAlgorithms.TUTTE, true);
 		oneGraph.put(LayoutAlgorithms.ISOM, true);
+		oneGraph.put(LayoutAlgorithms.COMPACT_TREE, false);
 		
 		
 	}

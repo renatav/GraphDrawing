@@ -12,6 +12,7 @@ import graph.layout.isom.ISOMLayouter;
 import graph.layout.symmetric.SymmetricCircleLayouter;
 import graph.layout.symmetric.TutteLayouter;
 import graph.layout.tree.BalloonLayouter;
+import graph.layout.tree.JGraphCompactTreeLayout;
 import graph.layout.tree.RadialTreeLayouter;
 import graph.layout.tree.JungTreeLayouter;
 
@@ -46,6 +47,8 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new SymmetricCircleLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.ISOM)
 			layouter = new ISOMLayouter<V,E>();
+		else if (algorithm == LayoutAlgorithms.COMPACT_TREE)
+			layouter = new JGraphCompactTreeLayout<V,E>();
 			
 		return layouter;
 

@@ -61,7 +61,7 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 			drawing.setVertexPosition(v, geometry.getPoint());
 		}
 
-		drawing.separate(100, 100);
+		//drawing.separate(100, 100);
 		return drawing;
 	}
 	

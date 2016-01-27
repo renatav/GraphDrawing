@@ -44,7 +44,7 @@ public abstract class AbstractJungLayouter<V extends Vertex, E extends Edge<V>> 
 			Point2D p = layouter.transform(v);
 			drawing.setVertexPosition(v, p);
 		}
-		drawing.separate(100, 100);
+		//drawing.separate(100, 100);
 		return drawing;
 	}
 	protected abstract void initLayouter(GraphLayoutProperties layoutProperties);
