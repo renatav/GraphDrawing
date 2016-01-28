@@ -281,5 +281,67 @@ public interface PropertyEnums {
 		}
 	}
 	
+	public enum  FastOrganicProperties implements PropertyEnums{
+		FORCE_CONSTANT("Force constant", false, Double.class), MINIMAL_DISTANCE_LIMIT("Minimal distance limit", false, Double.class),
+		INITIAL_TEMP("Initial temperature", false, Double.class), MAX_ITERATIONS("Iterations ", false, Double.class);
+		
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+		
+		FastOrganicProperties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+		
+		public String getName(){
+			return name;
+		}
+		
+		public boolean isHidden(){
+			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
+		}
+	}
+	
+	public enum  OrganicProperties implements PropertyEnums{
+		
+		IS_OPTIMIZE_EDGE_CORSSING("Should optimize edge crossing", false, Boolean.class),
+		EDGE_CROSSING_FACTOR("Edge crossing facotr", false, Double.class),
+		IS_OPTIMIZE_EDGE_DISTANCE("Should optimize edge distance", false, Boolean.class),
+		EDGE_DISTANCE_FACTOR("Edge distance factor", false, Double.class),
+		IS_FINE_TUNING("Should fine tune", false, Boolean.class),
+		FINE_TUNING_RADIUS("Fine tuning radius", false, Double.class),
+		IS_OPTIMIZE_BORDER_LINE("Should optimize border line", false, Boolean.class),
+		BORDER_LINE_FACTOR("Border line factor", false, Double.class),
+		AVERAGE_NODE_AREA("Average node area", false, Double.class);
+		
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+		
+		OrganicProperties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+		
+		public String getName(){
+			return name;
+		}
+		
+		public boolean isHidden(){
+			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
+		}
+	}
+	
 
 }

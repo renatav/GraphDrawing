@@ -1,4 +1,4 @@
-package graph.layout.isom;
+package graph.layout.organic;
 
 import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -9,7 +9,7 @@ import graph.elements.Vertex;
 import graph.layout.AbstractJungLayouter;
 import graph.layout.GraphLayoutProperties;
 
-public class ISOMLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V,E>{
+public class JungISOMLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V,E>{
 
 	@Override
 	protected void createJungGraph(Graph<V,E> graph){
