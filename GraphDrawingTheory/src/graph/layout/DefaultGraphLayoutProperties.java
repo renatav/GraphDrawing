@@ -2,6 +2,7 @@ package graph.layout;
 
 import graph.elements.Graph;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
+import graph.layout.PropertyEnums.OrganicProperties;
 
 public class DefaultGraphLayoutProperties {
 
@@ -26,6 +27,14 @@ public class DefaultGraphLayoutProperties {
 				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 3);
 				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 10);
 			}
+		}
+		
+		else if (algorithm == LayoutAlgorithms.ORGANIC){
+			properties.setProperty(OrganicProperties.IS_FINE_TUNING, true);
+			properties.setProperty(OrganicProperties.IS_OPTIMIZE_BORDER_LINE, true);
+			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, true);
+			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, true);
+			properties.setProperty(OrganicProperties.IS_OPTIMIZE_NODE_DISTRIBUTION, true);
 		}
 
 		return properties;

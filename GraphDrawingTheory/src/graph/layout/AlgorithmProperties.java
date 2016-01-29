@@ -24,8 +24,8 @@ public class AlgorithmProperties {
 		oneGraph.put(LayoutAlgorithms.ISOM, true);
 		oneGraph.put(LayoutAlgorithms.COMPACT_TREE, false);
 		oneGraph.put(LayoutAlgorithms.FAST_ORGANIC, true);
-		
-		
+		oneGraph.put(LayoutAlgorithms.ORGANIC, true);
+		oneGraph.put(LayoutAlgorithms.HIERARCHICAL, true);
 	}
 	
 	public static boolean isOneGraph(LayoutAlgorithms algorithm){

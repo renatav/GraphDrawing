@@ -3,11 +3,6 @@ package graph.layout;
 public interface PropertyEnums {
 	
 	
-	//TODO ubaciti ovde tip
-	//pa onda adjust for gravity za ovaj properties
-	//da moze da bude check box
-	//
-	
 	public enum KamadaKawaiProperties implements PropertyEnums{
 		DISCONNECTED_DISTANCE_MULTIPLIER("Disconnected distance multiplier", false, Double.class), LENGTH_FACTOR ("Length factor", false, Double.class),
 		MAXIMUM_ITERATIONS("Maximum itterations", false, Integer.class);
@@ -310,15 +305,19 @@ public interface PropertyEnums {
 	
 	public enum  OrganicProperties implements PropertyEnums{
 		
-		IS_OPTIMIZE_EDGE_CORSSING("Should optimize edge crossing", false, Boolean.class),
+		IS_OPTIMIZE_EDGE_CROSSING("Should optimize edge crossing", false, Boolean.class),
 		EDGE_CROSSING_FACTOR("Edge crossing facotr", false, Double.class),
 		IS_OPTIMIZE_EDGE_DISTANCE("Should optimize edge distance", false, Boolean.class),
 		EDGE_DISTANCE_FACTOR("Edge distance factor", false, Double.class),
-		IS_FINE_TUNING("Should fine tune", false, Boolean.class),
-		FINE_TUNING_RADIUS("Fine tuning radius", false, Double.class),
 		IS_OPTIMIZE_BORDER_LINE("Should optimize border line", false, Boolean.class),
 		BORDER_LINE_FACTOR("Border line factor", false, Double.class),
-		AVERAGE_NODE_AREA("Average node area", false, Double.class);
+		IS_OPTIMIZE_NODE_DISTRIBUTION("Should optimize node distribution", false, Boolean.class),
+		NODE_DISTRIBUTION_FACTOR("Node distribution factor", false, Double.class),
+		IS_FINE_TUNING("Should fine tune", false, Boolean.class),
+		FINE_TUNING_RADIUS("Fine tuning radius", false, Double.class),
+		AVERAGE_NODE_AREA("Average node area", false, Double.class),
+		AVERAGE_SCALE_FACTOR("Average scale factor (between 0 and 1)", false, Double.class),
+		MAX_ITERATIONS("Iterations", false, Integer.class);
 		
 		private String name;
 		private boolean hidden;
@@ -342,6 +341,35 @@ public interface PropertyEnums {
 			return type;
 		}
 	}
+	
+	public enum HierarchicalProperties implements PropertyEnums{
+		RESIZE_PARENT("Resize parent", false, Boolean.class);
+		
+		
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+		
+		HierarchicalProperties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+		
+		public String getName(){
+			return name;
+		}
+		
+		public boolean isHidden(){
+			return hidden;
+		}
+		
+		public Class<?> getType(){
+			return type;
+		}
+	}
+	
+	
 	
 
 }
