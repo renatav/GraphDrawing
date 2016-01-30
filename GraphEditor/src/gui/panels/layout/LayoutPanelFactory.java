@@ -6,6 +6,7 @@ import graph.layout.PropertyEnums.CircleProperties;
 import graph.layout.PropertyEnums.CompactTreeProperties;
 import graph.layout.PropertyEnums.FastOrganicProperties;
 import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
+import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
@@ -52,6 +53,8 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(FastOrganicProperties.class);
 		else if (al == LayoutAlgorithms.ORGANIC)
 			panel = new LayoutPropertyPanel(OrganicProperties.class);
+		else if (al == LayoutAlgorithms.HIERARCHICAL)
+			panel = new LayoutPropertyPanel(HierarchicalProperties.class);
 		panelsMap.put(al, panel);
 		return panel;
 	}

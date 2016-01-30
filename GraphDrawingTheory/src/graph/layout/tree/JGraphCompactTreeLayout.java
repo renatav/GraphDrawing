@@ -10,6 +10,10 @@ import graph.layout.PropertyEnums.CompactTreeProperties;
 
 public class JGraphCompactTreeLayout<V extends Vertex, E extends Edge<V>> extends AbstractJGraphXLayouter<V, E> {
 
+	public JGraphCompactTreeLayout(){
+		oneGraph = true;
+	}
+	
 	@Override
 	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 		

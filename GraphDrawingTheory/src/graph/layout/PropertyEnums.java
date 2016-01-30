@@ -343,8 +343,17 @@ public interface PropertyEnums {
 	}
 	
 	public enum HierarchicalProperties implements PropertyEnums{
-		RESIZE_PARENT("Resize parent", false, Boolean.class);
-		
+		RESIZE_PARENT("Resize parent", false, Boolean.class),
+		MOVE_PARENT("Move parent", false, Boolean.class),
+		PARENT_BORDER("Parent border", false, Integer.class),
+		INTRA_CELL_SPACING("Spacing between cells on the same layer", false, Double.class),
+		INTER_RANK_CELL_SPACING("Space between cells on adjacent layers", false, Double.class),
+		INTER_HIERARCHY_SPACING("Soace between unconnected hierarchies", false, Double.class),
+		PARALLELE_EDGE_SPACING("Distance between parallel edges on each rank", false, Double.class),
+//TODO orientation
+		FINE_TUNING("Perform fine tuning", false, Boolean.class),
+		PROMOTE_EDGES("Promote edges to appear connected to the highest siblings", false, Boolean.class),
+		TRAVERSE_ANCESTORS("Traverse ancestors", false, Boolean.class);
 		
 		private String name;
 		private boolean hidden;

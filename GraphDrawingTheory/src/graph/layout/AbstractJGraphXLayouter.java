@@ -18,7 +18,8 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 	
 	protected mxGraphLayout layouter;
 	protected mxGraph jGraphXGraph;
-	protected Map<V, Object> elementsJGraphXVerticesMap = new HashMap<V, Object>();
+	protected Map<V, Object> verticesMap = new HashMap<V, Object>();
+	protected Map<E, Object> edgesMap = new HashMap<E, Object>();
 	
 	protected void createJGraphXGraph(Graph<V,E> graph){
 		jGraphXGraph = new mxGraph();
@@ -28,12 +29,13 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 			for (V v : graph.getVertices()){
 				Object jgraphxVertex = jGraphXGraph.insertVertex(parent, null, v, 0, 0,
 						v.getSize().getWidth(), v.getSize().getHeight());
-				elementsJGraphXVerticesMap.put(v, jgraphxVertex);
+				verticesMap.put(v, jgraphxVertex);
 			}
 			for (E e : graph.getEdges()){
-				Object v1 = elementsJGraphXVerticesMap.get(e.getOrigin());
-				Object v2 = elementsJGraphXVerticesMap.get(e.getDestination());
-				jGraphXGraph.insertEdge(parent, null, null, v1, v2);
+				Object v1 = verticesMap.get(e.getOrigin());
+				Object v2 = verticesMap.get(e.getDestination());
+				Object jGraphXEdge = jGraphXGraph.insertEdge(parent, null, null, v1, v2);
+				edgesMap.put(e,  jGraphXEdge);
 			}
 		}
 		finally{
@@ -55,13 +57,13 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 		layouter.execute(parent);
 		Drawing<V, E> drawing = new Drawing<>();
 		
-		for (V v : elementsJGraphXVerticesMap.keySet()){
+		for (V v : verticesMap.keySet()){
 			mxIGraphModel model = jGraphXGraph.getModel();
-			mxGeometry geometry = model.getGeometry(elementsJGraphXVerticesMap.get(v));
+			mxGeometry geometry = model.getGeometry(verticesMap.get(v));
 			drawing.setVertexPosition(v, geometry.getPoint());
+			System.out.println(geometry.getPoint());
 		}
 
-		//drawing.separate(100, 100);
 		return drawing;
 	}
 	

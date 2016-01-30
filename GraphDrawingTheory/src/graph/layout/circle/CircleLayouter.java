@@ -15,12 +15,15 @@ import java.util.Map;
 
 public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>
 {
-
+	
+	
+	public CircleLayouter() {
+		oneGraph = false;
+	}
 
 	@Override
 	public Drawing<V, E> layout(Graph<V, E> graph,GraphLayoutProperties layoutProperties) {
 		
-		//TODO sta raditi sa cvorovima koji nisu povezani
 		
 		Circular<V,E> circular = new Circular<V,E>(graph);
 		List<V> ordering = circular.circularOrdering();
@@ -29,7 +32,7 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 		if (layoutProperties.getProperty(CircleProperties.DISTANCE) != null)
 			distance =  (Double) layoutProperties.getProperty(CircleProperties.DISTANCE);
 		
-		//graph.setVertices(ordering);
+		graph.setVertices(ordering);
 
 		CircleLayoutCalc<V> calc = new CircleLayoutCalc<V>();
 		

@@ -9,6 +9,7 @@ import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
 import graph.layout.force.directed.SpringLayouter;
 import graph.layout.organic.JGraphFastorganicLayouter;
+import graph.layout.organic.JGraphHierarchicalLayouter;
 import graph.layout.organic.JGraphOrganicLayouter;
 import graph.layout.organic.JungISOMLayouter;
 import graph.layout.symmetric.SymmetricCircleLayouter;
@@ -56,7 +57,7 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 		else if (algorithm == LayoutAlgorithms.ORGANIC)
 			layouter = new JGraphOrganicLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.HIERARCHICAL)
-			layouter = new JGraphOrganicLayouter<V,E>();
+			layouter = new JGraphHierarchicalLayouter<V,E>();
 			
 		return layouter;
 

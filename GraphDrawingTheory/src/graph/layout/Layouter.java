@@ -133,7 +133,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 		AbstractLayouter<V, E> layouter = layouterFactory.createLayouter(algorithm);
 
-		if (AlgorithmProperties.isOneGraph(algorithm)){
+		if (layouter.isOneGraph()){
 			try{
 				drawing = layouter.layout(formOneGraph(vertices, edges),layoutProperties);
 			}
@@ -141,7 +141,10 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				ex.printStackTrace();
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
-			drawing.positionEdges(edges);
+			
+			
+			if (!layouter.isPositionsEdges())
+				drawing.positionEdges(edges);
 			return drawing;
 		}
 
@@ -182,7 +185,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 			currentIndex ++;
 		}
-		drawing.positionEdges(edges);
+		if (!layouter.isPositionsEdges())
+			drawing.positionEdges(edges);
 		return drawing;
 	}
 }
