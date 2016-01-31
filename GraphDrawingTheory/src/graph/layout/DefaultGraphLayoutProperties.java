@@ -1,6 +1,7 @@
 package graph.layout;
 
 import graph.elements.Graph;
+import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
 
@@ -35,6 +36,13 @@ public class DefaultGraphLayoutProperties {
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_NODE_DISTRIBUTION, true);
+		}
+		
+		else if (algorithm == LayoutAlgorithms.HIERARCHICAL){
+			properties.setProperty(HierarchicalProperties.RESIZE_PARENT, true);
+			properties.setProperty(HierarchicalProperties.MOVE_PARENT, false);
+			properties.setProperty(HierarchicalProperties.FINE_TUNING, true);
+			
 		}
 
 		return properties;

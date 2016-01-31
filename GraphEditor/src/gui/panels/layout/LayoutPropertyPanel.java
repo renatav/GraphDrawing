@@ -88,10 +88,7 @@ public class LayoutPropertyPanel extends JPanel	{
 	public GraphLayoutProperties getEnteredLayoutProperties(){
 		GraphLayoutProperties layoutProperties = new GraphLayoutProperties();
 		for (Object key : componentsMap.keySet()){
-			System.out.println(key);
-			System.out.println(componentsMap.get(key));
 			if (componentsMap.get(key) instanceof JComboBox<?>){
-				System.out.println("combo");
 				layoutProperties.setProperty((PropertyEnums)key, ((JComboBox<?>)componentsMap.get(key)).getSelectedItem());
 			}
 			else if (componentsMap.get(key) instanceof JDigitsTextField){

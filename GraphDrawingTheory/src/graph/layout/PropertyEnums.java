@@ -350,10 +350,8 @@ public interface PropertyEnums {
 		INTER_RANK_CELL_SPACING("Space between cells on adjacent layers", false, Double.class),
 		INTER_HIERARCHY_SPACING("Soace between unconnected hierarchies", false, Double.class),
 		PARALLELE_EDGE_SPACING("Distance between parallel edges on each rank", false, Double.class),
-//TODO orientation
-		FINE_TUNING("Perform fine tuning", false, Boolean.class),
-		PROMOTE_EDGES("Promote edges to appear connected to the highest siblings", false, Boolean.class),
-		TRAVERSE_ANCESTORS("Traverse ancestors", false, Boolean.class);
+		ORIENTATION("Orientation", true, Integer.class),
+		FINE_TUNING("Perform fine tuning", false, Boolean.class);
 		
 		private String name;
 		private boolean hidden;

@@ -54,7 +54,7 @@ public class LayoutPanelFactory {
 		else if (al == LayoutAlgorithms.ORGANIC)
 			panel = new LayoutPropertyPanel(OrganicProperties.class);
 		else if (al == LayoutAlgorithms.HIERARCHICAL)
-			panel = new LayoutPropertyPanel(HierarchicalProperties.class);
+			panel = new HierarchicalLayoutPanel(HierarchicalProperties.class);
 		panelsMap.put(al, panel);
 		return panel;
 	}

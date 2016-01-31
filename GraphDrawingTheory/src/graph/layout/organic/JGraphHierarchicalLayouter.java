@@ -1,25 +1,15 @@
 package graph.layout.organic;
 
-import graph.drawing.Drawing;
 import graph.elements.Edge;
-import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractJGraphXLayouter;
 import graph.layout.GraphLayoutProperties;
-
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
+import graph.layout.PropertyEnums.HierarchicalProperties;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxIGraphModel;
-import com.mxgraph.util.mxPoint;
 
 public class JGraphHierarchicalLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJGraphXLayouter<V, E> {
 
-	
-	
 	public JGraphHierarchicalLayouter(){
 		positionsEdges = true;
 	}
@@ -27,28 +17,43 @@ public class JGraphHierarchicalLayouter<V extends Vertex, E extends Edge<V>> ext
 	@Override
 	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 		mxHierarchicalLayout hierarchicalLayouter = new mxHierarchicalLayout(jGraphXGraph);
+		
+		Boolean resizeParent = (Boolean)layoutProperties.getProperty(HierarchicalProperties.RESIZE_PARENT);
+		hierarchicalLayouter.setResizeParent(resizeParent);
+		
+		if (resizeParent){
+			Boolean moveParent = (Boolean)layoutProperties.getProperty(HierarchicalProperties.MOVE_PARENT);
+			Integer parentBorder = (Integer)layoutProperties.getProperty(HierarchicalProperties.PARENT_BORDER);
+			hierarchicalLayouter.setMoveParent(moveParent);
+			if (parentBorder != null)
+				hierarchicalLayouter.setParentBorder(parentBorder);
+		}
+		
+		Integer intraCellSpacing = (Integer)layoutProperties.getProperty(HierarchicalProperties.INTRA_CELL_SPACING);
+		if (intraCellSpacing != null)
+			hierarchicalLayouter.setIntraCellSpacing(intraCellSpacing);
+		
+		Integer interRankCellSpacing = (Integer)layoutProperties.getProperty(HierarchicalProperties.INTER_RANK_CELL_SPACING);
+		if (interRankCellSpacing != null)
+			hierarchicalLayouter.setInterRankCellSpacing(interRankCellSpacing);
+		
+		Integer parentBorder = (Integer)layoutProperties.getProperty(HierarchicalProperties.INTER_HIERARCHY_SPACING);
+		if (parentBorder != null)
+			hierarchicalLayouter.setParentBorder(parentBorder);
+		
+		Integer interHierarchySpacing = (Integer)layoutProperties.getProperty(HierarchicalProperties.PARALLELE_EDGE_SPACING);
+		if (interHierarchySpacing != null)
+			hierarchicalLayouter.setInterHierarchySpacing(interHierarchySpacing);
+		
+		Integer orientation = (Integer)layoutProperties.getProperty(HierarchicalProperties.ORIENTATION);
+		if (orientation != null)
+			hierarchicalLayouter.setOrientation(orientation);
+		
+		Boolean fineTuning = (Boolean)layoutProperties.getProperty(HierarchicalProperties.FINE_TUNING);
+		hierarchicalLayouter.setFineTuning(fineTuning);
 
 		layouter = hierarchicalLayouter;
 
 	}
 
-	@Override
-	protected Drawing<V,E> createDrawing(Graph<V,E> graph){
-		Drawing<V,E> drawing = super.createDrawing(graph);
-
-		for (E e : edgesMap.keySet()){
-			mxIGraphModel model = jGraphXGraph.getModel();
-			mxGeometry geometry = model.getGeometry(edgesMap.get(e));
-			if (geometry != null && geometry.getPoints() != null){
-				List<Point2D> points = new ArrayList<Point2D>();
-				points.add(drawing.getVertexMappings().get(e.getOrigin()));
-				for (int i = 1; i < geometry.getPoints().size() - 1; i++)
-					points.add(geometry.getPoints().get(i).getPoint());
-				points.add(drawing.getVertexMappings().get(e.getDestination()));
-				drawing.getEdgeMappings().put(e,points);
-			}
-		}
-		return drawing;
-
-	}
 }
