@@ -9,8 +9,10 @@ import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
 import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
+import graph.layout.PropertyEnums.PartitionProperties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
 import graph.layout.PropertyEnums.SpringProperties;
+import graph.layout.PropertyEnums.StackProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
 import graph.layout.PropertyEnums.TreeProperties;
 import graph.layout.PropertyEnums.TutteProperties;
@@ -55,6 +57,10 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(OrganicProperties.class);
 		else if (al == LayoutAlgorithms.HIERARCHICAL)
 			panel = new HierarchicalLayoutPanel(HierarchicalProperties.class);
+		else if (al == LayoutAlgorithms.STACK)
+			panel = new LayoutPropertyPanel(StackProperties.class);
+		else if (al == LayoutAlgorithms.PARTITION)
+			panel = new LayoutPropertyPanel(PartitionProperties.class);
 		panelsMap.put(al, panel);
 		return panel;
 	}
