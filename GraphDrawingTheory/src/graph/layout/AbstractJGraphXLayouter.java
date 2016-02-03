@@ -71,7 +71,6 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 
 		if (positionsEdges){
 			for (E e : edgesMap.keySet()){
-				System.out.println(e);
 				mxGeometry geometry = model.getGeometry(edgesMap.get(e));
 				if (geometry != null && geometry.getPoints() != null){
 					List<Point2D> points = new ArrayList<Point2D>();

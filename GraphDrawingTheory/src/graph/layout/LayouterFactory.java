@@ -7,6 +7,7 @@ import graph.layout.circle.CircleLayouter;
 import graph.layout.force.directed.DAGLayouter;
 import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
+import graph.layout.force.directed.PrefuseForceDirectedLayouter;
 import graph.layout.force.directed.SpringLayouter;
 import graph.layout.organic.JGraphFastorganicLayouter;
 import graph.layout.organic.JGraphHierarchicalLayouter;
@@ -64,6 +65,8 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new JGraphStackLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.PARTITION)
 			layouter = new JGraphPartitionLayouter<V,E>();
+		else if (algorithm == LayoutAlgorithms.SPTING2)
+			layouter = new PrefuseForceDirectedLayouter<V,E>();
 			
 		return layouter;
 
