@@ -75,6 +75,7 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 			else{ 
 				Point2D originPosition = vertexMappings.get(e.getOrigin());
 				Point2D destinationPosition = vertexMappings.get(e.getDestination());
+				
 				edgeNodePoints.add(new Point((int) originPosition.getX(), (int) originPosition.getY()));
 				edgeNodePoints.add(new Point((int) destinationPosition.getX(), (int) destinationPosition.getY()));
 			}
