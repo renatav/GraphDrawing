@@ -432,6 +432,33 @@ public interface PropertyEnums {
 			return type;
 		}
 	}
+	
+	public enum Balloon2Properties implements PropertyEnums{
+
+		MIN_RADIUS("Minimal radius", false, Integer.class);
+
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+
+		Balloon2Properties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+
+		public String getName(){
+			return name;
+		}
+
+		public boolean isHidden(){
+			return hidden;
+		}
+
+		public Class<?> getType(){
+			return type;
+		}
+	}
 
 
 }

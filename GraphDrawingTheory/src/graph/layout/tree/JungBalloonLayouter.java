@@ -9,7 +9,7 @@ import graph.elements.Vertex;
 import graph.layout.AbstractJungLayouter;
 import graph.layout.GraphLayoutProperties;
 
-public class BalloonLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V, E>{
+public class JungBalloonLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V, E>{
 	
 	@Override
 	protected void createJungGraph(Graph<V,E> graph){

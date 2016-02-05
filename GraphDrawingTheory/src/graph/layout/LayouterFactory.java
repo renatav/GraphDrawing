@@ -17,8 +17,9 @@ import graph.layout.partition.JGraphPartitionLayouter;
 import graph.layout.stack.JGraphStackLayouter;
 import graph.layout.symmetric.SymmetricCircleLayouter;
 import graph.layout.symmetric.TutteLayouter;
-import graph.layout.tree.BalloonLayouter;
+import graph.layout.tree.JungBalloonLayouter;
 import graph.layout.tree.JGraphCompactTreeLayout;
+import graph.layout.tree.PrefuseBalloonLayouter;
 import graph.layout.tree.RadialTreeLayouter;
 import graph.layout.tree.JungTreeLayouter;
 
@@ -40,7 +41,7 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 		else if (algorithm == LayoutAlgorithms.DAG)
 			layouter = new DAGLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.BALLOON)
-			layouter = new BalloonLayouter<V,E>();
+			layouter = new JungBalloonLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.RADIAL_TREE)
 			layouter = new RadialTreeLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.TREE)
@@ -67,6 +68,8 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new JGraphPartitionLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.SPTING2)
 			layouter = new PrefuseForceDirectedLayouter<V,E>();
+		else if (algorithm == LayoutAlgorithms.BALLON2)
+			layouter = new PrefuseBalloonLayouter<V,E>();
 			
 		return layouter;
 

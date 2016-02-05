@@ -13,6 +13,7 @@ public class PrefuseForceDirectedLayouter<V extends Vertex, E extends Edge<V>> e
 		
 		//don't enforce bounds 
 		//don't animate, run once
+		
 		layouter = new ForceDirectedLayout("graph", false, true);
 		
 	}
