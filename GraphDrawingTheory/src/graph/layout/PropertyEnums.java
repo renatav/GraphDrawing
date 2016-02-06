@@ -459,6 +459,94 @@ public interface PropertyEnums {
 			return type;
 		}
 	}
+	
+	public enum NodeLinkTreeProperties implements PropertyEnums{
+
+		ORIENTATION("Orientation", true, Integer.class),
+		SPACING_SIBLINGS("Spacing between sibling nodes", false, Double.class),
+		SPACING_SUBTREES("Spacing between subtreess", false, Double.class),
+		SPACING_DEPTH_LEVELS("Spacing between depth levels", false, Double.class),
+		SPACING_ROOT_NODE("Offset for root node position", false, Double.class);
+
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+
+		NodeLinkTreeProperties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+
+		public String getName(){
+			return name;
+		}
+
+		public boolean isHidden(){
+			return hidden;
+		}
+
+		public Class<?> getType(){
+			return type;
+		}
+	}
+	
+	public enum RadialTree2Properties implements PropertyEnums{
+
+		RADIUS_INCREMENT("Radius increment", false, Double.class),
+		AUSTO_SCALE("Auto scale", false, Boolean.class);
+		
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+
+		RadialTree2Properties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+
+		public String getName(){
+			return name;
+		}
+
+		public boolean isHidden(){
+			return hidden;
+		}
+
+		public Class<?> getType(){
+			return type;
+		}
+	}
+	
+	public enum SquarifiedTreemapProperties implements PropertyEnums{
+
+		FRAME("Framing space", false, Double.class);
+		
+		private String name;
+		private boolean hidden;
+		private Class<?> type;
+
+		SquarifiedTreemapProperties (String name, boolean hidden, Class<?> type){
+			this.name = name;
+			this.hidden = hidden;
+			this.type = type;
+		}
+
+		public String getName(){
+			return name;
+		}
+
+		public boolean isHidden(){
+			return hidden;
+		}
+
+		public Class<?> getType(){
+			return type;
+		}
+	}
+	
+	
 
 
 }

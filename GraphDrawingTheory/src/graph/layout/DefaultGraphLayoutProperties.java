@@ -5,6 +5,7 @@ import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
 import graph.layout.PropertyEnums.PartitionProperties;
+import graph.layout.PropertyEnums.RadialTree2Properties;
 import graph.layout.PropertyEnums.StackProperties;
 
 public class DefaultGraphLayoutProperties {
@@ -53,6 +54,10 @@ public class DefaultGraphLayoutProperties {
 		
 		else if (algorithm == LayoutAlgorithms.PARTITION){
 			properties.setProperty(PartitionProperties.HORIZONTAL, true);
+		}
+		
+		else if (algorithm == LayoutAlgorithms.RADIAL_TREE2){
+			properties.setProperty(RadialTree2Properties.AUSTO_SCALE, true);
 		}
 
 		return properties;

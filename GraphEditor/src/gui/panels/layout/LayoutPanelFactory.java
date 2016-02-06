@@ -9,10 +9,13 @@ import graph.layout.PropertyEnums.FastOrganicProperties;
 import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
 import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
+import graph.layout.PropertyEnums.NodeLinkTreeProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
 import graph.layout.PropertyEnums.PartitionProperties;
+import graph.layout.PropertyEnums.RadialTree2Properties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
 import graph.layout.PropertyEnums.SpringProperties;
+import graph.layout.PropertyEnums.SquarifiedTreemapProperties;
 import graph.layout.PropertyEnums.StackProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
 import graph.layout.PropertyEnums.TreeProperties;
@@ -64,6 +67,12 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(PartitionProperties.class);
 		else if (al == LayoutAlgorithms.BALLON2)
 			panel = new LayoutPropertyPanel(Balloon2Properties.class);
+		else if (al == LayoutAlgorithms.NODE_LINK_TREE)
+			panel = new NodeLinkTreeLayoutPanel(NodeLinkTreeProperties.class);
+		else if (al == LayoutAlgorithms.RADIAL_TREE2)
+			panel = new LayoutPropertyPanel(RadialTree2Properties.class);
+		else if (al == LayoutAlgorithms.SQUIRED_TREEMAP)
+			panel = new LayoutPropertyPanel(SquarifiedTreemapProperties.class);
 		panelsMap.put(al, panel);
 		return panel;
 	}
