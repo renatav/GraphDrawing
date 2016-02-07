@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="test">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="lib/JungLayouting/collections-generic-4.01.jar"/>
-	<classpathentry kind="lib" path="lib/JungLayouting/jung-algorithms-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/JungLayouting/jung-api-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/JungLayouting/jung-graph-impl-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/JungLayouting/jung-visualization-2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/Jama-1.0.3.jar"/>
-	<classpathentry kind="lib" path="lib/jgraphx.jar"/>
-	<classpathentry kind="lib" path="lib/prefuse.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
