@@ -100,13 +100,10 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	
 	private Map<V, List<E>> adjacency;
 	
-	private Class edgeClass;
-
 	private Logger log = Logger.getLogger(SeparationPairSplitting.class);
 
 
-	public List<SplitPair<V, E>> findSeaparationPairs(Graph<V,E> graph,  Class edgeClass) throws AlgorithmErrorException{
-		this.edgeClass = edgeClass;
+	public List<SplitPair<V, E>> findSeaparationPairs(Graph<V,E> graph) throws AlgorithmErrorException{
 
 		//step one: perform a depth-first search on the multigraph converting in
 		//into a palm tree

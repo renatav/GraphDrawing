@@ -109,12 +109,24 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 	//when calling draw for the first time, positions should already 
-	//contain positions should already contain position of vertices on S
-
+	//contain position of vertices on S
+	/**
+	 * Extends a convex polygon S* of the outer facial cycle of a plane
+	 *  graph G into a convex drawing of G where G
+	 * has no vertex of degree 2 not on S
+	 * @param G 2-connected plane graph
+	 * @param S Outer facial cycle
+	 * @param Sstar Extendable convex polygon of S
+	 * @param positions
+	 */
 	private void draw(Graph<V,E> G, List<V> S, List<V> Sstar, Map<V,Point2D> positions){
+
+		//if G has at most 3 vertices
+		//a convex drawing has been obtained - return
 		if (G.getVertices().size() <= 3)
 			return;
 
+		//select and arbitrary vertex of S* and let G' = G-v (remove v from G)
 		V v = arbitraryApex(Sstar);
 
 		List<E> vEdges = graph.adjacentEdges(v);
@@ -135,6 +147,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		E currentEdge = G.edgeBetween(v, v1);
 		V currentVertex = v1;
 
+		//remove v
+		G.removeVertex(v);
+
 		while (connectedVerties.size() < vEdges.size()){
 			connectedVerties.add(currentVertex);
 			V other = currentEdge.getOrigin() == currentVertex ? currentEdge.getDestination() : currentEdge.getOrigin();
@@ -148,9 +163,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				}
 			currentVertex = other;
 		}
-
-		//remove v
-		G.removeVertex(v);
 
 		//divide G into blocks and find cut vertices
 		List<V> cutVertices = splitting.findAllCutVertices(graph);
@@ -167,6 +179,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//TODO find Si
 			//find Si
 
+
+			//Si can't be determined that way - V(Si) - V(S) should't be empty
+			//not all vertices on Si should be on S!
+			//Implement the method for findinf S and S*, then come back here
+
 			List<V> siApexes = new ArrayList<V>();
 
 			//find vertices among v1, v2, .. vp_1 which the block contains
@@ -181,38 +198,23 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 			}
+			
 
-			int index1 = S.indexOf(vBorder1);
-			int index2 = S.indexOf(vBorder2);
+			//Step 2 - Draw each block bi convex
 
-			for (int i = index1; i <= index2; i++){
-				si.add(S.get(i));
-			}
+			//Step 2.1 Determine Si*
+			//when S* was found, positions of its vertices were found as well
+			//so we only need to find position of vertices not on S
+			//Locate the vertices in V(Si) - V(S) in the interios of the triangle
+			//v*v1*vi+1 (cut vertices + 2 connected to v at the beginning and end)
+			//in such way that the vertices adjacent to v are apices of convex polygon Si*
+			//and the others are on the straight line segments
 
-			index1 = connectedVerties.indexOf(vBorder1);
-			index2 = connectedVerties.indexOf(vBorder2);
-
-			siApexes.add(vBorder1);
-			for (int i = index2 - 1; i > index1; i--){
-				si.add(connectedVerties.get(i));
-				siApexes.add(connectedVerties.get(i));
-			}
-
-			siApexes.add(vBorder2);
+			//Step 2.2
+			//recursively call procedure Draw(bi,Si, Si*)
 		}
 
-		//Step 2 - Draw each block bi convex
 
-		//Step 2.1 Determine Si*
-		//when S* was found, positions of its vertices were found as well
-		//so we only need to find position of vertices not on S
-		//Locate the vertices in V(Si) - V(S) in the interios of the triangle
-		//v*v1*vi+1 (cut vertices + 2 connected to v at the beginning and end)
-		//in such way that the vertices adjacent to v are apices of convex polygon Si*
-		//and the others are on the straight line segments
-
-		//Step 2.2
-		//recursively call procedure Draw(bi,Si, Si*)
 
 	}
 
@@ -237,6 +239,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	/**
 	 * Determines if a 2-connected graph has a convex drawing
+	 * and finds all the extendable facial cycles
 	 * @throws CannotBeAppliedException 
 	 */
 	@SuppressWarnings("unchecked")
@@ -392,7 +395,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				if (isIsExtendable(edges))
 					extendableFacialCycles.add(edges);
 			}
-			
+
 			//TODO should this return all
 			return extendableFacialCycles;
 		}

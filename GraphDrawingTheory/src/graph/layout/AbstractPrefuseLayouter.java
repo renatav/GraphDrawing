@@ -72,7 +72,6 @@ public abstract class AbstractPrefuseLayouter<V extends Vertex, E extends Edge<V
 		
 		Drawing<V,E> drawing = new Drawing<V,E>();
 		
-		//
 		ActionList layout = new ActionList();
 		layout.add(layouter);
 		vis.putAction("layout", layout);
@@ -118,6 +117,7 @@ public abstract class AbstractPrefuseLayouter<V extends Vertex, E extends Edge<V
 		
 		return drawing;
 	}
-
+	
 	protected abstract void initLayouter(GraphLayoutProperties layoutProperties);
+
 }

@@ -87,7 +87,6 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 
 		return drawing;
 	}
-
 	protected abstract void initLayouter(GraphLayoutProperties layoutProperties);
 
 }

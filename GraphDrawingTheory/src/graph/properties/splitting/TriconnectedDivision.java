@@ -98,7 +98,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 		SeparationPairSplitting<V, E> separationPairSplitting = new SeparationPairSplitting<V,E>();
 		try {
-			separationPairSplitting.findSeaparationPairs(graph, edgeClass);
+			separationPairSplitting.findSeaparationPairs(graph);
 		} catch (AlgorithmErrorException e) {
 			e.printStackTrace();
 		}

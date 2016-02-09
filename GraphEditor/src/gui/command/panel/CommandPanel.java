@@ -74,7 +74,8 @@ public class CommandPanel extends JPanel{
 					String command = inputField.getText();
 					String reply = processCommand(command);
 					inputField.setText("");
-					centralArea.setText(centralArea.getText() + "\n" + command + "> " + reply);
+					if (!command.equals("clear"))
+						centralArea.setText(centralArea.getText() + "\n" + command + "> " + reply);
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_UP){
 					if (currentCommandIndex > 0)
@@ -399,7 +400,7 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[22])){
 			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting = new SeparationPairSplitting<GraphVertex, GraphEdge>();
 			try {
-				List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(graph, GraphEdge.class);
+				List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(graph);
 				return separationPairs.toString();
 			} catch (AlgorithmErrorException e) {
 				// TODO Auto-generated catch block
@@ -412,6 +413,11 @@ public class CommandPanel extends JPanel{
 		if (command.equals(commands[23])){
 			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
 			triDiv.execute();
+		}
+		
+		if (command.equals(commands[24])){
+			centralArea.setText("");
+			return "";
 		}
 		
 		if (command.equals(commands[15])){
@@ -439,7 +445,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[24];
+		commands = new String[25];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -465,6 +471,7 @@ public class CommandPanel extends JPanel{
 		commands[21] = "list biconnected components";
 		commands[22] = "separation pairs";
 		commands[23] = "triconnected";
+		commands[24] = "clear";
 	}
 		
 
