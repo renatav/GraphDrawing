@@ -93,13 +93,13 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	private DFSTree<V,E> tree;
 
 	private Map<Integer, List<V>> lowpt1sMap = new HashMap<Integer, List<V>>();
-	
+
 	private List<SplitPair<V,E>> separationPairs;
-	
+
 	private Map<V, List<SplitPair<V,E>>> separationPairStartVertices, separationPairEndVertices;
-	
+
 	private Map<V, List<E>> adjacency;
-	
+
 	private Logger log = Logger.getLogger(SeparationPairSplitting.class);
 
 
@@ -146,7 +146,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		log.info("first dfs traversal finished");
 		tree = new DFSTree<V,E>(root, number, treeEdges, fronds, vertices);
 		//System.out.println(tree);
-	
+
 		constructAdjacencyLists(adjacency);
 
 
@@ -178,7 +178,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			int[] lowpts = tree.lowpts(v);
 			lowpt1[vIndex] = lowpts[0];
 			lowpt2[vIndex] = lowpts[1];
-			
+
 			degree[vIndex] = adjacency.get(v).size();
 			a1[vIndex] = adjacency.get(v).size();
 			inverseNumbering[newnum[vIndex] - 1] = vIndex;
@@ -201,7 +201,6 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		}
 
 		//printDFSTree();
-		
 		findTypeOneSeparationPairs(separationPairs);
 		findTypeTwoSeparationPairs(paths, separationPairs);
 
@@ -216,14 +215,14 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 */
 	private List<SplitPair<V,E>> findTypeOneSeparationPairs(List<SplitPair<V, E>> separationPairs){
 		List<Integer> containedBs = new ArrayList<Integer>();
-		
-		
+
+
 		for (int a : lowpt1sMap.keySet()){
 
 			int aIndex = inverseNumbering[a - 1];
 			V aVert = vertices.get(aIndex);
 			containedBs.clear();
-		//	System.out.println("a: " + aVert);
+			//	System.out.println("a: " + aVert);
 
 			List<V> lowptList = lowpt1sMap.get(a); //all vertices whose lowpt1 = a - possible r
 			if (lowptList == null)
@@ -236,7 +235,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				int rIndex = vertices.indexOf(rVert);
 				int r = newnum[rIndex];
 
-			//	System.out.println("r " + rVert);
+				//	System.out.println("r " + rVert);
 
 				if (r == 1) // //all vertices are descendants of the first vertex, therefore there isn't s that satisfied the condition
 					continue;
@@ -247,7 +246,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				if (lowpt2[rIndex] >= newnum[bIndex]){
 
 					V bVert = vertices.get(bIndex);
-				//	System.out.println("b " + bVert);
+					//	System.out.println("b " + bVert);
 
 					List<V> descendants = tree.allDescendantsOf(rVert, true); //TODO save all outgoing edges when creating dfs tree?
 
@@ -275,7 +274,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 		List<V> rList = new ArrayList<V>();
 		List<V> bList = new ArrayList<V>();
-		
+
 		for (List<E> path : paths){
 
 			if (path.size() == 1)
@@ -287,8 +286,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 			rList.clear();
 			bList.clear();
-			
-			
+
+
 			for (E e : path){
 
 				int[] indexes = getDirectedNodes(e, newnum);
@@ -310,32 +309,32 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					int bNum = newnum[vertices.indexOf(bVert)];
 					if (bNum == rNum)
 						continue;
-					
-					
+
+
 					//System.out.println("Testing " + aVert + " " + bVert);
 					boolean satisfiedAll = true;
 
 					//check the back edges
 					for (E backEdge : fronds){
-						
+
 						indexes = getDirectedNodes(backEdge, newnum);
 						int xIndex = indexes[0];
 						int yIndex = indexes[1];
-						
+
 						int xNum = newnum[xIndex];
 						int yNum = newnum[yIndex];
-						
+
 						V xVert = vertices.get(xIndex);
-						
+
 						// r<=x<b has a<=y; 
-						
+
 						if (rNum <= xNum && xNum < bNum){
 							if (aNum > yNum){
 								satisfiedAll = false;
 								break;
 							}
 						}
-						
+
 						if (aNum < yNum && yNum < bNum){ 
 							//b->w-*>x
 							for (V w : tree.directDescendantsOf(bVert)){
@@ -348,16 +347,16 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 								}
 							}
 						}
-						
+
 					}
 					if (satisfiedAll){
 						log.info("separation pair "+ aVert + " " + bVert);
 						addSeparationPair(aVert, bVert, 2);
 					}
-					
+
 					current = bVert;
 				}
-				
+
 
 
 			}
@@ -514,6 +513,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 		for (E e : adjacency.get(v)){
 
+			System.out.println("firs on path");
+
 			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
 			int wIndex = vertices.indexOf(w);
 
@@ -537,8 +538,6 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		} 
 
 	}
-
-
 
 
 
@@ -634,33 +633,33 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	}
 
 	private boolean addSeparationPair(V start, V end, int type){
-		
+
 		SplitPair<V,E> newSplitPair = new SplitPair<V,E>(start, end, type);
 		if (separationPairs.contains(newSplitPair))
 			return false;
-		
+
 		separationPairs.add(newSplitPair);
-		
+
 		List<SplitPair<V,E>> list1 = separationPairStartVertices.get(start);
 		List<SplitPair<V,E>> list2 = separationPairEndVertices.get(end);
-		
+
 		if (list1 == null){
 			list1 = new ArrayList<SplitPair<V,E>>();
 			separationPairStartVertices.put(start, list1);
 		}
-		
+
 		if (list2 == null){
 			list2 = new ArrayList<SplitPair<V,E>>();
 			separationPairEndVertices.put(end, list2);
 		}
-		
+
 		list1.add(newSplitPair);
 		list2.add(newSplitPair);
-		
+
 		return true;
 	}
-	
-	
+
+
 
 	private void printDFSTree(){
 

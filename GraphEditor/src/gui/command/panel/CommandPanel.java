@@ -11,6 +11,7 @@ import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
+import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.SeparationPairSplitting;
 import graph.properties.splitting.Splitting;
 import graph.properties.splitting.TriconnectedDivision;
@@ -415,6 +416,17 @@ public class CommandPanel extends JPanel{
 			triDiv.execute();
 		}
 		
+		else if (command.equals(commands[25])){
+			HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(graph);
+			try {
+				hopcroftTarjan.execute();
+			} catch (AlgorithmErrorException e) {
+				return e.getMessage();
+			}
+			return "Done";
+			
+		}
+		
 		if (command.equals(commands[24])){
 			centralArea.setText("");
 			return "";
@@ -445,7 +457,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[25];
+		commands = new String[26];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -472,6 +484,7 @@ public class CommandPanel extends JPanel{
 		commands[22] = "separation pairs";
 		commands[23] = "triconnected";
 		commands[24] = "clear";
+		commands[25] = "splitting";
 	}
 		
 

@@ -2,7 +2,6 @@ package graph.properties.splitting;
 
 public class Triple {
 	
-	
 	private int h;
 	private int a;
 	private int b;
