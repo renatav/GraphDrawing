@@ -5,6 +5,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.HopcroftSplitComponent;
 import graph.trees.DFSTree;
+import graph.util.Util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,7 +112,13 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 	private Triple endOfStackMarker;
 
-	List<List<E>> paths = new ArrayList<List<E>>();
+	private Class<?> edgeClass;
+
+	private Map<E,Integer> edgesJMap; //to save j-s
+
+	private List<List<E>> paths = new ArrayList<List<E>>();
+	
+	private boolean fflag = false;
 
 
 	public HopcroftTarjanSplitting(Graph<V,E> graph){
@@ -140,17 +147,14 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 			int vIndex = vertices.indexOf(v);
 			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
 			int wIndex = vertices.indexOf(w);
-			
+
 			System.out.println("Current w: " + w);
 
 			//if v -> w i.e. if e is a tree edge
 
 			if (treeEdges.contains(e)){
-				
-				//TODO gde ide flag
-				
-				boolean flag;
-				E savedEdge;
+
+				E savedEdge = null;
 
 				//A:
 				if (firstEdgeOfAPath(e)){
@@ -198,68 +202,233 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				//B:
 				//while v != 1 and ((degree(w) = 2) and (A1(w) > 2) or (h,a,b) on tstack
 				//stasfies (v = a) - test for type 2 pairs
-				
+
 				while(true){
-					
-					if (number[vIndex] == 1)
+
+					if (newnum[vIndex] == 1)
 						break;
-					
+
 					//TODO obratiti paznju da li je ovo OK
 					boolean firstCondition = degree[wIndex] == 2 && a1[wIndex] > newnum[wIndex];
 					boolean secondCondition = false;
-					
+
 					Triple triple = null;
 					if (!tstack.isEmpty())
 						triple = tstack.peek();
-					
+
 					if (triple != null)
 						secondCondition = newnum[vIndex] == triple.getA();
+
+					if (!(firstCondition || secondCondition))
+						break;
 					
-					if (firstCondition || secondCondition){
-						//if (h,a,b) on tstack has (a=v) and father(b) = a
-						int b = triple.getB();
-						int bIndex = inverseNumbering[b];
-						int a = triple.getA();
-						if (secondCondition && newnum[father[bIndex]] == a){
-							//delete (h,a,b) from stack
-							log.info("removing triple " + triple + " from tstack");
-							tstack.pop();
-						}
-						else{
-							//if degree(w) = 2 and a1(w) > w
-							if (degree[wIndex] == 2 && a1[wIndex] > newnum[wIndex]){
-								j++;
-								//add top two edges (v,w) and (w,x) on estack to new component
-								E e1 = estack.get(estack.size() - 1);
-								E e2 = estack.get(estack.size() - 2);
-								
-								int[] dir = getDirectedNodes(e2, newnum);
-								int xIndex = dir[1];
-								int x = newnum[xIndex];
-								int vNum = newnum[vIndex];
-								
-								//TODO
-								log.info("Add " + e1 + " " + e2 + "to new component");
-								//add (v,x,j) to new component
-								log.info("Add " + vNum + ", " + x + ", " + j + " to new component");
-								
-								
-								//if (y,z) on estack has (y,z) = (x,v)
-								//basically, try to find an edge (x,v)
-								E xvEdge = onEstack(xIndex, vIndex);
-								if (xvEdge != null){
-									flag = true;
-									//remove from estack and save
-									estack.remove(xvEdge);
-									savedEdge = xvEdge;
-								}
-								
-								
-								
+					
+					//TEST FOR TYPE 2 PAIRS
+					
+					//if (h,a,b) on tstack has (a=v) and father(b) = a
+					int b = triple.getB();
+					int bIndex = inverseNumbering[b];
+					int a = triple.getA();
+					int h = triple.getH();
+					if (secondCondition && newnum[father[bIndex]] == a){
+						//delete (h,a,b) from stack
+						log.info("removing triple " + triple + " from tstack");
+						tstack.pop();
+					}
+					else{
+						int x = -1;
+						//if degree(w) = 2 and a1(w) > w
+						if (firstCondition){
+							j++;
+							//add top two edges (v,w) and (w,x) on estack to new component
+							E e1 = estack.get(estack.size() - 1);
+							E e2 = estack.get(estack.size() - 2);
+
+							int[] dir = getDirectedNodes(e2, newnum);
+							int xIndex = dir[1];
+							//TODO da li je ovo x lokalno ili se treba koristiti, i dole, kada se dodaje na komponentu
+							x = newnum[xIndex];
+							int vNum = newnum[vIndex];
+
+							//TODO
+							log.info("Add " + e1 + " " + e2 + "to new component");
+							//add (v,x,j) to new component
+							log.info("Add " + vNum + ", " + x + ", " + j + " to new component");
+
+
+							//if (y,z) on estack has (y,z) = (x,v)
+							//basically, try to find an edge (x,v)
+							E xvEdge = onEstack(xIndex, vIndex);
+							if (xvEdge != null){
+								fflag = true;
+								//remove from estack and save
+								estack.remove(xvEdge);
+								savedEdge = xvEdge;
 							}
 						}
+						//if else if (h,a,b) an tstack satisfies v=a and a!=father(b)
+						//E:
+						else if (secondCondition && newnum[father[bIndex]] != a){
+							j++;
+							//delete (h,a,b) from tstack
+							tstack.pop();
+							//while (x,y) on estack has (a<=x<=h) and (a<=y<=h)
+							while (true){
+								E currentEdge = estack.peek();
+								int[] directed = getDirectedNodes(currentEdge, newnum);
+								x = newnum[directed[0]];
+								int y = newnum[directed[1]];
+								boolean condition = a<=x && x<=h && a<=y && y<=h;
+								if(!condition)
+									break;
+								//if (x,y) = (a,b)
+								if (a == x && y == b){
+									fflag = true;
+									//deleted (a,b) from stack and save - (a,b) = (x,y) = e -> delete e from estack
+									estack.pop();
+									savedEdge = currentEdge;
+								}
+								else{
+									//delete(x,y) from estack and add to current component
+									estack.pop();
+									log.info("Add edge " + e + " to current compoenent");
+									//decrement degree(x), degree(y)
+									int xIndex = directed[0];
+									int yIndex = directed[1];
+									degree[xIndex]--;
+									degree[yIndex]--;
+								}
+							}
+							//add (a,b,j) to new component
+							log.info("add " + a + ", " + b + ", " + j + " to new component");
+							//x = b
+							x=b;
+						}
+						if (fflag){
+							//TODO sta sa ovim x da li se samo tu malocas gore postavlja ili snimiti i kada se ivica ucitava i to?
+							fflag = false;
+							j++;
+							//add saved edge, (x,v,j-1), (x,v,j) to new component
+							log.info("add saved edge " + savedEdge + "( " + x + ", " + v + ", " + j + ", ( " + x + ", "+ v + ", " + j + ") to new component");
+							//decrement  degree(x), degree(v)
+							int xIndex = inverseNumbering[x];
+							degree[xIndex]--;
+							degree[vIndex]--;
+						}
 						
+						//add (v,x,j) to estack //TODO estack?
+						//or is this actually virtual edge and we need more data, as in j?
+						//does that mean that v,x is a separation pair
+						V xVertex = vertices.get(inverseNumbering[x]);
+						log.info("Separation pair? " + v + vertices.get(inverseNumbering[x]));
+						
+						E virtualLEdge = Util.createEdge(v, xVertex, edgeClass);
+						estack.push(virtualLEdge);
+						edgesJMap.put(virtualLEdge, j);
+						//or add v,x to estack?
+						int xIndex = inverseNumbering[x];
+						//increment degree x, degree v
+						degree[xIndex] ++;
+						degree[vIndex]++;
+
+						//father(x) = v
+						father[xIndex] = vIndex;
+						//if (A1(v)) ->*x then a1(v) = x
+						
+						//TODO a1 contains numbering as values?
+						//in that case
+						
+						int a1VIndex = inverseNumbering[a1[vIndex]];
+						V a1vVertex = vertices.get(a1VIndex);
+						if (pathFrom(a1vVertex, xVertex))
+							a1[vIndex] = x; //x is numbering
+						
+						//w = x
+						w = xVertex;
+						wIndex = xIndex;
 					}
+					
+					//TEST FOR TYPE 1 PAIR
+					//G:
+					//lowpts contain numberings
+					//if (lowpt2(w)>=v) and ((lowpt1(w) != 1) or (father(v)!=1) or (w>3))
+					if (lowpt2[wIndex] >= newnum[vIndex] && (lowpt1[wIndex] != 1 || newnum[father[vIndex]] != 1 || newnum[wIndex] > 3)){
+						j++;
+						//while (x,y) on top of estack has (w <= x<w +ND(w) or ((w<=y<w+ND(w))
+						
+						while (true){
+							E currentEdge = estack.peek();
+							int[] directed = getDirectedNodes(currentEdge, newnum);
+							int xIndex = directed[0];
+							int yIndex = directed[1];
+							int x = newnum[xIndex];
+							int y = newnum[yIndex];
+							
+							boolean condition = (newnum[wIndex] <= x && x < newnum[wIndex] + nd[wIndex]) || 
+									(newnum[wIndex] <= y && y < newnum[wIndex] + nd[wIndex]);
+							
+							if (!condition)
+								break;
+							
+							//delete (x,y) from estack
+							estack.pop();
+							//add x,y to new component
+							log.info("Add " + currentEdge + " to new component");
+							//decrement degree(x), degree(y)
+							degree[xIndex]--;
+							degree[yIndex]--;
+						}
+						//add (w, lowpt1(w),j) to new component
+						log.info("Add (w, lowpt1(w),j) to new component");
+						//if a1(v) = w then a1(v) = lowpt1(w)
+						if (a1[vIndex] == newnum[wIndex])
+							a1[vIndex] = lowpt1[wIndex];
+						
+						//TEST FOR MULTIPLE EDGE
+						//if (x,y) on top of estack has (x,y) = (w, lowpt1(w))
+						
+						E currentEdge = estack.peek();
+						int[] directed = getDirectedNodes(currentEdge, newnum);
+						int xIndex = directed[0];
+						int yIndex = directed[1];
+						int x = newnum[xIndex];
+						int y = newnum[yIndex];
+						
+						if (x == newnum[wIndex] && y == lowpt1[wIndex]){
+							j++;
+							//add (x,y), (v,lowpt1(w), j =1), (v,lowpt1(w),j) to new component
+							log.info("add (x,y), (v,lowpt1(w), j =1), (v,lowpt1(w),j) to new component");
+							//decrement degree(v), degree(lowpt1(w))
+							degree[vIndex]--;
+							degree[inverseNumbering[lowpt1[wIndex]]]--;
+						}
+						
+						//if(lowpt1(w) != father(v)
+						if (lowpt1[wIndex] != newnum[father[vIndex]]){
+							//add (v, lowpt1(w), j) to estack
+							V secondVertex = vertices.get(inverseNumbering[lowpt1[wIndex]]);
+							E newEdge = Util.createEdge(v, secondVertex, edgeClass);
+							estack.push(newEdge);
+							edgesJMap.put(newEdge, j);
+							//increment degree(v), degree(lowpt1(w))
+							degree[vIndex]++;
+							degree[inverseNumbering[lowpt1[wIndex]]]++;
+						}
+						else{
+							j++;
+							//add (v, lowpt1(w), j-1), (v, lowpt1(w), j), tree arc (lowpt1(w),v) to new component
+							//mark tree arc (lowpt1(w),v) as virtual edge j --is this adding "triple" to estack??
+
+							log.info("add (v, lowpt1(w), j-1), (v, lowpt1(w), j), tree arc (lowpt1(w),v) to new component");
+							
+							//find tree arc lowpt1(w),v
+							V otherVertex = vertices.get(inverseNumbering[lowpt1[wIndex]]);
+							E treeArc = graph.edgeBetween(otherVertex, v);
+							edgesJMap.put(treeArc, j);
+						}
+ 					}
+					
+					//CONTINUE HERE
 					
 				}
 			}
@@ -286,6 +455,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 		estack = new Stack<E>();
 		tstack = new Stack<Triple>();
 		endOfStackMarker = new Triple(-1,-1,-1);
+		edgesJMap = new HashMap<E, Integer>();
+		edgeClass = graph.getEdges().get(0).getClass();
 		j = 0;
 
 		number = new int[size];
@@ -620,20 +791,33 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 		return true;
 
 	}
-
 	
+	private boolean pathFrom(V vertex1, V vertex2){
+		
+		//if there is a path that contains both vertices among the paths
+		//it should be vertex1 ->* vertex2
+		//path should only contain one back edge (definition)
+		if (vertex1 == vertex2)
+			return false;
+		for (List<E> path : paths)
+			if (path.contains(vertex1) && path.contains(vertex2))
+				return true;
+		return false;
+	}
+
+
 	private E onEstack(int index1, int index2){
 		//TODO da li je dobro sa tim direkcijama
 		for (int i = 0; i < estack.size(); i++){
 			E e = estack.get(i);
 			int[] directedNodes = getDirectedNodes(e, newnum);
-			
+
 			if (directedNodes[0] == index1 && directedNodes[1] == index2)
 				return e;
 		}
-		
+
 		return null;
-		
+
 	}
 
 	private boolean firstEdgeOfAPath(E e){
