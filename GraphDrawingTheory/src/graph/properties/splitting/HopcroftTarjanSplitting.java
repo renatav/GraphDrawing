@@ -4,7 +4,6 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.HopcroftSplitComponent;
-import graph.trees.DFSTree;
 import graph.util.Util;
 
 import java.util.ArrayList;
@@ -86,7 +85,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	 * inverse of numbering, takes number as the index of the array and keeps numberings as values
 	 */
 	private int[] inverseNumbering;
-
+	
 	/**denotes the start vertex of the current path in the pathfinder phase*/ 
 	private V s;
 	/**denotes the last number assigned to a vertex in the pathfinder phase*/
@@ -94,9 +93,6 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 	private int n;
 	private int j;
-	private DFSTree<V,E> tree;
-
-	private Map<Integer, List<V>> lowpt1sMap = new HashMap<Integer, List<V>>();
 
 	private Map<V, List<E>> adjacency;
 
@@ -127,7 +123,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 	public void execute() throws AlgorithmErrorException{
 		init();
-		pathsearch(vertices.get(0));
+		printVerticesData();
+		//pathsearch(vertices.get(0));
 
 	}
 
@@ -139,6 +136,9 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	 * e stack contains edges backed up over during search
 	 */
 	private void pathsearch(V v){
+		
+		
+		//TODO inverse numbering gde ima treba sa - 1 (zbog nacina kako se konstruise, index krece od 1, numbering od 1)
 
 		System.out.println("Current v: " + v);
 
@@ -429,10 +429,67 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
  					}
 					
 					//CONTINUE HERE
+					//C:
+					//if v->w is a first edge of a path then delete all entries on tstack down to and including end of stack marker
+					if (firstEdgeOfAPath(e))
+						while (!tstack.isEmpty()){
+							Triple t = tstack.pop();
+							if (t == endOfStackMarker)
+								break;
+						}
+					//D:
+					//while (h,a,b) on estack has highpt(v) > h do delete(h,a,b,)from tstack -- TODO IS T (h,a,b) on tstack???
+					while (true){
+						Triple t = tstack.peek();
+						if (t != null)
+							if (highpt[vIndex] > t.getH())
+								tstack.pop();
+					}
+				} //TODO da li sada ovde ide posle one while petlje sa pocetka
+				
+				//F:
+				//if v-->w is the first and last edge of a path
+				if (singleEdgePath(e)){
+					int y = 0;
+					//while (h,a,b) on tstack has a > w
 					
+					Triple last = null;
+					while(true){
+						Triple t = tstack.peek();
+						if (t.getA() <= newnum[wIndex])
+							break;
+						y = Math.max(y,t.getH());
+						tstack.pop();
+						last = t;
+					}
+
+					//if no triples deleted from tstack then add(v,w,v) to tstack
+					if (last == null){
+						Triple newTriple = new Triple(newnum[vIndex],newnum[wIndex],newnum[vIndex]);
+						tstack.push(newTriple);
+					}
+					//if (h,a,b ) last triple deleted then add (y,w,b) to tstack
+					else{
+						Triple newTriple = new Triple(y, newnum[wIndex], last.getB());
+						tstack.push(newTriple);
+					}
+				}
+				//if w = father(v)
+				if (father[vIndex] == wIndex){
+					j++;
+					//add (v,w), (v,w,j), tree arc (w,v) to new component
+					log.info("add (v,w), (v,w,j), tree arc (w,v) to new component");
+					//decrement degree v, degree w, mark tree arc (w,v) as virtual edge j
+					degree[vIndex]--;
+					degree[wIndex]--;
+					edgesJMap.put(e,j);
+				}
+				//add (v,w) to estack
+				else{
+					estack.push(e);
 				}
 			}
-		}
+		} //broj enddova se uklapa
 	}
 
 
@@ -481,7 +538,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 		dfs(root,null);
 
 		log.info("first dfs traversal finished");
-		tree = new DFSTree<V,E>(root, number, treeEdges, fronds, vertices);
+		//tree = new DFSTree<V,E>(root, number, treeEdges, fronds, vertices);
 		//System.out.println(tree);
 
 		constructAdjacencyLists(adjacency);
@@ -500,38 +557,26 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 		if (!checkAdjacencyValidity(adjacency, newnum, treeEdges))
 			throw new AlgorithmErrorException("Error: adjacency structure not valid");
 
-		tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
-		System.out.println(tree.toString());
+		//tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
+		//System.out.println(tree.toString());
 
 		log.info("setting lowpts, inverse numbering etc.");
 
 
+		int[] inverseOldNumbering = new int[number.length];
+		for (int i = 0; i < number.length; i++)
+			inverseOldNumbering[number[i] - 1] = i;
+			
+		
 		for (V v : vertices){
-
+			
 			int vIndex = vertices.indexOf(v);
-			int[] lowpts = tree.lowpts(v);
-			lowpt1[vIndex] = lowpts[0];
-			lowpt2[vIndex] = lowpts[1];
+			lowpt1[vIndex] = newnum[inverseOldNumbering[lowpt1[vIndex] - 1]];
+			lowpt2[vIndex] = newnum[inverseOldNumbering[lowpt2[vIndex] - 1]];
 
 			degree[vIndex] = adjacency.get(v).size();
 			a1[vIndex] = adjacency.get(v).size();
 			inverseNumbering[newnum[vIndex] - 1] = vIndex;
-
-			Integer lowpt1Val = lowpt1[vIndex];
-
-			List<V> verticesWithLowpt;
-			if (!lowpt1sMap.containsKey(lowpt1Val)){
-				verticesWithLowpt = new ArrayList<V>();
-				lowpt1sMap.put(lowpt1Val, verticesWithLowpt);
-			}
-			else
-				verticesWithLowpt = lowpt1sMap.get(lowpt1Val);
-			verticesWithLowpt.add(v);
-
-			degree[vIndex] = adjacency.get(v).size();
-			a1[vIndex] = adjacency.get(v).size();
-			inverseNumbering[newnum[vIndex] - 1] = vIndex;
-
 		}
 	}
 
@@ -569,8 +614,11 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				m--;
 			}
 			else{
-				if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering starts from 1, indexes from 1
-					highpt[newnum[wIndex] - 1] = newnum[vIndex];
+			//	if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering starts from 1, indexes from 1
+				//	highpt[newnum[wIndex] - 1] = newnum[vIndex];
+				
+				if (highpt[wIndex] == 0) //-1 since numbering starts from 1, indexes from 1
+					highpt[wIndex] = newnum[vIndex];
 				//output current path
 				//System.out.println("output " + currentPath);
 				s = null;
@@ -826,11 +874,34 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				return true;
 		return false;
 	}
+	
+	private boolean singleEdgePath(E e){
+		for (List<E> path : paths)
+			if (path.get(0) == e && path.size() == 1)
+				return true;
+		return false;
+	}
 
 	private void printTStack(){
 		System.out.println("TSTACK:");
 		for (Triple t : tstack){
 			System.out.println(t);
+		}
+	}
+	
+	private void printVerticesData(){
+		for (V v : graph.getVertices()){
+			int vIndex = vertices.indexOf(v);
+			System.out.println("Vertex " + v);
+			System.out.println("ND " + nd[vIndex]);
+			System.out.println("Numbering " + newnum[vIndex]);
+			System.out.println("Numbering old" + number[vIndex]);
+			System.out.println("lowpt1 " + lowpt1[vIndex]);
+			System.out.println("lowpt2 " + lowpt2[vIndex]);
+			System.out.println("father " + vertices.get(father[vIndex]));
+			System.out.println("highpt " + highpt[vIndex]);
+			System.out.println("degree " + degree[vIndex]);
+			System.out.println("a1 " + a1[vIndex]);
 		}
 	}
 
