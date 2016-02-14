@@ -125,6 +125,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 		init();
 		//printVerticesData();
+		//printPaths();
 		pathsearch(vertices.get(0));
 
 	}
@@ -159,6 +160,10 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 				//A:
 				if (firstEdgeOfAPath(e)){
+
+					log.info("First edge of a path");
+					printTStack();
+
 					int y = 0;
 
 					Triple lastDeletedTriple = null;
@@ -195,7 +200,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 					//add end of stack marker to tstack
 					log.info("Pushing end of stack marker");
 					tstack.push(endOfStackMarker);
-					printTStack();
+
 				}
 				pathsearch(w);
 				estack.push(e);
@@ -205,7 +210,13 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				//while v != 1 and ((degree(w) = 2) and (A1(w) > 2) or (h,a,b) on tstack
 				//stasfies (v = a) - test for type 2 pairs
 
+
+				printTStack();
+
 				while(true){
+
+					log.info("While lopp, testing for separation pairs");
+
 
 					if (newnum[vIndex] == 1)
 						break;
@@ -217,8 +228,18 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 					if (!tstack.isEmpty())
 						triple = tstack.peek();
 
+
+					System.out.println("current triple: " + triple );
+
 					if (triple != null)
 						secondCondition = newnum[vIndex] == triple.getA();
+
+
+					System.out.println(v);
+					System.out.println(w);
+					System.out.println(degree[wIndex]);
+					System.out.println(firstCondition);
+					System.out.println(secondCondition);
 
 					if (!(firstCondition || secondCondition))
 						break;
@@ -244,6 +265,12 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						int x = -1;
 						//if degree(w) = 2 and a1(w) > w
 						if (firstCondition){
+
+
+							V v1 = vertices.get(inverseNumbering[a - 1]);
+							V v2 = vertices.get(inverseNumbering[b - 1]);
+							log.info("Found type two separation pair: " + v1 + ", " + v2);
+
 							j++;
 							//add top two edges (v,w) and (w,x) on estack to new component
 							E e1 = estack.get(estack.size() - 1);
@@ -435,31 +462,45 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							edgesJMap.put(treeArc, j);
 						}
 					}
+				}
 
-					//CONTINUE HERE
-					//C:
-					//if v->w is a first edge of a path then delete all entries on tstack down to and including end of stack marker
-					if (firstEdgeOfAPath(e))
-						while (!tstack.isEmpty()){
-							Triple t = tstack.pop();
-							if (t == endOfStackMarker)
-								break;
-						}
-					//D:
-					//while (h,a,b) on estack has highpt(v) > h do delete(h,a,b,)from tstack -- TODO IS T (h,a,b) on tstack???
-					while (!tstack.empty()){
-						Triple t = tstack.peek();
-						if (highpt[vIndex] > t.getH())
-							tstack.pop();
-						else 
+				//After tstack is updated, if p contains more than on edge edge, 
+				//an end of stack marker is placed
+				//when backing over the first edge of p
+				//everything down to end of stack marker is deleted
+
+				//CONTINUE HERE
+				//C:
+				//if v->w is a first edge of a path then delete all entries on tstack down to and including end of stack marker
+				if (firstEdgeOfAPath(e))
+					while (!tstack.isEmpty()){
+						Triple t = tstack.pop();
+						log.info("Removing triple " + t + " from tstack");
+						if (t == endOfStackMarker)
 							break;
 					}
+				//D:
+				//while (h,a,b) on estack has highpt(v) > h do delete(h,a,b,)from tstack -- TODO IS T (h,a,b) on tstack???
+				while (!tstack.empty()){
+					Triple t = tstack.peek();
+					if (highpt[vIndex] > t.getH()){
+						tstack.pop();
+						log.info("Removing triple " + t + " from tstack");
+					}
+					else 
+						break;
 				} //TODO da li sada ovde ide posle one while petlje sa pocetka
 			} //TODO ovde mora da se zatvori onaj uslov da je tree edge, jer ispod je back edge, gde je kraj za while
 			else{
 				//F:
 				//if v-->w is the first and last edge of a path
+
+				log.info("Back edge");
+
 				if (singleEdgePath(e)){
+
+					log.info("Single edge path");
+
 					int y = 0;
 					//while (h,a,b) on tstack has a > w
 
@@ -477,11 +518,13 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 					if (last == null){
 						Triple newTriple = new Triple(newnum[vIndex],newnum[wIndex],newnum[vIndex]);
 						tstack.push(newTriple);
+						log.info("Pushing " + newTriple + " to tstack");
 					}
 					//if (h,a,b ) last triple deleted then add (y,w,b) to tstack
 					else{
 						Triple newTriple = new Triple(y, newnum[wIndex], last.getB());
 						tstack.push(newTriple);
+						log.info("Pushing " + newTriple + " to tstack");
 					}
 				}
 				//if w = father(v)
@@ -916,6 +959,12 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 			System.out.println("highpt " + highpt[vIndex]);
 			System.out.println("degree " + degree[vIndex]);
 			System.out.println("a1 " + a1[vIndex]);
+		}
+	}
+
+	private void printPaths(){
+		for (List<E> path : paths){
+			System.out.println(path);
 		}
 	}
 
