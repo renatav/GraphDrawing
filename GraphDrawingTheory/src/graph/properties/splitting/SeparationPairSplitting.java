@@ -350,7 +350,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 					}
 					if (satisfiedAll){
-						log.info("separation pair "+ aVert + " " + bVert);
+						log.info("type 2 separation pair "+ aVert + " " + bVert);
 						addSeparationPair(aVert, bVert, 2);
 					}
 
@@ -512,8 +512,6 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		//System.out.println("setting newnum " +  v + " = " +  newnum[vIndex]);
 
 		for (E e : adjacency.get(v)){
-
-			System.out.println("firs on path");
 
 			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
 			int wIndex = vertices.indexOf(w);
