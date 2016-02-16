@@ -323,11 +323,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public int vertexDegree(V v){
-		int degree = 0;
-		for (E e : edges)
-			if (e.getOrigin() == v || e.getDestination() == v)
-				degree ++;
-		return degree;
+		return adjacentLists.get(v).size();
 	}
 
 	/**

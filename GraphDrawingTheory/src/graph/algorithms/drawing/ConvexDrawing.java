@@ -8,7 +8,7 @@ import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.components.Block;
-import graph.properties.components.HopcroftSplitComponent;
+import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitComponentType;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
@@ -42,7 +42,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private List<SplitPair<V,E>> primeSeparationPairs;
 	private List<SplitPair<V,E>> forbiddenSeparationPairs;
 	private List<SplitPair<V,E>> criticalSeparationPairs;
-	private Map<SplitPair<V,E>, List<HopcroftSplitComponent<V, E>>> splitComponentsOfPair;
+	private Map<SplitPair<V,E>, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsOfPair;
 	private PlanarityTestingAlgorithm<V, E> planarityTesting = new FraysseixMendezPlanarity<V,E>();
 
 	private DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>();
@@ -300,11 +300,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					G1.removeEdge(foundEdge);
 				}
 				else{
-					List<HopcroftSplitComponent<V, E>> pairComponents = splitComponentsOfPair.get(criticalSeparationPair);
+					List<HopcroftTarjanSplitComponent<V, E>> pairComponents = splitComponentsOfPair.get(criticalSeparationPair);
 					//check if there is exactly one split component which is a ring
 					int ringsCount = 0;
-					HopcroftSplitComponent<V, E> ring = null;
-					for (HopcroftSplitComponent<V, E> splitComponent : pairComponents){
+					HopcroftTarjanSplitComponent<V, E> ring = null;
+					for (HopcroftTarjanSplitComponent<V, E> splitComponent : pairComponents){
 						if (splitComponent.getType() == SplitComponentType.RING){
 							ring = splitComponent;
 							ringsCount ++;
@@ -413,12 +413,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		List<SplitPair<V, E>> separationPairs = triconnectedDivision.getSeparationPairs();
 
-		Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap = triconnectedDivision.getComponentsVirtualEdgesMap();
+		Map<E, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsMap = triconnectedDivision.getComponentsVirtualEdgesMap();
 		Collection<E> virtualEdges = splitComponentsMap.keySet();
 
 		setVirtualEdgesSplitPairMap(separationPairs, virtualEdges);
 
-		Pair<List<HopcroftSplitComponent<V,E>>, List<E>> componentsAndContainedVEdges = formTriconnectedComponentsAndAnalyzeEdges(splitComponentsMap);
+		Pair<List<HopcroftTarjanSplitComponent<V,E>>, List<E>> componentsAndContainedVEdges = formTriconnectedComponentsAndAnalyzeEdges(splitComponentsMap);
 
 		//List<HopcroftSplitComponent<V,E>> triconnectedComponents = componentsAndContainedVEdges.getKey();
 
@@ -432,7 +432,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		forbiddenSeparationPairs = new ArrayList<SplitPair<V,E>>();
 		criticalSeparationPairs = new ArrayList<SplitPair<V,E>>();
-		splitComponentsOfPair = new HashMap<SplitPair<V,E>, List<HopcroftSplitComponent<V,E>>>();
+		splitComponentsOfPair = new HashMap<SplitPair<V,E>, List<HopcroftTarjanSplitComponent<V,E>>>();
 
 		for (E virtualEdge : virtualEdges){
 
@@ -445,11 +445,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 			SplitPair<V,E> separationPair = splitPairVirtualEdgeMapInverse.get(virtualEdge);
 
-			List<HopcroftSplitComponent<V, E>> pairComponents = new ArrayList<HopcroftSplitComponent<V,E>>();
+			List<HopcroftTarjanSplitComponent<V, E>> pairComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
 
-			for (HopcroftSplitComponent<V, E> splitComponent : splitComponentsMap.get(virtualEdge)){
+			for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponentsMap.get(virtualEdge)){
 
-				HopcroftSplitComponent<V, E> joinedComponent = formComponent(splitComponent, splitComponentsMap, splitComponentsMap.keySet(), virtualEdge);
+				HopcroftTarjanSplitComponent<V, E> joinedComponent = formComponent(splitComponent, splitComponentsMap, splitComponentsMap.keySet(), virtualEdge);
 				//System.out.println(joinedComponent);
 				if (joinedComponent != null)
 					pairComponents.add(joinedComponent);
@@ -475,7 +475,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					forbiddenSeparationPairs.add(separationPair);
 				else if (pairComponents.size() == 3){
 					boolean forbidden = true;
-					for (HopcroftSplitComponent<V, E> component : pairComponents)
+					for (HopcroftTarjanSplitComponent<V, E> component : pairComponents)
 						if (component.getType() == SplitComponentType.BOND || component.getType() == SplitComponentType.RING){
 							forbidden = false;
 							break;
@@ -487,7 +487,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				}
 				else  if (pairComponents.size() == 2){
 					boolean critical = true;
-					for (HopcroftSplitComponent<V, E> component : pairComponents){
+					for (HopcroftTarjanSplitComponent<V, E> component : pairComponents){
 						System.out.println(component);
 						System.out.println(component.getType());
 						if (component.getType() == SplitComponentType.RING){
@@ -523,7 +523,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 
-	private HopcroftSplitComponent<V,E> formComponent(HopcroftSplitComponent<V, E> component, Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap, 
+	private HopcroftTarjanSplitComponent<V,E> formComponent(HopcroftTarjanSplitComponent<V, E> component, Map<E, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsMap, 
 			Collection<E> virtualEdges, E virtualEdge){
 
 
@@ -536,7 +536,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//if it is a ring it corresponds to subdivision of edge (x,y)
 		//(x,y) is the separation pair whose split components we are looking for
 
-		HopcroftSplitComponent<V, E> ret = new HopcroftSplitComponent<V,E>();
+		HopcroftTarjanSplitComponent<V, E> ret = new HopcroftTarjanSplitComponent<V,E>();
 		ret.getEdges().addAll(component.getEdges());
 		boolean hasNonVirtualEdge = false;
 
@@ -544,7 +544,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		List<E> newEdges = new ArrayList<E>();
 		List<E> toProcess = new ArrayList<E>();
 		toProcess.addAll(component.getEdges());
-		List<HopcroftSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftSplitComponent<V, E>>();
+		List<HopcroftTarjanSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftTarjanSplitComponent<V, E>>();
 		processedComponents.add(component);
 
 		Map<V,List<E>> adjacencyLists = new HashMap<V, List<E>>();
@@ -614,7 +614,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						continue;
 				}
 
-				for (HopcroftSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
+				for (HopcroftTarjanSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
 					if (componentOfEdge.getEdges().contains(virtualEdge))
 						continue;
 					if (processedComponents.contains(componentOfEdge))
@@ -720,17 +720,17 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * Joins triple bonds into a bond and triangles into a ring
 	 * @return
 	 */
-	private Pair<List<HopcroftSplitComponent<V,E>>, List<E>> formTriconnectedComponentsAndAnalyzeEdges(Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap){
+	private Pair<List<HopcroftTarjanSplitComponent<V,E>>, List<E>> formTriconnectedComponentsAndAnalyzeEdges(Map<E, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsMap){
 
 		log.info("Forming triconnected comopnents");
 
 		List<E> containedVirtualEdges = new ArrayList<E>();
-		List<HopcroftSplitComponent<V, E>> components = new ArrayList<HopcroftSplitComponent<V, E>>();
+		List<HopcroftTarjanSplitComponent<V, E>> components = new ArrayList<HopcroftTarjanSplitComponent<V, E>>();
 		Collection<E> virtualEdges = splitComponentsMap.keySet();
 
-		List<HopcroftSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftSplitComponent<V, E>>();
+		List<HopcroftTarjanSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftTarjanSplitComponent<V, E>>();
 		for (E virtualEdge  : splitComponentsMap.keySet())
-			for (HopcroftSplitComponent<V, E> component : splitComponentsMap.get(virtualEdge)){
+			for (HopcroftTarjanSplitComponent<V, E> component : splitComponentsMap.get(virtualEdge)){
 				if (component.getType() != SplitComponentType.TRICONNECTED_GRAPH){
 					if (!processedComponents.contains(component))
 						formBondOrRing(component, splitComponentsMap, processedComponents, containedVirtualEdges, components);
@@ -743,12 +743,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 
-		return new Pair<List<HopcroftSplitComponent<V,E>>, List<E>>(components, containedVirtualEdges);
+		return new Pair<List<HopcroftTarjanSplitComponent<V,E>>, List<E>>(components, containedVirtualEdges);
 
 	}
 
-	private void formBondOrRing(HopcroftSplitComponent<V, E> component, Map<E, List<HopcroftSplitComponent<V, E>>> splitComponentsMap,
-			List<HopcroftSplitComponent<V, E>> processedComponents, List<E> containedVirtualEdges, List<HopcroftSplitComponent<V, E>> components){
+	private void formBondOrRing(HopcroftTarjanSplitComponent<V, E> component, Map<E, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsMap,
+			List<HopcroftTarjanSplitComponent<V, E>> processedComponents, List<E> containedVirtualEdges, List<HopcroftTarjanSplitComponent<V, E>> components){
 
 		SplitComponentType type = component.getType();
 		Collection<E> virtualEdges = splitComponentsMap.keySet();
@@ -757,7 +757,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		E virtualEdge = component.getVirtualEdge();
 
 
-		HopcroftSplitComponent<V, E> ret = new HopcroftSplitComponent<V,E>();
+		HopcroftTarjanSplitComponent<V, E> ret = new HopcroftTarjanSplitComponent<V,E>();
 		if (type == SplitComponentType.TRIPLE_BOND)
 			ret.setType(SplitComponentType.BOND);
 		else
@@ -794,7 +794,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 			//System.out.println("COMPONENTS: " + splitComponentsMap.get(e));
 
-			for (HopcroftSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
+			for (HopcroftTarjanSplitComponent<V, E> componentOfEdge : splitComponentsMap.get(e)){
 
 				//	System.out.println(" component of edgea" + componentOfEdge);
 
@@ -856,9 +856,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			return false;
 		}
 		for (SplitPair<V, E> criticalSeparationPair : criticalSeparationPairs){
-			List<HopcroftSplitComponent<V, E>> splitComponents = splitComponentsOfPair.get(criticalSeparationPair);
+			List<HopcroftTarjanSplitComponent<V, E>> splitComponents = splitComponentsOfPair.get(criticalSeparationPair);
 			int count = 0;
-			for (HopcroftSplitComponent<V, E> splitComponent : splitComponents){
+			for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponents){
 				//a component having no edge of S can only by a bond or a ring
 				if (splitComponent.getType() == SplitComponentType.BOND || splitComponent.getType() == SplitComponentType.RING){
 					//check if the component has at least one edge of S

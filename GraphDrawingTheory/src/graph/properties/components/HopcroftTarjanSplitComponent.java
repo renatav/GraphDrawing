@@ -7,7 +7,7 @@ import graph.properties.splitting.Triple;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends Component<V,E>{
+public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> extends Component<V,E>{
 
 	private SplitComponentType type;
 	private SplitPair<V,E> spearaionPair;
@@ -31,13 +31,13 @@ public class HopcroftSplitComponent<V extends Vertex, E extends Edge<V>> extends
 		this.edges = edges;
 	}
 
-	public HopcroftSplitComponent(SplitComponentType type, List<E> edges) {
+	public HopcroftTarjanSplitComponent(SplitComponentType type, List<E> edges) {
 		super(edges);
 		this.type = type;
 		triples = new ArrayList<Triple>();
 	}
 	
-	public HopcroftSplitComponent(){
+	public HopcroftTarjanSplitComponent(){
 		super();
 		triples = new ArrayList<Triple>();
 	}

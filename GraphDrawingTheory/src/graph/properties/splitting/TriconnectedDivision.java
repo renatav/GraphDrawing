@@ -3,7 +3,7 @@ package graph.properties.splitting;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.properties.components.HopcroftSplitComponent;
+import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitComponentType;
 import graph.properties.components.SplitPair;
 import graph.trees.DFSTree;
@@ -41,8 +41,8 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	private DFSTree<V, E> tree;
 	private Logger log = Logger.getLogger(TriconnectedDivision.class);
 	private List<V> separationPairVertices;
-	private Map<E, List<HopcroftSplitComponent<V, E>>> componentsVirtualEdgesMap;
-	private List<HopcroftSplitComponent<V, E>> components;
+	private Map<E, List<HopcroftTarjanSplitComponent<V, E>>> componentsVirtualEdgesMap;
+	private List<HopcroftTarjanSplitComponent<V, E>> components;
 
 
 	public TriconnectedDivision(Graph<V,E> graph){
@@ -54,8 +54,8 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 	public void execute(){
 
-		componentsVirtualEdgesMap = new HashMap<E, List<HopcroftSplitComponent<V, E>>>();
-		components = new ArrayList<HopcroftSplitComponent<V, E>>();
+		componentsVirtualEdgesMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
+		components = new ArrayList<HopcroftTarjanSplitComponent<V, E>>();
 		triconnected(graph);
 
 		//		try {
@@ -441,7 +441,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		if (formingTripleBond && componentEdges.size() < 3)
 			return;
 
-		HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
+		HopcroftTarjanSplitComponent<V, E> newComponent = new HopcroftTarjanSplitComponent<V,E>();
 		newComponent.getEdges().addAll(componentEdges);
 
 		E virtualEdge = createVirtualEdge(start, end, edgeClass, virtualEdges);
@@ -526,7 +526,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 			if (virtualBetween.size() == 0)
 				return;
 
-			HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
+			HopcroftTarjanSplitComponent<V, E> newComponent = new HopcroftTarjanSplitComponent<V,E>();
 			newComponent.getEdges().add(virtualBetween.get(0));
 			newComponent.getEdges().add(backEdge);
 			E virtualEdge = virtualBetween.get(0);
@@ -604,7 +604,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 
 			estack.removeAll(componentEdges);
 
-			HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
+			HopcroftTarjanSplitComponent<V, E> newComponent = new HopcroftTarjanSplitComponent<V,E>();
 			newComponent.getEdges().addAll(componentEdges);
 			
 			//E virtualEdge = Util.createEdge(start, end, edgeClass);
@@ -698,7 +698,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 		return null;
 	}
 
-	private void addCompnentWithMultiplevVirtualEdges(List<E> virtualEdges,HopcroftSplitComponent<V, E> newComponent, E virtualEdge){
+	private void addCompnentWithMultiplevVirtualEdges(List<E> virtualEdges,HopcroftTarjanSplitComponent<V, E> newComponent, E virtualEdge){
 		addComponent(virtualEdge, newComponent, true);
 		for (E v2 : virtualEdges)
 			if (v2 == virtualEdge)
@@ -707,14 +707,14 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 				addComponent(v2, newComponent, false);
 	}
 
-	private void addComponent(E virtualEdge, HopcroftSplitComponent<V, E> newComponent, boolean setVirtualEdge) {
+	private void addComponent(E virtualEdge, HopcroftTarjanSplitComponent<V, E> newComponent, boolean setVirtualEdge) {
 
 		components.add(newComponent);
 
-		List<HopcroftSplitComponent<V, E>> virtutalEdgeComponents;
+		List<HopcroftTarjanSplitComponent<V, E>> virtutalEdgeComponents;
 
 		if (!componentsVirtualEdgesMap.containsKey(virtualEdge)){
-			virtutalEdgeComponents = new ArrayList<HopcroftSplitComponent<V,E>>();
+			virtutalEdgeComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
 			componentsVirtualEdgesMap.put(virtualEdge, virtutalEdgeComponents);
 		}
 		else 
@@ -769,7 +769,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 				while (count <= num){
 					if (count % 3 == 0){
 						//form triple bond
-						HopcroftSplitComponent<V, E> newComponent = new HopcroftSplitComponent<V,E>();
+						HopcroftTarjanSplitComponent<V, E> newComponent = new HopcroftTarjanSplitComponent<V,E>();
 						newComponent.getEdges().add(e);
 						newComponent.getEdges().add(e);
 						newComponent.getEdges().add(e);
@@ -785,7 +785,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	
-	public Map<E, List<HopcroftSplitComponent<V, E>>> getComponentsVirtualEdgesMap() {
+	public Map<E, List<HopcroftTarjanSplitComponent<V, E>>> getComponentsVirtualEdgesMap() {
 		return componentsVirtualEdgesMap;
 	}
 
@@ -795,7 +795,7 @@ public class TriconnectedDivision<V extends Vertex, E extends Edge<V>> {
 	}
 
 
-	public List<HopcroftSplitComponent<V, E>> getComponents() {
+	public List<HopcroftTarjanSplitComponent<V, E>> getComponents() {
 		return components;
 	}
 }
