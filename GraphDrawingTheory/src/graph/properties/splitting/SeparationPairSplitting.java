@@ -253,7 +253,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 					if (vertices.size() - descendants.size() <= 2)// && !descendants.contains(aVert))
 						continue;
 
-					log.info("Detected separation pair (" + aVert + ", " + bVert + ")");
+					log.info("Detected separation pair type one (" + aVert + ", " + bVert + ")");
 					if (addSeparationPair(aVert, bVert, 1))
 						containedBs.add(bIndex);
 				}
