@@ -2,7 +2,6 @@ package graph.properties.components;
 
 import graph.elements.Edge;
 import graph.elements.Vertex;
-import graph.properties.splitting.Triple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +10,7 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 
 	private SplitComponentType type;
 	private SplitPair<V,E> spearaionPair;
-	private E virtualEdge;
-
-	private List<Triple> triples;
+	private List<E> virtualEdges;
 	
 	public SplitComponentType getType() {
 		return type;
@@ -29,26 +26,20 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 
 	public void setEdges(List<E> edges) {
 		this.edges = edges;
+		virtualEdges = new ArrayList<E>();
 	}
+	
+	public HopcroftTarjanSplitComponent() {
+		super();
+		virtualEdges = new ArrayList<E>();
+	}
+	
 
 	public HopcroftTarjanSplitComponent(SplitComponentType type, List<E> edges) {
 		super(edges);
 		this.type = type;
-		triples = new ArrayList<Triple>();
 	}
 	
-	public HopcroftTarjanSplitComponent(){
-		super();
-		triples = new ArrayList<Triple>();
-	}
-
-	public List<Triple> getTriples() {
-		return triples;
-	}
-
-	public void setTriples(List<Triple> triples) {
-		this.triples = triples;
-	}
 
 	@Override
 	public String toString() {
@@ -63,12 +54,22 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 		this.spearaionPair = spearaionPair;
 	}
 
-	public E getVirtualEdge() {
-		return virtualEdge;
+	public List<E> getVirtualEdges() {
+		return virtualEdges;
 	}
 
-	public void setVirtualEdge(E virtualEdge) {
-		this.virtualEdge = virtualEdge;
+	public void setVirtualEdges(List<E> virtualEdges) {
+		this.virtualEdges = virtualEdges;
+	}
+
+	
+	public void addEdge(E e){
+		edges.add(e);
+	}
+	
+	public void addVirtualEdge(E e){
+		edges.add(e);
+		virtualEdges.add(e);
 	}
 	
 	

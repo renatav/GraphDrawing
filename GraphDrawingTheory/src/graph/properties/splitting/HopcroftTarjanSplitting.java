@@ -115,21 +115,31 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	private List<List<E>> paths = new ArrayList<List<E>>();
 
 	private boolean fflag = false;
-
-
+	
+	private ArrayList<E> virtualEdges = new ArrayList<E>();
+	
 	public HopcroftTarjanSplitting(Graph<V,E> graph){
 		this.graph = graph;
 	}
+	
+	
+	//TODO Remove edgesJMap
+	//use addEdge and addVirtualEdge methods - record which virtual edges are contained by one split component
+	//create a map of virtual edges and split components it contains - will be used for convex drawing
+	
+	//TODO problem with some triple bonds not being detected and being joined with the other component
+	
 
 	public void execute() throws AlgorithmErrorException{
 
 		init();
-		printVerticesData();
-		System.out.println(treeEdges);
-		System.out.println(fronds);
+		//	printVerticesData();
+		//System.out.println(treeEdges);
+		//	System.out.println(fronds);
 		//printPaths();
 		//printAdjacency();
 		pathsearch(vertices.get(0));
+		formLastComponent();
 	}
 
 	/**
@@ -230,6 +240,9 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						break;
 
 					boolean firstCondition = degree[wIndex] == 2 && a1[wIndex] > newnum[wIndex];
+					System.out.println(a1[wIndex]);
+
+
 					boolean secondCondition = false;
 
 					Triple triple = null;
@@ -310,10 +323,9 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							separationPairs.add(separationPair);
 
 							virtualEdge = Util.createEdge(v, xVertex, edgeClass);
+							virtualEdges.add(virtualEdge);
 							splitComponent.getEdges().add(virtualEdge);
-							splitComponent.setVirtualEdge(virtualEdge);
 
-							//TODO what with j, what does it mean 
 							log.info("Add " + vNum + ", " + x + ", " + j + " to new component");
 
 
@@ -342,6 +354,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							SeparationPair<V> separationPair = new SeparationPair<V>(aVertex, bVertex,2);
 							separationPairs.add(separationPair);
 
+							
 							//while (x,y) on estack has (a<=x<=h) and (a<=y<=h)
 							while (!estack.isEmpty()){
 								E currentEdge = estack.peek();
@@ -374,8 +387,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							}
 							//add (a,b,j) to new component
 							virtualEdge = Util.createEdge(aVertex, bVertex, edgeClass);
+							virtualEdges.add(virtualEdge);
 							splitComponent.getEdges().add(virtualEdge);
-							splitComponent.setVirtualEdge(virtualEdge);
 							log.info("add " + aVertex + ", " + bVertex + ", " + j + " to new component");
 							//x = b
 							x=b;
@@ -390,12 +403,12 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							splitComponent.getEdges().add(savedEdge);
 							splitComponent.getEdges().add(virtualEdge);
 							splitComponent.getEdges().add(virtualEdge);
-							splitComponent.setVirtualEdge(virtualEdge);
 
-
-							log.info("add saved edge " + savedEdge + "( " + x + ", " + v + ", " + j + "-1, ( " + x + ", "+ v + ", " + j + ") to new component");
-							//decrement  degree(x), degree(v)
+							
 							int xIndex = inverseNumbering[x - 1];
+							V xVert = vertices.get(xIndex);
+							log.info("add saved edge " + savedEdge + "( " + xVert + ", " + v + ", " + j + "-1, ( " + xVert + ", "+ v + ", " + j + ") to new component");
+							//decrement  degree(x), degree(v)
 							degree[xIndex]--;
 							degree[vIndex]--;
 						}
@@ -432,8 +445,6 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				}
 
 
-				printEStack();
-
 				//TEST FOR TYPE 1 PAIR
 				//G:
 				//lowpts contain numberings
@@ -463,6 +474,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						estack.pop();
 						//add x,y to new component
 						log.info("Add " + currentEdge + " to new component");
+						
 						splitComponent.getEdges().add(currentEdge);
 						//decrement degree(x), degree(y)
 						degree[xIndex]--;
@@ -473,8 +485,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 					log.info("Add " + v + ", " + lowpt1W + ", " + j +" to new component");
 					virtualEdge = Util.createEdge(v, lowpt1W, edgeClass);
+					virtualEdges.add(virtualEdge);
 					splitComponent.getEdges().add(virtualEdge);
-					splitComponent.setVirtualEdge(virtualEdge);
 
 					splitComponents.add(splitComponent);
 					SeparationPair<V> separationPair = new SeparationPair<V>(v, lowpt1W, 1);
@@ -506,7 +518,6 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 								estack.pop();
 								tripleBond.getEdges().add(virtualEdge);
 								tripleBond.getEdges().add(virtualEdge);
-								tripleBond.setVirtualEdge(virtualEdge);
 								splitComponents.add(tripleBond);
 
 								log.info("add (x,y), (v,lowpt1(w), j =1), (v,lowpt1(w),j) to new component");
@@ -568,7 +579,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							break;
 					}
 				//D:
-				//while (h,a,b) on estack has highpt(v) > h do delete(h,a,b,)from tstack -- TODO IS T (h,a,b) on tstack???
+				//while (h,a,b) on estack has highpt(v) > h do delete(h,a,b,)from tstack 
 				while (!tstack.empty()){
 					Triple t = tstack.peek();
 					if (t == endOfStackMarker)
@@ -633,26 +644,19 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				else{
 					estack.push(e);
 					log.info("Pushing edge " + e  + " to estack");
-					
+
 				}
-				
-				
-//				//test multiple edges -- addition
-//				int[] directed = getDirectedNodes(e, newnum);
-//				E estackEdge = onEstack(directed[0], directed[1]);
-//				if (estackEdge != null){
-//					j++;
-//					estack.remove(estackEdge);
-//					E virtualEdge = Util.createEdge(vertices.get(directed[0]), vertices.get(directed[1]), edgeClass);
-//					HopcroftTarjanSplitComponent<V, E> tripleBond = new HopcroftTarjanSplitComponent<V,E>();
-//					tripleBond.getEdges().add(virtualEdge);
-//					tripleBond.getEdges().add(virtualEdge);
-//					tripleBond.getEdges().add(e);
-//					
-//				}
-				
+
 			}
+		
 		} 
+	}
+	
+	private void formLastComponent(){
+		HopcroftTarjanSplitComponent<V, E> splitComponent = new HopcroftTarjanSplitComponent<V,E>();
+		for (E e : estack)
+			splitComponent.getEdges().add(e);
+		splitComponents.add(splitComponent);
 	}
 
 
@@ -731,6 +735,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 			inverseOldNumbering[number[i] - 1] = i;
 
 
+		System.out.println(adjacency);
+
 		for (V v : vertices){
 
 			int vIndex = vertices.indexOf(v);
@@ -740,9 +746,11 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 			degree[vIndex] = graph.vertexDegree(v);
 
 			//a1[v] first entry in the adjacency list
-			E firstEdge = adjacency.get(v).get(0);
-			V other = firstEdge.getOrigin() == v ? firstEdge.getDestination()  : firstEdge.getOrigin();
-			a1[vIndex] = newnum[vertices.indexOf(other)];
+			if (adjacency.get(v).size() > 0){
+				E firstEdge = adjacency.get(v).get(0);
+				V other = firstEdge.getOrigin() == v ? firstEdge.getDestination()  : firstEdge.getOrigin();
+				a1[vIndex] = newnum[vertices.indexOf(other)];
+			}
 
 			inverseNumbering[newnum[vIndex] - 1] = vIndex;
 		}
@@ -782,13 +790,13 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				m--;
 			}
 			else{ //back edge
-				//	if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering starts from 1, indexes from 1
-				//	highpt[newnum[wIndex] - 1] = newnum[vIndex];
+				
+				if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering starts from 1, indexes from 1
+					highpt[newnum[wIndex] - 1] = newnum[vIndex];
 
-				if (highpt[wIndex] == 0)
-					highpt[wIndex] = newnum[vIndex];
+
 				//output current path
-				//System.out.println("output " + currentPath);
+				System.out.println("output " + currentPath);
 				s = null;
 			}
 		} 
@@ -851,8 +859,9 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 			for (E e : bucket.get(i)){
 				//add w to the end of A(v)
 
-				int[] directedIndexes = getDirectedNodes(e, number);
-				int vIndex = directedIndexes[0];
+
+				int vIndex = getDirectedNodes(e, number)[0];
+
 				v = vertices.get(vIndex);
 				//add w to end of A(v)
 				adjacent.get(v).add(e);
@@ -1023,7 +1032,6 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 
 	private E onEstack(int index1, int index2){
-		//TODO da li je dobro sa tim direkcijama jeste!
 		for (int i = 0; i < estack.size(); i++){
 			E e = estack.get(i);
 			int[] directedNodes = getDirectedNodes(e, newnum);
@@ -1064,26 +1072,30 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void printVerticesData(){
 		for (V v : graph.getVertices()){
 			int vIndex = vertices.indexOf(v);
 			System.out.println("Vertex " + v);
-			//	System.out.println("ND " + nd[vIndex]);
+			System.out.println("ND " + nd[vIndex]);
 			System.out.println("Numbering " + newnum[vIndex]);
 			System.out.println("lowpt1 " + lowpt1[vIndex]);
 			System.out.println("lowpt2 " + lowpt2[vIndex]);
-			//			System.out.println("father " + vertices.get(father[vIndex]));
-			//System.out.println("highpt " + highpt[vIndex]);
-			//	System.out.println("degree " + degree[vIndex]);
-			//System.out.println("a1 " + a1[vIndex]);
+			System.out.println("father " + vertices.get(father[vIndex]));
+			System.out.println("highpt " + highpt[vIndex]);
+			System.out.println("degree " + degree[vIndex]);
+			System.out.println("a1 " + a1[vIndex]);
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void printPaths(){
 		for (List<E> path : paths){
+			System.out.println(path);
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void printAdjacency(){
 		for (V v : vertices){
 			System.out.println("Vertex: " + v);

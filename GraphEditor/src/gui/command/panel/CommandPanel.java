@@ -14,7 +14,6 @@ import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.SeparationPairSplitting;
 import graph.properties.splitting.Splitting;
-import graph.properties.splitting.TriconnectedDivision;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
@@ -411,12 +410,8 @@ public class CommandPanel extends JPanel{
 			
 		}
 		
-		if (command.equals(commands[23])){
-			TriconnectedDivision<GraphVertex, GraphEdge> triDiv = new TriconnectedDivision<>(graph);
-			triDiv.execute();
-		}
 		
-		else if (command.equals(commands[25])){
+		else if (command.equals(commands[24])){
 			HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(graph);
 			try {
 				hopcroftTarjan.execute();
@@ -427,7 +422,7 @@ public class CommandPanel extends JPanel{
 			
 		}
 		
-		if (command.equals(commands[24])){
+		if (command.equals(commands[23])){
 			centralArea.setText("");
 			return "";
 		}
@@ -482,9 +477,8 @@ public class CommandPanel extends JPanel{
 		commands[20] = "convex";
 		commands[21] = "list biconnected components";
 		commands[22] = "separation pairs";
-		commands[23] = "triconnected";
-		commands[24] = "clear";
-		commands[25] = "splitting";
+		commands[23] = "clear";
+		commands[24] = "splitting";
 	}
 		
 
