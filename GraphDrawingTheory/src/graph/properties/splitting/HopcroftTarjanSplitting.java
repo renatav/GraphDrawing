@@ -731,9 +731,23 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 	private void formLastComponent(){
 		HopcroftTarjanSplitComponent<V, E> splitComponent = new HopcroftTarjanSplitComponent<V,E>();
-		for (E e : estack)
-			splitComponent.getEdges().add(e);
+		List<V> vertices = new ArrayList<V>();
+		for (E e : estack){
+			addEdgeToSplitComponent(splitComponent, e);
+			if (!vertices.contains(e.getOrigin()))
+				vertices.add(e.getOrigin());
+			if (!vertices.contains(e.getDestination()))
+				vertices.add(e.getDestination());
+		}
+		if (splitComponent.getEdges().size() > 3)
+			splitComponent.setType(SplitComponentType.TRICONNECTED_GRAPH);
+		else if (vertices.size() > 2)
+			splitComponent.setType(SplitComponentType.TRIANGLE);
+		else
+			splitComponent.setType(SplitComponentType.TRIPLE_BOND);
+			
 		splitComponents.add(splitComponent);
+		
 	}
 
 
