@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
@@ -89,7 +90,6 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	private int m;
 
 	private int n;
-	private int j;
 	private DFSTree<V,E> tree;
 
 	private Map<Integer, List<V>> lowpt1sMap = new HashMap<Integer, List<V>>();
@@ -659,6 +659,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 
 
+	@SuppressWarnings("unused")
 	private void printDFSTree(){
 
 		for (V v : vertices){

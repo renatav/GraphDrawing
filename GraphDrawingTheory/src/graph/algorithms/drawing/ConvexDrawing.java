@@ -11,6 +11,8 @@ import graph.properties.components.Block;
 import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitComponentType;
 import graph.properties.components.SplitPair;
+import graph.properties.splitting.AlgorithmErrorException;
+import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.Splitting;
 import graph.traversal.DijkstraAlgorithm;
 import graph.traversal.GraphTraversal;
@@ -405,7 +407,15 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	private void testSeparationPairs(){
 
-//		log.info("Determening types of separation pairs");
+		log.info("Determening types of separation pairs");
+		
+		HopcroftTarjanSplitting<V, E> hopcroftTarjanSplitting = new HopcroftTarjanSplitting<V,E>(graph, false);
+		try {
+			hopcroftTarjanSplitting.execute();
+		} catch (AlgorithmErrorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //
 //		TriconnectedDivision<V, E> triconnectedDivision = new TriconnectedDivision<V,E>(graph);
 //		triconnectedDivision.execute();
