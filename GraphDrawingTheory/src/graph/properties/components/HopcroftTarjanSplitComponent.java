@@ -8,15 +8,15 @@ import java.util.List;
 
 public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> extends Component<V,E>{
 
-	private SplitComponentType type;
+	private SplitTriconnectedComponentType type;
 	private SplitPair<V,E> spearaionPair;
 	private List<E> virtualEdges;
 	
-	public SplitComponentType getType() {
+	public SplitTriconnectedComponentType getType() {
 		return type;
 	}
 
-	public void setType(SplitComponentType type) {
+	public void setType(SplitTriconnectedComponentType type) {
 		this.type = type;
 	}
 
@@ -35,7 +35,15 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 	}
 	
 
-	public HopcroftTarjanSplitComponent(SplitComponentType type, List<E> edges) {
+	public HopcroftTarjanSplitComponent(List<E> edges, List<E> virtualEdges,
+			SplitTriconnectedComponentType type) {
+		super();
+		this.type = type;
+		this.edges = edges;
+		this.virtualEdges = virtualEdges;
+	}
+	
+	public HopcroftTarjanSplitComponent(SplitTriconnectedComponentType type, List<E> edges) {
 		super(edges);
 		this.type = type;
 	}

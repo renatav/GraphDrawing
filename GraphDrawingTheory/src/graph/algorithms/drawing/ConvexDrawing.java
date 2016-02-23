@@ -9,14 +9,13 @@ import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.properties.components.Block;
 import graph.properties.components.HopcroftTarjanSplitComponent;
-import graph.properties.components.SplitComponentType;
 import graph.properties.components.SplitPair;
+import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.Splitting;
 import graph.traversal.DijkstraAlgorithm;
 import graph.traversal.GraphTraversal;
-import graph.util.Pair;
 import graph.util.Util;
 
 import java.awt.geom.Point2D;
@@ -45,7 +44,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private List<SplitPair<V,E>> criticalSeparationPairs;
 	private Map<SplitPair<V,E>, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsOfPair;
 	private PlanarityTestingAlgorithm<V, E> planarityTesting = new FraysseixMendezPlanarity<V,E>();
-	
+
 	private Map<E, List<HopcroftTarjanSplitComponent<V, E>>> virtualEdgesSplitComponentsMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
 
 	private DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>();
@@ -201,7 +200,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 			}
-			
+
 
 			//Step 2 - Draw each block bi convex
 
@@ -255,7 +254,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		boolean allCyclesExtendable = false;
 
 		testSeparationPairs();
-		
+
 		if (forbiddenSeparationPairs.size() > 0){
 			throw new CannotBeAppliedException("Forbidden separation pair found. Graph doesn't have a convex drawing");
 		}
@@ -309,7 +308,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					int ringsCount = 0;
 					HopcroftTarjanSplitComponent<V, E> ring = null;
 					for (HopcroftTarjanSplitComponent<V, E> splitComponent : pairComponents){
-						if (splitComponent.getType() == SplitComponentType.RING){
+						if (splitComponent.getType() == SplitTriconnectedComponentType.RING){
 							ring = splitComponent;
 							ringsCount ++;
 							if (ringsCount > 1)
@@ -410,83 +409,219 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	private void testSeparationPairs(){
 
-		log.info("Determening types of separation pairs");
-		
+		log.info("Determining types of separation pairs");
+
 		HopcroftTarjanSplitting<V, E> hopcroftTarjanSplitting = new HopcroftTarjanSplitting<V,E>(graph, false);
-		
+
 		try {
 			hopcroftTarjanSplitting.execute();
 			List<HopcroftTarjanSplitComponent<V, E>> splitComponenets = hopcroftTarjanSplitting.getSplitComponents();
 			initVirtualEdgesComponentsMap(splitComponenets);
-			for (E e : hopcroftTarjanSplitting.getVirtualEdges())
-				formXYSplitComponents(splitComponenets, e);
+			//	for (E e : hopcroftTarjanSplitting.getVirtualEdges())
+			//	formXYSplitComponents(splitComponenets, e);
+
+			//form triconnected components
+
+			List<HopcroftTarjanSplitComponent<V, E>> triconnectedComponents = formTriconnectedComponents(splitComponenets);
+			for (HopcroftTarjanSplitComponent<V, E> triconnected : triconnectedComponents)
+				System.out.println(triconnected);
+
 		} catch (AlgorithmErrorException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
+	private List<HopcroftTarjanSplitComponent<V, E>> formTriconnectedComponents(List<HopcroftTarjanSplitComponent<V, E>>  components){
+		List<HopcroftTarjanSplitComponent<V,E>> triconnectedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
+
+		List<HopcroftTarjanSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
+
+		for (HopcroftTarjanSplitComponent<V, E> splitComponent : components){
+			if (processedComponents.contains(splitComponent))
+				continue;
+			if (splitComponent.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH)
+				triconnectedComponents.add(splitComponent);
+			else {
+				//if the component is a ring or a bond, merge it with other components to get a ring or a bond
+				//depending on the type of the component
+				if (splitComponent.getType() == SplitTriconnectedComponentType.TRIPLE_BOND){
+					HopcroftTarjanSplitComponent<V, E> bond = new HopcroftTarjanSplitComponent<V,E>();
+					bond.getEdges().addAll(splitComponent.getEdges());
+					bond.getVirtualEdges().addAll(splitComponent.getVirtualEdges());
+					bond.setType(SplitTriconnectedComponentType.BOND);
+
+					//find other triple bonds and merge them
+					int numOfMeges = 0;
+					//all virtual edges should be the same, get one
+					E virtualEdge = splitComponent.getVirtualEdges().get(0);
+					for (HopcroftTarjanSplitComponent<V, E> component : virtualEdgesSplitComponentsMap.get(virtualEdge))
+						if (component.getType() == SplitTriconnectedComponentType.TRIPLE_BOND && component != splitComponent){
+							numOfMeges ++;
+							bond.getEdges().addAll(component.getEdges());
+							bond.getVirtualEdges().addAll(component.getVirtualEdges());
+							processedComponents.add(component);
+						}
+
+					//remove virtual edges where the merge took place
+					//one merge = remove two edges
+					if (numOfMeges > 0)
+						for (int i = 0; i < 2*numOfMeges; i++){
+							bond.getEdges().remove(virtualEdge);
+							bond.getVirtualEdges().remove(virtualEdge);
+						}
+					triconnectedComponents.add(bond);							
+				}
+				//the component is a triangle, merge it with other triangles as far as possible
+				else{
+					//TODO proveriti ovo spajanje... kako uopste treba da se radi
+					HopcroftTarjanSplitComponent<V, E> ring = new HopcroftTarjanSplitComponent<V,E>();
+					ring.getEdges().addAll(splitComponent.getEdges());
+					ring.getVirtualEdges().addAll(splitComponent.getVirtualEdges());
+					ring.setType(SplitTriconnectedComponentType.RING);
+					List<E> edgesToBeMerged = new ArrayList<E>(ring.getVirtualEdges());
+					List<E> newVirtualEdges = new ArrayList<E>();
+					boolean merged;
+					while (edgesToBeMerged.size() > 0){
+						newVirtualEdges.clear();
+
+						for (E e : edgesToBeMerged){
+							merged = false;
+							System.out.println("virtual edge to merge on " + e);
+							for (HopcroftTarjanSplitComponent<V, E> component : virtualEdgesSplitComponentsMap.get(e)){
+								if (processedComponents.contains(component)|| component == splitComponent || 
+										component.getType() != SplitTriconnectedComponentType.TRIANGLE || 
+										component.getVirtualEdges().size() == component.getEdges().size()) // from looking at the example in chiba's paper (TODO - see if this is correct)
+									continue;
+								merged = true;
+								System.out.println("merging with component " + component);
+								for (E componentEdge : component.getEdges())
+									if (component.getVirtualEdges().contains(componentEdge)){
+										if (componentEdge != e){
+											newVirtualEdges.add(componentEdge);
+											ring.addVirtualEdge(componentEdge);
+										}
+									}
+									else
+										ring.addEdge(componentEdge);
+								processedComponents.add(component);
+							}
+							if (merged){
+								ring.getEdges().remove(e);
+								ring.getVirtualEdges().remove(e);
+							}
+						}
+						edgesToBeMerged.clear();
+						edgesToBeMerged.addAll(newVirtualEdges);
+					}
+					triconnectedComponents.add(ring);
+				}
+			}
+			processedComponents.add(splitComponent);
+		}
+		return triconnectedComponents;
+	}
+
+
 	/**
 	 * Forms {x,y} split components by joining split components previously detected split components
 	 * @param components A list of split components
 	 * @param virtualEdge Virtual edge (x,y) - corresponds to the split pair
 	 */
-	private void formXYSplitComponents(List<HopcroftTarjanSplitComponent<V, E>>  components, E virtualEdge){
-		
+	private List<HopcroftTarjanSplitComponent<V,E>> formXYSplitComponents(List<HopcroftTarjanSplitComponent<V, E>>  components, E virtualEdge){
+
 		System.out.println("Virtual edge " + virtualEdge);
 		//to start with, retrieve a list of components which contain the virtual edges representing the split pair
 		List<HopcroftTarjanSplitComponent<V, E>> baseComponents = virtualEdgesSplitComponentsMap.get(virtualEdge);
 		List<HopcroftTarjanSplitComponent<V,E>> xySplitComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
-		
+
 		//then join components which share a virtual edge with the current base component to form a {x,y} split component
 		for (HopcroftTarjanSplitComponent<V, E> currentBaseComponent : baseComponents){
-			System.out.println(currentBaseComponent);
-			HopcroftTarjanSplitComponent<V, E> xySplitComponent = new HopcroftTarjanSplitComponent<V,E>();
-			xySplitComponent.getEdges().addAll(currentBaseComponent.getEdges());
-			xySplitComponent.getVirtualEdges().addAll(currentBaseComponent.getVirtualEdges());
-			formCurrentComponent(xySplitComponent, virtualEdge);
-			xySplitComponents.add(xySplitComponent);
+			HopcroftTarjanSplitComponent<V, E> xySplitComponent = formCurrentComponent(currentBaseComponent, virtualEdge);
+			//split component must contain at least one non-virtual edge
+			System.out.println("Result: " + xySplitComponent);
+			if(xySplitComponent.getEdges().size() == xySplitComponent.getVirtualEdges().size())
+				System.out.println("Discarding component");
+			else
+				xySplitComponents.add(xySplitComponent);
+
+				
+
 		}
+		return xySplitComponents;
 	}
-	
-	
-	private void formCurrentComponent(HopcroftTarjanSplitComponent<V, E> current, E virtualEdge){
+
+
+	private HopcroftTarjanSplitComponent<V,E> formCurrentComponent(HopcroftTarjanSplitComponent<V,E> baseComponent,  E virtualEdge){
+
+		HopcroftTarjanSplitComponent<V, E> current = new HopcroftTarjanSplitComponent<V,E>();
+		current.getEdges().addAll(baseComponent.getEdges());
+		current.getVirtualEdges().addAll(baseComponent.getVirtualEdges());
 		
+		//set initial type, might be changes later if base component is a triangle and it is joined with a triconnected graph
+		if (baseComponent.getType() == SplitTriconnectedComponentType.TRIPLE_BOND)
+			current.setType(SplitTriconnectedComponentType.BOND);
+		else if (baseComponent.getType() == SplitTriconnectedComponentType.TRIANGLE)
+			current.setType(SplitTriconnectedComponentType.RING);
+		else
+			current.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
+
+		//form the component by merging it with all components that share a virtual edge different
+		//than the one representing the separation pair
+		//merge the merged components with those which share the newly added virtual edges
+		//and so on until no further merging can be done
+		//the resulting components should not contain any virtual edges except for the one representing
+		//the separation pair
+
+		System.out.println("Current base component " + baseComponent);
 		List<E> joinVirtualEdges = new ArrayList<E>();
-		joinVirtualEdges.addAll(current.getVirtualEdges());
-		joinVirtualEdges.remove(virtualEdge);
+		joinVirtualEdges.addAll(baseComponent.getVirtualEdges());
+		for (E ve : baseComponent.getVirtualEdges()){
+			if (ve == virtualEdge)
+				joinVirtualEdges.remove(ve);
+			else{
+				current.getEdges().remove(ve);
+				current.getVirtualEdges().remove(ve);
+			}
+		}
+
+		if (joinVirtualEdges.size() == 0)
+			return current;
+
 		List<E> newVirtualEdges = new ArrayList<E>();
+		List<HopcroftTarjanSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
+		processedComponents.add(baseComponent);
 		while (joinVirtualEdges.size() > 0){
 			newVirtualEdges.clear();
+
 			for (E e : joinVirtualEdges){
-				
-				int numOfJoins = 0;
+				System.out.println("virtual edge to merge on " + e);
 				for (HopcroftTarjanSplitComponent<V, E> component : virtualEdgesSplitComponentsMap.get(e)){
-					if (component == current)
+					if (processedComponents.contains(component))
 						continue;
-					for (E componentEdge : component.getEdges()){
-						if (component.getVirtualEdges().contains(componentEdge)){
-							if (componentEdge != e)
-								newVirtualEdges.add(componentEdge);
-							current.addVirtualEdge(componentEdge);
-						}
-						else
+					System.out.println("merging with component " + component);
+					if (component.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH)
+						current.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
+					for (E componentEdge : component.getEdges())
+						if (!component.getVirtualEdges().contains(componentEdge)){
 							current.addEdge(componentEdge);
 						}
-					numOfJoins++;
-					}
-				
-				for (int i = 0; i <= numOfJoins; i++){
-					current.getEdges().remove(e);
-					current.getVirtualEdges().remove(e);
+						else if (componentEdge != virtualEdge && componentEdge != e)
+							newVirtualEdges.add(componentEdge);
+					processedComponents.add(component);
 				}
+
 			}
+
+			System.out.println(newVirtualEdges);
 			joinVirtualEdges.clear();
 			joinVirtualEdges.addAll(newVirtualEdges);
 		}
+
+		return current;
 	}
-	
+
 	private void initVirtualEdgesComponentsMap(List<HopcroftTarjanSplitComponent<V, E>>  components){
 		virtualEdgesSplitComponentsMap.clear();
 		for (HopcroftTarjanSplitComponent<V, E> splitComponent : components){
@@ -499,7 +634,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
-	
+
 
 	/**
 	 * Checks if S* is extendable
@@ -522,7 +657,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			int count = 0;
 			for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponents){
 				//a component having no edge of S can only by a bond or a ring
-				if (splitComponent.getType() == SplitComponentType.BOND || splitComponent.getType() == SplitComponentType.RING){
+				if (splitComponent.getType() == SplitTriconnectedComponentType.BOND || splitComponent.getType() == SplitTriconnectedComponentType.RING){
 					//check if the component has at least one edge of S
 					boolean hasAtLeastOne = false;
 					for (E e : splitComponent.getEdges())

@@ -4,7 +4,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.HopcroftTarjanSplitComponent;
-import graph.properties.components.SplitComponentType;
+import graph.properties.components.SplitTriconnectedComponentType;
 import graph.util.Util;
 
 import java.util.ArrayList;
@@ -306,7 +306,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							//a1(w) is x mentioned below, so no need to anything with it
 							HopcroftTarjanSplitComponent<V, E> splitComponent = new HopcroftTarjanSplitComponent<V,E>();
 							splitComponents.add(splitComponent);
-							splitComponent.setType(SplitComponentType.TRIANGLE); //in this case we take two edges and a virtual edge -> triangle
+							splitComponent.setType(SplitTriconnectedComponentType.TRIANGLE); //in this case we take two edges and a virtual edge -> triangle
 
 							j++;
 
@@ -397,9 +397,9 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 								log.info("add " + aVertex + ", " + bVertex + ", " + j + " to new component");
 							//set component type
 							if (splitComponent.getEdges().size() > 3)
-								splitComponent.setType(SplitComponentType.TRICONNECTED_GRAPH);
+								splitComponent.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
 							else
-								splitComponent.setType(SplitComponentType.TRIANGLE);
+								splitComponent.setType(SplitTriconnectedComponentType.TRIANGLE);
 							//x = b
 							x=b;
 						}
@@ -413,7 +413,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							addEdgeToSplitComponent(splitComponent, savedEdge);
 							splitComponent.addVirtualEdge(virtualEdge);
 							splitComponent.addVirtualEdge(virtualEdge);
-							splitComponent.setType(SplitComponentType.TRIPLE_BOND);
+							splitComponent.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
 							int xIndex = inverseNumbering[x - 1];
 							if (debug)
 								log.info("add saved edge " + savedEdge + ", " + virtualEdge + ", " + virtualEdge + " to new component");
@@ -498,7 +498,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							addEdgeToSplitComponent(tripleBond, sameEdge);
 							addEdgeToSplitComponent(tripleBond, sameEdge);
 							splitComponents.add(tripleBond);
-							tripleBond.setType(SplitComponentType.TRIPLE_BOND);
+							tripleBond.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
 							if (debug)
 								log.info("add " + sameEdge + ", " + sameEdge + ", " + currentEdge + " to new component");
 							degree[xIndex]--;
@@ -515,9 +515,9 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 					splitComponent.addVirtualEdge(virtualEdge);
 					splitComponents.add(splitComponent);
 					if (splitComponent.getEdges().size() > 3)
-						splitComponent.setType(SplitComponentType.TRICONNECTED_GRAPH);
+						splitComponent.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
 					else
-						splitComponent.setType(SplitComponentType.TRIANGLE);
+						splitComponent.setType(SplitTriconnectedComponentType.TRIANGLE);
 
 					//if a1(v) = w then a1(v) = lowpt1(w)
 					if (a1[vIndex] == newnum[wIndex])
@@ -546,7 +546,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 								tripleBond.addVirtualEdge(virtualEdge);
 								tripleBond.addVirtualEdge(virtualEdge);
 								splitComponents.add(tripleBond);
-								tripleBond.setType(SplitComponentType.TRIPLE_BOND);
+								tripleBond.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
 								if (debug)
 									log.info("add " + currentEdge + ", " + virtualEdge + ", " + virtualEdge + " to new component");
 
@@ -585,7 +585,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						//mark tree arc as virtual edge
 						log.info("Adding virtual edge: " + treeArc);
 						virtualEdges.add(treeArc);
-						tripleBond.setType(SplitComponentType.TRIPLE_BOND);
+						tripleBond.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
 
 						//log.info("add (v, lowpt1(w), j-1), (v, lowpt1(w), j), tree arc (lowpt1(w),v) to new component");
 					}
@@ -695,7 +695,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						virtualEdges.add(treeArc);
 						if (debug)
 							log.info("add " + e + ", " + e + ", " + treeArc + " to new compoenent");
-						splitComponent.setType(SplitComponentType.TRIPLE_BOND);
+						splitComponent.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
 						if (debug)
 							log.info("add (v,w), (v,w,j), tree arc (w,v) to new component");
 						//decrement degree v, degree w, mark tree arc (w,v) as virtual edge j
@@ -766,11 +766,11 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 				vertices.add(e.getDestination());
 		}
 		if (splitComponent.getEdges().size() > 3)
-			splitComponent.setType(SplitComponentType.TRICONNECTED_GRAPH);
+			splitComponent.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
 		else if (vertices.size() > 2)
-			splitComponent.setType(SplitComponentType.TRIANGLE);
+			splitComponent.setType(SplitTriconnectedComponentType.TRIANGLE);
 		else
-			splitComponent.setType(SplitComponentType.TRIPLE_BOND);
+			splitComponent.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
 
 		splitComponents.add(splitComponent);
 

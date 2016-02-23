@@ -1,6 +1,6 @@
 package graph.properties.components;
 
-public enum SplitComponentType {
+public enum SplitTriconnectedComponentType {
 	
 	TRIPLE_BOND, TRIANGLE, TRICONNECTED_GRAPH, BOND, RING;
 }
