@@ -39,11 +39,25 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private Map<E, SplitPair<V,E>>  splitPairVirtualEdgeMapInverse;
 	private Logger log = Logger.getLogger(ConvexDrawing.class);
 
-	private List<SplitPair<V,E>> primeSeparationPairs;
-	private List<SplitPair<V,E>> forbiddenSeparationPairs;
-	private List<SplitPair<V,E>> criticalSeparationPairs;
+	/**A list of prime separation pairs represented by a virtual edge which contains
+	 * its two vertices as end points. A separation pair is prime if the virtual edge
+	 * is contained in a triconnected component 
+	 */
+	private List<E> primeSeparationPairs;
+	/**
+	 * A list of forbidden separation pairs. A prime separation pair is forbidden if it has at least 
+	 * 4 split components or 3 components none of which is either a ring or a bond 
+	 */
+	private List<E> forbiddenSeparationPairs;
+	/**
+	 * A list of critical separation pairs. A prime separation  pair is prime if it has either
+	 * i) three {x,y} split components including a ring or a bond or
+	 * ii) two {x,y} split components neither of which is a ring
+	 */
+	private List<E> criticalSeparationPairs;
 	private Map<SplitPair<V,E>, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsOfPair;
 	private PlanarityTestingAlgorithm<V, E> planarityTesting = new FraysseixMendezPlanarity<V,E>();
+	private List<E> virtualEdges;
 
 	private Map<E, List<HopcroftTarjanSplitComponent<V, E>>> virtualEdgesSplitComponentsMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
 
@@ -278,9 +292,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			List<V> criticalSeparationPairVertices = new ArrayList<V>();
 
 
-			for (SplitPair<V,E> criticalSeparationPair : criticalSeparationPairs){
-				V x = criticalSeparationPair.getV();
-				V y = criticalSeparationPair.getU();
+			for (E criticalSeparationPair : criticalSeparationPairs){
+				V x = criticalSeparationPair.getOrigin();
+				V y = criticalSeparationPair.getDestination();
 
 				if (!criticalSeparationPairVertices.contains(x))
 					criticalSeparationPairVertices.add(x);
@@ -340,9 +354,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 			//if one vertex belongs to two or more separation pairs, only create one edge between it and v
 			List<V> joinedVertices = new ArrayList<V>();
-			for (SplitPair<V,E> criticalSeparationPair : criticalSeparationPairs){
-				V v1 = criticalSeparationPair.getV();
-				V v2 = criticalSeparationPair.getU();
+			for (E criticalSeparationPair : criticalSeparationPairs){
+				V v1 = criticalSeparationPair.getOrigin();
+				V v2 = criticalSeparationPair.getDestination();
 				if (!joinedVertices.contains(v1)){
 					E e1 = Util.createEdge(v, v1, edgeClass);
 					G2.addEdge(e1);
@@ -417,14 +431,67 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			hopcroftTarjanSplitting.execute();
 			List<HopcroftTarjanSplitComponent<V, E>> splitComponenets = hopcroftTarjanSplitting.getSplitComponents();
 			initVirtualEdgesComponentsMap(splitComponenets);
-			//	for (E e : hopcroftTarjanSplitting.getVirtualEdges())
-			//	formXYSplitComponents(splitComponenets, e);
+			virtualEdges = hopcroftTarjanSplitting.getVirtualEdges();
 
 			//form triconnected components
 
 			List<HopcroftTarjanSplitComponent<V, E>> triconnectedComponents = formTriconnectedComponents(splitComponenets);
-			for (HopcroftTarjanSplitComponent<V, E> triconnected : triconnectedComponents)
-				System.out.println(triconnected);
+			primeSeparationPairs = new ArrayList<E>();
+
+			//find prime separation pairs
+			//a separation pair {x,y} is prime if x and y are end vertices of a virtual edge
+			//contained in a triconnected component
+			for (HopcroftTarjanSplitComponent<V, E> triconnected : triconnectedComponents){
+				for (E e : triconnected.getEdges())
+					if (!primeSeparationPairs.contains(e) && virtualEdges.contains(e))
+						primeSeparationPairs.add(e);
+			}
+
+			log.info("Prime separation pairs: " + primeSeparationPairs);
+
+			//find forbidden separation pairs
+			//a prime separation pair is forbidden if it has at least 4 split components or 3 components none
+			//of which is either a ring or a bond (meaning, just triconncted graphs) 
+			forbiddenSeparationPairs = new ArrayList<E>();
+
+			//find critical separation pairs
+			//a prime separation  pair is prime if it has either
+			//three {x,y} split components including a ring or a bond
+			//or two {x,y} split components neither of which is a ring
+			criticalSeparationPairs = new ArrayList<E>();
+
+			for (E e : primeSeparationPairs){
+				List<HopcroftTarjanSplitComponent<V, E>> xySplitComponents = formXYSplitComponents(splitComponenets, e);
+				if (xySplitComponents.size() >= 4)
+					forbiddenSeparationPairs.add(e);
+				else if (xySplitComponents.size() == 3){
+					boolean ringOrBond = false;
+					for (HopcroftTarjanSplitComponent<V, E> splitComponent : xySplitComponents)
+						if (splitComponent.getType() != SplitTriconnectedComponentType.TRICONNECTED_GRAPH){
+							ringOrBond = true;
+							break;
+						}
+					if (!ringOrBond)
+						forbiddenSeparationPairs.add(e);
+					else
+						criticalSeparationPairs.add(e);
+				}
+				else if (xySplitComponents.size() == 2){
+					boolean ring = false;
+					for (HopcroftTarjanSplitComponent<V, E> splitComponent : xySplitComponents)
+						if (splitComponent.getType() == SplitTriconnectedComponentType.RING){
+							ring = true;
+							break;
+						}
+					if (!ring)
+						criticalSeparationPairs.add(e);
+				}
+			}
+
+			log.info("Forbidden separation pairs: " + forbiddenSeparationPairs);
+			log.info("Critical separation pairs: " + criticalSeparationPairs);
+
+
 
 		} catch (AlgorithmErrorException e) {
 			// TODO Auto-generated catch block
@@ -546,7 +613,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			else
 				xySplitComponents.add(xySplitComponent);
 
-				
+
 
 		}
 		return xySplitComponents;
@@ -558,7 +625,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		HopcroftTarjanSplitComponent<V, E> current = new HopcroftTarjanSplitComponent<V,E>();
 		current.getEdges().addAll(baseComponent.getEdges());
 		current.getVirtualEdges().addAll(baseComponent.getVirtualEdges());
-		
+
 		//set initial type, might be changes later if base component is a triangle and it is joined with a triconnected graph
 		if (baseComponent.getType() == SplitTriconnectedComponentType.TRIPLE_BOND)
 			current.setType(SplitTriconnectedComponentType.BOND);
@@ -652,7 +719,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			log.info("Has forbidden separation pairs - not extendable");
 			return false;
 		}
-		for (SplitPair<V, E> criticalSeparationPair : criticalSeparationPairs){
+		//TODO prepraviti posle ispravki separation parova - rada preko ivica
+		for (E criticalSeparationPair : criticalSeparationPairs){
 			List<HopcroftTarjanSplitComponent<V, E>> splitComponents = splitComponentsOfPair.get(criticalSeparationPair);
 			int count = 0;
 			for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponents){
