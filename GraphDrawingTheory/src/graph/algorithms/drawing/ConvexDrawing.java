@@ -20,7 +20,6 @@ import graph.util.Util;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,8 +34,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private Class<?> edgeClass, vertexClass;
 	private Random rand;
 	private Splitting<V, E> splitting;
-	private Map<SplitPair<V,E>, E>  splitPairVirtualEdgeMap;
-	private Map<E, SplitPair<V,E>>  splitPairVirtualEdgeMapInverse;
 	private Logger log = Logger.getLogger(ConvexDrawing.class);
 
 	/**A list of prime separation pairs represented by a virtual edge which contains
@@ -55,7 +52,14 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * ii) two {x,y} split components neither of which is a ring
 	 */
 	private List<E> criticalSeparationPairs;
-	private Map<SplitPair<V,E>, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsOfPair;
+	/**
+	 * A map which contains a critical separation pair as the keys and a list of its split components as values
+	 */
+	private Map<E, List<HopcroftTarjanSplitComponent<V, E>>> splitComponentsOfPair;
+	/**
+	 * Planarity testing algorithm used to test the existence of an extendable facial cycle i.e. the possibility
+	 * of creating a convex drawing
+	 */
 	private PlanarityTestingAlgorithm<V, E> planarityTesting = new FraysseixMendezPlanarity<V,E>();
 	private List<E> virtualEdges;
 
@@ -76,8 +80,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
-		testSeparationPairs();
-
+		try {
+			convexTesting();
+		} catch (CannotBeAppliedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 
 		return ret;
@@ -234,24 +242,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	}
 
-	private void setVirtualEdgesSplitPairMap(List<SplitPair<V, E>> separationPairs, Collection<E> virtualEdges){
 
-		splitPairVirtualEdgeMap = new HashMap<SplitPair<V,E>, E>();
-		splitPairVirtualEdgeMapInverse = new HashMap<E, SplitPair<V,E>>();
-		boolean found;
-		for (SplitPair<V,E> sp : separationPairs){
-			found = false;
-			for (E e : virtualEdges)
-				if (e.getOrigin() == sp.getV() && e.getDestination() == sp.getU()){
-					splitPairVirtualEdgeMap.put(sp, e);
-					splitPairVirtualEdgeMapInverse.put(e, sp);
-					found = true;
-					break;
-				}
-			if (!found)
-				splitPairVirtualEdgeMap.put(sp, null);
-		}
-	}
 
 	/**
 	 * Determines if a 2-connected graph has a convex drawing
@@ -353,20 +344,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			G2.addVertex(v);
 
 			//if one vertex belongs to two or more separation pairs, only create one edge between it and v
-			List<V> joinedVertices = new ArrayList<V>();
-			for (E criticalSeparationPair : criticalSeparationPairs){
-				V v1 = criticalSeparationPair.getOrigin();
-				V v2 = criticalSeparationPair.getDestination();
-				if (!joinedVertices.contains(v1)){
-					E e1 = Util.createEdge(v, v1, edgeClass);
-					G2.addEdge(e1);
-					joinedVertices.add(v1);
-				}
-				if (!joinedVertices.contains(v2)){
-					E e2 = Util.createEdge(v, v2, edgeClass);
-					G2.addEdge(e2);
-					joinedVertices.add(v2);
-				}
+			//list of all vertices belonging to separation pairs was already formed
+			
+			for (V v1 :criticalSeparationPairVertices ){
+					E newEdge = Util.createEdge(v, v1, edgeClass);
+					G2.addEdge(newEdge);
 			}
 
 			log.info("Created graph G2 " + G2.toString());
@@ -459,6 +441,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//three {x,y} split components including a ring or a bond
 			//or two {x,y} split components neither of which is a ring
 			criticalSeparationPairs = new ArrayList<E>();
+			//prepare a map of critical separation pairs and the split components it contains
+			splitComponentsOfPair = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
+			
 
 			for (E e : primeSeparationPairs){
 				List<HopcroftTarjanSplitComponent<V, E>> xySplitComponents = formXYSplitComponents(splitComponenets, e);
@@ -473,8 +458,10 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						}
 					if (!ringOrBond)
 						forbiddenSeparationPairs.add(e);
-					else
+					else{
 						criticalSeparationPairs.add(e);
+						splitComponentsOfPair.put(e, xySplitComponents);
+					}
 				}
 				else if (xySplitComponents.size() == 2){
 					boolean ring = false;
@@ -483,9 +470,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 							ring = true;
 							break;
 						}
-					if (!ring)
+					if (!ring){
 						criticalSeparationPairs.add(e);
+						splitComponentsOfPair.put(e, xySplitComponents);
+					}
 				}
+				
 			}
 
 			log.info("Forbidden separation pairs: " + forbiddenSeparationPairs);
@@ -494,7 +484,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 		} catch (AlgorithmErrorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -555,14 +544,14 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 						for (E e : edgesToBeMerged){
 							merged = false;
-							System.out.println("virtual edge to merge on " + e);
+						//	System.out.println("virtual edge to merge on " + e);
 							for (HopcroftTarjanSplitComponent<V, E> component : virtualEdgesSplitComponentsMap.get(e)){
 								if (processedComponents.contains(component)|| component == splitComponent || 
 										component.getType() != SplitTriconnectedComponentType.TRIANGLE || 
 										component.getVirtualEdges().size() == component.getEdges().size()) // from looking at the example in chiba's paper (TODO - see if this is correct)
 									continue;
 								merged = true;
-								System.out.println("merging with component " + component);
+							//	System.out.println("merging with component " + component);
 								for (E componentEdge : component.getEdges())
 									if (component.getVirtualEdges().contains(componentEdge)){
 										if (componentEdge != e){
@@ -605,16 +594,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		//then join components which share a virtual edge with the current base component to form a {x,y} split component
 		for (HopcroftTarjanSplitComponent<V, E> currentBaseComponent : baseComponents){
+			System.out.println("base component " + currentBaseComponent);
 			HopcroftTarjanSplitComponent<V, E> xySplitComponent = formCurrentComponent(currentBaseComponent, virtualEdge);
-			//split component must contain at least one non-virtual edge
 			System.out.println("Result: " + xySplitComponent);
-			if(xySplitComponent.getEdges().size() == xySplitComponent.getVirtualEdges().size())
-				System.out.println("Discarding component");
-			else
+			//split component must contain at least one non-virtual edge
+			if(xySplitComponent.getEdges().size() != xySplitComponent.getVirtualEdges().size())
 				xySplitComponents.add(xySplitComponent);
-
-
-
 		}
 		return xySplitComponents;
 	}
@@ -641,7 +626,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//the resulting components should not contain any virtual edges except for the one representing
 		//the separation pair
 
-		System.out.println("Current base component " + baseComponent);
+		//System.out.println("Current base component " + baseComponent);
 		List<E> joinVirtualEdges = new ArrayList<E>();
 		joinVirtualEdges.addAll(baseComponent.getVirtualEdges());
 		for (E ve : baseComponent.getVirtualEdges()){
@@ -663,11 +648,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			newVirtualEdges.clear();
 
 			for (E e : joinVirtualEdges){
-				System.out.println("virtual edge to merge on " + e);
+				//System.out.println("virtual edge to merge on " + e);
 				for (HopcroftTarjanSplitComponent<V, E> component : virtualEdgesSplitComponentsMap.get(e)){
 					if (processedComponents.contains(component))
 						continue;
-					System.out.println("merging with component " + component);
+					//System.out.println("merging with component " + component);
 					if (component.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH)
 						current.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
 					for (E componentEdge : component.getEdges())
@@ -681,7 +666,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 			}
 
-			System.out.println(newVirtualEdges);
+			//System.out.println(newVirtualEdges);
 			joinVirtualEdges.clear();
 			joinVirtualEdges.addAll(newVirtualEdges);
 		}
