@@ -588,6 +588,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private List<HopcroftTarjanSplitComponent<V,E>> formXYSplitComponents(List<HopcroftTarjanSplitComponent<V, E>>  components, E virtualEdge){
 
 		System.out.println("Virtual edge " + virtualEdge);
+		System.out.println(virtualEdgesSplitComponentsMap);
 		//to start with, retrieve a list of components which contain the virtual edges representing the split pair
 		List<HopcroftTarjanSplitComponent<V, E>> baseComponents = virtualEdgesSplitComponentsMap.get(virtualEdge);
 		List<HopcroftTarjanSplitComponent<V,E>> xySplitComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();

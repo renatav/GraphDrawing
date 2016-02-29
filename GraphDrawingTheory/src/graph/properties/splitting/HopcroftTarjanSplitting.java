@@ -137,9 +137,9 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	public void execute() throws AlgorithmErrorException{
 
 		init();
-//		printVerticesData();
-//		System.out.println(treeEdges);
-//		System.out.println(fronds);
+		//printVerticesData();
+	//	System.out.println(treeEdges);
+		//System.out.println(fronds);
 //		printPaths();
 //		printAdjacency();
 		pathsearch(vertices.get(0));
@@ -437,6 +437,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						degree[vIndex]++;
 
 						//father(x) = v
+						System.out.println("setting father of " + xIndex + " = " + vIndex );
 						father[xIndex] = vIndex;
 
 						//if (A1(v)) ->*x then a1(v) = x
@@ -448,21 +449,31 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						//w = x
 						w = xVertex;
 						wIndex = xIndex;
+						//mozda je ovo lokalno za while petlju!
+						
 					}
 				}
 
 
+				
 				//TEST FOR TYPE 1 PAIR
 				//G:
 				//lowpts contain numberings
 				//if (lowpt2(w)>=v) and ((lowpt1(w) != 1) or (father(v)!=1) or (w>3))
+
+				//detected problem when a virtual edge is created, w is changed and type one separation
+				//pair is detected
+				w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+				wIndex = vertices.indexOf(w);
+					
+				
 				if (lowpt2[wIndex] >= newnum[vIndex] && (lowpt1[wIndex] != 1 || newnum[father[vIndex]] != 1 || newnum[wIndex] > 3)){
 					j++;
 					//while (x,y) on top of estack has (w <= x<w +ND(w) or ((w<=y<w+ND(w))
 
 					HopcroftTarjanSplitComponent<V, E> splitComponent = new HopcroftTarjanSplitComponent<V,E>();
 					E virtualEdge;
-
+					
 					while (!estack.isEmpty()){
 						E currentEdge = estack.peek();
 						int[] directed = getDirectedNodes(currentEdge, newnum);
@@ -470,7 +481,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						int yIndex = directed[1];
 						int x = newnum[xIndex];
 						int y = newnum[yIndex];
-
+						
 						boolean condition = (newnum[wIndex] <= x && x < newnum[wIndex] + nd[wIndex]) || 
 								(newnum[wIndex] <= y && y < newnum[wIndex] + nd[wIndex]);
 
@@ -494,15 +505,28 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						}
 						else{ //Added this to solve the problem of triple bonds not being detected and being joined with other components //TODO is there a mistake that let to this necessity? 
 							HopcroftTarjanSplitComponent<V, E> tripleBond = new HopcroftTarjanSplitComponent<V,E>();
+							
 							addEdgeToSplitComponent(tripleBond, currentEdge);
 							addEdgeToSplitComponent(tripleBond, sameEdge);
-							addEdgeToSplitComponent(tripleBond, sameEdge);
+							//the component can only contain an edge more than once if it is a virtual edge
+							if (virtualEdges.contains(sameEdge))
+									addEdgeToSplitComponent(tripleBond, sameEdge);
+							else
+								addEdgeToSplitComponent(tripleBond, currentEdge);
 							splitComponents.add(tripleBond);
 							tripleBond.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
 							if (debug)
 								log.info("add " + sameEdge + ", " + sameEdge + ", " + currentEdge + " to new component");
 							degree[xIndex]--;
 							degree[yIndex]--;
+							
+							//if the edge already contained by the component is not a virtual edge
+							//remove it (it should be contained by the newly created triple bond)
+							//and add the virtual edge
+							if (!virtualEdges.contains(sameEdge) && virtualEdges.contains(currentEdge)){
+								splitComponent.getEdges().remove(sameEdge);
+								addEdgeToSplitComponent(splitComponent, currentEdge);
+							}
 						}
 					}
 					//add (v, lowpt1(w),j) to new component
@@ -520,6 +544,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						splitComponent.setType(SplitTriconnectedComponentType.TRIANGLE);
 
 					//if a1(v) = w then a1(v) = lowpt1(w)
+					
+					
 					if (a1[vIndex] == newnum[wIndex])
 						a1[vIndex] = lowpt1[wIndex];
 
@@ -615,7 +641,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 					Triple t = tstack.peek();
 					if (t == endOfStackMarker)
 						break;
-					if (highpt[vIndex] > t.getH()){
+					if (highpt[newnum[vIndex]-1] > t.getH()){
 						tstack.pop();
 						if (debug)
 							log.info("Removing triple " + t + " from tstack");
@@ -683,7 +709,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 					if (treeArc != null){
 						HopcroftTarjanSplitComponent<V, E> splitComponent = new HopcroftTarjanSplitComponent<V,E>();
 						splitComponent.addEdge(e);
-						splitComponent.addEdge(e);
+						//the component shouldn't contain two same edges unless it is a virtual edge
+						splitComponent.addVirtualEdge(treeArc);
 						splitComponent.addVirtualEdge(treeArc);
 						splitComponents.add(splitComponent);
 						SeparationPair<V> separationPair = new SeparationPair<V>(v,w,1);
@@ -755,16 +782,44 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 	}
 
+	//TODO da li se moze desiti da treba vise komponenti da se napravi, ako se naleti na vise separation parova
 	private void formLastComponent(){
 		HopcroftTarjanSplitComponent<V, E> splitComponent = new HopcroftTarjanSplitComponent<V,E>();
 		List<V> vertices = new ArrayList<V>();
 		for (E e : estack){
-			addEdgeToSplitComponent(splitComponent, e);
+			
+			E sameEdge = alreadyContainsEdge(splitComponent, e);
+			
+			if (sameEdge == null)
+				addEdgeToSplitComponent(splitComponent, e);
+			else{
+				HopcroftTarjanSplitComponent<V, E> tripleBond = new HopcroftTarjanSplitComponent<V,E>();
+				addEdgeToSplitComponent(tripleBond, e);
+				addEdgeToSplitComponent(tripleBond, sameEdge);
+				//the component can only contain an edge more than once if it is a virtual edge
+				if (virtualEdges.contains(sameEdge))
+						addEdgeToSplitComponent(tripleBond, sameEdge);
+				else
+					addEdgeToSplitComponent(tripleBond, e);
+				splitComponents.add(tripleBond);
+				tripleBond.setType(SplitTriconnectedComponentType.TRIPLE_BOND);
+				
+				//if the edge already contained by the component is not a virtual edge
+				//remove it (it should be contained by the newly created triple bond)
+				//and add the virtual edge
+				if (!virtualEdges.contains(sameEdge) && virtualEdges.contains(e)){
+					splitComponent.getEdges().remove(sameEdge);
+					addEdgeToSplitComponent(splitComponent, e);
+				}
+			}
+
+			
 			if (!vertices.contains(e.getOrigin()))
 				vertices.add(e.getOrigin());
 			if (!vertices.contains(e.getDestination()))
 				vertices.add(e.getDestination());
 		}
+		
 		if (splitComponent.getEdges().size() > 3)
 			splitComponent.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
 		else if (vertices.size() > 2)
@@ -830,7 +885,10 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 		//find vertex whose number is 1, start with it
 		//that will be the previously selected root vertex
-		pathfiner(root,paths, null);
+		pathfinder(root,paths, null);
+		if (debug){
+			log.info("Found paths: " + paths);
+		}
 
 		if (debug){
 			log.info("second dfs completed");
@@ -879,7 +937,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	 * @param currentPath current path being built
 	 * @param treeEdges list of all tree edges (arcs)
 	 */
-	private void pathfiner(V v, 
+	private void pathfinder(V v, 
 			List<List<E>> paths, List<E> currentPath){
 
 		int vIndex = vertices.indexOf(v);
@@ -899,13 +957,15 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 			}
 			currentPath.add(e);
 			if (treeEdges.contains(e)){
-				pathfiner(w, paths, currentPath);
+				pathfinder(w, paths, currentPath);
 				m--;
 			}
 			else{ //back edge
 
-				if (highpt[newnum[wIndex] - 1] == 0) //-1 since numbering starts from 1, indexes from 1
+				if (highpt[newnum[wIndex] - 1] == 0){ //-1 since numbering starts from 1, indexes from 1
 					highpt[newnum[wIndex] - 1] = newnum[vIndex];
+					
+				}
 
 				s = null;
 			}
