@@ -257,6 +257,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//Form three sets: prime separation pairs, critical separation pairs and forbidden separation pairs
 
 		boolean allCyclesExtendable = false;
+		List<V> face;
 
 		testSeparationPairs();
 
@@ -268,9 +269,79 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			allCyclesExtendable = true;
 		}
 		else if (criticalSeparationPairs.size() == 1){
-			//TODO
 			//set S based on figure 4 from Chibba's paper
-			//finds those four possible cycles
+			//finds those seven possible cycles
+			//the extendable facial cycle should contain two vertices belonging to the separation pairs
+			//it should be a cycle
+			//there are either two or three split components of that pair
+			//two triconnected graphs
+			//or three components where at least one is a bond or a ring
+			//to satisfy condition 2, a facial cycle must contain edges of all but one
+			//split component of every critical separation pair (that one component is optional)
+			//that component is either a ring or a bond
+			//so, take paths from one critical pair vertex to the other one of the components, join them...
+			//easy if it is a ring
+			//TODO find an example where there are triconnected graphs as split components
+			E pair = criticalSeparationPairs.get(0);
+			V v1 = pair.getOrigin();
+			V v2 = pair.getDestination();
+			List<HopcroftTarjanSplitComponent<V, E>> splitComponents = splitComponentsOfPair.get(pair);
+
+			List<E> totalPath = new ArrayList<E>();
+			List<List<E>> mustContainPaths = new ArrayList<List<E>>();
+			List<List<E>> optionalPaths = new ArrayList<List<E>>();
+			face = new ArrayList<V>();
+
+			for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponents){
+				List<E> edges = new ArrayList<E>();
+				if (splitComponent.getType() == SplitTriconnectedComponentType.BOND){
+					edges.add(pair);
+					optionalPaths.add(edges);
+				}
+				else if (splitComponent.getType() == SplitTriconnectedComponentType.RING){
+					edges.addAll(splitComponent.getEdges());
+					edges.remove(pair);
+					optionalPaths.add(edges);
+				}
+				else{
+					edges.addAll(splitComponent.getEdges());
+					edges.remove(pair);
+					DijkstraAlgorithm<V,E> dijkstra = new DijkstraAlgorithm<V,E>(edges, false);
+					edges = dijkstra.getPath(v1, v2).getPath();
+					mustContainPaths.add(edges);
+					System.out.println(edges);
+				}
+			}
+			
+			//paths now contain a path from v1 to v2 in every split component
+			//joining them should result in acquiring the facial cycle
+			
+			for (List<E> path : mustContainPaths)
+				for (E e : path)
+					totalPath.add(e);
+			
+			//now about the other ones
+			//if mustContainPaths has less than two paths, at least two, the third one is optional according to condition 2
+			//for now, add them all
+			
+			for (List<E> path : optionalPaths)
+				for (E e : path)
+					totalPath.add(e);
+			
+			System.out.println(totalPath);
+			
+			for (E e : totalPath){
+				V origin = e.getOrigin();
+				V dest = e.getDestination();
+				if (!face.contains(origin))
+					face.add(origin);
+				if (!face.contains(dest))
+					face.add(dest);
+				
+			}
+			
+			System.out.println(face);
+				
 		}
 		else{
 			//STEP 2 construct graphs G1 and G2
@@ -345,10 +416,10 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 			//if one vertex belongs to two or more separation pairs, only create one edge between it and v
 			//list of all vertices belonging to separation pairs was already formed
-			
+
 			for (V v1 :criticalSeparationPairVertices ){
-					E newEdge = Util.createEdge(v, v1, edgeClass);
-					G2.addEdge(newEdge);
+				E newEdge = Util.createEdge(v, v1, edgeClass);
+				G2.addEdge(newEdge);
 			}
 
 			log.info("Created graph G2 " + G2.toString());
@@ -388,15 +459,16 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			V end = G1.adjacentVertices(start).get(0);
 			//G1 is biconnected, so this should not throw null pointer...
 
-			List<Path<V,E>> paths = traversal.findAllPathsDFSContaining(start, end, criticalSeparationPairVertices);
-			for (Path<V,E> path : paths){
-				List<E> edges = path.getPath();
-				if (isIsExtendable(edges))
-					extendableFacialCycles.add(edges);
-			}
+			//			List<Path<V,E>> paths = traversal.findAllPathsDFSContaining(start, end, criticalSeparationPairVertices);
+			//			for (Path<V,E> path : paths){
+			//				List<E> edges = path.getPath();
+			//				if (isIsExtendable(edges))
+			//					extendableFacialCycles.add(edges);
+			//}
 
 			//TODO should this return all
-			return extendableFacialCycles;
+			//return extendableFacialCycles;
+			return null;
 		}
 
 		return null;
@@ -443,7 +515,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			criticalSeparationPairs = new ArrayList<E>();
 			//prepare a map of critical separation pairs and the split components it contains
 			splitComponentsOfPair = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
-			
+
 
 			for (E e : primeSeparationPairs){
 				List<HopcroftTarjanSplitComponent<V, E>> xySplitComponents = formXYSplitComponents(splitComponenets, e);
@@ -475,7 +547,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						splitComponentsOfPair.put(e, xySplitComponents);
 					}
 				}
-				
+
 			}
 
 			log.info("Forbidden separation pairs: " + forbiddenSeparationPairs);
@@ -544,14 +616,14 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 						for (E e : edgesToBeMerged){
 							merged = false;
-						//	System.out.println("virtual edge to merge on " + e);
+							//	System.out.println("virtual edge to merge on " + e);
 							for (HopcroftTarjanSplitComponent<V, E> component : virtualEdgesSplitComponentsMap.get(e)){
 								if (processedComponents.contains(component)|| component == splitComponent || 
 										component.getType() != SplitTriconnectedComponentType.TRIANGLE || 
 										component.getVirtualEdges().size() == component.getEdges().size()) // from looking at the example in chiba's paper (TODO - see if this is correct)
 									continue;
 								merged = true;
-							//	System.out.println("merging with component " + component);
+								//	System.out.println("merging with component " + component);
 								for (E componentEdge : component.getEdges())
 									if (component.getVirtualEdges().contains(componentEdge)){
 										if (componentEdge != e){

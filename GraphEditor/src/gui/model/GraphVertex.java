@@ -12,6 +12,11 @@ public class GraphVertex extends GraphElement implements Vertex{
 	private String content;
 	private Point2D position;
 	
+	
+	public GraphVertex(){
+		
+	}
+	
 	public GraphVertex(Point2D position, String content){
 		size = new Dimension(50,50);
 		this.position = position;

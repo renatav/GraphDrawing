@@ -9,6 +9,5 @@ public interface Vertex {
 	
 	Object getContent();
 	
-	 
 
 }

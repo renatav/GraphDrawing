@@ -72,10 +72,6 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		return paths;
 	}
 	
-	
-	
-
-
 
 	private void findAllPathsDFS(List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, 
 			V currentVertex, V start, V end, List<V> excluding) {        
