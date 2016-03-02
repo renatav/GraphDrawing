@@ -60,12 +60,26 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * Planarity testing algorithm used to test the existence of an extendable facial cycle i.e. the possibility
 	 * of creating a convex drawing
 	 */
-	private PlanarityTestingAlgorithm<V, E> planarityTesting = new FraysseixMendezPlanarity<V,E>();
+	private PlanarityTestingAlgorithm<V, E> planarityTesting;
+	/**
+	 * A list of virtual edges. They correspond to found separation pairs
+	 */
 	private List<E> virtualEdges;
 
-	private Map<E, List<HopcroftTarjanSplitComponent<V, E>>> virtualEdgesSplitComponentsMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
+	/**A map with virtual edges (separation pairs) as  keys and a list of its
+	 * split components as values
+	 */
+	private Map<E, List<HopcroftTarjanSplitComponent<V, E>>> virtualEdgesSplitComponentsMap;
 
-	private DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>();
+	/**
+	 * An algorithm which will be used to find a path between two vertices, as that is necessary on several occasions
+	 */
+	private DijkstraAlgorithm<V, E> dijkstra;
+
+	/**
+	 * A map which indicates if a split component of a separation pair is complex (was joined with other components or not)
+	 */
+	private Map<HopcroftTarjanSplitComponent<V, E>, Boolean> complexComponentsMap;
 
 	public ConvexDrawing(Graph<V,E> graph){
 		this.graph = graph;
@@ -73,6 +87,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		vertexClass = graph.getVertices().get(0).getClass();
 		rand = new Random();
 		splitting = new Splitting<V,E>();
+		dijkstra = new DijkstraAlgorithm<V,E>();
+		virtualEdgesSplitComponentsMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
+		planarityTesting = new FraysseixMendezPlanarity<V,E>();
+		dijkstra.setDirected(false);
+		complexComponentsMap = new HashMap<HopcroftTarjanSplitComponent<V,E>, Boolean>();
 	}
 
 
@@ -282,6 +301,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//so, take paths from one critical pair vertex to the other one of the components, join them...
 			//easy if it is a ring
 			//TODO find an example where there are triconnected graphs as split components
+
+			log.info("Graph has one critical separation pair");
+
 			E pair = criticalSeparationPairs.get(0);
 			V v1 = pair.getOrigin();
 			V v2 = pair.getDestination();
@@ -306,30 +328,30 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				else{
 					edges.addAll(splitComponent.getEdges());
 					edges.remove(pair);
-					DijkstraAlgorithm<V,E> dijkstra = new DijkstraAlgorithm<V,E>(edges, false);
+					dijkstra.setEdges(edges);
+					dijkstra.setDirected(false);
 					edges = dijkstra.getPath(v1, v2).getPath();
 					mustContainPaths.add(edges);
 					System.out.println(edges);
 				}
 			}
-			
+
 			//paths now contain a path from v1 to v2 in every split component
 			//joining them should result in acquiring the facial cycle
-			
+
 			for (List<E> path : mustContainPaths)
 				for (E e : path)
 					totalPath.add(e);
-			
+
 			//now about the other ones
 			//if mustContainPaths has less than two paths, at least two, the third one is optional according to condition 2
 			//for now, add them all
-			
+
 			for (List<E> path : optionalPaths)
 				for (E e : path)
 					totalPath.add(e);
-			
-			System.out.println(totalPath);
-			
+
+
 			for (E e : totalPath){
 				V origin = e.getOrigin();
 				V dest = e.getDestination();
@@ -337,11 +359,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					face.add(origin);
 				if (!face.contains(dest))
 					face.add(dest);
-				
+
 			}
-			
-			System.out.println(face);
-				
+
+			log.info("Face " + face);
+
 		}
 		else{
 			//STEP 2 construct graphs G1 and G2
@@ -395,11 +417,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					if (ringsCount == 1){
 						//delete x-y path in the component from graph
 						log.info("Removing x-y path of component from G1");
-						dijkstra.setEdges(new ArrayList<E>(ring.getEdges()));
-						List<E> edges = dijkstra.getPath(x, y).getPath();
-						log.info("Edges: " + edges);
-						for (E e : edges)
-							G1.removeEdge(e);
+						//TODO double check this
+						//x-y path in a ring contains all edges of the ring except for the virtual edges
+						//that's why there is no need to use a path finder algorithm
+						for (E e : ring.getEdges())
+							if (e != criticalSeparationPair)
+								G1.removeEdge(e);
 					}
 				}
 			}
@@ -432,42 +455,80 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			if (!planar)
 				throw new CannotBeAppliedException("Graph G2 is not planar. Graph doesn't have a convex drawing");
 
-			//S is v-cycle of plane graph G2
+			log.info("Graph has a convex drawing. Finding an extendable facial cycle");
+
+			//S cycle exists, now find one
+			//The main idea here is based on the second condition
+			//For each {x,y} critical separation pair there exists at most one component having no edges in S
+			//that component is either a bond (if (x,y) in E or a ring otherwise
+			//S should contain of critical separation pair vertices
+			//If {x,y} is a critical separation pair, it has either 2 {x,y} split component which are triconnected graphs
+			//or 3 split components including a bond or a ring
+
+			//Observations:
+			//If {x,y} has two {x,y} split components, two triconnected graphs
+			//one of them is a split component (found using Hopcroft-Tarjan splitting)
+			//and it doesn't contain any other critical separation pair vertices other than x and y
+			//It is enough to find one path (since we're not searching for all, just for one face)
+			//Then, the task is reduced to finding another path from x to y (the part in the split component is covered)
+			//do that for every critical pair component which has no other critical separation pairs
+			//The idea is to do as little search as possible, not to look for all paths or something similar
 
 
-			//STEP 3
-			//Graph has a convex drawing
-			//TODO naci S - v-ciklus
-			//the  v-cycle is the cycle of plane subgraph of G1 of G2 which bounds the face of G1 in which v lay
-			//G1 = G2 - v
-			//napraviti ciklus koji spaja sve cvorove u G1 koji su spojeni sa v
+			for (E e : criticalSeparationPairs){
+				System.out.println("split components of " + e);
+				System.out.println(splitComponentsOfPair.get(e));
+			}
 
+			List<E> pathEdges = new ArrayList<E>();
+			List<E> graphEdges = new ArrayList<E>();
+			graphEdges.addAll(graph.getEdges());
+			List<HopcroftTarjanSplitComponent<V, E>> complexSplitComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
+			List<E> searchEdges = new ArrayList<E>();
 
-			//approach based on based on theorem 3 and condition 2
-			//find all cycles in G1 containing all vertices of critical separation pairs
-			//then see which satisfy condition 2
+			for (E criticalPair : criticalSeparationPairs){
+				V v1 = criticalPair.getOrigin();
+				V v2 = criticalPair.getDestination();
+				for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponentsOfPair.get(criticalPair)){
+					//does the split component contain other critical pair separation vertices and not just the ones of the current pair
+					//is it complex in other words, was the base component joined with other components
+					if (complexComponentsMap.get(splitComponent)){
+						complexSplitComponents.add(splitComponent);
+						log.info("Complex " + splitComponent);
+					}
+					else{
+						searchEdges.clear();
+						searchEdges.addAll(splitComponent.getEdges());
+						//remove virtual edge
+						searchEdges.remove(criticalPair);
+						//if the {x,y} split component is a ring, it is actually just a triangle
+						//two edges and a virtual edge
+						//the path between the two separation pair vertices just includes those two
+						//non-virtual edges
+						if (splitComponent.getType() == SplitTriconnectedComponentType.RING){
+							pathEdges.addAll(searchEdges);
+							log.info("Adding path edges: " + searchEdges);
+						}
+						else if (splitComponent.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH){
+							dijkstra.setEdges(searchEdges);
+							List<E> path = dijkstra.getPath(v1, v2).getPath();
+							pathEdges.addAll(path);
+							log.info("Adding path edges: " + searchEdges);
+						}
+						
+						for (E e : splitComponent.getEdges()){
+							if (e != criticalPair)
+								graphEdges.remove(e);
+						}
+						log.info("Remaining graph edges: " + graphEdges);
+					}
 
-			List<List<E>> extendableFacialCycles = new ArrayList<List<E>>();
-			GraphTraversal<V, E> traversal = new GraphTraversal<V, E>(G1);
+				}
+			}
+			
+			//which edges remain, do they just connect simple components, meaning that they connect separation pair vertices
+			//or is it more complex?
 
-			//arbitrary start
-			V start = criticalSeparationPairVertices.get(0);
-			//finds one adjacent to it in G1
-			//mark it as end
-			//path containing an edge between them is not acceptable, so if it is a cycle, it would go the other way around
-			//with that edge at the end, we have a cycle
-			V end = G1.adjacentVertices(start).get(0);
-			//G1 is biconnected, so this should not throw null pointer...
-
-			//			List<Path<V,E>> paths = traversal.findAllPathsDFSContaining(start, end, criticalSeparationPairVertices);
-			//			for (Path<V,E> path : paths){
-			//				List<E> edges = path.getPath();
-			//				if (isIsExtendable(edges))
-			//					extendableFacialCycles.add(edges);
-			//}
-
-			//TODO should this return all
-			//return extendableFacialCycles;
 			return null;
 		}
 
@@ -660,7 +721,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private List<HopcroftTarjanSplitComponent<V,E>> formXYSplitComponents(List<HopcroftTarjanSplitComponent<V, E>>  components, E virtualEdge){
 
 		System.out.println("Virtual edge " + virtualEdge);
-		System.out.println(virtualEdgesSplitComponentsMap);
 		//to start with, retrieve a list of components which contain the virtual edges representing the split pair
 		List<HopcroftTarjanSplitComponent<V, E>> baseComponents = virtualEdgesSplitComponentsMap.get(virtualEdge);
 		List<HopcroftTarjanSplitComponent<V,E>> xySplitComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
@@ -671,8 +731,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			HopcroftTarjanSplitComponent<V, E> xySplitComponent = formCurrentComponent(currentBaseComponent, virtualEdge);
 			System.out.println("Result: " + xySplitComponent);
 			//split component must contain at least one non-virtual edge
-			if(xySplitComponent.getEdges().size() != xySplitComponent.getVirtualEdges().size())
+			if(xySplitComponent.getEdges().size() != xySplitComponent.getVirtualEdges().size()){
 				xySplitComponents.add(xySplitComponent);
+			}
 		}
 		return xySplitComponents;
 	}
@@ -711,8 +772,10 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			}
 		}
 
-		if (joinVirtualEdges.size() == 0)
+		if (joinVirtualEdges.size() == 0){
+			complexComponentsMap.put(current, false);
 			return current;
+		}
 
 		List<E> newVirtualEdges = new ArrayList<E>();
 		List<HopcroftTarjanSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
@@ -744,6 +807,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			joinVirtualEdges.addAll(newVirtualEdges);
 		}
 
+		complexComponentsMap.put(current, true);
 		return current;
 	}
 

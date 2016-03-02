@@ -391,7 +391,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							}
 							//add (a,b,j) to new component
 							virtualEdge = createVirtualEdge(aVertex, bVertex, 2);
-							log.info("Adding virtual edge: " + virtualEdge);
+							if (debug)
+								log.info("Adding virtual edge: " + virtualEdge);
 							splitComponent.addVirtualEdge(virtualEdge);
 							if (debug)
 								log.info("add " + aVertex + ", " + bVertex + ", " + j + " to new component");
@@ -437,7 +438,6 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 						degree[vIndex]++;
 
 						//father(x) = v
-						System.out.println("setting father of " + xIndex + " = " + vIndex );
 						father[xIndex] = vIndex;
 
 						//if (A1(v)) ->*x then a1(v) = x

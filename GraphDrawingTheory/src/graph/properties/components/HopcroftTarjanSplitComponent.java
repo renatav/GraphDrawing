@@ -11,6 +11,7 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 	private SplitTriconnectedComponentType type;
 	private SplitPair<V,E> spearaionPair;
 	private List<E> virtualEdges;
+	private List<V> vertices;
 	
 	public SplitTriconnectedComponentType getType() {
 		return type;
@@ -48,6 +49,18 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 		this.type = type;
 	}
 	
+	public void setVertices(){
+		vertices = new ArrayList<V>();
+		for (E e : edges){
+			V v1 = e.getOrigin();
+			V v2 = e.getDestination();
+			if (!vertices.contains(v1))
+				vertices.add(v1);
+			if (!vertices.contains(v2))
+				vertices.add(v2);
+		}
+	}
+	
 
 	@Override
 	public String toString() {
@@ -78,6 +91,10 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 	public void addVirtualEdge(E e){
 		edges.add(e);
 		virtualEdges.add(e);
+	}
+
+	public List<V> getVertices() {
+		return vertices;
 	}
 	
 	
