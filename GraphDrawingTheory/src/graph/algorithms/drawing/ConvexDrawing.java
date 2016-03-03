@@ -20,6 +20,8 @@ import graph.util.Util;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.omg.CORBA.portable.RemarshalException;
 
 public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
@@ -79,7 +82,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * A map which indicates if a split component of a separation pair is complex (was joined with other components or not)
 	 */
-	private Map<HopcroftTarjanSplitComponent<V, E>, Boolean> complexComponentsMap;
+	private Map<HopcroftTarjanSplitComponent<V, E>, List<E>> componentsJoinedOnMap;
 
 	public ConvexDrawing(Graph<V,E> graph){
 		this.graph = graph;
@@ -91,7 +94,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		virtualEdgesSplitComponentsMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
 		planarityTesting = new FraysseixMendezPlanarity<V,E>();
 		dijkstra.setDirected(false);
-		complexComponentsMap = new HashMap<HopcroftTarjanSplitComponent<V,E>, Boolean>();
+		componentsJoinedOnMap = new HashMap<HopcroftTarjanSplitComponent<V,E>, List<E>>();
 	}
 
 
@@ -269,7 +272,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @throws CannotBeAppliedException 
 	 */
 	@SuppressWarnings("unchecked")
-	public List<List<E>> convexTesting() throws CannotBeAppliedException{
+	public List<V> convexTesting() throws CannotBeAppliedException{
 
 		//STEP 1 
 		//Find all separation pairs using Hopcroft-Tarjan triconnected division
@@ -308,6 +311,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			V v1 = pair.getOrigin();
 			V v2 = pair.getDestination();
 			List<HopcroftTarjanSplitComponent<V, E>> splitComponents = splitComponentsOfPair.get(pair);
+			log.info("Components: " + splitComponents);
 
 			List<E> totalPath = new ArrayList<E>();
 			List<List<E>> mustContainPaths = new ArrayList<List<E>>();
@@ -332,7 +336,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					dijkstra.setDirected(false);
 					edges = dijkstra.getPath(v1, v2).getPath();
 					mustContainPaths.add(edges);
-					System.out.println(edges);
 				}
 			}
 
@@ -344,12 +347,34 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					totalPath.add(e);
 
 			//now about the other ones
-			//if mustContainPaths has less than two paths, at least two, the third one is optional according to condition 2
-			//for now, add them all
+			//if there exist optional paths, there must be three split components
+			//if the there are already two triconncted graphs, no need to add anything else
+			//that would just ruin the cycle
+			//else, there are at least 2 rings or bonds
+			//having a triconnected graph and 2 rings or 3 rings would not result in a cycle
+			//so that is not an option
+			//bonds are not important since they don't add more vertices
+			//adding or not adding them is pretty much irrelevant
+			if (mustContainPaths.size() < 2){
+				Collections.sort(optionalPaths, new Comparator<List<E>>() {
 
-			for (List<E> path : optionalPaths)
-				for (E e : path)
-					totalPath.add(e);
+					@Override
+					public int compare(List<E> o1, List<E> o2) {
+						if (o1.size() > o2.size())
+							return -1;
+						else if (o1.size() < o2.size())
+							return 1;
+						else
+							return 0;
+					}
+				});
+				
+				for (int i = 0; i < 2 - mustContainPaths.size(); i++)
+					for (E e : optionalPaths.get(i))
+						totalPath.add(e);
+			}
+			
+			
 
 
 			for (E e : totalPath){
@@ -474,25 +499,64 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//do that for every critical pair component which has no other critical separation pairs
 			//The idea is to do as little search as possible, not to look for all paths or something similar
 
-
-			for (E e : criticalSeparationPairs){
-				System.out.println("split components of " + e);
-				System.out.println(splitComponentsOfPair.get(e));
-			}
-
+//
+//			for (E e : criticalSeparationPairs){
+//				System.out.println("split components of " + e);
+//				System.out.println(splitComponentsOfPair.get(e));
+//			}
+			face = new ArrayList<V>();
 			List<E> pathEdges = new ArrayList<E>();
 			List<E> graphEdges = new ArrayList<E>();
 			graphEdges.addAll(graph.getEdges());
 			List<HopcroftTarjanSplitComponent<V, E>> complexSplitComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
 			List<E> searchEdges = new ArrayList<E>();
+			List<List<E>> optionalPaths = new ArrayList<List<E>>();
+			int simpleComponentsAdded;
 
+			//used later to find path between separation pair vertices
+			//for optimization
+			Map<V, List<V>> verticesInTheSamePairMap = new HashMap<V,List<V>>();
 			for (E criticalPair : criticalSeparationPairs){
+				log.info("Current critical separation pair: " + criticalPair);
 				V v1 = criticalPair.getOrigin();
 				V v2 = criticalPair.getDestination();
+				
+				List<V> samePairList;
+				if (verticesInTheSamePairMap.containsKey(v1)){
+					samePairList = verticesInTheSamePairMap.get(v1);
+					samePairList.add(v2);
+				}
+				else if (verticesInTheSamePairMap.containsKey(v2)){
+					samePairList = verticesInTheSamePairMap.get(v2);
+					samePairList.add(v1);
+				}
+				else{
+					samePairList = new ArrayList<V>();
+					verticesInTheSamePairMap.put(v1, samePairList);
+					samePairList.add(v2);
+				}
+				
+				optionalPaths.clear();
+				simpleComponentsAdded = 0;
+				
+				//similar logic as above for simple components
+				//i.e. those that don't contain another critical separation pair
+				//the face should be a cycle, so we shouldn't connect the vertices of the separation pair twice on the same side
+				//each critical separation pair must contain at least one component which contains other separation pairs
+				//so, if there are two simple components, just one of them should be in the resulting face
+				//otherwise, the face wouldn't be a cycle
 				for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponentsOfPair.get(criticalPair)){
 					//does the split component contain other critical pair separation vertices and not just the ones of the current pair
-					//is it complex in other words, was the base component joined with other components
-					if (complexComponentsMap.get(splitComponent)){
+					//was it merged with a another component on another virtual edge belonging to a critical separation pair
+					boolean joinedWithAnotherCriticalSeparaionPiar = false;
+					if (componentsJoinedOnMap.containsKey(splitComponent))
+						for (E e : componentsJoinedOnMap.get(splitComponent))
+							if (criticalSeparationPairs.contains(e)){
+								joinedWithAnotherCriticalSeparaionPiar = true;
+								break;
+							}
+					
+					if (joinedWithAnotherCriticalSeparaionPiar){
 						complexSplitComponents.add(splitComponent);
 						log.info("Complex " + splitComponent);
 					}
@@ -506,30 +570,115 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						//the path between the two separation pair vertices just includes those two
 						//non-virtual edges
 						if (splitComponent.getType() == SplitTriconnectedComponentType.RING){
-							pathEdges.addAll(searchEdges);
-							log.info("Adding path edges: " + searchEdges);
+							optionalPaths.add(searchEdges);
 						}
 						else if (splitComponent.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH){
 							dijkstra.setEdges(searchEdges);
 							List<E> path = dijkstra.getPath(v1, v2).getPath();
 							pathEdges.addAll(path);
-							log.info("Adding path edges: " + searchEdges);
+							log.info("Adding path edges: " + path);
+							simpleComponentsAdded++;
 						}
 						
+						//remove the edges, they will either be added to path or discarded (won't be in the resulting facial cycle
 						for (E e : splitComponent.getEdges()){
 							if (e != criticalPair)
 								graphEdges.remove(e);
 						}
+						
+						//add virtual edge
+						//so that we can perform the search on the remaining edges
+						//trying a different approach, leaving this for now just in case
+						//if (!graphEdges.contains(criticalPair))
+							//graphEdges.add(criticalPair);
+						
 						log.info("Remaining graph edges: " + graphEdges);
 					}
-
 				}
+
+				//if there is only one optional path
+				//that means that there are two triconnected graphs and they will be added (or parts of them)
+				//thus condition 2 will be met
+				if (simpleComponentsAdded == 0 && optionalPaths.size() == 2){
+					log.info("Should add one of the optional paths: " + optionalPaths);
+					List<E> path1 = optionalPaths.get(0);
+					List<E> path2 = optionalPaths.get(1);
+					if (path1.size() > path2.size()){
+						pathEdges.addAll(path1);
+						log.info("Adding path edges: " + path1);
+					}
+					else{
+						pathEdges.addAll(path2);
+						log.info("Adding path edges: " + path2);
+					}
+				}
+				
+				log.info("Current path edges " + pathEdges );
+				
 			}
+			
+			//the resulting graph should be much more simple now
+			//find a path which connects all all critical pair vertices while traversing through 
+			
+			//if there is a direct link between vertices of two critical separation pair vertices (of different pairs)
+			//and a path from one to another, it doesn't matter whether that path will be in the cycle or not
+			//if there were two such distinct paths, than those two vertices would also be a critical separation pair
+			//therefore, the paths would've been already handled
+			//if there were more than two, that would be a forbidden separation pair
+			//therefore that isn't possible
+			//if there is not a direct link, and just one path, all vertices on the path should be on the face
+			//the problem is that the if we just vertices and not the edges, the path is not sorted
+			//maybe something like this, take a critical separation pair vertex
+			//find paths between it and other critical separation pair vertices
+			//add those paths
+			//that should be much simpler than traversing the whole graph, especially because the number of 
+			//remaining edges is much smaller now
+			dijkstra.setEdges(graphEdges);
+			List<V> coveredVertices = new ArrayList<V>();
+			
+			for (V v1: criticalSeparationPairVertices){
+				for (V v2 : criticalSeparationPairVertices){
+					if (v1 == v2 || coveredVertices.contains(v2))
+						continue;
+					if ((verticesInTheSamePairMap.containsKey(v1) && verticesInTheSamePairMap.get(v1).contains(v2))
+							|| ( verticesInTheSamePairMap.containsKey(v2) && verticesInTheSamePairMap.get(v2).contains(v1)))
+						continue;
+					
+					//else find path if exists
+					Path<V,E> path = dijkstra.getPath(v1, v2);
+					if (path != null)
+						System.out.println("Path between " + v1 + ", " + v2 + ": " + path.getPath());
+					
+					//if there are paths which contain other critical separation pair vertices
+					//no problem, we don't need the simple ones any more
+					//maybe create a method in path searcher which get a list of important vertices
+					//and marks which ones were found 
+					//or something like that
+				}
+				
+			}
+			
+//			pathEdges.addAll(graphEdges);
+//			for (E e : pathEdges){
+//				V origin = e.getOrigin();
+//				V dest = e.getDestination();
+//				if (!face.contains(origin))
+//					face.add(origin);
+//				if (!face.contains(dest))
+//					face.add(dest);
+//
+//			}
+			
+			//TODO sort face!
+			//just run a path finder
+			//in both this case and when there is only one critical separation pair
+
+			log.info("Face " + face);
 			
 			//which edges remain, do they just connect simple components, meaning that they connect separation pair vertices
 			//or is it more complex?
 
-			return null;
+			return face;
 		}
 
 		return null;
@@ -619,8 +768,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		} catch (AlgorithmErrorException e) {
 			e.printStackTrace();
 		}
-
 	}
+	
 
 	private List<HopcroftTarjanSplitComponent<V, E>> formTriconnectedComponents(List<HopcroftTarjanSplitComponent<V, E>>  components){
 		List<HopcroftTarjanSplitComponent<V,E>> triconnectedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
@@ -772,24 +921,35 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			}
 		}
 
-		if (joinVirtualEdges.size() == 0){
-			complexComponentsMap.put(current, false);
+		if (joinVirtualEdges.size() == 0)
 			return current;
-		}
 
 		List<E> newVirtualEdges = new ArrayList<E>();
 		List<HopcroftTarjanSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
 		processedComponents.add(baseComponent);
+		List<E> joinedOn = new ArrayList<E>();
+		//TODO further test this observation
+		int joinsForEdge; //If we merge two triangles on the same virtual edge, then the resulting component is no longer a ring
+		boolean typeChanged = false; //optimization
 		while (joinVirtualEdges.size() > 0){
 			newVirtualEdges.clear();
-
 			for (E e : joinVirtualEdges){
-				//System.out.println("virtual edge to merge on " + e);
+				System.out.println("virtual edge to merge on " + e);
+				joinsForEdge = 0;				
 				for (HopcroftTarjanSplitComponent<V, E> component : virtualEdgesSplitComponentsMap.get(e)){
 					if (processedComponents.contains(component))
 						continue;
-					//System.out.println("merging with component " + component);
-					if (component.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH)
+					if (!typeChanged){
+						if (component.getType() != SplitTriconnectedComponentType.BOND)
+							joinsForEdge ++;
+						if (joinsForEdge == 2){
+							current.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
+							typeChanged = true;
+						}
+					}
+					System.out.println("merging with component " + component);
+					System.out.println(component.getType());
+					if (!typeChanged && component.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH)
 						current.setType(SplitTriconnectedComponentType.TRICONNECTED_GRAPH);
 					for (E componentEdge : component.getEdges())
 						if (!component.getVirtualEdges().contains(componentEdge)){
@@ -798,6 +958,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						else if (componentEdge != virtualEdge && componentEdge != e)
 							newVirtualEdges.add(componentEdge);
 					processedComponents.add(component);
+					joinedOn.add(e);
 				}
 
 			}
@@ -807,7 +968,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			joinVirtualEdges.addAll(newVirtualEdges);
 		}
 
-		complexComponentsMap.put(current, true);
+		componentsJoinedOnMap.put(current, joinedOn);
 		return current;
 	}
 
