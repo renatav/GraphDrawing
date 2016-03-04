@@ -17,7 +17,8 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 	
 	public Path(List<E> path, List<EdgeDirection> directions) {
 		super();
-		this.path = path;
+		for (int i = 0; i < path.size(); i++)
+			addEdge(path.get(i), directions.get(i));
 		this.directions = directions;
 	}
 	

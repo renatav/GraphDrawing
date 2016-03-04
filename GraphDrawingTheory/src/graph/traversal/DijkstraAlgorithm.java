@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  * Algorithm for finding a path between two graph vertices in a graph
- * @author xxx
+ * @author xx
  *
  * @param <V>
  * @param <E>
@@ -74,9 +74,9 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 			edge = predEdges.get(step);
 			path.add(edge);
 			if (edge.getOrigin() == step)
-				directions.add(EdgeDirection.TO_DESTINATION);
+				directions.add(EdgeDirection.TO_ORIGIN); //changed this
 			else
-				directions.add(EdgeDirection.TO_ORIGIN);
+				directions.add(EdgeDirection.TO_DESTINATION);
 			step = predecessors.get(step);
 		}
 		// Put it into the correct order
@@ -89,6 +89,7 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 		
 		return new Path<V,E>(path, directions);
 	}
+	
 
 	private void execute(V source, List<V> excluding) {
 

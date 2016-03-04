@@ -1293,4 +1293,8 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 		return virtualEdges;
 	}
 
+	public List<List<E>> getPaths() {
+		return paths;
+	}
+
 }

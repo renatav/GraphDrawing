@@ -7,17 +7,17 @@ import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
+import graph.layout.circle.CircleLayoutCalc;
 import graph.properties.components.Block;
 import graph.properties.components.HopcroftTarjanSplitComponent;
-import graph.properties.components.SplitPair;
 import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.Splitting;
 import graph.traversal.DijkstraAlgorithm;
-import graph.traversal.GraphTraversal;
 import graph.util.Util;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.omg.CORBA.portable.RemarshalException;
 
 public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
@@ -83,6 +82,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * A map which indicates if a split component of a separation pair is complex (was joined with other components or not)
 	 */
 	private Map<HopcroftTarjanSplitComponent<V, E>, List<E>> componentsJoinedOnMap;
+	
+	/**
+	 * Hopcroft-Tarjan's algorithm for dividing a graph into split components and detecting separation pairs
+	 */
+	private HopcroftTarjanSplitting<V, E> hopcroftTarjanSplitting;
 
 	public ConvexDrawing(Graph<V,E> graph){
 		this.graph = graph;
@@ -103,7 +107,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
 		try {
-			convexTesting();
+			//find the extendable facial cycle (where every vertex of S is an apex of S*)
+			//if there are no such cycles, an exception is thrown
+			List<V> S = convexTesting();
+			ret = execute(S,S);
+			
 		} catch (CannotBeAppliedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -116,8 +124,21 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	@SuppressWarnings("unchecked")
 	public Map<V, Point2D> execute(List<V> S, List<V> Sstar){
+		
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
-
+		
+		//determine position of S* vertices
+		//TODO center as algorithm parameter
+		Point2D center = new Point(0,0);
+		int treshold = 20;
+		
+		CircleLayoutCalc<V> circleCalc = new CircleLayoutCalc<V>();
+		double radius = circleCalc.calculateRadius(Sstar, treshold);
+		Map<V,Point2D> positions = circleCalc.calculatePosition(Sstar, radius, center);
+		log.info("Calculating positions of the outer cycle");
+		log.info(positions);
+		ret.putAll(positions);
+	
 
 		//step one - for each vertex v of degree two not on S
 		//replace v together with two edges incident to v with a 
@@ -127,7 +148,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		Graph<V,E> gPrim = Util.copyGraph(graph);
 		//store deleted vertices in order to position them later
 		List<V> deleted = new ArrayList<V>();
-
 
 		Iterator<V> iter = gPrim.getVertices().iterator();
 		while (iter.hasNext()){
@@ -149,7 +169,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		//step 2 - call Draw on (G', S, S*) to extend S* into a convex drawing of G'
 
-
+		//step 3 For each deleter vertex of degree 2 determine its position on the straight 
+		//line segment joining the two vertices adjacent to the vertex
 
 		return ret;
 	}
@@ -210,6 +231,10 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			currentVertex = other;
 		}
 
+		//TODO
+		//block are biconnected components
+		//instead of using this, use class Biconnected!
+		
 		//divide G into blocks and find cut vertices
 		List<V> cutVertices = splitting.findAllCutVertices(graph);
 		List<Block<V,E>> blocks = splitting.findAllBlocks(G, cutVertices);
@@ -278,18 +303,26 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//Find all separation pairs using Hopcroft-Tarjan triconnected division
 		//Form three sets: prime separation pairs, critical separation pairs and forbidden separation pairs
 
-		boolean allCyclesExtendable = false;
-		List<V> face;
-
 		testSeparationPairs();
 
 		if (forbiddenSeparationPairs.size() > 0){
 			throw new CannotBeAppliedException("Forbidden separation pair found. Graph doesn't have a convex drawing");
 		}
-		else if (criticalSeparationPairs.size() == 0){
+
+		List<E> pathEdges = new ArrayList<E>();
+		List<V> face = new ArrayList<V>();
+		
+		if (criticalSeparationPairs.size() == 0){
+			
+			//all cycles are extendable
+			//take one
+			//for example, the one found during Hopcroft-Tarjan path finding phase
+			//the first of those paths is a cycle
+			
 			log.info("All facial cycles are extendable");
-			allCyclesExtendable = true;
+			pathEdges = hopcroftTarjanSplitting.getPaths().get(0);
 		}
+
 		else if (criticalSeparationPairs.size() == 1){
 			//set S based on figure 4 from Chibba's paper
 			//finds those seven possible cycles
@@ -303,7 +336,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//that component is either a ring or a bond
 			//so, take paths from one critical pair vertex to the other one of the components, join them...
 			//easy if it is a ring
-			//TODO find an example where there are triconnected graphs as split components
 
 			log.info("Graph has one critical separation pair");
 
@@ -313,10 +345,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			List<HopcroftTarjanSplitComponent<V, E>> splitComponents = splitComponentsOfPair.get(pair);
 			log.info("Components: " + splitComponents);
 
-			List<E> totalPath = new ArrayList<E>();
 			List<List<E>> mustContainPaths = new ArrayList<List<E>>();
 			List<List<E>> optionalPaths = new ArrayList<List<E>>();
-			face = new ArrayList<V>();
 
 			for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponents){
 				List<E> edges = new ArrayList<E>();
@@ -344,7 +374,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 			for (List<E> path : mustContainPaths)
 				for (E e : path)
-					totalPath.add(e);
+					pathEdges.add(e);
 
 			//now about the other ones
 			//if there exist optional paths, there must be three split components
@@ -368,26 +398,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 							return 0;
 					}
 				});
-				
+
 				for (int i = 0; i < 2 - mustContainPaths.size(); i++)
 					for (E e : optionalPaths.get(i))
-						totalPath.add(e);
-			}
-			
-			
-
-
-			for (E e : totalPath){
-				V origin = e.getOrigin();
-				V dest = e.getDestination();
-				if (!face.contains(origin))
-					face.add(origin);
-				if (!face.contains(dest))
-					face.add(dest);
-
+						pathEdges.add(e);
 			}
 
-			log.info("Face " + face);
 
 		}
 		else{
@@ -398,18 +414,18 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			log.info("Creating graph G1");
 			Graph<V, E> G1 = Util.copyGraph(graph);
 
-			List<V> criticalSeparationPairVertices = new ArrayList<V>();
-
+			Map<V, Integer> indexedCriticalSeparationPairVertices = new HashMap<V, Integer>();
+			int index = -1;
 
 			for (E criticalSeparationPair : criticalSeparationPairs){
 				V x = criticalSeparationPair.getOrigin();
 				V y = criticalSeparationPair.getDestination();
 
-				if (!criticalSeparationPairVertices.contains(x))
-					criticalSeparationPairVertices.add(x);
+				if (!indexedCriticalSeparationPairVertices.containsKey(x))
+					indexedCriticalSeparationPairVertices.put(x, ++index);
 
-				if (!criticalSeparationPairVertices.contains(y))
-					criticalSeparationPairVertices.add(y);
+				if (!indexedCriticalSeparationPairVertices.containsKey(y))
+					indexedCriticalSeparationPairVertices.put(y, ++index);
 
 				//check if e is an edge in graph
 				E foundEdge = null;
@@ -465,7 +481,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//if one vertex belongs to two or more separation pairs, only create one edge between it and v
 			//list of all vertices belonging to separation pairs was already formed
 
-			for (V v1 :criticalSeparationPairVertices ){
+			for (V v1 : indexedCriticalSeparationPairVertices.keySet()){
 				E newEdge = Util.createEdge(v, v1, edgeClass);
 				G2.addEdge(newEdge);
 			}
@@ -499,13 +515,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//do that for every critical pair component which has no other critical separation pairs
 			//The idea is to do as little search as possible, not to look for all paths or something similar
 
-//
-//			for (E e : criticalSeparationPairs){
-//				System.out.println("split components of " + e);
-//				System.out.println(splitComponentsOfPair.get(e));
-//			}
-			face = new ArrayList<V>();
-			List<E> pathEdges = new ArrayList<E>();
+			//
+			//			for (E e : criticalSeparationPairs){
+			//				System.out.println("split components of " + e);
+			//				System.out.println(splitComponentsOfPair.get(e));
+			//			}
 			List<E> graphEdges = new ArrayList<E>();
 			graphEdges.addAll(graph.getEdges());
 			List<HopcroftTarjanSplitComponent<V, E>> complexSplitComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
@@ -513,32 +527,24 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			List<List<E>> optionalPaths = new ArrayList<List<E>>();
 			int simpleComponentsAdded;
 
-			//used later to find path between separation pair vertices
+			//used later to find path between critical separation pair vertices
 			//for optimization
-			Map<V, List<V>> verticesInTheSamePairMap = new HashMap<V,List<V>>();
+			int size = indexedCriticalSeparationPairVertices.size();
+			boolean[][] criticalSeparationPairsConnectivity = new boolean[size][size];
+
 			for (E criticalPair : criticalSeparationPairs){
 				log.info("Current critical separation pair: " + criticalPair);
 				V v1 = criticalPair.getOrigin();
 				V v2 = criticalPair.getDestination();
-				
-				List<V> samePairList;
-				if (verticesInTheSamePairMap.containsKey(v1)){
-					samePairList = verticesInTheSamePairMap.get(v1);
-					samePairList.add(v2);
-				}
-				else if (verticesInTheSamePairMap.containsKey(v2)){
-					samePairList = verticesInTheSamePairMap.get(v2);
-					samePairList.add(v1);
-				}
-				else{
-					samePairList = new ArrayList<V>();
-					verticesInTheSamePairMap.put(v1, samePairList);
-					samePairList.add(v2);
-				}
-				
+				int index1 = indexedCriticalSeparationPairVertices.get(v1);
+				int index2 = indexedCriticalSeparationPairVertices.get(v2);
+
+				criticalSeparationPairsConnectivity[index1][index2] = true;
+				criticalSeparationPairsConnectivity[index2][index1] = true;
+
 				optionalPaths.clear();
 				simpleComponentsAdded = 0;
-				
+
 				//similar logic as above for simple components
 				//i.e. those that don't contain another critical separation pair
 				//the face should be a cycle, so we shouldn't connect the vertices of the separation pair twice on the same side
@@ -555,7 +561,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 								joinedWithAnotherCriticalSeparaionPiar = true;
 								break;
 							}
-					
+
 					if (joinedWithAnotherCriticalSeparaionPiar){
 						complexSplitComponents.add(splitComponent);
 						log.info("Complex " + splitComponent);
@@ -579,19 +585,19 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 							log.info("Adding path edges: " + path);
 							simpleComponentsAdded++;
 						}
-						
+
 						//remove the edges, they will either be added to path or discarded (won't be in the resulting facial cycle
 						for (E e : splitComponent.getEdges()){
 							if (e != criticalPair)
 								graphEdges.remove(e);
 						}
-						
+
 						//add virtual edge
 						//so that we can perform the search on the remaining edges
 						//trying a different approach, leaving this for now just in case
 						//if (!graphEdges.contains(criticalPair))
-							//graphEdges.add(criticalPair);
-						
+						//graphEdges.add(criticalPair);
+
 						log.info("Remaining graph edges: " + graphEdges);
 					}
 				}
@@ -612,76 +618,73 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						log.info("Adding path edges: " + path2);
 					}
 				}
-				
+
 				log.info("Current path edges " + pathEdges );
-				
+
 			}
-			
+
 			//the resulting graph should be much more simple now
-			//find a path which connects all all critical pair vertices while traversing through 
-			
-			//if there is a direct link between vertices of two critical separation pair vertices (of different pairs)
-			//and a path from one to another, it doesn't matter whether that path will be in the cycle or not
-			//if there were two such distinct paths, than those two vertices would also be a critical separation pair
-			//therefore, the paths would've been already handled
-			//if there were more than two, that would be a forbidden separation pair
-			//therefore that isn't possible
-			//if there is not a direct link, and just one path, all vertices on the path should be on the face
-			//the problem is that the if we just vertices and not the edges, the path is not sorted
-			//maybe something like this, take a critical separation pair vertex
-			//find paths between it and other critical separation pair vertices
-			//add those paths
-			//that should be much simpler than traversing the whole graph, especially because the number of 
-			//remaining edges is much smaller now
+			//find a path which connects all all critical pair vertices, complete the cycle
+			//instead of trying to form a cycle, find one big path
+			//we try to connect a critical separation vertex to all of the other ones
+			//since we removed a lot of the edges before, we will not traverse through the whole graph
+			//it is much simpler now
+			//if we encounter another critical pair vertex on the way, we mark that it is also connected to the 
+			//ones we started with
+			//the main idea is to minimize the number of path finding calls
+
 			dijkstra.setEdges(graphEdges);
-			List<V> coveredVertices = new ArrayList<V>();
-			
-			for (V v1: criticalSeparationPairVertices){
-				for (V v2 : criticalSeparationPairVertices){
-					if (v1 == v2 || coveredVertices.contains(v2))
+			List<V> traversedCriticalVertices = new ArrayList<V>();
+
+			for (V v1: indexedCriticalSeparationPairVertices.keySet()){
+				int v1Index = indexedCriticalSeparationPairVertices.get(v1);
+				for (V v2 : indexedCriticalSeparationPairVertices.keySet()){
+					int v2Index = indexedCriticalSeparationPairVertices.get(v2);	
+					if (v1 == v2 || criticalSeparationPairsConnectivity[v1Index][v2Index] || 
+							criticalSeparationPairsConnectivity[v2Index][v1Index])
 						continue;
-					if ((verticesInTheSamePairMap.containsKey(v1) && verticesInTheSamePairMap.get(v1).contains(v2))
-							|| ( verticesInTheSamePairMap.containsKey(v2) && verticesInTheSamePairMap.get(v2).contains(v1)))
-						continue;
-					
+
 					//else find path if exists
 					Path<V,E> path = dijkstra.getPath(v1, v2);
-					if (path != null)
-						System.out.println("Path between " + v1 + ", " + v2 + ": " + path.getPath());
-					
-					//if there are paths which contain other critical separation pair vertices
-					//no problem, we don't need the simple ones any more
-					//maybe create a method in path searcher which get a list of important vertices
-					//and marks which ones were found 
-					//or something like that
+					if (path != null){
+						//System.out.println("Path between " + v1 + ", " + v2 + ": " + path.getPath());
+						traversedCriticalVertices.clear();
+						for (V pathVertex : path.getUniqueVertices()){
+							if (indexedCriticalSeparationPairVertices.containsKey(pathVertex))
+								traversedCriticalVertices.add(pathVertex);
+						}
+
+						for (V traversed1 : traversedCriticalVertices)
+							for (V traversed2 : traversedCriticalVertices){
+								int traverseIndex1 = indexedCriticalSeparationPairVertices.get(traversed1);
+								int traverseIndex2 = indexedCriticalSeparationPairVertices.get(traversed2);	
+								criticalSeparationPairsConnectivity[traverseIndex1][traverseIndex2] = true;
+								criticalSeparationPairsConnectivity[traverseIndex2][traverseIndex1] = true;
+							}
+						for (E pathEdge : path.getPath())
+							if (!pathEdges.contains(pathEdge))
+								pathEdges.add(pathEdge);
+					}
 				}
-				
 			}
-			
-//			pathEdges.addAll(graphEdges);
-//			for (E e : pathEdges){
-//				V origin = e.getOrigin();
-//				V dest = e.getDestination();
-//				if (!face.contains(origin))
-//					face.add(origin);
-//				if (!face.contains(dest))
-//					face.add(dest);
-//
-//			}
-			
-			//TODO sort face!
-			//just run a path finder
-			//in both this case and when there is only one critical separation pair
 
-			log.info("Face " + face);
-			
-			//which edges remain, do they just connect simple components, meaning that they connect separation pair vertices
-			//or is it more complex?
-
-			return face;
 		}
+		log.info("Path edges: " + pathEdges);
 
-		return null;
+		//We now have the edges, but they are not sorted, the order is semi-random 
+		//Sort them before the face is formed
+
+		dijkstra.setEdges(pathEdges);
+		E first = pathEdges.get(0);
+		pathEdges.remove(0);
+		Path<V,E> result = dijkstra.getPath(first.getDestination(), first.getOrigin());
+		log.info("Resulting path " + result.getPath());
+
+		face.addAll(result.pathVertices());
+
+		log.info("Face " + face);
+
+		return face;
 
 	}
 
@@ -689,7 +692,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		log.info("Determining types of separation pairs");
 
-		HopcroftTarjanSplitting<V, E> hopcroftTarjanSplitting = new HopcroftTarjanSplitting<V,E>(graph, false);
+		hopcroftTarjanSplitting = new HopcroftTarjanSplitting<V,E>(graph, false);
 
 		try {
 			hopcroftTarjanSplitting.execute();
@@ -769,7 +772,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			e.printStackTrace();
 		}
 	}
-	
+
 
 	private List<HopcroftTarjanSplitComponent<V, E>> formTriconnectedComponents(List<HopcroftTarjanSplitComponent<V, E>>  components){
 		List<HopcroftTarjanSplitComponent<V,E>> triconnectedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();

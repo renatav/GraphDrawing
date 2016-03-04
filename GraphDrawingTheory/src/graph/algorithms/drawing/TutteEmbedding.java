@@ -133,7 +133,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 //		aY.printMatrix();
 //		bY.printMatrix();
 		
-		
 		//now solve using Cramer's rule
 		double[] xCoords = CramersRule.cramers(aX.values(), bX.values()[0]);
 		double[] yCoords = CramersRule.cramers(aY.values(), bY.values()[0]);
@@ -149,11 +148,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 		}
 
 		return ret;
-
-
-
 	}
-
-
 
 }
