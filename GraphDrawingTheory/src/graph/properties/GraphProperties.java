@@ -4,6 +4,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.BiconnectedComponent;
+import graph.properties.splitting.BiconnectedSplitting;
 import graph.traversal.DFSTreeTraversal;
 import graph.traversal.DijkstraAlgorithm;
 import graph.trees.DFSTree;
@@ -80,7 +81,6 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		low[i] = d;
 		childCount[i] = 0;
 		isArticulation[i] = false;
-
 
 		for (V adjacent : graph.adjacentVertices(current)){
 			int ni = graph.getVertices().indexOf(adjacent);
@@ -160,7 +160,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	}
 	
 	public List<BiconnectedComponent<V, E>> listBiconnectedComponents(){
-		Biconnected<V,E> biconnected = new Biconnected<V,E>(graph);
+		BiconnectedSplitting<V,E> biconnected = new BiconnectedSplitting<V,E>(graph);
 		return biconnected.findBiconnectedComponents();
 	}
 	

@@ -8,10 +8,12 @@ import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.layout.circle.CircleLayoutCalc;
+import graph.properties.components.BiconnectedComponent;
 import graph.properties.components.Block;
 import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
+import graph.properties.splitting.BiconnectedSplitting;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.Splitting;
 import graph.traversal.DijkstraAlgorithm;
@@ -82,7 +84,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * A map which indicates if a split component of a separation pair is complex (was joined with other components or not)
 	 */
 	private Map<HopcroftTarjanSplitComponent<V, E>, List<E>> componentsJoinedOnMap;
-	
+
 	/**
 	 * Hopcroft-Tarjan's algorithm for dividing a graph into split components and detecting separation pairs
 	 */
@@ -109,9 +111,10 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		try {
 			//find the extendable facial cycle (where every vertex of S is an apex of S*)
 			//if there are no such cycles, an exception is thrown
-			List<V> S = convexTesting();
-			ret = execute(S,S);
-			
+			//since it is much more practical, keep edges of a face as well, not just vertices
+			Path<V,E> S = convexTesting();
+			ret = execute(S);
+
 		} catch (CannotBeAppliedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -123,22 +126,26 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 	@SuppressWarnings("unchecked")
-	public Map<V, Point2D> execute(List<V> S, List<V> Sstar){
-		
+	public Map<V, Point2D> execute(Path<V,E> S){
+
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
-		
+
 		//determine position of S* vertices
 		//TODO center as algorithm parameter
 		Point2D center = new Point(0,0);
 		int treshold = 20;
-		
+
+		//convex testing returns S which is equal to S* (there are no vertices 
+		//in S which are not in S
+
+		List<V> Svertices = S.pathVertices();
 		CircleLayoutCalc<V> circleCalc = new CircleLayoutCalc<V>();
-		double radius = circleCalc.calculateRadius(Sstar, treshold);
-		Map<V,Point2D> positions = circleCalc.calculatePosition(Sstar, radius, center);
+		double radius = circleCalc.calculateRadius(Svertices, treshold);
+		Map<V,Point2D> positions = circleCalc.calculatePosition(Svertices, radius, center);
 		log.info("Calculating positions of the outer cycle");
 		log.info(positions);
 		ret.putAll(positions);
-	
+
 
 		//step one - for each vertex v of degree two not on S
 		//replace v together with two edges incident to v with a 
@@ -152,22 +159,32 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		Iterator<V> iter = gPrim.getVertices().iterator();
 		while (iter.hasNext()){
 			V v = iter.next();
-			if (!S.contains(v) && graph.vertexDegree(v) == 2){
-				iter.remove();
+			if (!Svertices.contains(v) && graph.vertexDegree(v) == 2){
+				log.info("Deleting " + v);
 				List<E> edges = graph.adjacentEdges(v);
 				E e1 = edges.get(0);
 				E e2 = edges.get(1);
-				gPrim.getEdges().remove(e1);
-				gPrim.getEdges().remove(e2);
+				log.info("removing " + e1);
+				log.info("removing " + e2);
+				gPrim.removeEdge(e1);
+				gPrim.removeEdge(e2);
 				V adjV1 = e1.getOrigin() == v ? e1.getDestination() : e1.getOrigin();
 				V adjV2 = e2.getOrigin() == v ? e2.getDestination() : e2.getOrigin();
 				E newEdge = Util.createEdge(adjV1, adjV2, edgeClass);
+				log.info("Creating " + newEdge);
 				gPrim.addEdge(newEdge);
 				deleted.add(v);
+				
 			}
 		}
-
+		
+		for (V v : deleted)
+			gPrim.removeVertex(v);
+		
+		
+		log.info("G': " + gPrim);
 		//step 2 - call Draw on (G', S, S*) to extend S* into a convex drawing of G'
+		draw(gPrim, S.getPath(), Svertices, ret);
 
 		//step 3 For each deleter vertex of degree 2 determine its position on the straight 
 		//line segment joining the two vertices adjacent to the vertex
@@ -186,7 +203,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @param Sstar Extendable convex polygon of S
 	 * @param positions
 	 */
-	private void draw(Graph<V,E> G, List<V> S, List<V> Sstar, Map<V,Point2D> positions){
+	private void draw(Graph<V,E> G, List<E> S, List<V> Svertices, Map<V,Point2D> positions){
 
 		//if G has at most 3 vertices
 		//a convex drawing has been obtained - return
@@ -194,99 +211,124 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			return;
 
 		//select and arbitrary vertex of S* and let G' = G-v (remove v from G)
-		V v = arbitraryApex(Sstar);
-
-		List<E> vEdges = graph.adjacentEdges(v);
-		List<V> connectedVerties = new ArrayList<V>();
-
+		V v = arbitraryApex(Svertices);
+		
+		log.info("Selected arbitrary vertex " + v);
 
 		//find vertices v1 and vp+1 as vertices on S adjacent to v
 		V v1, vp_1;
-		int index = S.indexOf(v);
-		int next = (index + 1) % S.size();
+		int index = Svertices.indexOf(v);
+		int next = (index + 1) % Svertices.size();
 		int previous = index - 1;
 		if (previous == -1)
-			previous = S.size() - 1;
+			previous = Svertices.size() - 1;
 
-		v1 = S.get(Math.min(next, previous));
-		vp_1 = S.get(Math.max(next, previous));
-
-		E currentEdge = G.edgeBetween(v, v1);
-		V currentVertex = v1;
+		v1 = Svertices.get(Math.min(next, previous));
+		vp_1 = Svertices.get(Math.max(next, previous));
+		
+		log.info("Previous " + v1);
+		log.info("Next " + vp_1);
 
 		//remove v
+		log.info(G);
 		G.removeVertex(v);
+		log.info("Removed vertex " + v);
+		log.info(G);
 
-		while (connectedVerties.size() < vEdges.size()){
-			connectedVerties.add(currentVertex);
-			V other = currentEdge.getOrigin() == currentVertex ? currentEdge.getDestination() : currentEdge.getOrigin();
 
-			//find next edge
-			List<E> allEdges = G.adjacentEdges(other);
-			for (E e : allEdges)
-				if (vEdges.contains(e) && e != currentEdge){
-					currentEdge = e;
-					break;
-				}
-			currentVertex = other;
-		}
+		//divide the G into blocks and find cut vertices
 
-		//TODO
-		//block are biconnected components
-		//instead of using this, use class Biconnected!
-		
-		//divide G into blocks and find cut vertices
-		List<V> cutVertices = splitting.findAllCutVertices(graph);
-		List<Block<V,E>> blocks = splitting.findAllBlocks(G, cutVertices);
+		List<BiconnectedComponent<V, E>> blocks = G.listBiconnectedComponents();
+		List<V> cutVertices = G.listCutVertices();
+		log.info("Cut vertices: " + cutVertices);
+		log.info("Blocks: " + blocks);
 
 		List<V> vis = new ArrayList<V>();
-		vis.add(v1);
+		//vis.add(v1);
 		vis.addAll(cutVertices);
 		vis.add(vp_1);
 
-		List<V> si = new ArrayList<V>();
-		for (Block<V,E> bi : blocks){
+		//v1 is in B1
+		//Vp+1 is in Bp
+		//Vi is in Bi-1 and Bi
+		//vi , 2<=i<=p is a cut vertex if G'
+		V currentV = v1;
+		
+		//Step 2 - Draw each block bi convex
 
-			//TODO find Si
-			//find Si
+		//Step 2.1 Determine Si*
+		//when S* was found, positions of its vertices were found as well
+		//so we only need to find position of vertices not on S
+		//Locate the vertices in V(Si) - V(S) in the interiors of the triangle
+		//v*v1*vi+1 (cut vertices + 2 connected to v at the beginning and end)
+		//in such way that the vertices adjacent to v are apices of convex polygon Si*
+		//and the others are on the straight line segments
 
+		//Step 2.2
+		//recursively call procedure Draw(bi,Si, Si*)
 
-			//Si can't be determined that way - V(Si) - V(S) should't be empty
-			//not all vertices on Si should be on S!
-			//Implement the method for findinf S and S*, then come back here
-
-			List<V> siApexes = new ArrayList<V>();
-
-			//find vertices among v1, v2, .. vp_1 which the block contains
-			V vBorder1 = null, vBorder2 = null;
-			for (V border : vis){
-				if (bi.getVertices().contains(border)){
-					if (vBorder1 == null)
-						vBorder1 = border;
-					else if (vBorder2 == null){
-						vBorder2 = border;
-						break;
-					}
+		List<E> blockEdgesOnS = new ArrayList<E>();
+		List<E> otherBlockEdges = new ArrayList<E>();
+		while (blocks.size() > 0){
+			//find the block which contains the current vertex
+			BiconnectedComponent<V, E> foundBlock = null;
+			for (BiconnectedComponent<V, E> block :  blocks)
+				if (block.getVertices().contains(currentV)){
+					foundBlock = block;
+					break;
 				}
+			blocks.remove(foundBlock);
+			log.info("Block " + foundBlock);
+			
+			//find the next vertex (the one both on S and in the block)
+			V otherVertex = null;
+			for (V sVertex : vis)
+				if (foundBlock.getVertices().contains(sVertex)){
+					otherVertex = sVertex;
+					break;
+				}
+			
+			
+			//now that the current block was determined
+			//find its extendable facial cycle
+			//for each Bi, Si is the union of Vi-Vi+1 path on S and on the block not counting edges of S
+			blockEdgesOnS.clear();
+			otherBlockEdges.clear();
+			for (E e : foundBlock.getEdges())
+				if (S.contains(e))
+					blockEdgesOnS.add(e);
+				else
+					otherBlockEdges.add(e);
+			
+			if (otherBlockEdges.size() > 0){
+				dijkstra.setEdges(otherBlockEdges);
+				List<E> otherPath = dijkstra.getPath(currentV, otherVertex).getPath();
+				blockEdgesOnS.addAll(otherPath);
 			}
-
-
-			//Step 2 - Draw each block bi convex
-
-			//Step 2.1 Determine Si*
-			//when S* was found, positions of its vertices were found as well
-			//so we only need to find position of vertices not on S
-			//Locate the vertices in V(Si) - V(S) in the interios of the triangle
-			//v*v1*vi+1 (cut vertices + 2 connected to v at the beginning and end)
-			//in such way that the vertices adjacent to v are apices of convex polygon Si*
-			//and the others are on the straight line segments
-
-			//Step 2.2
-			//recursively call procedure Draw(bi,Si, Si*)
+			
+			//sort and create path
+			Path<V,E> Si;
+			if (blockEdgesOnS.size() > 1){
+				dijkstra.setEdges(blockEdgesOnS);
+				E first = blockEdgesOnS.get(0);
+				blockEdgesOnS.remove(0);
+				Si = dijkstra.getPath(first.getDestination(), first.getOrigin());
+				log.info("Resulting path " + Si.getPath());
+			}
+			else
+				Si = new Path<V,E>(blockEdgesOnS);
+			
+			//we now positions of Si vertices which are on S
+			//it's now necessary to determine positions of those which are not
+			//for each such vertex, do the following:
+			//if it is adjacent to v (previously selected arbitrary apex)
+			//make it an apex of the polygon (for the block)
+			//else, place it on a straight line segment
+			
+			vis.remove(otherVertex);
+			currentV = otherVertex;
+				
 		}
-
-
-
 	}
 
 
@@ -297,7 +339,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @throws CannotBeAppliedException 
 	 */
 	@SuppressWarnings("unchecked")
-	public List<V> convexTesting() throws CannotBeAppliedException{
+	public Path<V,E> convexTesting() throws CannotBeAppliedException{
 
 		//STEP 1 
 		//Find all separation pairs using Hopcroft-Tarjan triconnected division
@@ -305,20 +347,18 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		testSeparationPairs();
 
-		if (forbiddenSeparationPairs.size() > 0){
+		if (forbiddenSeparationPairs.size() > 0)
 			throw new CannotBeAppliedException("Forbidden separation pair found. Graph doesn't have a convex drawing");
-		}
 
 		List<E> pathEdges = new ArrayList<E>();
-		List<V> face = new ArrayList<V>();
-		
+
 		if (criticalSeparationPairs.size() == 0){
-			
+
 			//all cycles are extendable
 			//take one
 			//for example, the one found during Hopcroft-Tarjan path finding phase
 			//the first of those paths is a cycle
-			
+
 			log.info("All facial cycles are extendable");
 			pathEdges = hopcroftTarjanSplitting.getPaths().get(0);
 		}
@@ -680,11 +720,10 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		Path<V,E> result = dijkstra.getPath(first.getDestination(), first.getOrigin());
 		log.info("Resulting path " + result.getPath());
 
-		face.addAll(result.pathVertices());
+		//face.addAll(result.pathVertices());
+		//log.info("Face " + face);
 
-		log.info("Face " + face);
-
-		return face;
+		return result;
 
 	}
 

@@ -1,4 +1,4 @@
-package graph.properties;
+package graph.properties.splitting;
 
 import graph.elements.Edge;
 import graph.elements.Graph;
@@ -16,7 +16,7 @@ import java.util.Stack;
  * @param <V>
  * @param <E>
  */
-public class Biconnected<V extends Vertex, E extends Edge<V>> {
+public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 
 	private boolean[] visited;
 	private int[] parent, d, low;
@@ -26,10 +26,10 @@ public class Biconnected<V extends Vertex, E extends Edge<V>> {
 	private List<V> vertices;
 
 
-	public Biconnected(Graph<V,E> graph){
+	public BiconnectedSplitting(Graph<V,E> graph){
 		this.graph = graph;
 	}
-
+	
 	public List<BiconnectedComponent<V,E>> findBiconnectedComponents(){
 
 		//initialization
@@ -63,7 +63,6 @@ public class Biconnected<V extends Vertex, E extends Edge<V>> {
 			int vIndex = vertices.indexOf(v);
 
 			if (!visited[vIndex]){
-				System.out.println("pushing " + e);
 				stack.push(e);
 				parent[vIndex] = uIndex;
 				dfsVisit(v, components);

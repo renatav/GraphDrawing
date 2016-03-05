@@ -96,11 +96,13 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	public void removeVertex(V v){
 		vertices.remove(v);
-		List<E> adjacent = adjacentLists.get(v);
+		List<E> adjacent = new ArrayList<E>();
+		adjacent.addAll(adjacentLists.get(v));
 		for (E e : adjacent){
-			edges.remove(e);
+			removeEdge(e);
 		}
 		adjacentLists.remove(v);
+		
 	}
 
 
@@ -205,7 +207,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		if (adjacentLists.get(v) != null)
 			for (E e : adjacentLists.get(v)){
 				V other = e.getDestination() != v ? e.getDestination() : e.getOrigin();
-				if (! ret.contains(other))
+				if (!ret.contains(other))
 					ret.add(other);
 			}
 		return ret;
@@ -399,7 +401,6 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				else
 					ret[i][j] = 0;
 
-				System.out.println("has edge: " + vertices.get(i) + " and " + vertices.get(j) +  " " + hasEdge(vertices.get(i), vertices.get(j)));
 			}
 		return ret;
 	}
@@ -516,6 +517,14 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			}
 		}
 		return true;
+	}
+
+
+	/**
+	 * @return the adjacentLists
+	 */
+	public Map<V, LinkedList<E>> getAdjacentLists() {
+		return adjacentLists;
 	}
 
 
