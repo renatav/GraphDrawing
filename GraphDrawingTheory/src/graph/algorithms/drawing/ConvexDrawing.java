@@ -3,17 +3,15 @@ package graph.algorithms.drawing;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Edge;
+import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.layout.circle.CircleLayoutCalc;
-import graph.properties.components.BiconnectedComponent;
-import graph.properties.components.Block;
 import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
-import graph.properties.splitting.BiconnectedSplitting;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.Splitting;
 import graph.traversal.DijkstraAlgorithm;
@@ -55,7 +53,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * i) three {x,y} split components including a ring or a bond or
 	 * ii) two {x,y} split components neither of which is a ring
 	 */
-	private List<E> criticalSeparationPairs;
+	private List<E> criticalSeparationPairs; 
 	/**
 	 * A map which contains a critical separation pair as the keys and a list of its split components as values
 	 */
@@ -139,6 +137,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//in S which are not in S
 
 		List<V> Svertices = S.pathVertices();
+		Svertices.remove(Svertices.size() - 1);
+		log.info("Face vertices " + Svertices);
 		CircleLayoutCalc<V> circleCalc = new CircleLayoutCalc<V>();
 		double radius = circleCalc.calculateRadius(Svertices, treshold);
 		Map<V,Point2D> positions = circleCalc.calculatePosition(Svertices, radius, center);
@@ -230,16 +230,17 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		log.info("Next " + vp_1);
 
 		//remove v
-		log.info(G);
+		List<E> adjacentEdges = new ArrayList<E>();
+		adjacentEdges.addAll(G.adjacentEdges(v));
 		G.removeVertex(v);
 		log.info("Removed vertex " + v);
 		log.info(G);
-
+		
 
 		//divide the G into blocks and find cut vertices
 
-		List<BiconnectedComponent<V, E>> blocks = G.listBiconnectedComponents();
 		List<V> cutVertices = G.listCutVertices();
+		List<Graph<V, E>> blocks = G.listBiconnectedComponents();
 		log.info("Cut vertices: " + cutVertices);
 		log.info("Blocks: " + blocks);
 
@@ -269,10 +270,14 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		List<E> blockEdgesOnS = new ArrayList<E>();
 		List<E> otherBlockEdges = new ArrayList<E>();
+		List<V> verticesOnS = new ArrayList<V>();
+		List<V> SiVerticesNotOnSAdjToV = new ArrayList<V>();
+		List<V> SiVerticesNotOnSNotAdjToV = new ArrayList<V>();
+		
 		while (blocks.size() > 0){
 			//find the block which contains the current vertex
-			BiconnectedComponent<V, E> foundBlock = null;
-			for (BiconnectedComponent<V, E> block :  blocks)
+			Graph<V, E> foundBlock = null;
+			for (Graph<V, E> block :  blocks)
 				if (block.getVertices().contains(currentV)){
 					foundBlock = block;
 					break;
@@ -294,36 +299,94 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//for each Bi, Si is the union of Vi-Vi+1 path on S and on the block not counting edges of S
 			blockEdgesOnS.clear();
 			otherBlockEdges.clear();
+			//also form a list of all vertices which are on S
+			//it will later be used to calculate the positions of other vertices
+			//on Si and not on S
+			verticesOnS.clear();
+			
 			for (E e : foundBlock.getEdges())
-				if (S.contains(e))
+				if (S.contains(e)){
 					blockEdgesOnS.add(e);
+				}
 				else
 					otherBlockEdges.add(e);
+			
+			System.out.println("S: " + S);
+			System.out.println("Block edges on S: " + blockEdgesOnS);
+			System.out.println("Other block edges: " + otherBlockEdges);
 			
 			if (otherBlockEdges.size() > 0){
 				dijkstra.setEdges(otherBlockEdges);
 				List<E> otherPath = dijkstra.getPath(currentV, otherVertex).getPath();
+				log.info("Other path: (from " + currentV + " to " + otherVertex + ": " + otherPath);
 				blockEdgesOnS.addAll(otherPath);
 			}
 			
-			//sort and create path
-			Path<V,E> Si;
+			
+			//form Si and Si vertices, which will be used during the recursive call
+			
+			List<E> Si;
+			List<V> SiVertices;
+			
 			if (blockEdgesOnS.size() > 1){
+				
 				dijkstra.setEdges(blockEdgesOnS);
 				E first = blockEdgesOnS.get(0);
 				blockEdgesOnS.remove(0);
-				Si = dijkstra.getPath(first.getDestination(), first.getOrigin());
-				log.info("Resulting path " + Si.getPath());
+				Path<V,E> path = dijkstra.getPath(first.getDestination(), first.getOrigin());
+				Si = path.getPath();
+				SiVertices = path.pathVertices();
+				Si.add(first);
+				log.info("Resulting path " + Si);
 			}
-			else
-				Si = new Path<V,E>(blockEdgesOnS);
+			else{
+				Si = blockEdgesOnS;
+				SiVertices = new ArrayList<V>();
+				for (E e : blockEdgesOnS){
+					if (!SiVertices.contains(e.getOrigin()))
+						SiVertices.add(e.getOrigin());
+					if (!SiVertices.contains(e.getDestination()))
+						SiVertices.add(e.getDestination());
+				}
+			}
 			
-			//we now positions of Si vertices which are on S
+			
+			//we know positions of Si vertices which are on S
 			//it's now necessary to determine positions of those which are not
 			//for each such vertex, do the following:
 			//if it is adjacent to v (previously selected arbitrary apex)
-			//make it an apex of the polygon (for the block)
+			//make it an apex of the polygon (for the block) and inside triangle v-vi-vi+1
 			//else, place it on a straight line segment
+			
+			SiVerticesNotOnSAdjToV.clear();
+			SiVerticesNotOnSNotAdjToV.clear();
+			for (E e : otherBlockEdges){
+				if (!Svertices.contains(e.getOrigin())){
+					if (adjacentEdges.contains(e.getOrigin())){
+						if (!SiVerticesNotOnSAdjToV.contains(e.getOrigin()))
+							SiVerticesNotOnSAdjToV.add(e.getOrigin());
+					}
+					else{
+						if (!SiVerticesNotOnSNotAdjToV.contains(e.getOrigin()))
+							SiVerticesNotOnSNotAdjToV.add(e.getOrigin());
+					}
+				}
+				if (!Svertices.contains(e.getDestination())){
+					if (adjacentEdges.contains(e.getDestination())){
+						if (!SiVerticesNotOnSAdjToV.contains(e.getDestination()))
+							SiVerticesNotOnSAdjToV.add(e.getDestination());
+					}
+					else{
+						if (!SiVerticesNotOnSNotAdjToV.contains(e.getDestination()))
+							SiVerticesNotOnSNotAdjToV.add(e.getDestination());
+					}
+				}
+				
+			}
+			
+			log.info("Vertices not on S adjacent to v " + SiVerticesNotOnSAdjToV);
+			log.info("Vertices not on S not adjacent to v " + SiVerticesNotOnSNotAdjToV);
+			
 			
 			vis.remove(otherVertex);
 			currentV = otherVertex;
@@ -718,7 +781,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		E first = pathEdges.get(0);
 		pathEdges.remove(0);
 		Path<V,E> result = dijkstra.getPath(first.getDestination(), first.getOrigin());
-		log.info("Resulting path " + result.getPath());
+		List<E> resultingEdges = result.getPath();
+		result.addEdge(first, EdgeDirection.TO_DESTINATION);
+		log.info("Resulting path edgees" + resultingEdges);
 
 		//face.addAll(result.pathVertices());
 		//log.info("Face " + face);

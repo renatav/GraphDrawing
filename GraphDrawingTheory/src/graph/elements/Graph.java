@@ -1,7 +1,6 @@
 package graph.elements;
 
 import graph.properties.GraphProperties;
-import graph.properties.components.BiconnectedComponent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +59,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	}
 
-	public Graph( boolean directed){
+	public Graph(boolean directed){
 		this();
 		this.directed = directed;
 	}
@@ -388,7 +387,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return properties.getCutVertices();
 	}
 	
-	public List<BiconnectedComponent<V,E>>listBiconnectedComponents(){
+	public List<Graph<V,E>>listBiconnectedComponents(){
 		return properties.listBiconnectedComponents();
 	}
 

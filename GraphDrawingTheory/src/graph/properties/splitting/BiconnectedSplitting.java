@@ -3,7 +3,6 @@ package graph.properties.splitting;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.properties.components.BiconnectedComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,9 @@ import java.util.Stack;
 /**
  * Finds all biconnected components of a graph
  * efficiently, by using the depth-first search 
- *
+ * Since the components should have the same features as block
+ * Like removal of vertex which also removed the edge, being able to find its cut vertices etc. 
+ * There is no specific class to represent the component, it is also a graph
  * @param <V>
  * @param <E>
  */
@@ -30,7 +31,7 @@ public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 	
-	public List<BiconnectedComponent<V,E>> findBiconnectedComponents(){
+	public List<Graph<V,E>> findBiconnectedComponents(){
 
 		//initialization
 		vertices = graph.getVertices();
@@ -42,7 +43,7 @@ public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 		stack = new Stack<E>();
 		count = 0;
 
-		List<BiconnectedComponent<V,E>> components = new ArrayList<BiconnectedComponent<V,E>>();
+		List<Graph<V,E>> components = new ArrayList<Graph<V,E>>();
 		vertices = graph.getVertices();
 
 		for (V u : vertices)
@@ -52,7 +53,7 @@ public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 		return components;
 	}
 
-	private void dfsVisit(V u, List<BiconnectedComponent<V,E>> components){
+	private void dfsVisit(V u, List<Graph<V,E>> components){
 		int uIndex = vertices.indexOf(u);
 		visited[uIndex] = true;
 		count ++;
@@ -78,16 +79,18 @@ public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
-	private BiconnectedComponent<V,E> formComponent(E e){
-		List<E> edges = new ArrayList<E>();
+	@SuppressWarnings("unchecked")
+	private Graph<V,E> formComponent(E e){
+		Graph<V,E> component = new Graph<V,E>();
 		E pop = null;
 		do {
 			pop = stack.pop();
-			edges.add(pop);
+			component.addVertex(pop.getOrigin(), pop.getDestination());
+			component.addEdge(pop);
 		}
 		while (pop != e);
 
-		return new BiconnectedComponent<V, E>(edges);
+		return component;
 	}
 
 

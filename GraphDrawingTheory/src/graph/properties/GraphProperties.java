@@ -3,7 +3,6 @@ package graph.properties;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.properties.components.BiconnectedComponent;
 import graph.properties.splitting.BiconnectedSplitting;
 import graph.traversal.DFSTreeTraversal;
 import graph.traversal.DijkstraAlgorithm;
@@ -159,7 +158,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 	
-	public List<BiconnectedComponent<V, E>> listBiconnectedComponents(){
+	public List<Graph<V, E>> listBiconnectedComponents(){
 		BiconnectedSplitting<V,E> biconnected = new BiconnectedSplitting<V,E>(graph);
 		return biconnected.findBiconnectedComponents();
 	}
