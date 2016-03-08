@@ -4,7 +4,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
-import graph.layout.circle.CircleLayoutCalc;
+import graph.math.CircleLayoutCalc;
 import graph.symmetry.Permutation;
 
 import java.awt.geom.Point2D;

@@ -8,7 +8,9 @@ import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
-import graph.layout.circle.CircleLayoutCalc;
+import graph.math.Calc;
+import graph.math.CircleLayoutCalc;
+import graph.math.Line;
 import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
@@ -381,17 +383,47 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 							SiVerticesNotOnSNotAdjToV.add(e.getDestination());
 					}
 				}
-				
 			}
 			
 			log.info("Vertices not on S adjacent to v " + SiVerticesNotOnSAdjToV);
 			log.info("Vertices not on S not adjacent to v " + SiVerticesNotOnSNotAdjToV);
 			
-			
 			vis.remove(otherVertex);
 			currentV = otherVertex;
 				
 		}
+	}
+	
+	private void positionVerticesAsApices(V vi, V vi_1, V v, Map<V,Point2D> positions, List<V> vertices){
+		//vertices should be apices of a polygon and should be placed inside the triangle whose
+		//apices are vi, vi_1 and v
+		//the idea here is to place them on a circle arc whose tangents are sides of the triangle v-vi and v-vi_1
+		Point2D viPoint = positions.get(vi);
+		Point2D vi_1Point = positions.get(vi_1);
+		Point2D vPoint = positions.get(v);
+		
+		Line viLine = Calc.lineThroughTwoPoints(vPoint, viPoint);
+		Line vi_1Line = Calc.lineThroughTwoPoints(vPoint, vi_1Point);
+		Line perperndicularViLine = Calc.perperndicularLineIntersectingOnPoint(viLine, viPoint);
+		Line perperndicularVi_1Line = Calc.perperndicularLineIntersectingOnPoint(vi_1Line, vi_1Point);
+		Point2D circleCenter = Calc.intersectionOfLines(perperndicularViLine, perperndicularVi_1Line);
+		double radius = Calc.distanceBetweenTwoPoints(viPoint, circleCenter);
+		
+		double a = Calc.distanceBetweenTwoPoints(viPoint, vPoint);
+		double b = Calc.distanceBetweenTwoPoints(vi_1Point, viPoint);
+		double c = Calc.distanceBetweenTwoPoints(viPoint, vi_1Point);
+		//calculate angle between sides vi-v and vi+1-v
+		//so that we would know the angle between the center of the circle vi and vi+1
+		double vAngle = Calc.triangleAngle(a, b, c);
+		double circleAngle = Math.PI/2 - vAngle;
+		
+		int numberOfVertices = vertices.size();
+		
+		//sada je ideja da se povuku linije iz centra po uglom cicleAngle/numberOfVertices, circleAngle/numOfVertices*2 itd
+		//ti preseci sa kruznicom bi bile tacke na jednakom rastojanju i unutar trougla!
+		
+		
+			
 	}
 
 

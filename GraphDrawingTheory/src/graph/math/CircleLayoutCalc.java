@@ -1,4 +1,4 @@
-package graph.layout.circle;
+package graph.math;
 
 import graph.elements.Vertex;
 

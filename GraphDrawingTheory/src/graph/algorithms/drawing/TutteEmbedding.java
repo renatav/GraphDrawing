@@ -3,7 +3,7 @@ package graph.algorithms.drawing;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.layout.circle.CircleLayoutCalc;
+import graph.math.CircleLayoutCalc;
 import graph.math.CramersRule;
 import graph.math.Matrix;
 

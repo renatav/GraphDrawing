@@ -7,6 +7,7 @@ import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.CircleProperties;
+import graph.math.CircleLayoutCalc;
 import graph.ordering.circular.Circular;
 
 import java.awt.geom.Point2D;
