@@ -85,8 +85,34 @@ public class Calc {
 	public static double triangleAngle(double a, double b, double c){
 		
 		//c^2 = a^2 + b^2 -2a*b*cosC
-		
 		return Math.acos((Math.pow(a,2) + Math.pow(b,2) - Math.pow(c,2))/(2*a*b));
+	}
+	
+	public static Line lineAtAngleFromAtPoint(Line l1, Point2D point, double angle){
+		//tg(angle) = (k1-k2)/(1+k1*k2)
+		double k1 = l1.getK();
+		double tan = Math.tan(angle);
+		double k2 = (k1 - tan)/(1 + tan*k1);
+		double x = point.getX();
+		double y = point.getY();
+		double n2 = y - k2*x;
+		return new Line(k2, n2);
 		
+	}
+	
+	
+	public static Point2D[] circleLineIntersection(Line l, Point2D circleCenter, double radius){
+		
+		//circle form (x-a)^2 + (y-b)^2 = r^2
+		//(a,b) is the center of the circle
+		//line form y = mx + d
+		
+		//delta = r^2*(1+m^2)-(b-m*a-d)^2
+		//x1,2 = (a + b*m - d*m +-sqrt(delta)/(1+m^2))
+		//y1,2 = (d+a*m + b*m^2 +- m*sqrt(delta)/(1+m^2)
+		
+		
+		
+		return null;
 	}
 }
