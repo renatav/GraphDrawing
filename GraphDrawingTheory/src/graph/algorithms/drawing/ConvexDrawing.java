@@ -8,14 +8,11 @@ import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
-import graph.math.Calc;
 import graph.math.CircleLayoutCalc;
-import graph.math.Line;
 import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
-import graph.properties.splitting.Splitting;
 import graph.traversal.DijkstraAlgorithm;
 import graph.util.Util;
 
@@ -37,7 +34,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private Graph<V,E> graph;
 	private Class<?> edgeClass, vertexClass;
 	private Random rand;
-	private Splitting<V, E> splitting;
 	private Logger log = Logger.getLogger(ConvexDrawing.class);
 
 	/**A list of prime separation pairs represented by a virtual edge which contains
@@ -95,7 +91,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		edgeClass = graph.getEdges().get(0).getClass();
 		vertexClass = graph.getVertices().get(0).getClass();
 		rand = new Random();
-		splitting = new Splitting<V,E>();
 		dijkstra = new DijkstraAlgorithm<V,E>();
 		virtualEdgesSplitComponentsMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
 		planarityTesting = new FraysseixMendezPlanarity<V,E>();
@@ -231,9 +226,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		log.info("Previous " + v1);
 		log.info("Next " + vp_1);
 
-		//remove v
-		List<E> adjacentEdges = new ArrayList<E>();
-		adjacentEdges.addAll(G.adjacentEdges(v));
+		//remove v, determine which vertices are adjacent to it
+		
+		List<V> adjacentVertices = new ArrayList<V>();
+		adjacentVertices.addAll(G.adjacentVertices(v));
+		log.info("Adjacent vertices: " + adjacentVertices);
 		G.removeVertex(v);
 		log.info("Removed vertex " + v);
 		log.info(G);
@@ -313,9 +310,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				else
 					otherBlockEdges.add(e);
 			
-			System.out.println("S: " + S);
-			System.out.println("Block edges on S: " + blockEdgesOnS);
-			System.out.println("Other block edges: " + otherBlockEdges);
+			log.info("S: " + S);
+			log.info("Block edges on S: " + blockEdgesOnS);
+			log.info("Other block edges: " + otherBlockEdges);
 			
 			if (otherBlockEdges.size() > 0){
 				dijkstra.setEdges(otherBlockEdges);
@@ -364,7 +361,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			SiVerticesNotOnSNotAdjToV.clear();
 			for (E e : otherBlockEdges){
 				if (!Svertices.contains(e.getOrigin())){
-					if (adjacentEdges.contains(e.getOrigin())){
+					if (adjacentVertices.contains(e.getOrigin())){
 						if (!SiVerticesNotOnSAdjToV.contains(e.getOrigin()))
 							SiVerticesNotOnSAdjToV.add(e.getOrigin());
 					}
@@ -374,7 +371,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 				if (!Svertices.contains(e.getDestination())){
-					if (adjacentEdges.contains(e.getDestination())){
+					if (adjacentVertices.contains(e.getDestination())){
 						if (!SiVerticesNotOnSAdjToV.contains(e.getDestination()))
 							SiVerticesNotOnSAdjToV.add(e.getDestination());
 					}
@@ -388,6 +385,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			log.info("Vertices not on S adjacent to v " + SiVerticesNotOnSAdjToV);
 			log.info("Vertices not on S not adjacent to v " + SiVerticesNotOnSNotAdjToV);
 			
+			if (SiVerticesNotOnSAdjToV.size() > 0)
+				positionVerticesAsApices(currentV, otherVertex,v, positions, SiVerticesNotOnSAdjToV);
+			
 			vis.remove(otherVertex);
 			currentV = otherVertex;
 				
@@ -397,30 +397,35 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private void positionVerticesAsApices(V vi, V vi_1, V v, Map<V,Point2D> positions, List<V> vertices){
 		//vertices should be apices of a polygon and should be placed inside the triangle whose
 		//apices are vi, vi_1 and v
-		//the idea here is to place them on a circle arc whose tangents are sides of the triangle v-vi and v-vi_1
 		Point2D viPoint = positions.get(vi);
 		Point2D vi_1Point = positions.get(vi_1);
 		Point2D vPoint = positions.get(v);
 		
-		Line viLine = Calc.lineThroughTwoPoints(vPoint, viPoint);
-		Line vi_1Line = Calc.lineThroughTwoPoints(vPoint, vi_1Point);
-		Line perperndicularViLine = Calc.perperndicularLineIntersectingOnPoint(viLine, viPoint);
-		Line perperndicularVi_1Line = Calc.perperndicularLineIntersectingOnPoint(vi_1Line, vi_1Point);
-		Point2D circleCenter = Calc.intersectionOfLines(perperndicularViLine, perperndicularVi_1Line);
-		double radius = Calc.distanceBetweenTwoPoints(viPoint, circleCenter);
+		log.info("viPoint " + viPoint);
+		log.info("vi_1Point " + vi_1Point);
+		log.info("vPoint " + vPoint);
+	
+		//second idea
+		//find centroid of the triangle
+		////place one vertex there
+		//draw a line parallel to vi,vi+1 through the controid
+		//find the intersection with v,vi and v, vi+1
+		//get awe get two new triangles
+		//vi, intersection, centroid
+		//vi+1, other intersection centroid
+		//then to the same for those two triangles
+		//find their centroids
+		//then form two new triangles
+		//do so in a way that will guarantee that their centroid
+		//is placed so that the line constantly rises or drops
+		//and moves from left to right - no zig zags
+		//that's the purpose of the parallel line - prevent
+		//such oscillations
+		//if one of the apices of a new triangle is the old centroid
+		//the other apex should be on the parallel line drawn to contain it
+		//intersection of the median containing the new centroid and that parallel line
 		
-		double a = Calc.distanceBetweenTwoPoints(viPoint, vPoint);
-		double b = Calc.distanceBetweenTwoPoints(vi_1Point, viPoint);
-		double c = Calc.distanceBetweenTwoPoints(viPoint, vi_1Point);
-		//calculate angle between sides vi-v and vi+1-v
-		//so that we would know the angle between the center of the circle vi and vi+1
-		double vAngle = Calc.triangleAngle(a, b, c);
-		double circleAngle = Math.PI/2 - vAngle;
-		
-		int numberOfVertices = vertices.size();
-		
-		//sada je ideja da se povuku linije iz centra po uglom cicleAngle/numberOfVertices, circleAngle/numOfVertices*2 itd
-		//ti preseci sa kruznicom bi bile tacke na jednakom rastojanju i unutar trougla!
+		List<V> positionedVertices = new ArrayList<V>();
 		
 		
 			

@@ -88,31 +88,22 @@ public class Calc {
 		return Math.acos((Math.pow(a,2) + Math.pow(b,2) - Math.pow(c,2))/(2*a*b));
 	}
 	
-	public static Line lineAtAngleFromAtPoint(Line l1, Point2D point, double angle){
-		//tg(angle) = (k1-k2)/(1+k1*k2)
-		double k1 = l1.getK();
-		double tan = Math.tan(angle);
-		double k2 = (k1 - tan)/(1 + tan*k1);
-		double x = point.getX();
-		double y = point.getY();
-		double n2 = y - k2*x;
-		return new Line(k2, n2);
+	
+	public static Point2D triangleCentroid(Point2D a, Point2D b, Point2D c){
 		
+		double x = (a.getX() + b.getX() + c.getX())/3;
+		double y = (a.getY() + b.getY() + c.getY()/3);
+		return new Point2D.Double(x,y);
 	}
 	
-	
-	public static Point2D[] circleLineIntersection(Line l, Point2D circleCenter, double radius){
-		
-		//circle form (x-a)^2 + (y-b)^2 = r^2
-		//(a,b) is the center of the circle
-		//line form y = mx + d
-		
-		//delta = r^2*(1+m^2)-(b-m*a-d)^2
-		//x1,2 = (a + b*m - d*m +-sqrt(delta)/(1+m^2))
-		//y1,2 = (d+a*m + b*m^2 +- m*sqrt(delta)/(1+m^2)
-		
-		
-		
-		return null;
+	public static Line parallelLineThroughPoint(Line line1, Point2D point){
+		double k = line1.getK();
+		//y = kx + n
+		//n = y - k*x
+		double n = point.getY() - k * point.getX();
+		return new Line(k,n);
 	}
+
+	
+	
 }

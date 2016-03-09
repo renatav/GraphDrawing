@@ -23,4 +23,9 @@ public class Line {
 	public void setN(double n) {
 		this.n = n;
 	}
+
+	@Override
+	public String toString() {
+		return "Line [k=" + k + ", n=" + n + "]";
+	}
 }
