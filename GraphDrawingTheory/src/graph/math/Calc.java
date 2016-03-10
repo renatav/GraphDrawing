@@ -96,6 +96,10 @@ public class Calc {
 		return new Point2D.Double(x,y);
 	}
 	
+	public static Point2D triangleCentroid(Triangle t){
+		return triangleCentroid(t.getA(), t.getB(), t.getC());
+	}
+	
 	public static Line parallelLineThroughPoint(Line line1, Point2D point){
 		double k = line1.getK();
 		//y = kx + n

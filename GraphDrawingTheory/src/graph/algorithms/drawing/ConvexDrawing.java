@@ -8,7 +8,10 @@ import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
+import graph.math.Calc;
 import graph.math.CircleLayoutCalc;
+import graph.math.Line;
+import graph.math.Triangle;
 import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
@@ -425,10 +428,66 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//the other apex should be on the parallel line drawn to contain it
 		//intersection of the median containing the new centroid and that parallel line
 		
-		List<V> positionedVertices = new ArrayList<V>();
+
+		int positionedVertices = 0;
 		
+		int currentIndex = 0;
+		V current;
+		Map<Integer, List<Triangle>> trianglesLevelsMap = new HashMap<Integer, List<Triangle>>();
+		int level = 1;
+		Triangle t = new Triangle(viPoint, vi_1Point, vPoint);
+		List<Triangle> levelOne = new ArrayList<Triangle>();
+		levelOne.add(t);
+		trianglesLevelsMap.put(1, levelOne);
 		
+		while (positionedVertices < vertices.size()){
+			current = vertices.get(currentIndex);
+			List<Triangle> triangles = trianglesLevelsMap.get(level);
+			if (triangles.size() == 0){
+				trianglesLevelsMap.remove(level);
+				level ++;
+				triangles = trianglesLevelsMap.get(level);
+			}
+			t = triangles.get(0); //maybe random gen here?
+			triangles.remove(t);
+			//position current vertex
+			Point2D centroid = Calc.triangleCentroid(t);
+			positions.put(current, centroid);
+			positionedVertices ++;
+			//divide the triangle,form new ones
+			//if current triangle is at level one (vi, vi+1, v)
+			//draw a line through centroid parallel to vi,vi+1
+			//new triangles are vi, intersection 1, centroid
+			//and vi+i, intersection 2, centroid
+			//try to establish some convention regarding which point will be a,b and c
+			//use that to generalize division and creation of new triangles
 			
+			Line parallelTo = Calc.lineThroughTwoPoints(t.getA(), t.getB());
+			Line parallelLIne = Calc.parallelLineThroughPoint(parallelTo, centroid);
+			
+			if (level == 1){
+				Line l1 = Calc.lineThroughTwoPoints(t.getA(), t.getC()); //vi and v
+				Point2D intersection1 = Calc.intersectionOfLines(l1, parallelLIne);
+				Line l2 = Calc.lineThroughTwoPoints(t.getB(), t.getC()); //vi+1 and v
+				Point2D intersection2 = Calc.intersectionOfLines(l2, parallelLIne);
+				Triangle t1 = new Triangle(t.getA(), intersection1, centroid);
+				Triangle t2 = new Triangle(t.getA(), intersection2, centroid);
+				List<Triangle> nextLevelTriangls = trianglesLevelsMap.get(level + 1);
+				if (nextLevelTriangls == null){
+					nextLevelTriangls = new ArrayList<Triangle>();
+					trianglesLevelsMap.put(level + 1, nextLevelTriangls);
+				}
+				nextLevelTriangls.add(t1);
+				nextLevelTriangls.add(t2);
+			}
+			
+			
+			
+		}
+		
+		//discover the orientation of the triangle
+		//we need to connect vi and vi+1
+		//is 
 	}
 
 
