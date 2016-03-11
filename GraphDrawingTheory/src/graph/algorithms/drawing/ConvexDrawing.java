@@ -391,6 +391,14 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			if (SiVerticesNotOnSAdjToV.size() > 0)
 				positionVerticesAsApices(currentV, otherVertex,v, positions, SiVerticesNotOnSAdjToV);
 			
+			List<V> apices = new ArrayList<V>();
+			for (V vert : SiVertices)
+				if (!SiVerticesNotOnSNotAdjToV.contains(vert))
+					apices.add(vert);	
+			
+			if (SiVerticesNotOnSNotAdjToV.size() > 0)
+				positionVerticesOnStraightLineSegments(apices, positions, SiVerticesNotOnSNotAdjToV);
+			
 			vis.remove(otherVertex);
 			currentV = otherVertex;
 				
@@ -427,7 +435,6 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//if one of the apices of a new triangle is the old centroid
 		//the other apex should be on the parallel line drawn to contain it
 		//intersection of the median containing the new centroid and that parallel line
-		
 
 		int positionedVertices = 0;
 		
@@ -453,7 +460,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//position current vertex
 			Point2D centroid = Calc.triangleCentroid(t);
 			positions.put(current, centroid);
-			positionedVertices ++;
+			positionedVertices++;
+			currentIndex++;
 			//divide the triangle,form new ones
 			//if current triangle is at level one (vi, vi+1, v)
 			//draw a line through centroid parallel to vi,vi+1
@@ -463,31 +471,54 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//use that to generalize division and creation of new triangles
 			
 			Line parallelTo = Calc.lineThroughTwoPoints(t.getA(), t.getB());
-			Line parallelLIne = Calc.parallelLineThroughPoint(parallelTo, centroid);
+			Line parallelLine = Calc.parallelLineThroughPoint(parallelTo, centroid);
+			List<Triangle> nextLevelTriangls = trianglesLevelsMap.get(level + 1);
+			Triangle t1, t2;
 			
 			if (level == 1){
 				Line l1 = Calc.lineThroughTwoPoints(t.getA(), t.getC()); //vi and v
-				Point2D intersection1 = Calc.intersectionOfLines(l1, parallelLIne);
+				Point2D intersection1 = Calc.intersectionOfLines(l1, parallelLine);
 				Line l2 = Calc.lineThroughTwoPoints(t.getB(), t.getC()); //vi+1 and v
-				Point2D intersection2 = Calc.intersectionOfLines(l2, parallelLIne);
-				Triangle t1 = new Triangle(t.getA(), intersection1, centroid);
-				Triangle t2 = new Triangle(t.getA(), intersection2, centroid);
-				List<Triangle> nextLevelTriangls = trianglesLevelsMap.get(level + 1);
-				if (nextLevelTriangls == null){
-					nextLevelTriangls = new ArrayList<Triangle>();
-					trianglesLevelsMap.put(level + 1, nextLevelTriangls);
-				}
-				nextLevelTriangls.add(t1);
-				nextLevelTriangls.add(t2);
+				Point2D intersection2 = Calc.intersectionOfLines(l2, parallelLine);
+				t1 = new Triangle(t.getA(), intersection1, centroid);
+				t2 = new Triangle(t.getB(), intersection2, centroid);
+			}
+			else{
+				
+				//TODO proveriti izbor temena
+				
+				//for the side which has two points on the parallel line
+				//take the new point as the intersection with the median
+				//with that line, new centroid, old centroid
+				//for the other one, draw new parallel line
+				//form the triangle taking intersection with the appropriate triangle side
+				//one old vertex and new centroid
+				
+				//each triangle should be formed in the way such that
+				//b and c are on the same parallel line
+				//a is the remaining apex
+				Line parallelSide = Calc.lineThroughTwoPoints(t.getB(), t.getC());
+				Line median = Calc.lineThroughTwoPoints(t.getA(), centroid);
+				Point2D intersection1 = Calc.intersectionOfLines(parallelSide, median);
+				t1 = new Triangle(centroid, intersection1, t.getC());
+				
+				//the side that doesn't have C 
+				Line intersectionSide = Calc.lineThroughTwoPoints(t.getA(), t.getB());
+				Point2D intersection = Calc.intersectionOfLines(parallelLine, intersectionSide);
+				t2 = new Triangle(t.getA(), intersection, centroid);
 			}
 			
-			
-			
+			if (nextLevelTriangls == null){
+				nextLevelTriangls = new ArrayList<Triangle>();
+				trianglesLevelsMap.put(level + 1, nextLevelTriangls);
+			}
+			nextLevelTriangls.add(t1);
+			nextLevelTriangls.add(t2);
 		}
-		
-		//discover the orientation of the triangle
-		//we need to connect vi and vi+1
-		//is 
+	}
+	
+	private void positionVerticesOnStraightLineSegments(List<V> apices, Map<V,Point2D> positions, List<V> vertices){
+		//position vertices on straight line segments
 	}
 
 
