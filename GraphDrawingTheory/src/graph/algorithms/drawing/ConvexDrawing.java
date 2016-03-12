@@ -317,13 +317,15 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			log.info("Block edges on S: " + blockEdgesOnS);
 			log.info("Other block edges: " + otherBlockEdges);
 			
+			//TODO sta ako ne postoji putanja?
+			//da li se moze desiti ako je ok da ne postoji?
+			//ovo se desilo kada je tako proslo da nema cut vertex-a
 			if (otherBlockEdges.size() > 0){
 				dijkstra.setEdges(otherBlockEdges);
 				List<E> otherPath = dijkstra.getPath(currentV, otherVertex).getPath();
 				log.info("Other path: (from " + currentV + " to " + otherVertex + ": " + otherPath);
 				blockEdgesOnS.addAll(otherPath);
 			}
-			
 			
 			//form Si and Si vertices, which will be used during the recursive call
 			
@@ -460,6 +462,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//position current vertex
 			Point2D centroid = Calc.triangleCentroid(t);
 			positions.put(current, centroid);
+			log.info("Setting position of " + v + ": " + centroid);
 			positionedVertices++;
 			currentIndex++;
 			//divide the triangle,form new ones
@@ -474,6 +477,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			Line parallelLine = Calc.parallelLineThroughPoint(parallelTo, centroid);
 			List<Triangle> nextLevelTriangls = trianglesLevelsMap.get(level + 1);
 			Triangle t1, t2;
+			
+			if (nextLevelTriangls == null){
+				nextLevelTriangls = new ArrayList<Triangle>();
+				trianglesLevelsMap.put(level + 1, nextLevelTriangls);
+			}
 			
 			if (level == 1){
 				Line l1 = Calc.lineThroughTwoPoints(t.getA(), t.getC()); //vi and v
@@ -507,11 +515,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				Point2D intersection = Calc.intersectionOfLines(parallelLine, intersectionSide);
 				t2 = new Triangle(t.getA(), intersection, centroid);
 			}
-			
-			if (nextLevelTriangls == null){
-				nextLevelTriangls = new ArrayList<Triangle>();
-				trianglesLevelsMap.put(level + 1, nextLevelTriangls);
-			}
+		
 			nextLevelTriangls.add(t1);
 			nextLevelTriangls.add(t2);
 		}
@@ -519,6 +523,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	
 	private void positionVerticesOnStraightLineSegments(List<V> apices, Map<V,Point2D> positions, List<V> vertices){
 		//position vertices on straight line segments
+		//TODO
 	}
 
 

@@ -6,6 +6,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
+import graph.layout.PropertyEnums.BoxProperties;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -30,6 +31,9 @@ public class BoxLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLa
 		elementsToLayout = graph.getVertices();
 		
 		Drawing<V,E> drawing = new Drawing<V,E>();
+		
+		if (layoutProperties.getProperty(BoxProperties.COLUMNS) != null)
+			numberInRow = (Integer) layoutProperties.getProperty(BoxProperties.COLUMNS);
 		
 		int numberOfRows = elementsToLayout.size() / numberInRow;
 		int currentIndex = 0;

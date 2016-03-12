@@ -29,9 +29,9 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 		Circular<V,E> circular = new Circular<V,E>(graph);
 		List<V> ordering = circular.circularOrdering();
 		
-		Double distance = 0D;
+		Integer distance= 0;
 		if (layoutProperties.getProperty(CircleProperties.DISTANCE) != null)
-			distance =  (Double) layoutProperties.getProperty(CircleProperties.DISTANCE);
+			distance =  (Integer) layoutProperties.getProperty(CircleProperties.DISTANCE);
 		
 		graph.setVertices(ordering);
 

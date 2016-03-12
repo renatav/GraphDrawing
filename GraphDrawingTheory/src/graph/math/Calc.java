@@ -92,7 +92,7 @@ public class Calc {
 	public static Point2D triangleCentroid(Point2D a, Point2D b, Point2D c){
 		
 		double x = (a.getX() + b.getX() + c.getX())/3;
-		double y = (a.getY() + b.getY() + c.getY()/3);
+		double y = (a.getY() + b.getY() + c.getY())/3;
 		return new Point2D.Double(x,y);
 	}
 	
