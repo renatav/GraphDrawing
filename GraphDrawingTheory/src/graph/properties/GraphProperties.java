@@ -143,6 +143,10 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return tree.getBackEdges().size() > 0;
 	}
 	
+	public boolean isTree(){
+		return !isCyclic() && isConnected();
+	}
+	
 	public List<List<E>> listMultiEdges(){
 		
 		List<List<E>> ret = new ArrayList<List<E>>();

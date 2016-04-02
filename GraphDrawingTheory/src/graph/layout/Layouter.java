@@ -186,8 +186,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 			currentIndex ++;
 		}
 		if (!layouter.isPositionsEdges())
-			drawing.positionEdges(edges);
-		return drawing;
+			ret.positionEdges(edges);
+		return ret;
 	}
 }
 

@@ -1,0 +1,42 @@
+package graph.layout;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class LayoutAestheticMap {
+
+	private static Map<AestheticCriteria, List<LayoutAlgorithms>> aestheticCriteriaAlgorithms;
+	
+	static {
+		aestheticCriteriaAlgorithms = new HashMap<AestheticCriteria, List<LayoutAlgorithms>>();
+		List<LayoutAlgorithms> planar = new ArrayList<LayoutAlgorithms>();
+		planar.add(LayoutAlgorithms.CONVEX);
+		planar.add(LayoutAlgorithms.TUTTE);
+		aestheticCriteriaAlgorithms.put(AestheticCriteria.PLANAR, planar);
+		List<LayoutAlgorithms> minEdgeCrosses = new ArrayList<LayoutAlgorithms>();
+		minEdgeCrosses.add(LayoutAlgorithms.DAG);
+		minEdgeCrosses.add(LayoutAlgorithms.FAST_ORGANIC);
+		minEdgeCrosses.add(LayoutAlgorithms.FRUCHTERMAN_REINGOLD);
+		minEdgeCrosses.add(LayoutAlgorithms.ISOM);
+		minEdgeCrosses.add(LayoutAlgorithms.KAMADA_KAWAI);
+		minEdgeCrosses.add(LayoutAlgorithms.SPTING2);
+		aestheticCriteriaAlgorithms.put(AestheticCriteria.MINIMAL_EDGE_CROESSES, minEdgeCrosses);
+		List<LayoutAlgorithms> symmetric = new ArrayList<LayoutAlgorithms>();
+		symmetric.add(LayoutAlgorithms.CONCENTRIC);
+		aestheticCriteriaAlgorithms.put(AestheticCriteria.SYMMETRIC, symmetric);
+		List<LayoutAlgorithms> straightLine = new ArrayList<LayoutAlgorithms>();
+		straightLine.add(LayoutAlgorithms.TUTTE);
+		straightLine.add(LayoutAlgorithms.CONVEX);
+		aestheticCriteriaAlgorithms.put(AestheticCriteria.STRAIGHT_LINE, straightLine);
+		List<LayoutAlgorithms> flow = new ArrayList<LayoutAlgorithms>();
+		flow.add(LayoutAlgorithms.HIERARCHICAL);
+		aestheticCriteriaAlgorithms.put(AestheticCriteria.FLOW, flow);
+	}
+	
+	public static LayoutAlgorithms pick(AestheticCriteria criterion){
+		//for now
+		return aestheticCriteriaAlgorithms.get(criterion).get(0);
+	}
+}

@@ -131,7 +131,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//determine position of S* vertices
 		//TODO center as algorithm parameter
 		Point2D center = new Point(0,0);
-		int treshold = 20;
+		int treshold = 80;
 
 		//convex testing returns S which is equal to S* (there are no vertices 
 		//in S which are not in S
@@ -154,7 +154,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//leave the original graph intact - make a copy to start with
 		Graph<V,E> gPrim = Util.copyGraph(graph);
 		//store deleted vertices in order to position them later
-		List<V> deleted = new ArrayList<V>();
+		Map<V, E> deletedAdjacentMap = new HashMap<V,E>();
 
 		Iterator<V> iter = gPrim.getVertices().iterator();
 		while (iter.hasNext()){
@@ -173,21 +173,32 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				E newEdge = Util.createEdge(adjV1, adjV2, edgeClass);
 				log.info("Creating " + newEdge);
 				gPrim.addEdge(newEdge);
-				deleted.add(v);
+				deletedAdjacentMap.put(v,newEdge);
 				
 			}
 		}
 		
-		for (V v : deleted)
+		for (V v : deletedAdjacentMap.keySet()){
 			gPrim.removeVertex(v);
+		}
 		
 		
 		log.info("G': " + gPrim);
 		//step 2 - call Draw on (G', S, S*) to extend S* into a convex drawing of G'
 		draw(gPrim, S.getPath(), Svertices, ret);
 
-		//step 3 For each deleter vertex of degree 2 determine its position on the straight 
+		//step 3 For each deleted vertex of degree 2 determine its position on the straight 
 		//line segment joining the two vertices adjacent to the vertex
+		//TODO what if both vertex and adjacent were delete
+		for (V v : deletedAdjacentMap.keySet()){
+//			V firstAdjacent = deletedAdjacentMap.get(v).getOrigin();
+//			V secondAdjacent = deletedAdjacentMap.get(v).getDestination();
+//			Point2D pos1 = ret.get(firstAdjacent);
+//			Point2D pos2 = ret.get(secondAdjacent);
+//			Point2D.Double pos = new Point2D.Double((pos1.getX() + pos2.getX())/2,
+//					(pos1.getY() + pos2.getY())/2);
+			ret.put(v, new Point2D.Double(0,0));
+		}
 
 		return ret;
 	}
@@ -204,6 +215,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @param positions
 	 */
 	private void draw(Graph<V,E> G, List<E> S, List<V> Svertices, Map<V,Point2D> positions){
+		
+		log.info("Calling draw for " + G);
 
 		//if G has at most 3 vertices
 		//a convex drawing has been obtained - return
@@ -400,6 +413,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			
 			if (SiVerticesNotOnSNotAdjToV.size() > 0)
 				positionVerticesOnStraightLineSegments(apices, positions, SiVerticesNotOnSNotAdjToV);
+			
+			draw(foundBlock, Si, SiVertices, positions);
 			
 			vis.remove(otherVertex);
 			currentV = otherVertex;
@@ -1235,6 +1250,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @param S
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private boolean isIsExtendable(List<E> S){
 
 		if (forbiddenSeparationPairs.size() > 0){

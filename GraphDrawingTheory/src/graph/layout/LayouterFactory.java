@@ -2,6 +2,7 @@ package graph.layout;
 
 import graph.elements.Edge;
 import graph.elements.Vertex;
+import graph.layout.automatic.AutomaticPropertiesLayout;
 import graph.layout.box.BoxLayouter;
 import graph.layout.circle.CircleLayouter;
 import graph.layout.force.directed.DAGLayouter;
@@ -15,6 +16,7 @@ import graph.layout.organic.JGraphOrganicLayouter;
 import graph.layout.organic.JungISOMLayouter;
 import graph.layout.partition.JGraphPartitionLayouter;
 import graph.layout.stack.JGraphStackLayouter;
+import graph.layout.straight.line.ConvexLayouter;
 import graph.layout.symmetric.SymmetricCircleLayouter;
 import graph.layout.symmetric.TutteLayouter;
 import graph.layout.tree.JungBalloonLayouter;
@@ -33,7 +35,9 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 
 		AbstractLayouter<V,E> layouter = null;
 		
-		if (algorithm == LayoutAlgorithms.KAMADA_KAWAI)
+		if (algorithm == LayoutAlgorithms.AUTOMATIC)
+			layouter = new AutomaticPropertiesLayout<V,E>();
+		else if (algorithm == LayoutAlgorithms.KAMADA_KAWAI)
 			layouter = new KamadaKawaiLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.FRUCHTERMAN_REINGOLD)
 			layouter= new FruchtermanReingoldLayouter<V,E>();
@@ -79,6 +83,8 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new PrefuseRadialTreeLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.SQUIRED_TREEMAP)
 			layouter = new PrefuseSquarifiedTreeMapLayouter<V,E>();
+		else if (algorithm == LayoutAlgorithms.CONVEX)
+			layouter = new ConvexLayouter<V,E>();
 			
 		return layouter;
 

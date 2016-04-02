@@ -349,6 +349,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public boolean isConnected(){
 		return properties.isConnected();
 	}
+	
+	public boolean isTree(){
+		return properties.isTree();
+	}
 
 	/**
 	 * Checks is graph is connected

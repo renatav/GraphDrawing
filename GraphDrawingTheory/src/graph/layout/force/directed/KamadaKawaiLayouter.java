@@ -15,11 +15,10 @@ public class KamadaKawaiLayouter<V extends Vertex, E extends Edge<V>> extends Ab
 
 		kkLayout.setAdjustForGravity(true);
 		
-		Object lengthFactor = layoutProperties.getProperty(KamadaKawaiProperties.LENGTH_FACTOR);
-		Object distanceMultiplier = layoutProperties.getProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER);
-		Object maxIterations = layoutProperties.getProperty(KamadaKawaiProperties.MAXIMUM_ITERATIONS);
-		
 		if (layoutProperties != null){
+			Object lengthFactor = layoutProperties.getProperty(KamadaKawaiProperties.LENGTH_FACTOR);
+			Object distanceMultiplier = layoutProperties.getProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER);
+			Object maxIterations = layoutProperties.getProperty(KamadaKawaiProperties.MAXIMUM_ITERATIONS);
 			if (lengthFactor != null && lengthFactor instanceof Double)
 				kkLayout.setLengthFactor((double)lengthFactor);
 			if (distanceMultiplier != null && distanceMultiplier instanceof Double)
