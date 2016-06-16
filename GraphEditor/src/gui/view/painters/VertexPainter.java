@@ -16,7 +16,7 @@ public class VertexPainter implements IElementPainter {
 
 	private GraphVertex vertex;
 	private Shape shape;
-	private BasicStroke stroke = new BasicStroke();
+	private BasicStroke stroke = new BasicStroke(2);
 	
 	public VertexPainter(GraphVertex vertex){
 		this.vertex = vertex;

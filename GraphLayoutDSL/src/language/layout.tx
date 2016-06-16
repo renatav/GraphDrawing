@@ -1,0 +1,265 @@
+Layout:
+	LayoutGraph | LayoutSubgraphs
+;
+
+LayoutGraph:
+	'Layout' 'graph' layoutType = LayoutEnum
+;
+
+LayoutSubgraphs:
+	'Layout' layoutSubgraphs += LayoutSubraph 
+;
+
+LayoutSubraph:
+	(subgraph = Subgraph | 'others')  layoutType = LayoutEnum 	
+;
+
+Subgraph:
+	'subgraph' vertices += Vertex[',']
+;
+
+
+LayoutEnum:
+	LayoutStyle | AestheticCriteria | LayoutAlgorithm
+;
+
+LayoutStyle:
+	howToLayout = 'style' style = LayoutStyleEnum
+;
+
+LayoutStyleEnum:
+	'automatic' | 'circular' | 'tree' | 'hierarchical' | 'symmetric' | 'general'
+;
+
+AestheticCriteria:
+	howToLayout = 'criteria' aestheticCriteria += AestheticCriteion[',']
+;
+
+LayoutAlgorithm:
+	howToLayout = 'algorithm' '=' algorithm = LayoutAlgorithmEnum
+;
+
+AestheticCriteion:
+	EdgeCrossings | MinimumAngles | MinimumBands |
+	UniformFlow | Symmetry  | 
+	NodeDistribution | EdgeLengths | EdgeVariation
+;
+
+EdgeCrossings:
+	MinimizeCrossings |  Planar
+;
+
+MinimizeCrossings:
+	'minimize'? 'edge' criterion = 'crossings'
+;
+Planar:
+	criterion = 'planar'
+;
+
+MinimumAngles:
+	('maximize' 'minimal')? criterion = 'angle' ('threshold' '=' threshold = INT)?
+;
+
+MinimumBands:
+	'minimize'? criterion = 'bands'
+;
+
+UniformFlow:
+	'uniform'? 'criterion = flow' ('direction' '=' direction = Orientation)?
+;
+
+Symmetry:
+	criterion = 'symmetric' ('automorphism' automorphism = Automorphism)?
+;
+
+
+NodeDistribution:
+	criterion = 'distribute' 'nodes' 'evenly'
+;
+
+EdgeLengths:
+	criterion = 'optimize' 'edges' 'lengths'
+;
+
+EdgeVariation:
+	criterion = 'similar' 'edges' 'lengths'
+;
+
+
+LayoutAlgorithmEnum:
+	TreeAlgorithm | StraightLineAlgorithm | HierarchicalAlgorithm |
+	CircularAlgorithm | SymmetricAlgorithm | ForceDirectedAlgorithm |
+	BoxAlgorithm
+;
+
+TreeAlgorithm:
+	RadialTreeAlgorithm | LevelBasedTreeAlgorithm | CompactTreeAlgorithm |
+	NodeLinkTreeAlgorithm | BalloonTreeAlgorithm
+;
+
+RadialTreeAlgorithm:
+	name = 'radial' 'tree'
+	('horizontal' 'distance'? '=' xDist = INT)?
+	('vertical' 'distance'? '=' yDist = INT)?
+;
+
+LevelBasedTreeAlgorithm:
+	name = 'level' 'based' 'tree'
+	('horizontal' 'distance' '=' xDist = INT)?
+	('vertical' 'distance' '=' yDist = INT)?
+;
+
+CompactTreeAlgorithm:
+	name = 'Compact' 'tree'
+	horizontal ?= 'horizontal'
+	invert ?= 'invert'
+	resizeParents ?= 'resize' 'parents'
+	('level' ' distance' '=' levelDistance = INT)?
+	('node' 'distance' '=' nodeDistance = INT)?
+;
+
+NodeLinkTreeAlgorithm:
+	name = 'node' 'link' 'tree'
+	('orientation' '=' orientation = Orientation)?
+	('spacing' 'between'? 'siblings' '=' spacingSiblings = FLOAT)?
+	('spacing' 'between'? 'subtrees' '=' spacingSubtrees = FLOAT)?
+	('spacing' 'between'? 'levels' '=' spacingLevels = FLOAT)?
+	('offset' 'for' 'root' 'node' '=' offsetRootNode = FLOAT)?
+;
+
+BalloonTreeAlgorithm:
+	name = 'balloon' 'tree'
+	('minimal' 'radius' '=' minRadius = INT)?
+;
+
+OrthogonalAlgorithm:
+	name = 'orthogonal'
+	rectangular ?= 'rectangular'
+;
+
+HierarchicalAlgorithm:
+	name = 'hierarchical'
+	resizeParent ?= 'resize' 'parent'
+	moveParent ?= 'move' 'parent'
+	('parent' 'border' '=' parentBorder = INT)?
+	('same' 'layer' 'spacing' '='  interCellSpacing = FLOAT)?
+	('adjacent' 'layers' 'spacing' '=' interRankSpacing = FLOAT)?
+	('hierarchy' 'spacing' '=' interHierarchySpacing = FLOAT)?
+	('parallel' 'edges' 'spacing' '=' parallelEdgeSpacing = FLOAT)?
+	('orientation' '=' orientation = Orientation)?
+	fineTuning ?= 'fine' 'tune'	
+;
+
+CircularAlgorithm:
+	name = 'circular'
+	optimize ?= 'optimize' 'crossings'
+	('distance' '=' dist = INT)?
+;
+
+SymmetricAlgorithm:
+	ConcentricSymmetricAlgorithm | PlanarSymmetricAlgorithm
+;
+
+ConcentricSymmetricAlgorithm:
+	name = 'concentric' 'symmetric'
+	'automorphism' '=' automorphism = Automorphism 
+;
+
+PlanarSymmetricAlgorithm:
+	type = 'planar' 'name = symmetric'
+;
+
+ForceDirectedAlgorithm:
+	KamadaKawai | FruchtermanReingold | Spring |
+	FastOrganic | Organic
+;
+
+KamadaKawai:
+	name = 'Kamada' 'Kawai'
+	('disconnected' 'distance' 'multiplier' '=' distanceMultiplier = FLOAT)?
+	('length' 'factor' '=' lengthFactor = FLOAT)?
+	('maximum' 'iterations' '=' maxIterations = INT)?
+;
+
+FruchtermanReingold:
+	name = 'Fruchterman' 'Reingold'
+	('attraction' 'multiplier' '=' attractionMultiplier = FLOAT)?
+	('resolution' 'multiplier' '=' resolutionMultiplier = FLOAT)?
+	('maximum' 'iterations' '=' maxIterations = INT)?
+;
+
+
+Spring:
+	name = 'spring'
+	('stretch' '=' stretch = FLOAT)?
+	('repulsion' 'range' '=' resolutionRange = INT)?
+	('force' 'multiplier' '=' forceMultiplier = FLOAT)?
+;
+
+FastOrganic:
+	type = 'fast' name = 'organic'
+	('force' 'constant' '=' forceConstant = FLOAT)?
+	('minimal' 'distance' 'limit' '=' minimalDistanceLimit = FLOAT)?
+	('initial' 'temperature' '=' initialTemperature = FLOAT)?
+	('maximum' 'iterations' '=' maxIterations = INT)?
+;
+
+Organic:
+	name = 'organic'
+	optimizeEdgeCrossings ?=  'optimize' 'edge' 'crossings'
+	('edge' 'crossing' 'factor' '=' edgeCrossingFactor = FLOAT)?
+	optimizeEdgeDistance ?=  'optimize' 'edge' 'distance'
+	('edge' 'distance' 'factor' '=' edgeDistanceFactor = FLOAT)?
+	optimizeBorderLine ?=  'optimize' 'border' 'line'
+	('border' 'line' 'factor' '=' borderLineFactor = FLOAT)?
+	optimizeNodeDistribution ?=  'optimize' 'node' 'distribution'
+	('node' 'distribution' 'factor' '=' nodeDistributionFactor = FLOAT)?
+	fineTune ?=  'fine' 'tune'
+	('fine' 'tuning' 'radius' '=' fineTuningRadius = FLOAT)?
+	('average' 'node' 'area' '=' averageNodeArea = FLOAT)?
+	('average' 'scale' 'factor' '=' averageScaleFactor = FLOAT)?
+	('maximum' 'iterations' '=' maxIterations = INT)?
+;
+
+BoxAlgorithm:
+	name = 'box'
+	('columns' '=' numOfColumns = INT)?
+;
+
+
+StraightLineAlgorithm:
+ 	TutteEmbedding | ConvexAlgorithm | OrthogonalAlgorithm
+;
+
+TutteEmbedding:
+	name = 'Tutte' 'embedding'
+	('distance' '=' dist = INT)?
+;
+
+ConvexAlgorithm:
+	name = 'convex'
+	('distance' '=' dist = INT)?
+;
+
+OrthogonalAlgorithm:
+	name = 'orthogonal'
+	rectangular ?= 'rectangular'
+;
+
+Vertex:
+	'v' index = INT
+;
+
+Automorphism:
+	'(' vertices += Vertex[','] ')'
+;
+
+Orientation:
+	'left' | 'right' | 'up' | 'down'
+;
+
+Comment:
+ 	/\/\/.*$/
+;
+
+	

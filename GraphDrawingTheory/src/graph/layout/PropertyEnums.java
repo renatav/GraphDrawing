@@ -5,7 +5,7 @@ public interface PropertyEnums {
 
 	public enum KamadaKawaiProperties implements PropertyEnums{
 		DISCONNECTED_DISTANCE_MULTIPLIER("Disconnected distance multiplier", false, Double.class), LENGTH_FACTOR ("Length factor", false, Double.class),
-		MAXIMUM_ITERATIONS("Maximum itterations", false, Integer.class);
+		MAXIMUM_ITERATIONS("Maximum iterations", false, Integer.class);
 
 		private String name;
 		private boolean hidden;
@@ -306,7 +306,7 @@ public interface PropertyEnums {
 	public enum  OrganicProperties implements PropertyEnums{
 
 		IS_OPTIMIZE_EDGE_CROSSING("Should optimize edge crossing", false, Boolean.class),
-		EDGE_CROSSING_FACTOR("Edge crossing facotr", false, Double.class),
+		EDGE_CROSSING_FACTOR("Edge crossing factor", false, Double.class),
 		IS_OPTIMIZE_EDGE_DISTANCE("Should optimize edge distance", false, Boolean.class),
 		EDGE_DISTANCE_FACTOR("Edge distance factor", false, Double.class),
 		IS_OPTIMIZE_BORDER_LINE("Should optimize border line", false, Boolean.class),
