@@ -20,7 +20,9 @@ public class Factory {
 
     public Factory() {
 		String modulesDir = Paths.get("./src/modules").toAbsolutePath().normalize().toString();
+		String modelsDir = Paths.get("./src/models").toAbsolutePath().normalize().toString();
 		interpreter.exec("import sys; sys.path.insert(0, '" + modulesDir + "')");
+		interpreter.exec("import sys; sys.path.insert(0, '" + modelsDir + "')");
         interpreter.exec("from interpreter.Interpreter import Interpreter");
         grammarInterpreter = (PyInstance) interpreter.eval("Interpreter()");
     }
@@ -35,6 +37,7 @@ public class Factory {
     	PyString ret = (PyString) grammarInterpreter.invoke("execute",new PyString(model));
     	String s = ret.asString();
     	System.out.println(s);
+    	
         
     }
 

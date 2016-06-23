@@ -1,5 +1,6 @@
 from textx.metamodel import metamodel_from_file
 from textx.export import metamodel_export, model_export
+from models import MLayoutGraph, MLayoutSubgraphs
 import os
 
 class Interpreter():
@@ -16,8 +17,9 @@ class Interpreter():
         #mozda ovde napraviti nekiobjekat koji ce se vratiti
         #ali po tako da se pretvori u Java objekat kasnije
         #bolje nego da se vraca neki string
-        	   
+        	
         model = self.metamodel.model_from_str(model_str)
+        
         if model.__class__.__name__ == 'LayoutGraph':
             print 'graph'
             layoutType = model.layoutType.howToLayout
