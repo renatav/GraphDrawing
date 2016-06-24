@@ -1,4 +1,9 @@
-/factory/
 /interpreter/
-/util/
+/main/
+/factory/
 /models/
+/util/
+/java/
+/app/
+/interfaces/
+/language/

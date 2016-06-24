@@ -1,9 +1,9 @@
-package factory.interfaces;
+package interfaces;
 
 import java.util.List;
 import java.util.Map;
 
-public interface ILayoutGraph {
+public interface ILayoutGraph extends ILayout{
 
 	public String getGraph();
 	public String getType();

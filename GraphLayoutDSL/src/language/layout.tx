@@ -7,11 +7,11 @@ LayoutGraph:
 ;
 
 LayoutSubgraphs:
-	'Layout' layoutSubgraphs += LayoutSubraph 
+	'Layout' layoutSubgraphs += LayoutSubraph[';']
 ;
 
 LayoutSubraph:
-	(subgraph = Subgraph | 'others')  layoutType = LayoutEnum 	
+	(subgraph = Subgraph |  'others')  layoutType = LayoutEnum 	
 ;
 
 Subgraph:
@@ -24,7 +24,7 @@ LayoutEnum:
 ;
 
 LayoutStyle:
-	howToLayout = 'style' style = LayoutStyleEnum
+	howToLayout = 'style' '=' style = LayoutStyleEnum
 ;
 
 LayoutStyleEnum:
