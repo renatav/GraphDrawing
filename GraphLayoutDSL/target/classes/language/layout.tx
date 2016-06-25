@@ -24,7 +24,7 @@ LayoutEnum:
 ;
 
 LayoutStyle:
-	howToLayout = 'style' '=' style = LayoutStyleEnum
+	howToLayout = 'style' style = LayoutStyleEnum
 ;
 
 LayoutStyleEnum:
@@ -36,7 +36,7 @@ AestheticCriteria:
 ;
 
 LayoutAlgorithm:
-	howToLayout = 'algorithm' '=' algorithm = LayoutAlgorithmEnum
+	howToLayout = 'algorithm' algorithm = LayoutAlgorithmEnum
 ;
 
 AestheticCriteion:
@@ -105,15 +105,15 @@ RadialTreeAlgorithm:
 
 LevelBasedTreeAlgorithm:
 	name = 'level' 'based' 'tree'
-	('horizontal' 'distance' '=' xDist = INT)?
-	('vertical' 'distance' '=' yDist = INT)?
+	('horizontal' 'distance'? '=' xDist = INT)?
+	('vertical' 'distance'? '=' yDist = INT)?
 ;
 
 CompactTreeAlgorithm:
-	name = 'Compact' 'tree'
+	name = 'compact' 'tree'
 	horizontal ?= 'horizontal'
 	invert ?= 'invert'
-	resizeParents ?= 'resize' 'parents'
+	(resizeParents ?= 'resize' 'parents')?
 	('level' ' distance' '=' levelDistance = INT)?
 	('node' 'distance' '=' nodeDistance = INT)?
 ;
@@ -123,8 +123,8 @@ NodeLinkTreeAlgorithm:
 	('orientation' '=' orientation = Orientation)?
 	('spacing' 'between'? 'siblings' '=' spacingSiblings = FLOAT)?
 	('spacing' 'between'? 'subtrees' '=' spacingSubtrees = FLOAT)?
-	('spacing' 'between'? 'levels' '=' spacingLevels = FLOAT)?
-	('offset' 'for' 'root' 'node' '=' offsetRootNode = FLOAT)?
+	('spacing' 'between'? 'depth'? 'levels' '=' spacingLevels = FLOAT)?
+	('offset' 'for'? 'root' 'node'? '=' offsetRootNode = FLOAT)?
 ;
 
 BalloonTreeAlgorithm:
@@ -139,20 +139,20 @@ OrthogonalAlgorithm:
 
 HierarchicalAlgorithm:
 	name = 'hierarchical'
-	resizeParent ?= 'resize' 'parent'
-	moveParent ?= 'move' 'parent'
+	(resizeParent ?= 'resize' 'parent')?
+	(moveParent ?= 'move' 'parent')?
 	('parent' 'border' '=' parentBorder = INT)?
-	('same' 'layer' 'spacing' '='  interCellSpacing = FLOAT)?
+	('same' 'layer' 'spacing' '='  intraCellSpacing = FLOAT)?
 	('adjacent' 'layers' 'spacing' '=' interRankSpacing = FLOAT)?
 	('hierarchy' 'spacing' '=' interHierarchySpacing = FLOAT)?
 	('parallel' 'edges' 'spacing' '=' parallelEdgeSpacing = FLOAT)?
 	('orientation' '=' orientation = Orientation)?
-	fineTuning ?= 'fine' 'tune'	
+	(fineTuning ?= 'fine' 'tune')?
 ;
 
 CircularAlgorithm:
 	name = 'circular'
-	optimize ?= 'optimize' 'crossings'
+	(optimize ?= 'optimize' 'crossings')?
 	('distance' '=' dist = INT)?
 ;
 
@@ -206,15 +206,15 @@ FastOrganic:
 
 Organic:
 	name = 'organic'
-	optimizeEdgeCrossings ?=  'optimize' 'edge' 'crossings'
+	(optimizeEdgeCrossings ?=  'optimize' 'edge' 'crossings')?
 	('edge' 'crossing' 'factor' '=' edgeCrossingFactor = FLOAT)?
-	optimizeEdgeDistance ?=  'optimize' 'edge' 'distance'
+	(optimizeEdgeDistance ?=  'optimize' 'edge' 'distance')?
 	('edge' 'distance' 'factor' '=' edgeDistanceFactor = FLOAT)?
-	optimizeBorderLine ?=  'optimize' 'border' 'line'
+	(optimizeBorderLine ?=  'optimize' 'border' 'line')?
 	('border' 'line' 'factor' '=' borderLineFactor = FLOAT)?
 	optimizeNodeDistribution ?=  'optimize' 'node' 'distribution'
 	('node' 'distribution' 'factor' '=' nodeDistributionFactor = FLOAT)?
-	fineTune ?=  'fine' 'tune'
+	(fineTune ?=  'fine' 'tune')?
 	('fine' 'tuning' 'radius' '=' fineTuningRadius = FLOAT)?
 	('average' 'node' 'area' '=' averageNodeArea = FLOAT)?
 	('average' 'scale' 'factor' '=' averageScaleFactor = FLOAT)?

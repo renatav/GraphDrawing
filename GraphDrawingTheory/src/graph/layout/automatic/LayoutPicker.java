@@ -21,9 +21,16 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	
 	public LayoutAlgorithms pickAlgorithm(Graph<V,E> graph){
 		//check graph properties
+		//TODO kada koji algoritam za stablo, kada kruzni
+		//recimo, ako je puno povezano sa jednim centralnim
+		//staviti njega u centar, ostalo poredjati okolo
+		//kada recimo radial tree, kada balloon, kada level based (obicno)
+		//da li je simetricno itd.
+		//nepovezani - box
 		if (graph.isTree())
 			return LayoutAlgorithms.TREE;
 		else
 			return LayoutAlgorithms.KAMADA_KAWAI;
+	
 	}
 }

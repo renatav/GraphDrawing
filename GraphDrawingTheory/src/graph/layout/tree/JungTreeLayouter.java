@@ -22,25 +22,22 @@ public class JungTreeLayouter<V extends Vertex, E extends Edge<V>> extends Abstr
 	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 
 		
-		Integer xDist = 50, yDist = 50;
+		int xDist = -1, yDist = -1;
 		
 		if (layoutProperties != null){
-			layoutProperties.getProperty(TreeProperties.X_DISTANCE);
-
 
 			Object xDistValue = layoutProperties.getProperty(TreeProperties.X_DISTANCE);
 			Object yDistValue = layoutProperties.getProperty(TreeProperties.Y_DISTANCE);
 
-			if (xDistValue instanceof Double)
-				xDist = ((Double) xDistValue).intValue();
-
-			if (yDistValue instanceof Double)
-				yDist = ((Double) xDistValue).intValue();
+			if (xDistValue != null)
+				xDist = (int) xDistValue;
+			if (yDistValue != null)
+				yDist = (int) yDistValue;
 		}
 
 		TreeLayout<V,E> treeLayout;
-		if (xDist != null){
-			if (yDist != null)
+		if (xDist != -1){
+			if (yDist != -1)
 				treeLayout = new TreeLayout<V, E>((Forest<V, E>) jungGraph, xDist, yDist);
 			else
 				treeLayout = new TreeLayout<V, E>((Forest<V, E>) jungGraph, xDist);

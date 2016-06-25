@@ -2,13 +2,14 @@ from textx.metamodel import metamodel_from_file
 from textx.export import metamodel_export, model_export
 from models import MLayoutGraph, MLayoutSubgraphs
 import os
+import sys
 
 class Interpreter():
 
-    def __init__(self):
-        meta_model_path = os.path.join(os.getcwd(), 'src\language\layout.tx')
-        print meta_model_path
-        metamodel = metamodel_from_file(meta_model_path)
+    def __init__(self,):
+        metamodel_dir = sys.path[0] 
+        metamodel_path = os.path.join(metamodel_dir, "layout.tx")
+        metamodel = metamodel_from_file(metamodel_path)
         self.metamodel = metamodel
 
     def execute(self, model_str):

@@ -1,9 +1,11 @@
 package interpreter.java;
 
+
 import interfaces.ILayout;
 import interfaces.ILayoutGraph;
 import interfaces.ILayoutSubgraphs;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +20,16 @@ import org.python.util.PythonInterpreter;
 
 import util.Factory;
 
+/**
+ * Interpreter. Receives the input string and calls python interpreter.
+ * Singleton, since there is no need to construct the python and parse the grammar
+ * several times.
+ */
 public class Interpreter {
 
 	private PythonInterpreter interpreter = new PythonInterpreter();
 	private PyInstance grammarInterpreter;
+	private static Interpreter instance;
 	
     /**
      * Create a new PythonInterpreter object, then use it to
@@ -31,12 +39,34 @@ public class Interpreter {
      */
 
     public Interpreter() {
-		String modulesDir = Paths.get("./src/modules").toAbsolutePath().normalize().toString();
-		String modelsDir = Paths.get("./src/models").toAbsolutePath().normalize().toString();
+    	
+		
+		File f = new File(Interpreter.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		String root = f.getAbsolutePath();
+		String modulesDir = Paths.get(root,"modules").toAbsolutePath().normalize().toString();
+		String modelsDir = Paths.get(root,"models").toAbsolutePath().normalize().toString();
+		String languageDir = Paths.get(root,"language").toAbsolutePath().normalize().toString();
+		modulesDir = modulesDir.replace("\\", "\\\\");
+		modelsDir = modelsDir.replace("\\", "\\\\");
+		languageDir = languageDir.replace("\\", "\\\\");
+		System.out.println(modulesDir);
 		interpreter.exec("import sys; sys.path.insert(0, '" + modulesDir + "')");
 		interpreter.exec("import sys; sys.path.insert(0, '" + modelsDir + "')");
+		interpreter.exec("import sys; sys.path.insert(0, '" + languageDir + "')");
+		
+
+	//	interpreter.exec("import sys; sys.path.insert(0, '" + modulesDir + "')");
+	//	interpreter.exec("import sys; sys.path.insert(0, '" + modelsDir + "')");
+		//interpreter.exec("import sys; print sys.path");
         interpreter.exec("from interpreter.Interpreter import Interpreter");
         grammarInterpreter = (PyInstance) interpreter.eval("Interpreter()");
+    }
+    
+    public static Interpreter getInstance(){
+    	if (instance == null)
+    		instance = new Interpreter();
+    	return instance;
+    		
     }
     
 

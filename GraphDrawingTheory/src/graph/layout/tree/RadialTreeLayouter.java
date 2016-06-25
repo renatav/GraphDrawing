@@ -26,18 +26,17 @@ public class RadialTreeLayouter<V extends Vertex, E extends Edge<V>> extends Abs
 
 		Object xDistValue = layoutProperties.getProperty(RadialTreeProperties.X_DISTANCE);
 		Object yDistValue = layoutProperties.getProperty(RadialTreeProperties.Y_DISTANCE);
+		int xDist = -1, yDist = -1;
 		
-		Integer xDist = null, yDist = null;
+		if (xDistValue != null)
+			xDist = (int) xDistValue;
+		if (yDistValue != null)
+			yDist = (int) yDistValue;
 		
-		if (xDistValue instanceof Double)
-			xDist = ((Double) xDistValue).intValue();
-		
-		if (yDistValue instanceof Double)
-			yDist = ((Double) xDistValue).intValue();
 		
 		RadialTreeLayout<V,E> radialTreeLayout;
-		if (xDist != null){
-			if (yDist != null)
+		if (xDist != -1){
+			if (yDist != -1)
 				radialTreeLayout = new RadialTreeLayout<V, E>((Forest<V, E>) jungGraph, xDist, yDist);
 			else
 				radialTreeLayout = new RadialTreeLayout<V, E>((Forest<V, E>) jungGraph, xDist);

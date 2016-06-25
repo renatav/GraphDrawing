@@ -9,6 +9,7 @@ import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
+import graph.layout.dsl.UserDescriptionLayout;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
@@ -23,6 +24,8 @@ import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
+import interfaces.ILayout;
+import interpreter.java.Interpreter;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -427,6 +430,15 @@ public class CommandPanel extends JPanel{
 			return "";
 		}
 		
+		if (command.startsWith(commands[25])){
+			//Layout DSL input
+			Interpreter interpreter = Interpreter.getInstance();
+			ILayout layoutInstructions =  interpreter.execute(command);
+			UserDescriptionLayout<GraphVertex, GraphEdge> dslLayout = new UserDescriptionLayout<GraphVertex, GraphEdge>(graph.getVertices(), 
+					graph.getEdges(), layoutInstructions);
+			
+		}
+		
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
@@ -452,7 +464,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[26];
+		commands = new String[27];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -479,6 +491,7 @@ public class CommandPanel extends JPanel{
 		commands[22] = "separation pairs";
 		commands[23] = "clear";
 		commands[24] = "splitting";
+		commands[25] = "Layout";
 	}
 		
 
