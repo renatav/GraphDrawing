@@ -349,7 +349,7 @@ public interface PropertyEnums {
 		INTRA_CELL_SPACING("Spacing between cells on the same layer", false, Double.class),
 		INTER_RANK_CELL_SPACING("Space between cells on adjacent layers", false, Double.class),
 		INTER_HIERARCHY_SPACING("Soace between unconnected hierarchies", false, Double.class),
-		PARALLELE_EDGE_SPACING("Distance between parallel edges on each rank", false, Double.class),
+		PARALLEL_EDGE_SPACING("Distance between parallel edges on each rank", false, Double.class),
 		ORIENTATION("Orientation", true, Integer.class),
 		FINE_TUNING("Perform fine tuning", false, Boolean.class);
 

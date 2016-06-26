@@ -42,6 +42,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 	private Pair<LayoutAlgorithms, GraphLayoutProperties> selectLayout(List<V> vertices, List<E> edges, LayoutGraph layoutInstructions){
 		//TODO prepraviti gramatiku tako da se osobine algoritama mogu navoditi u proizvoljnom rasporedu
 		//recimo, napraviti pravilo xxProperty, pa staviti 0 ili vise dodelu
+		//TODO git ignore za DSL projekat
 		
 		if (layoutInstructions.getType().equals("algorithm")){
 			LayoutAlgorithms layoutAlgorithm = null;
@@ -117,10 +118,10 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 					layoutProperties.setProperty(HierarchicalProperties.INTER_RANK_CELL_SPACING, algorithm.get("interRankSpacing"));
 				if (algorithm.containsKey("interHierarchySpacing"))
 					layoutProperties.setProperty(HierarchicalProperties.INTER_HIERARCHY_SPACING, algorithm.get("interHierarchySpacing"));
-				if (algorithm.containsKey("parallelEdgeSpacing"))
-					layoutProperties.setProperty(HierarchicalProperties.PARALLELE_EDGE_SPACING, algorithm.get("parallelEdgeSpacing"));
-				if (algorithm.containsKey("fineTuning"))
-					layoutProperties.setProperty(HierarchicalProperties.FINE_TUNING, algorithm.get("fineTuning"));
+				if (algorithm.containsKey("parallelEdgesSpacing"))
+					layoutProperties.setProperty(HierarchicalProperties.PARALLEL_EDGE_SPACING, algorithm.get("parallelEdgesSpacing"));
+				if (algorithm.containsKey("fineTune"))
+					layoutProperties.setProperty(HierarchicalProperties.FINE_TUNING, algorithm.get("fineTune"));
 				if (algorithm.containsKey("orientation")){
 					String orientation = algorithm.get("orientation");
 					if (orientation.equals("right"))

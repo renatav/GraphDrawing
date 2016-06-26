@@ -54,7 +54,13 @@ class Interpreter():
                 #the algorithm could be of numerous classes
                 for attr, value in algorithm.__dict__.iteritems():
                     if not (attr.startswith('_') or attr == 'parent'):
-                        algorithmProperties[attr] = value
+                        if attr == 'properties':
+                            for property in value:
+                                 for propertyAttr, propertyValue in property.__dict__.iteritems():
+                                    if not (propertyAttr.startswith('_') or propertyAttr == 'parent'):
+                                           algorithmProperties[propertyAttr] = propertyValue
+                        else:
+                            algorithmProperties[attr] = value
                       
                 layoutGraph =  MLayoutGraph(graph = graph, type = layoutType, algorithm =  algorithmProperties)  
                 return layoutGraph

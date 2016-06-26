@@ -24,6 +24,8 @@ local.properties
 .settings/
 .loadpath
 
+*/target/* 
+
 # External tool builders
 .externalToolBuilders/
 
@@ -41,5 +43,3 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
-
-*/target/* 

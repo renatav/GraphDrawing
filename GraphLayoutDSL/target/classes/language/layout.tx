@@ -99,61 +99,157 @@ TreeAlgorithm:
 
 RadialTreeAlgorithm:
 	name = 'radial' 'tree'
-	('horizontal' 'distance'? '=' xDist = INT)?
-	('vertical' 'distance'? '=' yDist = INT)?
+	properties *= RadialTreeAlgorithmProperty[',']
+;
+
+RadialTreeAlgorithmProperty:
+	HorizontalTreeProperty | VerticalTreeProperty
+;
+
+HorizontalTreeProperty:
+	'horizontal' 'distance'? '=' xDist = INT
+;
+
+VerticalTreeProperty:
+	'vertical' 'distance'? '=' yDist = INT
 ;
 
 LevelBasedTreeAlgorithm:
 	name = 'level' 'based' 'tree'
-	('horizontal' 'distance'? '=' xDist = INT)?
-	('vertical' 'distance'? '=' yDist = INT)?
+	properties *= LevelBasedTreeAlgorithmProperty[',']
+;
+
+LevelBasedTreeAlgorithmProperty:
+	HorizontalTreeProperty | VerticalTreeProperty
 ;
 
 CompactTreeAlgorithm:
 	name = 'compact' 'tree'
-	horizontal ?= 'horizontal'
-	invert ?= 'invert'
-	(resizeParents ?= 'resize' 'parents')?
-	('level' ' distance' '=' levelDistance = INT)?
-	('node' 'distance' '=' nodeDistance = INT)?
+	properties *= CompactTreeAlgorithmProperty[',']
 ;
 
+CompactTreeAlgorithmProperty:
+	IsHorizontalProperty | IsInvertProperty | IsResizeParentsProperty |
+	LevelDistanceProperty | NodeDistanceProperty
+;
+
+IsHorizontalProperty:
+	horizontal ?= 'horizontal'
+;
+
+IsInvertProperty:
+	invert ?= 'invert'
+;
+	
+IsResizeParentsProperty:
+	resizeParents ?= 'resize' 'parents'
+;
+
+LevelDistanceProperty:
+	'level' ' distance' '=' levelDistance = INT
+;
+
+NodeDistanceProperty:
+	'node' 'distance' '=' nodeDistance = INT
+;
+	
 NodeLinkTreeAlgorithm:
 	name = 'node' 'link' 'tree'
-	('orientation' '=' orientation = Orientation)?
-	('spacing' 'between'? 'siblings' '=' spacingSiblings = FLOAT)?
-	('spacing' 'between'? 'subtrees' '=' spacingSubtrees = FLOAT)?
-	('spacing' 'between'? 'depth'? 'levels' '=' spacingLevels = FLOAT)?
-	('offset' 'for'? 'root' 'node'? '=' offsetRootNode = FLOAT)?
+	properties *= NodeLinkTreeAlgorithmProperty[',']
 ;
 
+NodeLinkTreeAlgorithmProperty:
+	OrientationProperty | SpacingSiblingsProperty | SpacingSubtreesProperty | 
+	SpacingLevelsProperty | OffsetForRootNodeProperty
+;
+
+OrientationProperty:
+	'orientation' '=' orientation = Orientation
+;
+
+SpacingSiblingsProperty:
+	'spacing' 'between'? 'siblings' '=' spacingSiblings = FLOAT
+;
+
+SpacingSubtreesProperty:
+	'spacing' 'between'? 'subtrees' '=' spacingSubtrees = FLOAT
+;
+
+SpacingLevelsProperty:
+	'spacing' 'between'? 'depth'? 'levels' '=' spacingLevels = FLOAT
+;
+
+OffsetForRootNodeProperty:
+	'offset' 'for'? 'root' 'node'? '=' offsetRootNode = FLOAT
+;
+	
 BalloonTreeAlgorithm:
 	name = 'balloon' 'tree'
-	('minimal' 'radius' '=' minRadius = INT)?
+	properties *= BalloonTreeAlgorithmProperty[',']
 ;
 
-OrthogonalAlgorithm:
-	name = 'orthogonal'
-	rectangular ?= 'rectangular'
+//this was done in order to avoid inconsistencies  with other rules of this kind and to enable easy addition of additional properties 
+BalloonTreeAlgorithmProperty:
+	MinimalRadiusProperty
+;
+
+MinimalRadiusProperty:
+	'minimal' 'radius' '=' minRadius = INT
 ;
 
 HierarchicalAlgorithm:
 	name = 'hierarchical'
-	(resizeParent ?= 'resize' 'parent')?
-	(moveParent ?= 'move' 'parent')?
-	('parent' 'border' '=' parentBorder = INT)?
-	('same' 'layer' 'spacing' '='  intraCellSpacing = FLOAT)?
-	('adjacent' 'layers' 'spacing' '=' interRankSpacing = FLOAT)?
-	('hierarchy' 'spacing' '=' interHierarchySpacing = FLOAT)?
-	('parallel' 'edges' 'spacing' '=' parallelEdgeSpacing = FLOAT)?
-	('orientation' '=' orientation = Orientation)?
-	(fineTuning ?= 'fine' 'tune')?
+	properties *= HierarchicalAlgorithmProperty[',']
+;
+
+HierarchicalAlgorithmProperty:
+	IsResizeParentsProperty | ParentBorderProperty | IsMoveParentProperty  | 
+	IntraCellSpacingProperty | InterRankSpacingProperty | InterHierarchySpacingProperty |
+	ParallelEdgesSpacingProperty | OrientationProperty | IsFineTuneProperty
+;
+
+IsMoveParentProperty:
+	moveParent ?= 'move' 'parent'
+;
+
+ParentBorderProperty:
+	 'parent' 'border' '=' parentBorder = INT
+;
+
+IntraCellSpacingProperty:
+	'same' 'layer' 'spacing' '='  intraCellSpacing = FLOAT
+;
+
+InterRankSpacingProperty:
+	'adjacent' 'layers' 'spacing' '=' interRankSpacing = FLOAT
+;
+
+InterHierarchySpacingProperty:
+	'hierarchy' 'spacing' '=' interHierarchySpacing = FLOAT
+;
+
+ParallelEdgesSpacingProperty:
+	'parallel' 'edges' 'spacing' '=' parallelEdgesSpacing = FLOAT
+;
+
+IsFineTuneProperty:	
+	fineTune ?= 'fine' 'tune'
 ;
 
 CircularAlgorithm:
 	name = 'circular'
-	(optimize ?= 'optimize' 'crossings')?
-	('distance' '=' dist = INT)?
+	properties *= CircularAlgorithmProperty[',']
+;
+
+CircularAlgorithmProperty:
+	IsOptimizeCrossingProperty | DistanceProperty
+;
+
+IsOptimizeCrossingProperty:
+	optimize ?= 'optimize' 'crossings'
+;
+DistanceProperty:
+	'distance' '=' dist = INT
 ;
 
 SymmetricAlgorithm:
@@ -162,7 +258,15 @@ SymmetricAlgorithm:
 
 ConcentricSymmetricAlgorithm:
 	name = 'concentric' 'symmetric'
-	'automorphism' '=' automorphism = Automorphism 
+	properties *= ConcentricSymmetricAlgorithmProperty[',']
+	
+;
+
+ConcentricSymmetricAlgorithmProperty:
+	AutomorphismProperty
+;
+AutomorphismProperty:
+	'automorphism' '=' automorphism = Automorphism
 ;
 
 PlanarSymmetricAlgorithm:
@@ -176,54 +280,157 @@ ForceDirectedAlgorithm:
 
 KamadaKawai:
 	name = 'Kamada' 'Kawai'
-	('disconnected' 'distance' 'multiplier' '=' distanceMultiplier = FLOAT)?
-	('length' 'factor' '=' lengthFactor = FLOAT)?
-	('maximum' 'iterations' '=' maxIterations = INT)?
+	properties *= KamadaKawaiProperties[',']
+;
+
+KamadaKawaiProperties:
+	DisconnectedDistanceMultiplierProperty | LengthFactorProperty | 
+	MaxIterationsProperty
+;
+
+DisconnectedDistanceMultiplierProperty:
+	'disconnected'? 'distance' 'multiplier' '=' distanceMultiplier = FLOAT
+;
+LengthFactorProperty:
+	'length' 'factor' '=' lengthFactor = FLOAT
+;
+MaxIterationsProperty:
+	'maximum' 'iterations' '=' maxIterations = INT
 ;
 
 FruchtermanReingold:
 	name = 'Fruchterman' 'Reingold'
-	('attraction' 'multiplier' '=' attractionMultiplier = FLOAT)?
-	('resolution' 'multiplier' '=' resolutionMultiplier = FLOAT)?
-	('maximum' 'iterations' '=' maxIterations = INT)?
+	properties *= FruchtermanReingoldProperty[',']
 ;
 
+FruchtermanReingoldProperty:
+	AttractionMultiplierProperty | ResolutionMultiplierProperty | MaxIterationsProperty
+;
+
+AttractionMultiplierProperty:
+	'attraction' 'multiplier' '=' attractionMultiplier = FLOAT
+;
+
+ResolutionMultiplierProperty:
+	'resolution' 'multiplier' '=' resolutionMultiplier = FLOAT
+;
 
 Spring:
 	name = 'spring'
-	('stretch' '=' stretch = FLOAT)?
-	('repulsion' 'range' '=' resolutionRange = INT)?
-	('force' 'multiplier' '=' forceMultiplier = FLOAT)?
+	properties *= SpringProperty[',']
+;
+
+SpringProperty:
+	StretchProperty | RepulsionRangeProperty | ForceMultiplierProperty
+;
+
+StretchProperty:
+	'stretch' '=' stretch = FLOAT
+;
+
+RepulsionRangeProperty:
+	'repulsion' 'range' '=' resolutionRange = INT
+;
+
+ForceMultiplierProperty:
+	'force' 'multiplier' '=' forceMultiplier = FLOAT
 ;
 
 FastOrganic:
 	type = 'fast' name = 'organic'
-	('force' 'constant' '=' forceConstant = FLOAT)?
-	('minimal' 'distance' 'limit' '=' minimalDistanceLimit = FLOAT)?
-	('initial' 'temperature' '=' initialTemperature = FLOAT)?
-	('maximum' 'iterations' '=' maxIterations = INT)?
+	properties *= FastOrganicProperty[',']
+;
+
+FastOrganicProperty:
+	ForceConstantProperty | MinimalDistanceLimitProperty |
+	InitialTemperatureProperty | MaxIterationsProperty
+;
+
+ForceConstantProperty:
+	'force' 'constant' '=' forceConstant = FLOAT
+;
+
+MinimalDistanceLimitProperty:
+	'minimal' 'distance' 'limit' '=' minimalDistanceLimit = FLOAT
+;
+
+InitialTemperatureProperty:
+	'initial' 'temperature' '=' initialTemperature = FLOAT
 ;
 
 Organic:
 	name = 'organic'
-	(optimizeEdgeCrossings ?=  'optimize' 'edge' 'crossings')?
-	('edge' 'crossing' 'factor' '=' edgeCrossingFactor = FLOAT)?
-	(optimizeEdgeDistance ?=  'optimize' 'edge' 'distance')?
-	('edge' 'distance' 'factor' '=' edgeDistanceFactor = FLOAT)?
-	(optimizeBorderLine ?=  'optimize' 'border' 'line')?
-	('border' 'line' 'factor' '=' borderLineFactor = FLOAT)?
-	optimizeNodeDistribution ?=  'optimize' 'node' 'distribution'
-	('node' 'distribution' 'factor' '=' nodeDistributionFactor = FLOAT)?
-	(fineTune ?=  'fine' 'tune')?
-	('fine' 'tuning' 'radius' '=' fineTuningRadius = FLOAT)?
-	('average' 'node' 'area' '=' averageNodeArea = FLOAT)?
-	('average' 'scale' 'factor' '=' averageScaleFactor = FLOAT)?
-	('maximum' 'iterations' '=' maxIterations = INT)?
+	properties *= OrganicProperty[',']
 ;
+
+OrganicProperty:
+	EdgeCrossingFactorProperty | IsOptimizeEdgeCrossingsProperty |
+	EdgeDistanceFactorProperty | IsOptimizeEdgeDistanceProperty |
+	BorderLineFactorProperty | IsOptimizeBorderLineProperty |
+	NodeDistributionFactorProperty | IsOptimizeNodeDistributionProperty |
+	FineTuningRadiusProperty | IsFineTuneProperty |
+	AverageNodeAreaProperty | AverageScaleFactorProperty |
+	MaxIterationsProperty
+;
+
+IsOptimizeEdgeCrossingsProperty:
+	optimizeEdgeCrossings ?=  'optimize' 'edge' 'crossings'
+;
+
+EdgeCrossingFactorProperty:
+	'edge' 'crossing' 'factor' '=' edgeCrossingFactor = FLOAT
+;
+
+IsOptimizeEdgeDistanceProperty:
+	optimizeEdgeDistance ?=  'optimize' 'edge' 'distance'
+;
+
+EdgeDistanceFactorProperty:
+	'edge' 'distance' 'factor' '=' edgeDistanceFactor = FLOAT
+;
+
+
+IsOptimizeBorderLineProperty:
+	optimizeBorderLine ?=  'optimize' 'border' 'line'
+;
+
+BorderLineFactorProperty:
+	'border' 'line' 'factor' '=' borderLineFactor = FLOAT
+;
+
+
+IsOptimizeNodeDistributionProperty:
+	optimizeNodeDistribution ?=  'optimize' 'node' 'distribution'
+;
+
+NodeDistributionFactorProperty:
+	'node' 'distribution' 'factor' '=' nodeDistributionFactor = FLOAT
+;
+
+FineTuningRadiusProperty:
+	'fine' 'tuning' 'radius' '=' fineTuningRadius = FLOAT
+;
+
+AverageNodeAreaProperty:
+	'average' 'node' 'area' '=' averageNodeArea = FLOAT
+;
+
+AverageScaleFactorProperty:
+	'average' 'scale' 'factor' '=' averageScaleFactor = FLOAT
+;
+
 
 BoxAlgorithm:
 	name = 'box'
-	('columns' '=' numOfColumns = INT)?
+	properties *= BoxAlgorithmPropery[',']
+;
+
+BoxAlgorithmPropery:
+	ColumnsProperty
+;
+
+ColumnsProperty:
+	'columns' '=' numOfColumns = INT
 ;
 
 
@@ -233,18 +440,40 @@ StraightLineAlgorithm:
 
 TutteEmbedding:
 	name = 'Tutte' 'embedding'
-	('distance' '=' dist = INT)?
+	properties *= TutteEmbeddingProperty[',']
+;
+
+TutteEmbeddingProperty:
+	DistanceProperty
+;
+
+DistanceProperty:
+	'distance' '=' dist = INT
 ;
 
 ConvexAlgorithm:
 	name = 'convex'
-	('distance' '=' dist = INT)?
+	properties *= ConvexAlgorithmProperty[',']
+;
+
+ConvexAlgorithmProperty:
+	DistanceProperty
 ;
 
 OrthogonalAlgorithm:
 	name = 'orthogonal'
+	properties *= OrthogonalAlgorithmProperty[',']
+;
+
+//it is almost certain that there will be more properties
+OrthogonalAlgorithmProperty:
+	RectnagularProperty
+;
+
+RectnagularProperty:
 	rectangular ?= 'rectangular'
 ;
+
 
 Vertex:
 	'v' index = INT
