@@ -26,9 +26,11 @@ public abstract class AbstractPrefuseLayouter<V extends Vertex, E extends Edge<V
 	protected Map<E, prefuse.data.Edge> edgesMap = new HashMap<E, prefuse.data.Edge>();
 	protected Visualization vis = new Visualization();
 	protected Table nodeData, edgeData;
+	protected Graph<V,E> graph;
 
 	protected void createPrefuseGraph(Graph<V,E> graph){
 		// Create tables for node and edge data, and configure their columns.
+		this.graph = graph;
 		nodeData = new Table();
 		edgeData = new Table(0,1);
 

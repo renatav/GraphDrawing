@@ -26,6 +26,9 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 	private GraphLayoutProperties layoutProperties;
 	private LayouterFactory<V,E> layouterFactory;
 
+	public Layouter(){
+		layouterFactory = new LayouterFactory<V,E>();
+	}
 
 	public Layouter(List<V> vertices, List<E> edges, LayoutAlgorithms algorithm){
 		this.edges = edges;
@@ -188,6 +191,62 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		if (!layouter.isPositionsEdges())
 			ret.positionEdges(edges);
 		return ret;
+	}
+
+	/**
+	 * @return the edges
+	 */
+	public List<E> getEdges() {
+		return edges;
+	}
+
+	/**
+	 * @param edges the edges to set
+	 */
+	public void setEdges(List<E> edges) {
+		this.edges = edges;
+	}
+
+	/**
+	 * @return the vertices
+	 */
+	public List<V> getVertices() {
+		return vertices;
+	}
+
+	/**
+	 * @param vertices the vertices to set
+	 */
+	public void setVertices(List<V> vertices) {
+		this.vertices = vertices;
+	}
+
+	/**
+	 * @return the algorithm
+	 */
+	public LayoutAlgorithms getAlgorithm() {
+		return algorithm;
+	}
+
+	/**
+	 * @param algorithm the algorithm to set
+	 */
+	public void setAlgorithm(LayoutAlgorithms algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	/**
+	 * @return the layoutProperties
+	 */
+	public GraphLayoutProperties getLayoutProperties() {
+		return layoutProperties;
+	}
+
+	/**
+	 * @param layoutProperties the layoutProperties to set
+	 */
+	public void setLayoutProperties(GraphLayoutProperties layoutProperties) {
+		this.layoutProperties = layoutProperties;
 	}
 }
 

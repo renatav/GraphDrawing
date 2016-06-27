@@ -49,7 +49,6 @@ public class Interpreter {
 		modulesDir = modulesDir.replace("\\", "\\\\");
 		modelsDir = modelsDir.replace("\\", "\\\\");
 		languageDir = languageDir.replace("\\", "\\\\");
-		System.out.println(modulesDir);
 		interpreter.exec("import sys; sys.path.insert(0, '" + modulesDir + "')");
 		interpreter.exec("import sys; sys.path.insert(0, '" + modelsDir + "')");
 		interpreter.exec("import sys; sys.path.insert(0, '" + languageDir + "')");

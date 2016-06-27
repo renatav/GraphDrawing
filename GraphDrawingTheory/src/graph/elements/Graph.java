@@ -344,18 +344,31 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Checks is graph is connected
-	 * @return
+	 * @return true if the graph is connected, false otherwise
 	 */
 	public boolean isConnected(){
 		return properties.isConnected();
 	}
 	
+	/**
+	 * Check if the graph is a tree
+	 * @return true if the graph is a tree, false otherwise
+	 */
 	public boolean isTree(){
 		return properties.isTree();
 	}
+	
+	/**
+	 * @param root Root of the tree
+	 * @return list of vertices which are tree leaves 
+	 * (presuming that the graph is a tree)
+	 */
+	public List<V> getTreeLeaves(V root){
+		return properties.treeLeaves(root);
+	}
 
 	/**
-	 * Checks is graph is connected
+	 * Checks is graph is connected presumed that certain vertices are removed
 	 * @return
 	 */
 	public boolean isConnected(List<V> excluding){

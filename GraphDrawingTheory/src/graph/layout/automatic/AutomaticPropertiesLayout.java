@@ -20,6 +20,7 @@ public class AutomaticPropertiesLayout<V extends Vertex, E extends Edge<V>> exte
 	}
 	
 	
+	
 	@Override
 	public Drawing<V, E> layout(Graph<V, E> graph,
 			GraphLayoutProperties layoutProperties) {

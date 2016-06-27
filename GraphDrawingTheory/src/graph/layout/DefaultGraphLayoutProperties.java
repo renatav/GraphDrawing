@@ -1,6 +1,7 @@
 package graph.layout;
 
 import graph.elements.Graph;
+import graph.layout.PropertyEnums.BalloonProperties;
 import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
@@ -58,6 +59,10 @@ public class DefaultGraphLayoutProperties {
 		
 		else if (algorithm == LayoutAlgorithms.RADIAL_TREE2){
 			properties.setProperty(RadialTree2Properties.AUSTO_SCALE, true);
+		}
+		
+		else if (algorithm == LayoutAlgorithms.BALLOON){
+			properties.setProperty(BalloonProperties.MIN_RADIUS, 30);
 		}
 
 		return properties;

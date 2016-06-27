@@ -1,9 +1,12 @@
 package graph.layout.dsl;
 
+import graph.drawing.Drawing;
 import graph.elements.Edge;
 import graph.elements.Vertex;
+import graph.exception.CannotBeAppliedException;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
+import graph.layout.Layouter;
 import graph.layout.PropertyEnums.BalloonProperties;
 import graph.layout.PropertyEnums.BoxProperties;
 import graph.layout.PropertyEnums.CircleProperties;
@@ -17,9 +20,9 @@ import graph.layout.PropertyEnums.OrganicProperties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
 import graph.layout.PropertyEnums.SpringProperties;
 import graph.layout.PropertyEnums.TreeProperties;
-import graph.layout.PropertyEnums.TutteProperties;
 import graph.util.Pair;
 import interfaces.ILayout;
+import interpreter.java.Interpreter;
 
 import java.util.List;
 import java.util.Map;
@@ -29,20 +32,51 @@ import javax.swing.SwingConstants;
 import models.java.LayoutGraph;
 
 public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
+	
+	private List<V> vertices;
+	private List<E> edges;
+	private String userDescription;
+	private Layouter<V,E> layouter;
 
-	public UserDescriptionLayout(List<V> vertices, List<E> edges, ILayout layoutInstructions){
-
-		if (layoutInstructions instanceof LayoutGraph){
-			selectLayout(vertices, edges, (LayoutGraph) layoutInstructions);
+	public UserDescriptionLayout(List<V> vertices, List<E> edges, String userDescription){
+		this.vertices = vertices;
+		this.edges = edges;
+		this.userDescription = userDescription;
+		layouter = new Layouter<V,E>();
+	}
+	
+	public Drawing<V,E> layout(){
+		ILayout layoutDescription = Interpreter.getInstance().execute(userDescription);
+		Drawing<V,E> drawing = new Drawing<V,E>();
+		
+		if (layoutDescription instanceof LayoutGraph){
+			executeOne(vertices, edges, (LayoutGraph) layoutDescription, drawing);
+			
 		}
-
+		return drawing;
+	}
+	
+	private void executeOne(List<V> vertices, List<E> edges, LayoutGraph layoutDescription, Drawing<V,E> drawing){
+		Pair<LayoutAlgorithms, GraphLayoutProperties> algorithmAndProperties = selectLayout(vertices, edges, (LayoutGraph) layoutDescription);
+		LayoutAlgorithms algorithm = algorithmAndProperties.getKey();
+		GraphLayoutProperties properties = algorithmAndProperties.getValue();
+		layouter.setVertices(vertices);
+		layouter.setEdges(edges);
+		layouter.setAlgorithm(algorithm);
+		if (properties != null)
+			layouter.setLayoutProperties(properties);
+		
+		try {
+			Drawing<V,E> oneDrawing = layouter.layout();
+			drawing.getVertexMappings().putAll(oneDrawing.getVertexMappings());
+			drawing.getEdgeMappings().putAll(oneDrawing.getEdgeMappings());
+		} catch (CannotBeAppliedException e) {
+			e.printStackTrace();
+		}
 	}
 
 
 	private Pair<LayoutAlgorithms, GraphLayoutProperties> selectLayout(List<V> vertices, List<E> edges, LayoutGraph layoutInstructions){
-		//TODO prepraviti gramatiku tako da se osobine algoritama mogu navoditi u proizvoljnom rasporedu
-		//recimo, napraviti pravilo xxProperty, pa staviti 0 ili vise dodelu
-		//TODO git ignore za DSL projekat
 		
 		if (layoutInstructions.getType().equals("algorithm")){
 			LayoutAlgorithms layoutAlgorithm = null;
@@ -232,6 +266,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 			else if (style.equals("symmetrical")){
 				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.CONCENTRIC, null); //TODO replace with better algorithm when implemented
 			}
+			//analize the graph and choose the best force-directed
 			else if (style.equals("general")){
 				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.KAMADA_KAWAI, null);
 			}

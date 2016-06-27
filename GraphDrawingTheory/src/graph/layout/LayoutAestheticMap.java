@@ -29,10 +29,9 @@ public class LayoutAestheticMap {
 		List<LayoutAlgorithms> straightLine = new ArrayList<LayoutAlgorithms>();
 		straightLine.add(LayoutAlgorithms.TUTTE);
 		straightLine.add(LayoutAlgorithms.CONVEX);
-		aestheticCriteriaAlgorithms.put(AestheticCriteria.STRAIGHT_LINE, straightLine);
 		List<LayoutAlgorithms> flow = new ArrayList<LayoutAlgorithms>();
 		flow.add(LayoutAlgorithms.HIERARCHICAL);
-		aestheticCriteriaAlgorithms.put(AestheticCriteria.FLOW, flow);
+		aestheticCriteriaAlgorithms.put(AestheticCriteria.UNIFORM_FLOW, flow);
 	}
 	
 	public static LayoutAlgorithms pick(AestheticCriteria criterion){

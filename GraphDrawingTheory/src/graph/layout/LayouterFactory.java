@@ -24,7 +24,6 @@ import graph.layout.tree.JungTreeLayouter;
 import graph.layout.tree.PrefuseBalloonLayouter;
 import graph.layout.tree.PrefuseNodeLinkTreeLayouter;
 import graph.layout.tree.PrefuseRadialTreeLayouter;
-import graph.layout.tree.PrefuseSquarifiedTreeMapLayouter;
 import graph.layout.tree.RadialTreeLayouter;
 
 public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
@@ -78,8 +77,6 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new PrefuseNodeLinkTreeLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.RADIAL_TREE2)
 			layouter = new PrefuseRadialTreeLayouter<V,E>();
-		else if (algorithm == LayoutAlgorithms.SQUIRED_TREEMAP)
-			layouter = new PrefuseSquarifiedTreeMapLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.CONVEX)
 			layouter = new ConvexLayouter<V,E>();
 			

@@ -7,6 +7,7 @@ import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
+import graph.drawing.Drawing;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.layout.dsl.UserDescriptionLayout;
@@ -22,10 +23,9 @@ import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
+import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
-import interfaces.ILayout;
-import interpreter.java.Interpreter;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -432,11 +432,19 @@ public class CommandPanel extends JPanel{
 		
 		if (command.startsWith(commands[25])){
 			//Layout DSL input
-			Interpreter interpreter = Interpreter.getInstance();
-			ILayout layoutInstructions =  interpreter.execute(command);
 			UserDescriptionLayout<GraphVertex, GraphEdge> dslLayout = new UserDescriptionLayout<GraphVertex, GraphEdge>(graph.getVertices(), 
-					graph.getEdges(), layoutInstructions);
+					graph.getEdges(), command);
 			
+			Drawing<GraphVertex, GraphEdge> drawing = dslLayout.layout();
+			GraphView view = MainFrame.getInstance().getCurrentView();
+			for (GraphVertex vert : graph.getVertices()){
+				vert.setPosition(drawing.getVertexMappings().get(vert));
+			}
+			for (GraphEdge edge : graph.getEdges()){
+				List<Point2D> points = drawing.getEdgeMappings().get(edge);
+				edge.setLinkNodes(points);
+			}
+			view.repaint();
 		}
 		
 		if (command.equals(commands[15])){

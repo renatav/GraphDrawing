@@ -143,8 +143,40 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return tree.getBackEdges().size() > 0;
 	}
 	
+	/**
+	 * Checks if the graph is a tree
+	 * @return true, if it is a tree, false otherwise
+	 */
 	public boolean isTree(){
 		return !isCyclic() && isConnected();
+	}
+	
+	/**
+	 * Lists all tree leaves (presumes that the graph is a tree)
+	 * @return List of leaves
+	 */
+	public List<V> treeLeaves(V root){
+		List<V> ret = new ArrayList<V>();
+		for (V v : graph.getVertices()){
+			if (v != root && graph.getAdjacentLists().get(v).size() == 1)
+				ret.add(v);
+		}
+		return ret;
+	}
+	
+	/**
+	 * Checks if the tree is balanced
+	 * @param root
+	 * @return
+	 */
+	public boolean balancedTree(V root){
+		
+		/* For binary trees
+		 * A tree is perfectly height-balanced if the left and right subtrees of any node are the same height
+		 *  We will say that a tree is height-balanced if the heights of the left and right subtree's of each node are within 1. 
+		 */
+		
+		return false;
 	}
 	
 	public List<List<E>> listMultiEdges(){
