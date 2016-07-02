@@ -451,6 +451,7 @@ public class CommandPanel extends JPanel{
 		else if (command.trim().equals("Binary tree")){
 			try {
 				BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
+				System.out.println(binaryTree);
 			} catch (CannotBeAppliedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

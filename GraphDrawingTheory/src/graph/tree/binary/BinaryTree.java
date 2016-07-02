@@ -57,6 +57,7 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 
 	private void formTree(List<BinaryTreeNode<V>> currentLevel){
 		log.info("form for: " + currentLevel);
+		
 		List<BinaryTreeNode<V>> nextLevel = new ArrayList<BinaryTreeNode<V>>();
 		BinaryTreeNode<V> lChild, rChild, parent, notSet;
 		int notSetNum;
@@ -64,7 +65,18 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 
 		for (BinaryTreeNode<V> currentNode : currentLevel){
 			log.info("current node: " + currentNode);
+			//add to nodes
+			if (!nodes.contains(currentNode))
+				nodes.add(currentNode);
 			V current = currentNode.getVertex();
+			
+			if (currentNode.getLeft() != null && currentNode.getRight() != null
+					&& graph.adjacentVertices(current).size() == 2){
+				root = currentNode;
+				continue;
+			}
+			
+			
 			List<V> adjacent = graph.adjacentVertices(current);
 			if (adjacent.size() == 1){ //leaf node
 				BinaryTreeNode<V> adjNode = vertexNodesMap.get(adjacent.get(0));
@@ -124,34 +136,35 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 				System.out.println(parent);
 				System.out.println(notSet);
 				System.out.println(notSetAdjacent);
-				
-				if (adjacent.size() == 3){ //definitely not the root node
-					if (notSetNum == 1){
-						if (notSet == null)
-							notSet = new BinaryTreeNode<V>(notSetAdjacent);
-						if (rChild != null){ //lChild is also != null
-							//current node's parent is the not set node
-							log.info("Setting the parent of " + currentNode + " to " + notSet );
-							
-							nextLevel.add(notSet);
-							log.info("adding " + notSet + " to next level");
-							
-							currentNode.setParent(notSet);
-							if (notSet.getLeft() == null)
-								notSet.setLeft(currentNode);
-							else
-								notSet.setRight(currentNode);
-						}
-						else{
-							//not both children are set
-							//set right, because if one is missing, it's right
-							log.info("Setting the child of " + currentNode + " to " + notSet );
+
+				if (notSetNum == 1){
+					if (notSet == null){
+						notSet = new BinaryTreeNode<V>(notSetAdjacent);
+						vertexNodesMap.put(notSetAdjacent, notSet);
+					}
+					if (rChild != null || (adjacent.size() == 2 && lChild != null)){ //set parent
+						//current node's parent is the not set node
+						log.info("Setting the parent of " + currentNode + " to " + notSet );
+
+						nextLevel.add(notSet);
+						log.info("adding " + notSet + " to next level");
+
+						currentNode.setParent(notSet);
+						if (notSet.getLeft() == null)
+							notSet.setLeft(currentNode);
+						else
+							notSet.setRight(currentNode);
+					}
+					else{
+						//not both children are set
+						log.info("Setting the child of " + currentNode + " to " + notSet );
+						if (lChild == null)
+							currentNode.setLeft(notSet);
+						else if (rChild == null)
 							currentNode.setRight(notSet);
-							notSet.setParent(currentNode);
-						}
+						notSet.setParent(currentNode);
 					}
 				}
-				
 
 				//mora se ovo jos prosiriti tako da se
 				//i tu nesto postavlja
@@ -159,10 +172,8 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 				//kako da znamo ko je parent, ko child
 				//imamo v1, v3, v3 je kandidat za child
 				//nekako videti da se to poveze
-			
-				
-				
-				
+
+
 				if (notSetNum == 2){
 					//if parent is set, we know we need to set the two children
 					//if a child and the parent are missing, we don't know
@@ -174,8 +185,10 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 								continue;
 
 							BinaryTreeNode<V> adjNode = vertexNodesMap.get(adj);
-							if (adjNode == null)
+							if (adjNode == null){
 								adjNode = new BinaryTreeNode<V>(adj);
+								vertexNodesMap.put(adj, adjNode);
+							}
 							if (currentNode.getLeft() == null){
 								log.info("Setting the left child of " + currentNode + " to " + adjNode );
 								currentNode.setLeft(adjNode);
@@ -191,9 +204,30 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 		}
-		
+
 		if (nextLevel.size() > 0)
 			formTree(nextLevel);
+	}
+
+	public BinaryTreeNode<V> getRoot() {
+		return root;
+	}
+
+	public void setRoot(BinaryTreeNode<V> root) {
+		this.root = root;
+	}
+
+	public List<BinaryTreeNode<V>> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(List<BinaryTreeNode<V>> nodes) {
+		this.nodes = nodes;
+	}
+
+	@Override
+	public String toString() {
+		return "BinaryTree [root=" + root + ", nodes=" + nodes + "]";
 	}
 
 }
