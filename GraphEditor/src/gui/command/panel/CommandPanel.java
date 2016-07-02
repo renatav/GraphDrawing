@@ -19,6 +19,7 @@ import graph.properties.splitting.Splitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
+import graph.tree.binary.BinaryTree;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
@@ -425,12 +426,12 @@ public class CommandPanel extends JPanel{
 			
 		}
 		
-		if (command.equals(commands[23])){
+		else if (command.equals(commands[23])){
 			centralArea.setText("");
 			return "";
 		}
 		
-		if (command.startsWith(commands[25])){
+		else if (command.startsWith(commands[25])){
 			//Layout DSL input
 			UserDescriptionLayout<GraphVertex, GraphEdge> dslLayout = new UserDescriptionLayout<GraphVertex, GraphEdge>(graph.getVertices(), 
 					graph.getEdges(), command);
@@ -445,6 +446,15 @@ public class CommandPanel extends JPanel{
 				edge.setLinkNodes(points);
 			}
 			view.repaint();
+		}
+		
+		else if (command.trim().equals("Binary tree")){
+			try {
+				BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
+			} catch (CannotBeAppliedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		if (command.equals(commands[15])){
@@ -500,6 +510,7 @@ public class CommandPanel extends JPanel{
 		commands[23] = "clear";
 		commands[24] = "splitting";
 		commands[25] = "Layout";
+		commands[26] = "Binary tree";
 	}
 		
 

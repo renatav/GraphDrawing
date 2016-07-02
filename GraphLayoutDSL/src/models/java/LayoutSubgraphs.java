@@ -13,10 +13,6 @@ public class LayoutSubgraphs implements ILayoutSubgraphs{
 		this.subgraphs = subgraphs;
 	}
 	
-	@Override
-	public List<ILayoutGraph> getSubgraphs() {
-		return subgraphs;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -27,6 +23,11 @@ public class LayoutSubgraphs implements ILayoutSubgraphs{
 		for (ILayoutGraph subgraph : subgraphs)
 			ret += subgraph.toString();
 		return ret;
+	}
+
+
+	public List<ILayoutGraph> getSubgraphs() {
+		return subgraphs;
 	}
 
 }
