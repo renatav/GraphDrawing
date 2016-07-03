@@ -452,6 +452,8 @@ public class CommandPanel extends JPanel{
 			try {
 				BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
 				System.out.println(binaryTree);
+				boolean balanced = binaryTree.isBalanced();
+				return binaryTree.toString() + "\n Balanced: " + balanced;
 			} catch (CannotBeAppliedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

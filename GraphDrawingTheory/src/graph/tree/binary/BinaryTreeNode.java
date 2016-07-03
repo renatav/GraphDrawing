@@ -8,6 +8,7 @@ public class BinaryTreeNode<V extends Vertex> {
 	private BinaryTreeNode<V> left;
 	private BinaryTreeNode<V> right;
 	private BinaryTreeNode<V> parent;
+	private int height = 1;
 	
 	
 	public BinaryTreeNode(V vertex) {
@@ -68,7 +69,27 @@ public class BinaryTreeNode<V extends Vertex> {
 	
 	@Override
 	public String toString() {
-		return "BinaryTreeNode [vertex=" + vertex + "]";
+		String ret = "BinaryTreeNode [vertex=" + vertex + " height = " + height;
+		if (left != null)
+			ret += "  left = " + left.getVertex();
+		if (right != null)
+			ret += " right =" + right.getVertex();
+		if (parent != null)
+			ret += " parent = " + parent.getVertex();
+		ret +=" ]";
+		
+		return ret;
+		
+	}
+
+
+	public int getHeight() {
+		return height;
+	}
+
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 
 

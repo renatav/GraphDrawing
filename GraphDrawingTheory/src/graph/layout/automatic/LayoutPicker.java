@@ -4,6 +4,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.LayoutAlgorithms;
+import graph.tree.binary.BinaryTree;
 
 import java.util.List;
 
@@ -43,8 +44,11 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 			List<V> leaves = graph.getTreeLeaves(null);
 			if (leaves.size() >= (int)balloonFactor*graph.getVertices().size())
 				return LayoutAlgorithms.BALLOON;
-			else		
-				return LayoutAlgorithms.TREE;
+			else if (new BinaryTree<V,E>(graph).isCanBeConstructed()){
+					return LayoutAlgorithms.TREE; //level based approach, this won't be too wide
+			}
+			else return LayoutAlgorithms.NODE_LINK_TREE;
+				
 			
 		}
 		else

@@ -12,6 +12,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+/**
+ * A binary tree constructed from a given undirected graph
+ */
 public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 
 
@@ -20,44 +23,68 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 	private Map<V, BinaryTreeNode<V>> vertexNodesMap = new HashMap<V, BinaryTreeNode<V>>();
 	private Graph<V,E> graph;
 	private Logger log = Logger.getLogger(BinaryTree.class);
+	private boolean canBeConstructed;
 
-	public BinaryTree(Graph<V,E> graph) throws CannotBeAppliedException{
+	public BinaryTree(Graph<V,E> graph){
 		this.graph = graph;
-		formBinaryTree(graph);
+		try {
+			formBinaryTree(graph);
+			canBeConstructed = true;
+		} catch (CannotBeAppliedException e) {
+			canBeConstructed = false;
+		}
 	}
 
 	private void formBinaryTree(Graph<V, E> graph) throws CannotBeAppliedException{
 		//start with the leaves and go upwards
-		//or just traverse the vertices, form a map of 
-		//created nodes - vertices
-		//if the vertex is encountered again, grab the node from the map
-		//avoid two traversal that way
-
-		//notes of the binary tree should have between 1 and 3 links
+		//nodes of the binary tree should have between 1 and 3 links
 		//leaves have 1
 		//root has 1 or 2
 		//ordinary nodes have 2 or 3 (parent and 1 or 2 children)
 
-		//find leaves and go from the bottom
-		List<BinaryTreeNode<V>> leaves = new ArrayList<BinaryTreeNode<V>>();
-		for (V v : graph.getVertices())
-			if (graph.adjacentVertices(v).size() == 1){
-				BinaryTreeNode<V> leaf = new BinaryTreeNode<V>(v);
-				vertexNodesMap.put(v, leaf);
-				leaves.add(leaf);
-			}
+		//trivial cases
+		if (graph.getVertices().size() == 1){
+			root = new BinaryTreeNode<V>(graph.getVertices().get(0));
+			nodes.add(root);
+		}
+		else if (graph.getVertices().size() == 2){
+			if (graph.getEdges().size() != 1)
+				throw new CannotBeAppliedException("Not a binary tree");
 
-		if (leaves.size() == 0)
-			throw new CannotBeAppliedException("Not aabinary tree");
+			BinaryTreeNode<V> node1 = new BinaryTreeNode<V>(graph.getVertices().get(0));
+			BinaryTreeNode<V> node2 = new BinaryTreeNode<V>(graph.getVertices().get(1));
+			node1.setLeft(node2);
+			node2.setParent(node1);
+			node1.setHeight(2);
+			nodes.add(node1);
+			nodes.add(node2);
+			root = node1;
+		}
+		else{
+			List<BinaryTreeNode<V>> leaves = new ArrayList<BinaryTreeNode<V>>();
+			for (V v : graph.getVertices())
+				if (graph.adjacentVertices(v).size() == 1){
+					BinaryTreeNode<V> leaf = new BinaryTreeNode<V>(v);
+					vertexNodesMap.put(v, leaf);
+					leaves.add(leaf);
+				}
 
-		formTree(leaves);
+			if (leaves.size() == 0)
+				throw new CannotBeAppliedException("Not a binary tree");
+
+
+			formTree(leaves, true);
+			if (root == null)
+				throw new CannotBeAppliedException("Not a binary tree");
+		}
 
 	}
 
 
-	private void formTree(List<BinaryTreeNode<V>> currentLevel){
-		log.info("form for: " + currentLevel);
-		
+	private void formTree(List<BinaryTreeNode<V>> currentLevel, boolean debug) throws CannotBeAppliedException{
+		if (debug)
+			log.info("form for: " + currentLevel);
+
 		List<BinaryTreeNode<V>> nextLevel = new ArrayList<BinaryTreeNode<V>>();
 		BinaryTreeNode<V> lChild, rChild, parent, notSet;
 		int notSetNum;
@@ -69,15 +96,18 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 			if (!nodes.contains(currentNode))
 				nodes.add(currentNode);
 			V current = currentNode.getVertex();
-			
-			if (currentNode.getLeft() != null && currentNode.getRight() != null
-					&& graph.adjacentVertices(current).size() == 2){
-				root = currentNode;
-				continue;
-			}
-			
-			
+
+			//			if (currentNode.getLeft() != null && currentNode.getRight() != null
+			//					&& graph.adjacentVertices(current).size() == 2){
+			//				root = currentNode;
+			//				continue;
+			//			}
+
+
 			List<V> adjacent = graph.adjacentVertices(current);
+			if (adjacent.size() > 3)
+				throw new CannotBeAppliedException("Not a binary tree");
+
 			if (adjacent.size() == 1){ //leaf node
 				BinaryTreeNode<V> adjNode = vertexNodesMap.get(adjacent.get(0));
 				if (adjNode == null){
@@ -86,7 +116,11 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 					vertexNodesMap.put(adjacent.get(0),adjNode);
 				}
 				currentNode.setParent(adjNode);
-				log.info("parent: " + adjNode);
+				if (debug)
+					log.info("parent of leaf: " + adjNode);
+
+				if (adjNode.getHeight() < currentNode.getHeight() + 1)
+					adjNode.setHeight(currentNode.getHeight() + 1);
 
 				if (adjNode.getLeft() == null)
 					adjNode.setLeft(currentNode);
@@ -110,8 +144,8 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 
 				for (V adj : adjacent){
 					BinaryTreeNode<V> adjNode = vertexNodesMap.get(adj);
-					log.info("Current adjacent: " + adj);
-					System.out.println(currentNode.getLeft());
+					if (debug)
+						log.info("Current adjacent: " + adj);
 					if (adjNode != null){ //already processed
 						if (currentNode.getLeft() == adjNode)
 							lChild = adjNode;
@@ -130,24 +164,43 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 
-				System.out.println(notSetNum);
-				System.out.println(lChild);
-				System.out.println(rChild);
-				System.out.println(parent);
-				System.out.println(notSet);
-				System.out.println(notSetAdjacent);
+				if (debug){
+					log.info("not set num: " + notSetNum);
+					log.info("left child: " + lChild);
+					log.info("right child:" + rChild);
+					log.info("parent " + parent);
+					log.info("not set node: " + notSet);
+					log.info("not adjacent vertex: " + notSetAdjacent);
+				}
 
 				if (notSetNum == 1){
 					if (notSet == null){
 						notSet = new BinaryTreeNode<V>(notSetAdjacent);
 						vertexNodesMap.put(notSetAdjacent, notSet);
 					}
-					if (rChild != null || (adjacent.size() == 2 && lChild != null)){ //set parent
-						//current node's parent is the not set node
-						log.info("Setting the parent of " + currentNode + " to " + notSet );
+
+					//set parent, but not if it already has both children set
+					if ((rChild != null || (adjacent.size() == 2 && lChild != null)
+							&& !(notSet.getLeft() != null && notSet.getRight() != null))){ 
+
+						//if the second condition is met
+						//there is still a chance that the node is the root
+						//and therefore doesn't have a parent
+
+						if (debug)
+							log.info("Setting the parent of " + currentNode + " to " + notSet );
+
+						//height of the node should reflect it's max distance from a leaf
+						if (notSet.getHeight() < currentNode.getHeight() + 1)
+							notSet.setHeight(currentNode.getHeight() + 1);
+
+						if (notSet.getParent() == currentNode)
+							notSet.setParent(null);
+
 
 						nextLevel.add(notSet);
-						log.info("adding " + notSet + " to next level");
+						if (debug)
+							log.info("adding " + notSet + " to next level");
 
 						currentNode.setParent(notSet);
 						if (notSet.getLeft() == null)
@@ -162,17 +215,13 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 							currentNode.setLeft(notSet);
 						else if (rChild == null)
 							currentNode.setRight(notSet);
+
+						if (currentNode.getHeight() < notSet.getHeight() + 1)
+							currentNode.setHeight(notSet.getHeight() + 1);
+
 						notSet.setParent(currentNode);
 					}
 				}
-
-				//mora se ovo jos prosiriti tako da se
-				//i tu nesto postavlja
-				//kada je root?
-				//kako da znamo ko je parent, ko child
-				//imamo v1, v3, v3 je kandidat za child
-				//nekako videti da se to poveze
-
 
 				if (notSetNum == 2){
 					//if parent is set, we know we need to set the two children
@@ -189,6 +238,7 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 								adjNode = new BinaryTreeNode<V>(adj);
 								vertexNodesMap.put(adj, adjNode);
 							}
+
 							if (currentNode.getLeft() == null){
 								log.info("Setting the left child of " + currentNode + " to " + adjNode );
 								currentNode.setLeft(adjNode);
@@ -199,14 +249,59 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 								currentNode.setRight(adjNode);
 								adjNode.setParent(currentNode);
 							}
+
+							if (currentNode.getHeight() < adjNode.getHeight() + 1)
+								currentNode.setHeight(adjNode.getHeight() + 1);
+
 						}
 					}
 				}
 			}
+
+			if (adjacent.size() == 2 && currentNode.getLeft() != null && currentNode.getRight() != null)
+				root = currentNode;
 		}
 
 		if (nextLevel.size() > 0)
-			formTree(nextLevel);
+			formTree(nextLevel, debug);
+	}
+	
+	/**
+	 * A height-balanced binary tree is defined as a binary tree in
+	 *  which the depth of the two subtrees of every node
+	 *  never differ by more than 1.
+	 * @return
+	 */
+	public boolean isBalanced(){
+		if (root == null)
+			return true;
+ 
+		if (getHeight(root) == -1)
+			return false;
+ 
+		return true;
+	}
+	
+	private int getHeight(BinaryTreeNode<V> root){
+		if (root == null)
+			return 0;
+ 
+		int left = getHeight(root.getLeft());
+		int right = getHeight(root.getRight());
+ 
+		if (left == -1 || right == -1)
+			return -1;
+ 
+		if (Math.abs(left - right) > 1) {
+			return -1;
+		}
+ 
+		return Math.max(left, right) + 1;
+ 
+	}
+	
+	public int height(){
+		return root.getHeight();
 	}
 
 	public BinaryTreeNode<V> getRoot() {
@@ -227,7 +322,14 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 
 	@Override
 	public String toString() {
-		return "BinaryTree [root=" + root + ", nodes=" + nodes + "]";
+		String ret =  "BinaryTree [root=" + root + "\n";
+		for (BinaryTreeNode<V> node : nodes)
+			ret += node + "\n";
+		return ret;
+	}
+
+	public boolean isCanBeConstructed() {
+		return canBeConstructed;
 	}
 
 }
