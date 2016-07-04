@@ -449,15 +449,10 @@ public class CommandPanel extends JPanel{
 		}
 		
 		else if (command.trim().equals("Binary tree")){
-			try {
-				BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
-				System.out.println(binaryTree);
-				boolean balanced = binaryTree.isBalanced();
-				return binaryTree.toString() + "\n Balanced: " + balanced;
-			} catch (CannotBeAppliedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
+			System.out.println(binaryTree);
+			boolean balanced = binaryTree.isBalanced();
+			return binaryTree.toString() + "\n Balanced: " + balanced;
 		}
 		
 		if (command.equals(commands[15])){

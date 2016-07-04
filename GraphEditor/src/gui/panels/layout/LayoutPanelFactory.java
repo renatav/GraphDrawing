@@ -41,7 +41,7 @@ public class LayoutPanelFactory {
 			panel = new SymmetricLayoutPanel(TutteProperties.class);
 		else if (al == LayoutAlgorithms.BOX)
 			panel = new LayoutPropertyPanel(BoxProperties.class);
-		else if (al == LayoutAlgorithms.CIRCLE)
+		else if (al == LayoutAlgorithms.CIRCLE || al == LayoutAlgorithms.CIRCLE_CENTER)
 			panel = new LayoutPropertyPanel(CircleProperties.class);
 		else if (al == LayoutAlgorithms.FRUCHTERMAN_REINGOLD)
 			panel = new LayoutPropertyPanel(FruchtermanReingoldProperties.class);

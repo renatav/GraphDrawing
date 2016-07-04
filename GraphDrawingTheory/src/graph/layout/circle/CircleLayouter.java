@@ -14,9 +14,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Map;
 
-public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>
-{
-	
+public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
 	
 	public CircleLayouter() {
 		oneGraph = false;
@@ -27,14 +25,20 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 		
 		
 		Circular<V,E> circular = new Circular<V,E>(graph);
-		List<V> ordering = circular.circularOrdering();
+		List<V> ordering = graph.getVertices();
+		try{
+			//optimize crossings
+			ordering = circular.circularOrdering();
+			graph.setVertices(ordering);
+		}
+		catch(Exception ex){
+			//not always possible
+		}
 		
 		Integer distance= 0;
 		if (layoutProperties.getProperty(CircleProperties.DISTANCE) != null)
 			distance =  (Integer) layoutProperties.getProperty(CircleProperties.DISTANCE);
 		
-		graph.setVertices(ordering);
-
 		CircleLayoutCalc<V> calc = new CircleLayoutCalc<V>();
 		
 		double radius = calc.calculateRadius(graph.getVertices(), distance);
@@ -48,5 +52,5 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 		
 		return drawing;
 	}
-
+	
 }

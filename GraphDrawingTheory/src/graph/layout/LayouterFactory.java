@@ -5,6 +5,7 @@ import graph.elements.Vertex;
 import graph.layout.automatic.AutomaticPropertiesLayout;
 import graph.layout.box.BoxLayouter;
 import graph.layout.circle.CircleLayouter;
+import graph.layout.circle.CircleWithCenterLayouter;
 import graph.layout.force.directed.DAGLayouter;
 import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
@@ -79,6 +80,8 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new PrefuseRadialTreeLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.CONVEX)
 			layouter = new ConvexLayouter<V,E>();
+		else if (algorithm == LayoutAlgorithms.CIRCLE_CENTER)
+			layouter = new CircleWithCenterLayouter<V,E>();
 			
 		return layouter;
 

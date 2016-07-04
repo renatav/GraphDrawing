@@ -113,7 +113,7 @@ public interface PropertyEnums {
 	}
 
 	public enum CircleProperties implements PropertyEnums{
-		DISTANCE("Distance", false, Integer.class);
+		DISTANCE("Distance", false, Integer.class), OPTIMIZE_CROSSINGS("Optimize crossings", false,Boolean.class);
 
 		private String name;
 		private boolean hidden;
