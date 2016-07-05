@@ -46,9 +46,9 @@ public class Interpreter {
 		String modulesDir = Paths.get(root,"modules").toAbsolutePath().normalize().toString();
 		String modelsDir = Paths.get(root,"models").toAbsolutePath().normalize().toString();
 		String languageDir = Paths.get(root,"language").toAbsolutePath().normalize().toString();
-		modulesDir = modulesDir.replace("\\", "\\\\");
-		modelsDir = modelsDir.replace("\\", "\\\\");
-		languageDir = languageDir.replace("\\", "\\\\");
+		modulesDir = modulesDir.replace("\\", "\\\\").replace("%20", " ");
+		modelsDir = modelsDir.replace("\\", "\\\\").replace("%20", " ");
+		languageDir = languageDir.replace("\\", "\\\\").replace("%20", " ");
 		interpreter.exec("import sys; sys.path.insert(0, '" + modulesDir + "')");
 		interpreter.exec("import sys; sys.path.insert(0, '" + modelsDir + "')");
 		interpreter.exec("import sys; sys.path.insert(0, '" + languageDir + "')");
@@ -56,7 +56,7 @@ public class Interpreter {
 
 	//	interpreter.exec("import sys; sys.path.insert(0, '" + modulesDir + "')");
 	//	interpreter.exec("import sys; sys.path.insert(0, '" + modelsDir + "')");
-		//interpreter.exec("import sys; print sys.path");
+		interpreter.exec("import sys; print sys.path");
         interpreter.exec("from interpreter.Interpreter import Interpreter");
         grammarInterpreter = (PyInstance) interpreter.eval("Interpreter()");
     }

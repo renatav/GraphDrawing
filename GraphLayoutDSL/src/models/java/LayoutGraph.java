@@ -11,13 +11,13 @@ public class LayoutGraph implements ILayoutGraph{
 	private String graph;
 	private String type;
 	private String style;
-	private List<Map<String, String>> aestheticCriteria;
-	private Map<String, String> algorithm;
+	private List<Map<String, Object>> aestheticCriteria;
+	private Map<String, Object> algorithm;
 	
 	
 	public LayoutGraph(String graph, String type, String style,
-			List<Map<String, String>> aestheticCriteria,
-			Map<String, String> algorithm) {
+			List<Map<String, Object>> aestheticCriteria,
+			Map<String, Object> algorithm) {
 		super();
 		this.graph = graph;
 		this.type = type;
@@ -53,12 +53,12 @@ public class LayoutGraph implements ILayoutGraph{
 	}
 
 
-	public List<Map<String, String>> getAestheticCriteria() {
+	public List<Map<String, Object>> getAestheticCriteria() {
 		return aestheticCriteria;
 	}
 
 
-	public Map<String, String> getAlgorithm() {
+	public Map<String, Object> getAlgorithm() {
 		return algorithm;
 	}
 

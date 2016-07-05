@@ -36,6 +36,9 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	 */
 	public LayoutAlgorithms pickAlgorithm(Graph<V,E> graph){
 		
+		//TODO add detection based on planarity and symmetry when more 
+		//layout algorithms are implemented 
+		
 		LayoutAlgorithms ret;
 		
 		log.info("Picking layout for graph: " + graph);

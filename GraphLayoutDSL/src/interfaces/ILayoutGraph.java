@@ -8,6 +8,6 @@ public interface ILayoutGraph extends ILayout{
 	public String getGraph();
 	public String getType();
 	public String getStyle();
-	public List<Map<String, String>> getAestheticCriteria();
-	public Map<String, String> getAlgorithm();
+	public List<Map<String, Object>> getAestheticCriteria();
+	public Map<String, Object> getAlgorithm();
 }

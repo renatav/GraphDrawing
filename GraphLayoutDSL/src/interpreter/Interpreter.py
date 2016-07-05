@@ -1,6 +1,6 @@
 from textx.metamodel import metamodel_from_file
 from textx.export import metamodel_export, model_export
-from models import MLayoutGraph, MLayoutSubgraphs
+from pythonmodels import MLayoutGraph, MLayoutSubgraphs
 import os
 import sys
 

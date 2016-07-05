@@ -4,6 +4,7 @@ import graph.drawing.Drawing;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
+import graph.layout.AestheticCriteria;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
 import graph.layout.Layouter;
@@ -82,7 +83,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 			LayoutAlgorithms layoutAlgorithm = null;
 			GraphLayoutProperties layoutProperties = new GraphLayoutProperties();
 
-			Map<String, String> algorithm = layoutInstructions.getAlgorithm();
+			Map<String, Object> algorithm = layoutInstructions.getAlgorithm();
 			if (algorithm.get("name").equals("radial")){
 				layoutAlgorithm = LayoutAlgorithms.RADIAL_TREE;
 				if (algorithm.containsKey("xDist"))
@@ -122,7 +123,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 					layoutProperties.setProperty(NodeLinkTreeProperties.SPACING_ROOT_NODE, algorithm.get("offsetRootNode"));
 				//TODO razmisliti o orijentaciji u jeziku, da li je ok samo left, right, ili left to right itd.
 				if (algorithm.containsKey("orientation")){
-					String orientation = algorithm.get("orientation");
+					String orientation = (String)algorithm.get("orientation");
 					if (orientation.equals("right"))
 						layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 0);
 					else if (orientation.equals("left"))
@@ -157,7 +158,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 				if (algorithm.containsKey("fineTune"))
 					layoutProperties.setProperty(HierarchicalProperties.FINE_TUNING, algorithm.get("fineTune"));
 				if (algorithm.containsKey("orientation")){
-					String orientation = algorithm.get("orientation");
+					String orientation = (String)algorithm.get("orientation");
 					if (orientation.equals("right"))
 						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, SwingConstants.EAST);
 					else if (orientation.equals("left"))
@@ -168,11 +169,10 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 						layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, SwingConstants.NORTH);
 				}
 			}
-			//TODO circle layouter bez optimizacije
 			else if (algorithm.get("name").equals("circular")){
 				layoutAlgorithm = LayoutAlgorithms.CIRCLE;
-				//if (algorithm.containsKey("optimize"))
-					//layoutProperties.setProperty(CircleProperties.OPTIMIZE, algorithm.get("resizeParent"));
+				if (algorithm.containsKey("optimize"))
+					layoutProperties.setProperty(CircleProperties.OPTIMIZE_CROSSINGS, algorithm.get("optimize"));
 				if (algorithm.containsKey("distance"))
 					layoutProperties.setProperty(CircleProperties.DISTANCE, algorithm.get("distance"));
 			}
@@ -266,13 +266,15 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 			else if (style.equals("symmetrical")){
 				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.CONCENTRIC, null); //TODO replace with better algorithm when implemented
 			}
-			//analize the graph and choose the best force-directed
 			else if (style.equals("general")){
 				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.KAMADA_KAWAI, null);
 			}
 		}
 		else if (layoutInstructions.getType().equals("criteria")){
 			System.out.println("aesthetic criteria");
+			List<Map<String, Object>> criteriaMap = layoutInstructions.getAestheticCriteria();
+			Map<AestheticCriteria, Object> criteriaProperties;
+			List<AestheticCriteria> aeshteticCriteria;
 			//organic layout za estetske kriterijume zvuci savrseno
 			//moze se podesavati sta da se optimizuje
 			//ako je zadato vise kreiterijuma

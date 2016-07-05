@@ -3,11 +3,11 @@ Layout:
 ;
 
 LayoutGraph:
-	'Layout' 'graph' layoutType = LayoutEnum
+	'layout' 'graph' layoutType = LayoutEnum
 ;
 
 LayoutSubgraphs:
-	'Layout' layoutSubgraphs += LayoutSubraph[';']
+	'layout' layoutSubgraphs += LayoutSubraph[';']
 ;
 
 LayoutSubraph:
@@ -65,7 +65,7 @@ MinimumBands:
 ;
 
 UniformFlow:
-	'uniform'? 'criterion = flow' ('direction' '=' direction = Orientation)?
+	'uniform'? criterion = 'flow' ('direction' '=' direction = Orientation)?
 ;
 
 Symmetry:

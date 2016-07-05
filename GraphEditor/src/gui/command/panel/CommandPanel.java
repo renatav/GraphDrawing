@@ -509,7 +509,7 @@ public class CommandPanel extends JPanel{
 		commands[22] = "separation pairs";
 		commands[23] = "clear";
 		commands[24] = "splitting";
-		commands[25] = "Layout";
+		commands[25] = "layout";
 		commands[26] = "binary tree";
 		commands[27] = "is ring";
 	}
