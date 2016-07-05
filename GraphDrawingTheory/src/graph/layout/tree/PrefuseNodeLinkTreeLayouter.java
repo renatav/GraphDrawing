@@ -14,24 +14,26 @@ public class PrefuseNodeLinkTreeLayouter<V extends Vertex, E extends Edge<V>> ex
 		
 		NodeLinkTreeLayout nodeLinkTreeLayouter = new NodeLinkTreeLayout("graph");
 		
-		Integer orientation = (Integer) layoutProperties.getProperty(NodeLinkTreeProperties.ORIENTATION);
-		nodeLinkTreeLayouter.setOrientation(orientation);
 		
-		Double bspace = (Double) layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_SIBLINGS);
+		Object orientation = layoutProperties.getProperty(NodeLinkTreeProperties.ORIENTATION);
+		if (orientation != null)
+			nodeLinkTreeLayouter.setOrientation((int) orientation);
+		
+		Object bspace = layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_SIBLINGS);
 		if (bspace != null)
-			nodeLinkTreeLayouter.setBreadthSpacing(bspace);
+			nodeLinkTreeLayouter.setBreadthSpacing((double) bspace);
 		
-		Double dspace = (Double) layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_DEPTH_LEVELS);
+		Object dspace = layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_DEPTH_LEVELS);
 		if (dspace != null)
-			nodeLinkTreeLayouter.setDepthSpacing(dspace);
+			nodeLinkTreeLayouter.setDepthSpacing((double) dspace);
 		
-		Double tspace = (Double) layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_SUBTREES);
+		Object tspace = layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_SUBTREES);
 		if (tspace != null)
-			nodeLinkTreeLayouter.setSubtreeSpacing(tspace);
+			nodeLinkTreeLayouter.setSubtreeSpacing((double) tspace);
 		
-		Double offset = (Double) layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_ROOT_NODE);
+		Object offset = (Double) layoutProperties.getProperty(NodeLinkTreeProperties.SPACING_ROOT_NODE);
 		if (offset != null)
-			nodeLinkTreeLayouter.setRootNodeOffset(offset);
+			nodeLinkTreeLayouter.setRootNodeOffset((double) offset);
 		
 		layouter = nodeLinkTreeLayouter;
 		

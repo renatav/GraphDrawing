@@ -15,8 +15,6 @@ import graph.layout.organic.JGraphFastorganicLayouter;
 import graph.layout.organic.JGraphHierarchicalLayouter;
 import graph.layout.organic.JGraphOrganicLayouter;
 import graph.layout.organic.JungISOMLayouter;
-import graph.layout.partition.JGraphPartitionLayouter;
-import graph.layout.stack.JGraphStackLayouter;
 import graph.layout.straight.line.ConvexLayouter;
 import graph.layout.symmetric.SymmetricCircleLayouter;
 import graph.layout.symmetric.TutteLayouter;
@@ -66,10 +64,6 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new JGraphOrganicLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.HIERARCHICAL)
 			layouter = new JGraphHierarchicalLayouter<V,E>();
-		else if (algorithm == LayoutAlgorithms.STACK)
-			layouter = new JGraphStackLayouter<V,E>();
-		else if (algorithm == LayoutAlgorithms.PARTITION)
-			layouter = new JGraphPartitionLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.SPTING2)
 			layouter = new PrefuseForceDirectedLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.BALLOON)

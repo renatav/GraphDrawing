@@ -14,13 +14,13 @@ public class PrefuseRadialTreeLayouter<V extends Vertex, E extends Edge<V>> exte
 		
 		RadialTreeLayout radialTreeLayouter = new RadialTreeLayout("graph");
 		
-		Double radiusIncrement = (Double) layoutProperties.getProperty(RadialTree2Properties.RADIUS_INCREMENT);
-		Boolean autoScale = (Boolean)layoutProperties.getProperty(RadialTree2Properties.AUSTO_SCALE);
+		Object radiusIncrement = layoutProperties.getProperty(RadialTree2Properties.RADIUS_INCREMENT);
+		Object autoScale = layoutProperties.getProperty(RadialTree2Properties.AUSTO_SCALE);
 		
 		if (radiusIncrement != null)
-			radialTreeLayouter.setRadiusIncrement(radiusIncrement);
-		
-		radialTreeLayouter.setAutoScale(autoScale);
+			radialTreeLayouter.setRadiusIncrement((double) radiusIncrement);
+		if (autoScale != null)
+		radialTreeLayouter.setAutoScale((boolean) autoScale);
 		
 		layouter = radialTreeLayouter;
 		

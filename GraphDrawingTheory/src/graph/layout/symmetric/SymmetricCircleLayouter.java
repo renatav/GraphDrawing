@@ -22,9 +22,12 @@ public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> exten
 	public Drawing<V, E> layout(Graph<V, E> graph, GraphLayoutProperties layoutProperties) {
 
 
-		distance =  (Double) layoutProperties.getProperty(SymmetricProperties.DISTANCE);
-		p = (Permutation) layoutProperties.getProperty(SymmetricProperties.PERMUTATION);
-		center = (Point2D) layoutProperties.getProperty(SymmetricProperties.CENTER);
+		if (layoutProperties.getProperty(SymmetricProperties.DISTANCE) != null)
+			distance =  (Double) layoutProperties.getProperty(SymmetricProperties.DISTANCE);
+		if (layoutProperties.getProperty(SymmetricProperties.PERMUTATION) != null)
+			p = (Permutation) layoutProperties.getProperty(SymmetricProperties.PERMUTATION);
+		if (layoutProperties.getProperty(SymmetricProperties.CENTER) != null)
+			center = (Point2D) layoutProperties.getProperty(SymmetricProperties.CENTER);
 
 		init(graph);
 

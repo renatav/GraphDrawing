@@ -60,15 +60,36 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		List<Graph<V,E>> graphs = new ArrayList<Graph<V,E>>();
 		List<V> coveredVertices = new ArrayList<V>();
 		List<E> coveredEdges = new ArrayList<E>();
+		Graph<V,E> notConnected = null;
+		List<V> verticesWithEdges = null;
+
+		if (algorithm == LayoutAlgorithms.AUTOMATIC){
+			verticesWithEdges = new ArrayList<V>();
+			for (E e : edges){ //find vertices that don't belong to any of the graphs
+				if (!verticesWithEdges.contains(e.getOrigin()))
+					verticesWithEdges.add(e.getOrigin());
+				if (!verticesWithEdges.contains(e.getDestination()))
+					verticesWithEdges.add(e.getDestination());
+			}
+			if (verticesWithEdges.size() < vertices.size())
+				notConnected = new Graph<V,E>();
+		}
 
 		for (V v : vertices){
 			if (coveredVertices.contains(v))
 				continue;
+			if (notConnected != null && !verticesWithEdges.contains(v)){
+				notConnected.addVertex(v);
+				continue;
+			}
 
 			Graph<V,E> graph = new Graph<>();
 			formGraph(graph, v, coveredVertices, coveredEdges);
 			graphs.add(graph);
 		}
+		
+		if (notConnected != null)
+			graphs.add(notConnected);
 
 		return graphs;
 	}
@@ -144,8 +165,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				ex.printStackTrace();
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
-			
-			
+
+
 			if (!layouter.isPositionsEdges())
 				drawing.positionEdges(edges);
 			return drawing;

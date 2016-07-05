@@ -6,6 +6,7 @@ import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.math.CircleLayoutCalc;
 import graph.symmetry.Permutation;
+import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 
 import java.awt.geom.Point2D;
 
@@ -33,6 +34,11 @@ public abstract class SymmetricLayouter <V extends Vertex, E extends Edge<V>> ex
 					distance = v.getSize().getWidth();
 			}
 			distance *= 1.3;
+		}
+		
+		if (p == null){
+			McKayGraphLabelingAlgorithm<V, E> graphLavelingAlg = new McKayGraphLabelingAlgorithm<>(graph);
+			p = graphLavelingAlg.findAutomorphisms().get(0);
 		}
 	}
 

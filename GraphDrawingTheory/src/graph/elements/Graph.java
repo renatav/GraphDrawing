@@ -390,6 +390,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public List<List<E>> listMultiEdges(){
 		return properties.listMultiEdges();
 	}
+	
+	public boolean isRing(){
+		return properties.isRing();
+	}
+	
 
 	/**
 	 * Checks if a graph is biconnected. 
@@ -465,7 +470,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public void setDirected(boolean directed) {
 		this.directed = directed;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Graph [vertices=" + vertices + ", edges=" + edges + "]";

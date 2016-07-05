@@ -450,9 +450,11 @@ public class CommandPanel extends JPanel{
 		
 		else if (command.trim().equals("Binary tree")){
 			BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
-			System.out.println(binaryTree);
 			boolean balanced = binaryTree.isBalanced();
 			return binaryTree.toString() + "\n Balanced: " + balanced;
+		}
+		else if (command.trim().equals("is ring")){
+			return graph.isRing() + "";
 		}
 		
 		if (command.equals(commands[15])){
@@ -480,7 +482,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[27];
+		commands = new String[28];
 		
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -508,7 +510,8 @@ public class CommandPanel extends JPanel{
 		commands[23] = "clear";
 		commands[24] = "splitting";
 		commands[25] = "Layout";
-		commands[26] = "Binary tree";
+		commands[26] = "binary tree";
+		commands[27] = "is ring";
 	}
 		
 

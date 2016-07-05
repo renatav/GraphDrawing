@@ -73,7 +73,7 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 				throw new CannotBeAppliedException("Not a binary tree");
 
 
-			formTree(leaves, true);
+			formTree(leaves, false);
 			if (root == null)
 				throw new CannotBeAppliedException("Not a binary tree");
 		}

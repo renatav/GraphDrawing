@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
 public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	
-	private double balloonFactor = 0.75;
+	private double balloonFactor = 0.8;
 	private double hierarchicalFactor = 0.34;
 	private double circleCenterFactor = 0.9;
 	private Logger log = Logger.getLogger(LayoutPicker.class);
@@ -42,7 +42,8 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 		
 		if (graph.getEdges().size() == 0) //if there are no edges, just vertices
 			ret = LayoutAlgorithms.BOX;   //for example, packages in a class diagram
-		
+		else if (graph.isRing())
+			ret = LayoutAlgorithms.CIRCLE;
 		else if (graph.isTree()){
 			
 			log.info("Graph is a tree. Finding the best tree algorithm");
@@ -56,8 +57,9 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 			
 			//it's not really that important if the root has only one edge
 			List<V> leaves = graph.getTreeLeaves(null);
+			System.out.println(leaves);
 			
-			if (leaves.size() >= (int)balloonFactor*graph.getVertices().size())
+			if (leaves.size() >= balloonFactor*graph.getVertices().size())
 				ret = LayoutAlgorithms.BALLOON;
 			else{
 				//level-based approaches produce nice layouts, like we would draw the tree ourselves
@@ -107,7 +109,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 		List<E> graphEdges = graph.getEdges();
 		List<E> backEdges = dfsTree.getBackEdges();
 		//if back edges are at most 1/3 (or hierarchicalFactor) of all edges, use hierarchical layout
-		if (backEdges.size() / graphEdges.size() <= hierarchicalFactor)
+		if ((double)backEdges.size() / (double)graphEdges.size() <= hierarchicalFactor)
 			return true;
 		
 		return false;

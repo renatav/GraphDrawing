@@ -17,20 +17,23 @@ public class JGraphCompactTreeLayout<V extends Vertex, E extends Edge<V>> extend
 	@Override
 	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 		
-		boolean horizontal = (boolean) layoutProperties.getProperty(CompactTreeProperties.HORIZONTAL);
-		boolean invert = (boolean) layoutProperties.getProperty(CompactTreeProperties.INVERT);
-		Integer levelDistance = (Integer) layoutProperties.getProperty(CompactTreeProperties.LEVEL_DISTANCE);
-		boolean resizeParents = (boolean) layoutProperties.getProperty(CompactTreeProperties.RESIZE_PARENTS);
-		Integer nodeDistance = (Integer) layoutProperties.getProperty(CompactTreeProperties.NODE_DISTANCE);
+		Object horizontal = layoutProperties.getProperty(CompactTreeProperties.HORIZONTAL);
+		Object invert = layoutProperties.getProperty(CompactTreeProperties.INVERT);
+		Object levelDistance = layoutProperties.getProperty(CompactTreeProperties.LEVEL_DISTANCE);
+		Object resizeParents = layoutProperties.getProperty(CompactTreeProperties.RESIZE_PARENTS);
+		Object nodeDistance = layoutProperties.getProperty(CompactTreeProperties.NODE_DISTANCE);
 		
 		mxCompactTreeLayout treeLayout = new mxCompactTreeLayout(jGraphXGraph);
-		treeLayout.setHorizontal(horizontal);
-		treeLayout.setInvert(invert);
+		if (horizontal != null)
+			treeLayout.setHorizontal((boolean)horizontal);
+		if (invert != null)
+			treeLayout.setInvert((boolean) invert);
 		if (levelDistance != null)
-			treeLayout.setLevelDistance(levelDistance);
-		treeLayout.setResizeParent(resizeParents);
+			treeLayout.setLevelDistance((int)levelDistance);
+		if (resizeParents != null)
+			treeLayout.setResizeParent((boolean)resizeParents);
 		if (nodeDistance != null)
-			treeLayout.setNodeDistance(nodeDistance);
+			treeLayout.setNodeDistance((int)nodeDistance);
 		
 		layouter = treeLayout;
 		

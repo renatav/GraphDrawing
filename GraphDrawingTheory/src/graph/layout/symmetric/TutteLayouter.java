@@ -6,6 +6,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.GraphLayoutProperties;
+import graph.layout.PropertyEnums.SymmetricProperties;
 import graph.layout.PropertyEnums.TutteProperties;
 import graph.symmetry.CyclicSymmetricGraphDrawing;
 import graph.symmetry.Permutation;
@@ -25,9 +26,12 @@ public class TutteLayouter <V extends Vertex, E extends Edge<V>> extends Symmetr
 			GraphLayoutProperties layoutProperties) {
 
 
-		distance =  (Double) layoutProperties.getProperty(TutteProperties.DISTANCE);
-		center = (Point2D) layoutProperties.getProperty(TutteProperties.CENTER);
-		p = (Permutation) layoutProperties.getProperty(TutteProperties.PERMUTATION);
+		if (layoutProperties.getProperty(SymmetricProperties.DISTANCE) != null)
+			distance =  (Double) layoutProperties.getProperty(SymmetricProperties.DISTANCE);
+		if (layoutProperties.getProperty(SymmetricProperties.PERMUTATION) != null)
+			p = (Permutation) layoutProperties.getProperty(SymmetricProperties.PERMUTATION);
+		if (layoutProperties.getProperty(SymmetricProperties.CENTER) != null)
+			center = (Point2D) layoutProperties.getProperty(SymmetricProperties.CENTER);
 
 		init(graph);
 

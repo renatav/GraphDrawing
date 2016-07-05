@@ -164,20 +164,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 	
-	/**
-	 * Checks if the tree is balanced
-	 * @param root
-	 * @return
-	 */
-	public boolean balancedTree(V root){
-		
-		/* For binary trees
-		 * A tree is perfectly height-balanced if the left and right subtrees of any node are the same height
-		 *  We will say that a tree is height-balanced if the heights of the left and right subtree's of each node are within 1. 
-		 */
-		
-		return false;
-	}
+
 	
 	public List<List<E>> listMultiEdges(){
 		
@@ -197,6 +184,43 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	public List<Graph<V, E>> listBiconnectedComponents(){
 		BiconnectedSplitting<V,E> biconnected = new BiconnectedSplitting<V,E>(graph);
 		return biconnected.findBiconnectedComponents();
+	}
+	
+	public boolean isRing(){
+		//a graph is a ring if it is basically one cycle
+		
+		//rings have as many vertices as edges
+		if (graph.getVertices().size() != graph.getEdges().size())
+			return false;
+		
+		List<E> traversedEdges = new ArrayList<E>();
+		List<V> traversedVertices = new ArrayList<V>();
+		
+		E currentEdge = graph.getEdges().get(0);
+		
+		while (traversedEdges.size() < graph.getEdges().size()){
+			V next = currentEdge.getDestination();
+			if (traversedVertices.contains(next))
+				next = currentEdge.getOrigin();
+			
+			traversedVertices.add(next);
+			traversedEdges.add(currentEdge);
+			
+			List<E> adjacent = graph.adjacentEdges(next);
+			if (adjacent.size() != 2)
+				return false;
+			
+			if (adjacent.get(0) == currentEdge)
+				currentEdge = adjacent.get(1);
+			else
+				currentEdge = adjacent.get(0);
+				
+		}
+		
+		if (traversedVertices.size() == graph.getVertices().size())
+			return true;
+		
+		return false;
 	}
 	
 }
