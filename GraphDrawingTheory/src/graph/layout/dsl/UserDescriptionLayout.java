@@ -1,7 +1,10 @@
 package graph.layout.dsl;
 
+import graph.algorithms.drawing.ConvexDrawing;
+import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.drawing.Drawing;
 import graph.elements.Edge;
+import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.layout.AestheticCriteria;
@@ -33,11 +36,13 @@ import javax.swing.SwingConstants;
 import models.java.LayoutGraph;
 
 public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
-	
+
 	private List<V> vertices;
 	private List<E> edges;
 	private String userDescription;
 	private Layouter<V,E> layouter;
+	private FraysseixMendezPlanarity<V, E> planarityTest = 
+			new FraysseixMendezPlanarity<V,E>();
 
 	public UserDescriptionLayout(List<V> vertices, List<E> edges, String userDescription){
 		this.vertices = vertices;
@@ -45,18 +50,18 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 		this.userDescription = userDescription;
 		layouter = new Layouter<V,E>();
 	}
-	
+
 	public Drawing<V,E> layout(){
 		ILayout layoutDescription = Interpreter.getInstance().execute(userDescription);
 		Drawing<V,E> drawing = new Drawing<V,E>();
-		
+
 		if (layoutDescription instanceof LayoutGraph){
 			executeOne(vertices, edges, (LayoutGraph) layoutDescription, drawing);
-			
+
 		}
 		return drawing;
 	}
-	
+
 	private void executeOne(List<V> vertices, List<E> edges, LayoutGraph layoutDescription, Drawing<V,E> drawing){
 		Pair<LayoutAlgorithms, GraphLayoutProperties> algorithmAndProperties = selectLayout(vertices, edges, (LayoutGraph) layoutDescription);
 		LayoutAlgorithms algorithm = algorithmAndProperties.getKey();
@@ -66,7 +71,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 		layouter.setAlgorithm(algorithm);
 		if (properties != null)
 			layouter.setLayoutProperties(properties);
-		
+
 		try {
 			Drawing<V,E> oneDrawing = layouter.layout();
 			drawing.getVertexMappings().putAll(oneDrawing.getVertexMappings());
@@ -78,7 +83,9 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 
 
 	private Pair<LayoutAlgorithms, GraphLayoutProperties> selectLayout(List<V> vertices, List<E> edges, LayoutGraph layoutInstructions){
-		
+
+		Graph<V,E> graph = formOneGraph(vertices, edges);
+
 		if (layoutInstructions.getType().equals("algorithm")){
 			LayoutAlgorithms layoutAlgorithm = null;
 			GraphLayoutProperties layoutProperties = new GraphLayoutProperties();
@@ -245,7 +252,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 				if (algorithm.containsKey("numOfColumns"))
 					layoutProperties.setProperty(BoxProperties.COLUMNS, algorithm.get("numOfColumns"));
 			}
-			
+
 			//TODO  simetricni i konveksni (kada se srede)
 			return new Pair<LayoutAlgorithms, GraphLayoutProperties>(layoutAlgorithm, layoutProperties);
 		}
@@ -271,16 +278,194 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 			}
 		}
 		else if (layoutInstructions.getType().equals("criteria")){
-			System.out.println("aesthetic criteria");
-			List<Map<String, Object>> criteriaMap = layoutInstructions.getAestheticCriteria();
-			Map<AestheticCriteria, Object> criteriaProperties;
-			List<AestheticCriteria> aeshteticCriteria;
-			//organic layout za estetske kriterijume zvuci savrseno
-			//moze se podesavati sta da se optimizuje
-			//ako je zadato vise kreiterijuma
+			List<Map<String, Object>> criteriaMaps = layoutInstructions.getAestheticCriteria();
+			LayoutAlgorithms layoutAlgorithm;
+			GraphLayoutProperties layoutProperties = new GraphLayoutProperties();
+
+			//node distribution, node lengths, node variation
+			//minimization of edge crossings etc.
+			//can be handled by using a force-directed layout and
+			//setting its parameters
+			//organic layout is particularly powerful
+			//force directed layouts also tend to produce a
+			//symmetric layout
+			//if more than one criteria is specified
+			//it might not be possible to create a drawing
+			//that will satisfy all of them completely
+			//for example, a graph might not have a planar drawing at all
+			//and even if it does, it is very unlikely that it has
+			//a drawing that is both planar and symmetric
+			//as more algorithms are implemented
+			//there will be more possibilities
+
+			//if graph is a tree, there are more possibilities
+			//the drawing can always be planar and level-based
+			//approaches produce relatively symmetric drawings 
+
+			//possible criteria:
+			//edge crossings (and planarity), minimum angles, minimum bands
+			//uniform flow, symmetry, node distribution, edge lengths
+			//edge variation
+
+			//TODO expand as new algorithms are added
+			int planar = -1, symmetric = -1,  edgeCrossings = -1, mimimumAngles = -1, minimumBands = -1,
+					uniformFlow = -1, nodeDistribution = -1, edgeLengths = -1, edgeVariation = -1;
+
+			String name;
+			for (int i = 0; i < criteriaMaps.size(); i++){
+
+				Map<String, Object> criterion = criteriaMaps.get(i);
+
+				name = (String) criterion.get("criterion");
+				switch (name){
+				case "planar":
+					planar = i;
+					break;
+				case "crossings":
+					edgeCrossings = i;
+					break;
+				case "angle":
+					mimimumAngles = i;
+					break;
+				case "bands":
+					minimumBands = i;
+					break;
+				case "flow":
+					uniformFlow = i;
+					break;
+				case "symmetric":
+					symmetric = i;
+					break;
+				case "distribute":
+					nodeDistribution = i;
+					break;
+				case "optimize":
+					edgeLengths = i;
+					break;
+				case "similar":
+					edgeVariation = i;
+					break;
+				}
+			}
+
+
+			boolean tree = graph.isTree();
+
+			if (planar != -1){
+				//check if the graph is planar
+				//if it is, check if it is a tree
+				boolean isPlanar;
+				if (!tree){
+					isPlanar = planarityTest.isPlannar(graph);
+					if (isPlanar)
+						edgeCrossings = 0;
+				}
+			}
+
+
+			if (planar != -1 && criteriaMaps.size() == 1 && !tree){
+				try{
+					//see if a convex drawing exists
+					//TODO
+					//za sada, posto ovo nije skroz stabilno
+					//kada se on zavrsi, samo proveriti da li ima konveksni 
+					//izvrsiti samo convex test
+					ConvexDrawing<V,E> convex = new ConvexDrawing<V,E>(graph);
+					convex.execute();
+					layoutAlgorithm = LayoutAlgorithms.CONVEX;
+
+				}
+				catch(Exception ex){
+					//if there is no convex drawing, and is not a tree
+					//apply Kamada-Kawai for now
+					//until other specialized planar drawing algorithms
+					//are implemented
+					layoutAlgorithm = LayoutAlgorithms.KAMADA_KAWAI;
+				}
+			}
+			else if (tree && (nodeDistribution == -1 || uniformFlow != -1)){
+				//if graph is a tree, simply drawing a tree
+				//is the best option, it is mostly symmetric, planar
+				//edges are of equal length
+				//there are no bands, the flow is uniform
+				//the only exception if it was specified that
+				//nodes should be distributed evenly
+				//in that case one force-directed approach
+				//should be used
+				
+				layoutAlgorithm = LayoutAlgorithms.NODE_LINK_TREE;
+				if (uniformFlow != -1){
+						//check if a specific direction was specified
+						//in that case an algorithm that allows this
+						//property to be set should be used
+						String orientation = (String) criteriaMaps.get(uniformFlow).get("direction"); 
+						if (orientation.equals("right"))
+							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 0);
+						else if (orientation.equals("left"))
+							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 1);
+						else if (orientation.equals("down"))
+							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 2);
+						else if (orientation.equals("up"))
+							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 3);
+					}
+				else if (symmetric != -1)
+					layoutAlgorithm = LayoutAlgorithms.COMPACT_TREE;
+			}
+			else if (symmetric != -1 && criteriaMaps.size() == 1){
+				//TODO permutation check
+				//better algorithm when it is implemented
+				layoutAlgorithm = LayoutAlgorithms.CONCENTRIC;
+			}
+			else if (uniformFlow != -1){
+				//hierarchical
+				layoutAlgorithm = LayoutAlgorithms.HIERARCHICAL;
+				String orientation = (String) criteriaMaps.get(uniformFlow).get("direction"); 
+				if (orientation.equals("right"))
+					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 0);
+				else if (orientation.equals("left"))
+					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 1);
+				else if (orientation.equals("down"))
+					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 2);
+				else if (orientation.equals("up"))
+					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 3);
+			}
+			else{
+				//organic, set properties
+				layoutAlgorithm = LayoutAlgorithms.ORGANIC;
+				
+				if (edgeCrossings != -1)
+					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, true);
+				//if (algorithm.containsKey("edgeCrossingFactor"))
+					//layoutProperties.setProperty(OrganicProperties.EDGE_CROSSING_FACTOR, algorithm.get("edgeCrossingFactor"));
+				if (edgeLengths != -1)
+					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, true);
+				//if (algorithm.containsKey("edgeDistanceFactor"))
+					//layoutProperties.setProperty(OrganicProperties.EDGE_DISTANCE_FACTOR, algorithm.get("edgeDistanceFactor"));
+				if (nodeDistribution != -1)
+					layoutProperties.setProperty(OrganicProperties.NODE_DISTRIBUTION_FACTOR, true);
+				
+				layoutProperties.setProperty(OrganicProperties.IS_FINE_TUNING, true);
+			}
+
+			
+			return new Pair<LayoutAlgorithms, GraphLayoutProperties>(layoutAlgorithm, layoutProperties);
+
 		}
 
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Graph<V,E> formOneGraph(List<V> vertices, List<E> edges){
+		Graph<V,E> graph = new Graph<V,E>();
+
+		for (V v : vertices)
+			graph.addVertex(v);
+
+		for (E e : edges)
+			graph.addEdge(e);
+
+		return graph;
 	}
 
 }
