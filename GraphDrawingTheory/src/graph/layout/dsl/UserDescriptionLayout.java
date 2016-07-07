@@ -7,7 +7,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
-import graph.layout.AestheticCriteria;
+import graph.layout.DefaultGraphLayoutProperties;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
 import graph.layout.Layouter;
@@ -26,14 +26,17 @@ import graph.layout.PropertyEnums.SpringProperties;
 import graph.layout.PropertyEnums.TreeProperties;
 import graph.util.Pair;
 import interfaces.ILayout;
+import interfaces.ILayoutGraph;
 import interpreter.java.Interpreter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.SwingConstants;
 
 import models.java.LayoutGraph;
+import models.java.LayoutSubgraphs;
 
 public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 
@@ -57,8 +60,61 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 
 		if (layoutDescription instanceof LayoutGraph){
 			executeOne(vertices, edges, (LayoutGraph) layoutDescription, drawing);
-
 		}
+		else{
+			Graph<V,E> graph = formOneGraph(vertices, edges);
+			List<V> subgraphVertices = new ArrayList<V>();
+			List<V> allSubgraphVertices = new ArrayList<V>();
+			LayoutGraph others = null;
+			
+			LayoutSubgraphs layoutSubgraphs = (LayoutSubgraphs)layoutDescription;
+			for (ILayoutGraph layoutGraph : layoutSubgraphs.getSubgraphs()){
+				String subgraph = layoutGraph.getGraph();
+				if (subgraph.equals("others")){
+					others = (LayoutGraph) layoutGraph;
+					continue;
+				}
+				
+				//subgraph is given as a set of vertices
+				//each vertex is identified either by its content
+				//or by its index
+				String[] subgraphVerticesStr = subgraph.split(",");
+				subgraphVertices.clear();
+				
+				if (!layoutGraph.isGraphContent()){
+					for (String indexStr : subgraphVerticesStr){
+						if (indexStr.equals(""))
+							subgraphVertices.add(vertices.get(0));
+						else
+							subgraphVertices.add(vertices.get(Integer.parseInt(indexStr)));
+					}
+				}
+				else{
+					for (V v : vertices)
+						if (subgraphVertices.contains(v.getContent()))
+								subgraphVertices.add(v);
+				}
+				
+				allSubgraphVertices.addAll(subgraphVertices);
+				
+				//find all edges between these vertices
+				List<E> subgraphEdges = graph.edgesBetween(subgraphVertices);
+				executeOne(subgraphVertices, subgraphEdges, (LayoutGraph) layoutGraph, drawing);
+			}
+			
+			//layout others if specified
+			if (others != null){
+				List<V> otherVertices=  new ArrayList<V>();
+				for (V v : vertices)
+					if (!allSubgraphVertices.contains(v))
+						otherVertices.add(v);
+				
+				List<E> subgraphEdges = graph.edgesBetween(otherVertices);
+				executeOne(otherVertices, subgraphEdges, (LayoutGraph) others, drawing);
+			}
+			
+		}
+		
 		return drawing;
 	}
 
@@ -392,13 +448,15 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 				//nodes should be distributed evenly
 				//in that case one force-directed approach
 				//should be used
-				
+
 				layoutAlgorithm = LayoutAlgorithms.NODE_LINK_TREE;
 				if (uniformFlow != -1){
-						//check if a specific direction was specified
-						//in that case an algorithm that allows this
-						//property to be set should be used
-						String orientation = (String) criteriaMaps.get(uniformFlow).get("direction"); 
+					layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.NODE_LINK_TREE, graph);
+					//check if a specific direction was specified
+					//in that case an algorithm that allows this
+					//property to be set should be used
+					String orientation = (String) criteriaMaps.get(uniformFlow).get("direction");
+					if (orientation != null){
 						if (orientation.equals("right"))
 							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 0);
 						else if (orientation.equals("left"))
@@ -408,8 +466,11 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 						else if (orientation.equals("up"))
 							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 3);
 					}
-				else if (symmetric != -1)
+				}
+				else if (symmetric != -1){
 					layoutAlgorithm = LayoutAlgorithms.COMPACT_TREE;
+					layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(layoutAlgorithm, graph);
+				}
 			}
 			else if (symmetric != -1 && criteriaMaps.size() == 1){
 				//TODO permutation check
@@ -420,34 +481,38 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 				//hierarchical
 				layoutAlgorithm = LayoutAlgorithms.HIERARCHICAL;
 				String orientation = (String) criteriaMaps.get(uniformFlow).get("direction"); 
-				if (orientation.equals("right"))
-					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 0);
-				else if (orientation.equals("left"))
-					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 1);
-				else if (orientation.equals("down"))
-					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 2);
-				else if (orientation.equals("up"))
-					layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 3);
+				if (orientation != null){
+					if (orientation.equals("right"))
+						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 0);
+					else if (orientation.equals("left"))
+						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 1);
+					else if (orientation.equals("down"))
+						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 2);
+					else if (orientation.equals("up"))
+						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, 3);
+				}
 			}
 			else{
 				//organic, set properties
 				layoutAlgorithm = LayoutAlgorithms.ORGANIC;
-				
+
 				if (edgeCrossings != -1)
 					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, true);
-				//if (algorithm.containsKey("edgeCrossingFactor"))
-					//layoutProperties.setProperty(OrganicProperties.EDGE_CROSSING_FACTOR, algorithm.get("edgeCrossingFactor"));
+				//if (algorithm.containsKey("edgeCross ingFactor"))
+				//layoutProperties.setProperty(OrganicProperties.EDGE_CROSSING_FACTOR, algorithm.get("edgeCrossingFactor"));
 				if (edgeLengths != -1)
 					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, true);
 				//if (algorithm.containsKey("edgeDistanceFactor"))
-					//layoutProperties.setProperty(OrganicProperties.EDGE_DISTANCE_FACTOR, algorithm.get("edgeDistanceFactor"));
+				//layoutProperties.setProperty(OrganicProperties.EDGE_DISTANCE_FACTOR, algorithm.get("edgeDistanceFactor"));
 				if (nodeDistribution != -1)
 					layoutProperties.setProperty(OrganicProperties.NODE_DISTRIBUTION_FACTOR, true);
-				
+
 				layoutProperties.setProperty(OrganicProperties.IS_FINE_TUNING, true);
 			}
 
-			
+			System.out.println("Chosen algorithm: " + layoutAlgorithm);
+
+
 			return new Pair<LayoutAlgorithms, GraphLayoutProperties>(layoutAlgorithm, layoutProperties);
 
 		}

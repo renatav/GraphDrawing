@@ -14,48 +14,58 @@ public class JGraphOrganicLayouter<V extends Vertex, E extends Edge<V>> extends 
 	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 		mxOrganicLayout organicLayouter = new mxOrganicLayout(jGraphXGraph);
 		
-		Boolean optimizeEdgeCrossing = (Boolean) layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING);
-		Double edgeCrossingFactor = (Double) layoutProperties.getProperty(OrganicProperties.EDGE_CROSSING_FACTOR);
-		Boolean optimizeEdgeDistance = (Boolean) layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE);
-		Double edgeDistanceFactor = (Double) layoutProperties.getProperty(OrganicProperties.EDGE_DISTANCE_FACTOR);
-		Boolean optimizeBorderLine = (Boolean) layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_BORDER_LINE);
-		Double borderLineFactor = (Double) layoutProperties.getProperty(OrganicProperties.BORDER_LINE_FACTOR);
-		Boolean optimizeNodeDistribution = (Boolean) layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_NODE_DISTRIBUTION);
-		Double nodeDistributionFactor = (Double) layoutProperties.getProperty(OrganicProperties.NODE_DISTRIBUTION_FACTOR);
-		Boolean fineTuning = (Boolean) layoutProperties.getProperty(OrganicProperties.IS_FINE_TUNING);
-		Double fineTuningRadius = (Double) layoutProperties.getProperty(OrganicProperties.FINE_TUNING_RADIUS);
-		Double averageNodeArea = (Double) layoutProperties.getProperty(OrganicProperties.AVERAGE_NODE_AREA);
-		Double averageScaleFactor = (Double) layoutProperties.getProperty(OrganicProperties.AVERAGE_SCALE_FACTOR);
-		Integer maxIterations = (Integer) layoutProperties.getProperty(OrganicProperties.MAX_ITERATIONS);
+		Object optimizeEdgeCrossing = layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING);
+		Object edgeCrossingFactor = layoutProperties.getProperty(OrganicProperties.EDGE_CROSSING_FACTOR);
+		Object optimizeEdgeDistance = layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE);
+		Object edgeDistanceFactor = layoutProperties.getProperty(OrganicProperties.EDGE_DISTANCE_FACTOR);
+		Object optimizeBorderLine = layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_BORDER_LINE);
+		Object borderLineFactor = layoutProperties.getProperty(OrganicProperties.BORDER_LINE_FACTOR);
+		Object optimizeNodeDistribution = layoutProperties.getProperty(OrganicProperties.IS_OPTIMIZE_NODE_DISTRIBUTION);
+		Object nodeDistributionFactor = layoutProperties.getProperty(OrganicProperties.NODE_DISTRIBUTION_FACTOR);
+		Object fineTuning = layoutProperties.getProperty(OrganicProperties.IS_FINE_TUNING);
+		Object fineTuningRadius = layoutProperties.getProperty(OrganicProperties.FINE_TUNING_RADIUS);
+		Object averageNodeArea = layoutProperties.getProperty(OrganicProperties.AVERAGE_NODE_AREA);
+		Object averageScaleFactor = layoutProperties.getProperty(OrganicProperties.AVERAGE_SCALE_FACTOR);
+		Object maxIterations = layoutProperties.getProperty(OrganicProperties.MAX_ITERATIONS);
 		
-		organicLayouter.setOptimizeEdgeCrossing(optimizeEdgeCrossing);
-		if (optimizeEdgeCrossing && edgeCrossingFactor != null)
-			organicLayouter.setEdgeCrossingCostFactor(edgeCrossingFactor);
+		if (optimizeEdgeCrossing != null)
+			organicLayouter.setOptimizeEdgeCrossing((boolean) optimizeEdgeCrossing);
 		
-		organicLayouter.setOptimizeEdgeDistance(optimizeEdgeDistance);
-		if (optimizeEdgeDistance && edgeDistanceFactor != null)
-			organicLayouter.setEdgeDistanceCostFactor(edgeDistanceFactor);
+		if (optimizeEdgeCrossing!= null && (boolean)optimizeEdgeCrossing && edgeCrossingFactor != null)
+			organicLayouter.setEdgeCrossingCostFactor((double) edgeCrossingFactor);
 		
-		organicLayouter.setOptimizeBorderLine(optimizeBorderLine);
-		if (optimizeBorderLine && borderLineFactor != null)
-			organicLayouter.setBorderLineCostFactor(borderLineFactor);
+		if (optimizeEdgeDistance != null)
+			organicLayouter.setOptimizeEdgeDistance((boolean) optimizeEdgeDistance);
 		
-		organicLayouter.setOptimizeNodeDistribution(optimizeNodeDistribution);
-		if (optimizeNodeDistribution && nodeDistributionFactor != null )
-			organicLayouter.setOptimizeNodeDistribution(optimizeNodeDistribution);
+		if (optimizeEdgeDistance!= null && (boolean)optimizeEdgeDistance && edgeDistanceFactor != null)
+			organicLayouter.setEdgeDistanceCostFactor((double) edgeDistanceFactor);
 		
-		organicLayouter.setFineTuning(fineTuning);
-		if (fineTuning && fineTuningRadius != null)
-			organicLayouter.setFineTuningRadius(fineTuningRadius);
+		if (optimizeBorderLine != null)
+			organicLayouter.setOptimizeBorderLine((boolean) optimizeBorderLine);
+		
+		if (optimizeBorderLine!= null && (boolean)optimizeBorderLine && borderLineFactor != null)
+			organicLayouter.setBorderLineCostFactor((double) borderLineFactor);
+		
+		if (optimizeNodeDistribution != null)
+			organicLayouter.setOptimizeNodeDistribution((boolean) optimizeNodeDistribution);
+		
+		if (optimizeNodeDistribution!= null && (boolean)optimizeNodeDistribution && nodeDistributionFactor != null )
+			organicLayouter.setOptimizeNodeDistribution((boolean) optimizeNodeDistribution);
+		
+		if (fineTuning != null)
+			organicLayouter.setFineTuning((boolean) fineTuning);
+		
+		if (fineTuning!= null && (boolean)fineTuning && fineTuningRadius != null)
+			organicLayouter.setFineTuningRadius((double)fineTuningRadius);
 		
 		if (averageNodeArea != null)
-			organicLayouter.setAverageNodeArea(averageNodeArea);
+			organicLayouter.setAverageNodeArea((double) averageNodeArea);
 		
 		if (averageScaleFactor != null)
-			organicLayouter.setAverageNodeArea(averageScaleFactor);
+			organicLayouter.setAverageNodeArea((double) averageScaleFactor);
 		
 		if (maxIterations != null)
-			organicLayouter.setMaxIterations(maxIterations);
+			organicLayouter.setMaxIterations((int) maxIterations);
 		
 		layouter = organicLayouter;
 		

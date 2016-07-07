@@ -539,6 +539,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 
 
+	@SuppressWarnings("unused")
 	private boolean firstEdgeOfAPath(E e, List<List<E>> paths){
 		for (List<E> path : paths)
 			if (path.get(0) == e)

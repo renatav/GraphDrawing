@@ -337,6 +337,12 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		return reursiveLinkDistance;
 	}
 
+	@Override
+	public String toString() {
+		return "Drawing [vertexMappings=" + vertexMappings + ", edgeMappings="
+				+ edgeMappings + "]";
+	}
+
 
 
 

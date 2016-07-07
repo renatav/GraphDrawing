@@ -275,6 +275,20 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(e);
 		return ret;
 	}
+	
+	public List<E> edgesBetween(List<V> vertices){
+		List<E> ret = new ArrayList<E>();
+		for (V v : vertices)
+			for (E e : adjacentEdges(v)){
+				if (!ret.contains(e)){
+					V other = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+					if (vertices.contains(other))
+						ret.add(e);
+				}
+			}
+		
+		return ret;
+	}
 
 	/**
 	 * All edges which connect one vertix to itself

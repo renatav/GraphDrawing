@@ -476,7 +476,7 @@ RectnagularProperty:
 
 
 Vertex:
-	'v' index = INT
+	'v' index = INT | content = STRING
 ;
 
 Automorphism:

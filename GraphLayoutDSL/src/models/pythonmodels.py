@@ -5,12 +5,13 @@ class MLayoutGraph(ILayoutGraph):
     how a graph should be laid out. It is also used
     to describe how a subgraph should be laid out'''
     
-    def __init__(self, graph, type, style = "", aestheticCriteria = None, algorithm = None):
+    def __init__(self, graph, type, style = "",  graphContent = False, aestheticCriteria = None, algorithm = None):
         self.attr_graph = graph
         self.attr_type = type
         self.attr_style = style
         self.attr_aestheticCriteria = aestheticCriteria
         self.attr_algorithm = algorithm
+        self.attr_graphContent = graphContent
     
     def getGraph(self):
         return self.attr_graph
@@ -26,6 +27,9 @@ class MLayoutGraph(ILayoutGraph):
     
     def getAlgorithm(self):
         return self.attr_algorithm
+       
+    def isGraphContent(self):
+        return self.attr_graphContent
     
     
 class MLayoutSubgraphs(ILayoutSubgraphs):

@@ -28,14 +28,21 @@ class Interpreter():
                    graph = 'others'
                 else:
                     vertices = ''
+                    content = True
                     for i,vertex in enumerate(subgraph.vertices):
-                        vertices = vertices + str(vertex.index)
+                        if vertex.index:
+                            vertices = vertices + str(vertex.index)
+                            content = False
+                        else:
+                            vertices = vertices + vertex.content
                         if i < len(subgraph.vertices) - 1:
-                             vertices = vertices + ','
-                    graph = vertices
+                                 vertices = vertices + ','
+                        graph = vertices
                    
+               
                 layoutType = layoutSubgraph.layoutType
                 layoutOneSubgraph = Interpreter.execute_one(layoutType, graph)
+                layoutOneSubgraph.attr_graphContent = content
               
                 subgraphs.append(layoutOneSubgraph)  
             

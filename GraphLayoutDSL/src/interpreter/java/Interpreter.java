@@ -83,7 +83,8 @@ public class Interpreter {
     		ILayoutGraph pyLayoutGraph =  (ILayoutGraph) Factory.createJavaObject(ILayoutGraph.class, interpreted);
     		LayoutGraph layoutGraph = new LayoutGraph(pyLayoutGraph.getGraph(), 
     				pyLayoutGraph.getType(), pyLayoutGraph.getStyle(),
-    				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm());
+    				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm(),
+    				pyLayoutGraph.isGraphContent());
     		ret = layoutGraph;
     	}
     	else{
@@ -92,7 +93,8 @@ public class Interpreter {
     		for (ILayoutGraph pyLayoutGraph : pyLayoutSubgraphs.getSubgraphs()){
     			LayoutGraph layoutGraph = new LayoutGraph(pyLayoutGraph.getGraph(), 
         				pyLayoutGraph.getType(), pyLayoutGraph.getStyle(),
-        				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm());
+        				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm(), 
+        				pyLayoutGraph.isGraphContent());
     			subgraphs.add(layoutGraph);
     		}
     		LayoutSubgraphs layoutSubgraphs = new LayoutSubgraphs(subgraphs);

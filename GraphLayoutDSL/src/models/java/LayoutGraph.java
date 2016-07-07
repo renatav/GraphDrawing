@@ -13,17 +13,19 @@ public class LayoutGraph implements ILayoutGraph{
 	private String style;
 	private List<Map<String, Object>> aestheticCriteria;
 	private Map<String, Object> algorithm;
+	private boolean graphContent;
 	
 	
 	public LayoutGraph(String graph, String type, String style,
 			List<Map<String, Object>> aestheticCriteria,
-			Map<String, Object> algorithm) {
+			Map<String, Object> algorithm, boolean graphContent) {
 		super();
 		this.graph = graph;
 		this.type = type;
 		this.style = style;
 		this.aestheticCriteria = aestheticCriteria;
 		this.algorithm = algorithm;
+		this.graphContent = graphContent;
 	}
 
 
@@ -60,6 +62,11 @@ public class LayoutGraph implements ILayoutGraph{
 
 	public Map<String, Object> getAlgorithm() {
 		return algorithm;
+	}
+
+
+	public boolean isGraphContent() {
+		return graphContent;
 	}
 
 }

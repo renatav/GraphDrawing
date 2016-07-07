@@ -438,10 +438,10 @@ public class CommandPanel extends JPanel{
 			
 			Drawing<GraphVertex, GraphEdge> drawing = dslLayout.layout();
 			GraphView view = MainFrame.getInstance().getCurrentView();
-			for (GraphVertex vert : graph.getVertices()){
+			for (GraphVertex vert : drawing.getVertexMappings().keySet()){
 				vert.setPosition(drawing.getVertexMappings().get(vert));
 			}
-			for (GraphEdge edge : graph.getEdges()){
+			for (GraphEdge edge : drawing.getEdgeMappings().keySet()){
 				List<Point2D> points = drawing.getEdgeMappings().get(edge);
 				edge.setLinkNodes(points);
 			}

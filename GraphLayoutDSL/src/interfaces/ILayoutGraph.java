@@ -6,6 +6,7 @@ import java.util.Map;
 public interface ILayoutGraph extends ILayout{
 
 	public String getGraph();
+	public boolean isGraphContent();
 	public String getType();
 	public String getStyle();
 	public List<Map<String, Object>> getAestheticCriteria();
