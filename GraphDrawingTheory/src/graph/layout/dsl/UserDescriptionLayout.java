@@ -7,6 +7,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
+import graph.exception.DSLException;
 import graph.layout.DefaultGraphLayoutProperties;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
@@ -47,6 +48,20 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 	private FraysseixMendezPlanarity<V, E> planarityTest = 
 			new FraysseixMendezPlanarity<V,E>();
 
+	int startX = 200;
+	int startY = 200;
+
+	int spaceX = 200;
+	int spaceY = 200;
+	int numInRow = 4;
+	int currentIndex = 1;
+
+	int currentStartPositionX = startX;
+	int currentStartPositionY = startY;
+
+	int maxYInRow = 0;
+
+
 	public UserDescriptionLayout(List<V> vertices, List<E> edges, String userDescription){
 		this.vertices = vertices;
 		this.edges = edges;
@@ -54,19 +69,25 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 		layouter = new Layouter<V,E>();
 	}
 
-	public Drawing<V,E> layout(){
+	public Drawing<V,E> layout() throws DSLException{
 		ILayout layoutDescription = Interpreter.getInstance().execute(userDescription);
-		Drawing<V,E> drawing = new Drawing<V,E>();
 
+		Drawing<V,E> drawing;
 		if (layoutDescription instanceof LayoutGraph){
-			executeOne(vertices, edges, (LayoutGraph) layoutDescription, drawing);
+			LayoutGraph layoutGraph = (LayoutGraph) layoutDescription;
+			if (layoutGraph.getException() != null && !layoutGraph.getException().equals(""))
+				throw new DSLException(((LayoutGraph) layoutDescription).getException());
+			drawing = executeOne(vertices, edges, (LayoutGraph) layoutDescription);
 		}
 		else{
+
+			drawing = new Drawing<V,E>();
+
 			Graph<V,E> graph = formOneGraph(vertices, edges);
 			List<V> subgraphVertices = new ArrayList<V>();
 			List<V> allSubgraphVertices = new ArrayList<V>();
 			LayoutGraph others = null;
-			
+
 			LayoutSubgraphs layoutSubgraphs = (LayoutSubgraphs)layoutDescription;
 			for (ILayoutGraph layoutGraph : layoutSubgraphs.getSubgraphs()){
 				String subgraph = layoutGraph.getGraph();
@@ -74,13 +95,13 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 					others = (LayoutGraph) layoutGraph;
 					continue;
 				}
-				
+
 				//subgraph is given as a set of vertices
 				//each vertex is identified either by its content
 				//or by its index
 				String[] subgraphVerticesStr = subgraph.split(",");
 				subgraphVertices.clear();
-				
+
 				if (!layoutGraph.isGraphContent()){
 					for (String indexStr : subgraphVerticesStr){
 						if (indexStr.equals(""))
@@ -92,33 +113,40 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 				else{
 					for (V v : vertices)
 						if (subgraphVertices.contains(v.getContent()))
-								subgraphVertices.add(v);
+							subgraphVertices.add(v);
 				}
-				
+
 				allSubgraphVertices.addAll(subgraphVertices);
-				
+
 				//find all edges between these vertices
 				List<E> subgraphEdges = graph.edgesBetween(subgraphVertices);
-				executeOne(subgraphVertices, subgraphEdges, (LayoutGraph) layoutGraph, drawing);
+				Drawing<V,E> oneDrawing = executeOne(subgraphVertices, subgraphEdges, (LayoutGraph) layoutGraph);
+				positionDrawing(oneDrawing);
+				drawing.getVertexMappings().putAll(oneDrawing.getVertexMappings());
+				drawing.getEdgeMappings().putAll(oneDrawing.getEdgeMappings());
 			}
-			
+
 			//layout others if specified
 			if (others != null){
 				List<V> otherVertices=  new ArrayList<V>();
 				for (V v : vertices)
 					if (!allSubgraphVertices.contains(v))
 						otherVertices.add(v);
-				
+
 				List<E> subgraphEdges = graph.edgesBetween(otherVertices);
-				executeOne(otherVertices, subgraphEdges, (LayoutGraph) others, drawing);
+				Drawing<V,E> oneDrawing = executeOne(otherVertices, subgraphEdges, (LayoutGraph) others);
+				positionDrawing(oneDrawing);
+				drawing.getVertexMappings().putAll(oneDrawing.getVertexMappings());
+				drawing.getEdgeMappings().putAll(oneDrawing.getEdgeMappings());
 			}
-			
+
 		}
-		
+
 		return drawing;
 	}
 
-	private void executeOne(List<V> vertices, List<E> edges, LayoutGraph layoutDescription, Drawing<V,E> drawing){
+	private Drawing<V,E> executeOne(List<V> vertices, List<E> edges, LayoutGraph layoutDescription){
+
 		Pair<LayoutAlgorithms, GraphLayoutProperties> algorithmAndProperties = selectLayout(vertices, edges, (LayoutGraph) layoutDescription);
 		LayoutAlgorithms algorithm = algorithmAndProperties.getKey();
 		GraphLayoutProperties properties = algorithmAndProperties.getValue();
@@ -130,11 +158,41 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 
 		try {
 			Drawing<V,E> oneDrawing = layouter.layout();
-			drawing.getVertexMappings().putAll(oneDrawing.getVertexMappings());
-			drawing.getEdgeMappings().putAll(oneDrawing.getEdgeMappings());
+			return oneDrawing;
 		} catch (CannotBeAppliedException e) {
 			e.printStackTrace();
 		}
+
+		return null;
+	}
+
+	private void positionDrawing(Drawing<V,E> drawing){
+
+		
+		int currentLeftmost = drawing.findLeftmostPosition();
+		int currentTop = drawing.findTop();
+
+
+		//leftmost should start at point currentStartPositionX
+		int moveByX = currentStartPositionX - currentLeftmost;
+
+		//top should start at point currentStartPositionY
+		int moveByY = currentStartPositionY - currentTop;
+
+		drawing.moveByIncludingEdges(moveByX, moveByY);
+
+		int[] bounds = drawing.getBounds();
+		if (bounds[1] > maxYInRow)
+			maxYInRow = bounds[1];
+
+		currentStartPositionX += bounds[0] + spaceX;
+
+		if (currentIndex % numInRow == 0){
+			currentStartPositionY += maxYInRow + spaceY;
+			maxYInRow = 0;
+			currentStartPositionX = startX;
+		}
+
 	}
 
 
@@ -234,10 +292,11 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 			}
 			else if (algorithm.get("name").equals("circular")){
 				layoutAlgorithm = LayoutAlgorithms.CIRCLE;
+				System.out.println(algorithm);
 				if (algorithm.containsKey("optimize"))
 					layoutProperties.setProperty(CircleProperties.OPTIMIZE_CROSSINGS, algorithm.get("optimize"));
-				if (algorithm.containsKey("distance"))
-					layoutProperties.setProperty(CircleProperties.DISTANCE, algorithm.get("distance"));
+				if (algorithm.containsKey("dist"))
+					layoutProperties.setProperty(CircleProperties.DISTANCE, algorithm.get("dist"));
 			}
 			else if (algorithm.get("name").equals("Kamada")){
 				layoutAlgorithm = LayoutAlgorithms.KAMADA_KAWAI;

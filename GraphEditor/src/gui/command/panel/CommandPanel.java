@@ -10,6 +10,7 @@ import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.drawing.Drawing;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
+import graph.exception.DSLException;
 import graph.layout.dsl.UserDescriptionLayout;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
@@ -42,9 +43,9 @@ import javax.swing.JTextField;
 import net.miginfocom.swing.MigLayout;
 
 public class CommandPanel extends JPanel{
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private static String[] commands;
 	private JTextField inputField = new JTextField();
 	private JTextArea centralArea = new JTextArea(10, 10);
@@ -56,22 +57,22 @@ public class CommandPanel extends JPanel{
 
 	public CommandPanel(){
 		setLayout(new MigLayout("fill"));
-		
+
 		add(inputField, "dock south, growx");
-		
+
 		centralArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(centralArea);
 		add(scrollPane, "grow");
-		
+
 		initCommands();
-		
+
 		inputField.addKeyListener(new KeyListener() {
-			 
+
 			@Override
 			public void keyTyped(KeyEvent e) {
-				
+
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER){
@@ -92,25 +93,25 @@ public class CommandPanel extends JPanel{
 					if (currentCommandIndex < allCommands.size())
 						inputField.setText(allCommands.get(currentCommandIndex));
 				}
-				
+
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e) {
-				
+
 			}
 		});
 	}
 
-	
-	
+
+
 	private String processCommand(String command){
 		command = command.trim();
 		allCommands.add(command);
 		currentCommandIndex = allCommands.size();
-		
+
 		Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
-		
+
 		if (command.equals(commands[0]))
 			System.exit(0);
 		if (command.startsWith(commands[1])){ //create graph
@@ -141,7 +142,7 @@ public class CommandPanel extends JPanel{
 			if (split.length < 2)
 				return "Please enter vertex name and position as (x, y)";
 			if (split[0].contains("(") && !split[1].contains("("))
-				 return "Please enter vertex name and position as (x, y)";
+				return "Please enter vertex name and position as (x, y)";
 			String content = split[0];
 			int positionStart = command.indexOf("(");
 			if (positionStart == -1)
@@ -183,8 +184,8 @@ public class CommandPanel extends JPanel{
 			MainFrame.getInstance().getCurrentView().addEdgePainter(new EdgePainter(edge, MainFrame.getInstance().getCurrentView().getModel().getGraph()));
 			return "Edge " + v1 + ", " + v2 + " added";
 		}
-		
-		
+
+
 
 		if (command.startsWith(commands[4])){
 			return MainFrame.getInstance().getCurrentView().getModel().getGraph().isConnected() ? "yes" : "no";
@@ -206,7 +207,7 @@ public class CommandPanel extends JPanel{
 		}
 
 		if (command.startsWith(commands[8])){
-		//	if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
+			//	if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
 			//	return "Graph is biconnected.";
 			//return splitting.findAllCutVertices(MainFrame.getInstance().getCurrentView().getModel().getGraph()).toString();
 			return graph.listCutVertices().toString();
@@ -290,7 +291,7 @@ public class CommandPanel extends JPanel{
 			return splitting.splitGraph(pair, edge, graph).toString(); 
 		}
 
-		
+
 		if (command.startsWith(commands[13])){
 			command = command.substring(commands[13].length()).trim();
 			String[] split = command.split(" ");
@@ -320,7 +321,7 @@ public class CommandPanel extends JPanel{
 
 			return splitting.maximalSplitPairs(graph, edge).toString(); 
 		}
-		
+
 		if (command.startsWith(commands[14])){
 			command = command.substring(commands[14].length()).trim();
 			String[] split = command.split(" ");
@@ -355,7 +356,7 @@ public class CommandPanel extends JPanel{
 				return "Couldn't construct spqr tree: " + e.getMessage();
 			}
 		}
-		
+
 		if (command.equals(commands[16])){
 			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
 			List<Permutation> automorphisms = nauty.findAutomorphisms();
@@ -366,11 +367,11 @@ public class CommandPanel extends JPanel{
 
 			return ret;
 		}
-		
+
 		if (command.equals(commands[17])){
-				SimpleCyclesFinder<GraphVertex, GraphEdge> jcycles = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
-				System.out.println(jcycles.findCycles(graph));
-				return (jcycles.toString());
+			SimpleCyclesFinder<GraphVertex, GraphEdge> jcycles = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
+			System.out.println(jcycles.findCycles(graph));
+			return (jcycles.toString());
 		}
 		if (command.equals(commands[18])){
 			SimpleUndirectedCyclesFinder<GraphVertex, GraphEdge> cycles = 
@@ -380,7 +381,7 @@ public class CommandPanel extends JPanel{
 				ret += cycle + "\n";
 			return ret;
 		}
-		
+
 		if (command.equals(commands[19])){
 			String ret = "";
 			PermutationAnalyzator<GraphVertex, GraphEdge> analyzator =new PermutationAnalyzator<GraphVertex,GraphEdge>(graph);
@@ -388,19 +389,19 @@ public class CommandPanel extends JPanel{
 			ret += analyzator.findRotationGroups() + "\n";
 			ret += analyzator.findDihedralGroups();
 			return ret;
-			
+
 		}
-		
+
 		if (command.equals(commands[20])){
 			System.out.println("convex");
 			ConvexDrawing<GraphVertex, GraphEdge> drawing = new ConvexDrawing<GraphVertex,GraphEdge>(graph);
 			drawing.execute();
 		}
-		
+
 		if (command.equals(commands[21])){
 			return graph.listBiconnectedComponents().toString();
 		}
-		 
+
 		if (command.equals(commands[22])){
 			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting = new SeparationPairSplitting<GraphVertex, GraphEdge>();
 			try {
@@ -411,10 +412,10 @@ public class CommandPanel extends JPanel{
 				e.printStackTrace();
 				return e.getMessage();
 			}
-			
+
 		}
-		
-		
+
+
 		else if (command.equals(commands[24])){
 			HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(graph);
 			try {
@@ -423,31 +424,36 @@ public class CommandPanel extends JPanel{
 				return e.getMessage();
 			}
 			return "Done";
-			
+
 		}
-		
+
 		else if (command.equals(commands[23])){
 			centralArea.setText("");
 			return "";
 		}
-		
+
 		else if (command.startsWith(commands[25])){
 			//Layout DSL input
 			UserDescriptionLayout<GraphVertex, GraphEdge> dslLayout = new UserDescriptionLayout<GraphVertex, GraphEdge>(graph.getVertices(), 
 					graph.getEdges(), command);
-			
-			Drawing<GraphVertex, GraphEdge> drawing = dslLayout.layout();
-			GraphView view = MainFrame.getInstance().getCurrentView();
-			for (GraphVertex vert : drawing.getVertexMappings().keySet()){
-				vert.setPosition(drawing.getVertexMappings().get(vert));
+			try{
+				Drawing<GraphVertex, GraphEdge> drawing = dslLayout.layout();
+				GraphView view = MainFrame.getInstance().getCurrentView();
+				for (GraphVertex vert : drawing.getVertexMappings().keySet()){
+					vert.setPosition(drawing.getVertexMappings().get(vert));
+				}
+				for (GraphEdge edge : drawing.getEdgeMappings().keySet()){
+					List<Point2D> points = drawing.getEdgeMappings().get(edge);
+					edge.setLinkNodes(points);
+				}
+				view.repaint();
+				return "Done";
 			}
-			for (GraphEdge edge : drawing.getEdgeMappings().keySet()){
-				List<Point2D> points = drawing.getEdgeMappings().get(edge);
-				edge.setLinkNodes(points);
+			catch(DSLException ex){
+				return ex.getMessage();
 			}
-			view.repaint();
 		}
-		
+
 		else if (command.trim().equals("Binary tree")){
 			BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
 			boolean balanced = binaryTree.isBalanced();
@@ -456,7 +462,7 @@ public class CommandPanel extends JPanel{
 		else if (command.trim().equals("is ring")){
 			return graph.isRing() + "";
 		}
-		
+
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
 			builder.append("quit\n");
@@ -483,7 +489,7 @@ public class CommandPanel extends JPanel{
 
 	private static  void initCommands(){
 		commands = new String[28];
-		
+
 		commands[0] = "quit";
 		commands[1] = "create graph";
 		commands[2] = "add vertex";
@@ -513,6 +519,6 @@ public class CommandPanel extends JPanel{
 		commands[26] = "binary tree";
 		commands[27] = "is ring";
 	}
-		
+
 
 }

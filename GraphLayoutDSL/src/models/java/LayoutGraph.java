@@ -14,6 +14,7 @@ public class LayoutGraph implements ILayoutGraph{
 	private List<Map<String, Object>> aestheticCriteria;
 	private Map<String, Object> algorithm;
 	private boolean graphContent;
+	private String exception;
 	
 	
 	public LayoutGraph(String graph, String type, String style,
@@ -27,7 +28,10 @@ public class LayoutGraph implements ILayoutGraph{
 		this.algorithm = algorithm;
 		this.graphContent = graphContent;
 	}
-
+	
+	public LayoutGraph(String exception){
+		this.exception = exception;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -44,29 +48,28 @@ public class LayoutGraph implements ILayoutGraph{
 		return graph;
 	}
 
-
 	public String getType() {
 		return type;
 	}
-
 
 	public String getStyle() {
 		return style;
 	}
 
-
 	public List<Map<String, Object>> getAestheticCriteria() {
 		return aestheticCriteria;
 	}
-
 
 	public Map<String, Object> getAlgorithm() {
 		return algorithm;
 	}
 
-
 	public boolean isGraphContent() {
 		return graphContent;
+	}
+
+	public String getException() {
+		return exception;
 	}
 
 }

@@ -81,7 +81,11 @@ public class Interpreter {
     	ILayout ret;
     	if (type.contains("MLayoutGraph")){
     		ILayoutGraph pyLayoutGraph =  (ILayoutGraph) Factory.createJavaObject(ILayoutGraph.class, interpreted);
-    		LayoutGraph layoutGraph = new LayoutGraph(pyLayoutGraph.getGraph(), 
+    		LayoutGraph layoutGraph;
+    		if (!pyLayoutGraph.getException().equals(""))
+    			layoutGraph = new LayoutGraph(pyLayoutGraph.getException());
+    		else
+    			layoutGraph = new LayoutGraph(pyLayoutGraph.getGraph(), 
     				pyLayoutGraph.getType(), pyLayoutGraph.getStyle(),
     				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm(),
     				pyLayoutGraph.isGraphContent());

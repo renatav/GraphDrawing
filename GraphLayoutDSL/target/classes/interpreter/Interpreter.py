@@ -1,5 +1,6 @@
 from textx.metamodel import metamodel_from_file
 from textx.export import metamodel_export, model_export
+from textx.exceptions import TextXSyntaxError
 from pythonmodels import MLayoutGraph, MLayoutSubgraphs
 import os
 import sys
@@ -14,7 +15,11 @@ class Interpreter():
 
     def execute(self, model_str):
 	
-        model = self.metamodel.model_from_str(model_str)
+        try:
+            model = self.metamodel.model_from_str(model_str)
+        except TextXSyntaxError as e:
+            return MLayoutGraph(exception = e.message)
+            
         
         if model.__class__.__name__ == 'LayoutGraph':
                 layoutGraph = Interpreter.execute_one(model.layoutType, 'graph')
