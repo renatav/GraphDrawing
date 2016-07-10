@@ -377,19 +377,24 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.AUTOMATIC, null);
 			}
 			else if (style.equals("circular")){
-				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.CIRCLE, null);
+				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.CIRCLE, 
+						DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.CIRCLE, graph));
 			}
 			else if (style.equals("tree")){
-				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.TREE, null);
+				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.COMPACT_TREE, 
+						DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.COMPACT_TREE, graph));
 			}
 			else if (style.equals("hierarchical")){
-				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.HIERARCHICAL, null);
+				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.HIERARCHICAL, 
+						DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.HIERARCHICAL, graph));
 			}
-			else if (style.equals("symmetrical")){
-				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.CONCENTRIC, null); //TODO replace with better algorithm when implemented
+			else if (style.equals("symmetric")){
+				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.CONCENTRIC,
+						DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.CONCENTRIC, graph)); //TODO replace with better algorithm when implemented
 			}
 			else if (style.equals("general")){
-				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.KAMADA_KAWAI, null);
+				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.KAMADA_KAWAI,
+						DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.KAMADA_KAWAI, graph));
 			}
 		}
 		else if (layoutInstructions.getType().equals("criteria")){
