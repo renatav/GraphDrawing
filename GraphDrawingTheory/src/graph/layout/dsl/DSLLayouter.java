@@ -39,7 +39,7 @@ import javax.swing.SwingConstants;
 import models.java.LayoutGraph;
 import models.java.LayoutSubgraphs;
 
-public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
+public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 
 	private List<V> vertices;
 	private List<E> edges;
@@ -62,7 +62,7 @@ public class UserDescriptionLayout<V extends Vertex, E extends Edge<V>>  {
 	int maxYInRow = 0;
 
 
-	public UserDescriptionLayout(List<V> vertices, List<E> edges, String userDescription){
+	public DSLLayouter(List<V> vertices, List<E> edges, String userDescription){
 		this.vertices = vertices;
 		this.edges = edges;
 		this.userDescription = userDescription;

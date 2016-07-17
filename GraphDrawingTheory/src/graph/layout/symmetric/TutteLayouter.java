@@ -25,7 +25,6 @@ public class TutteLayouter <V extends Vertex, E extends Edge<V>> extends Symmetr
 	public Drawing<V, E> layout(Graph<V, E> graph,
 			GraphLayoutProperties layoutProperties) {
 
-
 		if (layoutProperties.getProperty(SymmetricProperties.DISTANCE) != null)
 			distance =  (Double) layoutProperties.getProperty(SymmetricProperties.DISTANCE);
 		if (layoutProperties.getProperty(SymmetricProperties.PERMUTATION) != null)
@@ -38,6 +37,7 @@ public class TutteLayouter <V extends Vertex, E extends Edge<V>> extends Symmetr
 
 		//for now, before implementing a better way to detect a face
 		String faceStrList = (String) layoutProperties.getProperty(TutteProperties.FACE);
+		
 
 		List<V> face = new ArrayList<V>();
 
@@ -50,6 +50,7 @@ public class TutteLayouter <V extends Vertex, E extends Edge<V>> extends Symmetr
 				if (v != null)
 					face.add(v);
 			}
+			
 		}
 
 		else{

@@ -5,6 +5,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,10 +32,16 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 		mxIGraphModel model = jGraphXGraph.getModel();
 		try{
 			for (V v : graph.getVertices()){
+				Dimension size;
+				if (v.getSize() == null)
+					size = new Dimension(10, 10);
+				else
+					size = v.getSize();
+				
 				Object jgraphxVertex = jGraphXGraph.insertVertex(parent, null, v, 0, 0,
-						v.getSize().getWidth(), v.getSize().getHeight());
-				model.getGeometry(jgraphxVertex).setHeight(v.getSize().getHeight());
-				model.getGeometry(jgraphxVertex).setWidth(v.getSize().getWidth()); //Doesn't make much difference...
+						size.getWidth(), size.getHeight());
+				model.getGeometry(jgraphxVertex).setHeight(size.getHeight());
+				model.getGeometry(jgraphxVertex).setWidth(size.getWidth()); //Doesn't make much difference...
 				verticesMap.put(v, jgraphxVertex);
 			}
 			for (E e : graph.getEdges()){

@@ -92,10 +92,7 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 					currentNode = nodes.get(0);
 			}
 
-			log.info("processing node " + currentNode);
 			processedNodes.add(currentNode);
-			
-			log.info("setting wave front and center nodes");
 			
 			//Define a wave front node to be adjacent to the last node processed
 			//A wave center node is adjacent to some other node that has already been processed.
@@ -120,11 +117,11 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 				if (copyGraph.adjacentVertices(v1).contains(v2)){
 					//removalList.add(copyGraph.edgeesBetweenWithTriangulated(v1, v2).get(0));
 					//original graph can't contain triangulated edges, so no need to remove them afterwards
-					E e = copyGraph.edgeBetween(v1, v2);
-					if (e == null){
-						System.out.println("ima u ajdacent, nema edge");
-						System.out.println(v1 + " " + v2);
-					}
+					//E e = copyGraph.edgeBetween(v1, v2);
+//					if (e == null){
+//						System.out.println("ima u ajdacent, nema edge");
+//						System.out.println(v1 + " " + v2);
+//					}
 					
 					removalList.add(copyGraph.edgeBetween(v1, v2));
 				}
@@ -163,7 +160,7 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 		
 		Graph<V,E> originalGraphCopy = new Graph<V,E>(graph.getVertices(), graph.getEdges());
 		for (E e : removalList){
-			log.info("Removing edge " + e.getOrigin() + " - " + e.getDestination());
+			//log.info("Removing edge " + e.getOrigin() + " - " + e.getDestination());
 			originalGraphCopy.removeEdge(e);
 		}
 		
@@ -173,7 +170,7 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 		Path<V,E> longestPath = traversal.findLongestPath();
 		
 		List<V> embeddingOrder = longestPath.pathVertivesWithoutDuplicates();
-		System.out.println(embeddingOrder);
+		//System.out.println(embeddingOrder);
 		
 		/*step 17 - If there are any nodes that have not been placed, then place the remaining nodes
 		into the embedding order with the following priority:

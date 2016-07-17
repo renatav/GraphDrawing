@@ -34,7 +34,6 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 		List<PermutationCycle<V>> cyclesNotOnPaths = new ArrayList<PermutationCycle<V>>();
 		cyclesNotOnPaths.addAll(g.getCycles());
 
-		System.out.println("Permutation " + g);
 
 		maxLenghts = maxLenghts(g);
 

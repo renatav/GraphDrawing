@@ -41,6 +41,7 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		OrderedPartition<V> pi = new OrderedPartition<V>(graph.getVertices());
 		binaryRepresenatation = new BinaryRepresentation<V,E>(graph);
 		OrderedPartition<V> refined = refinementProcedure(pi);
+		System.out.println("create search tree");
 		SearchTree<V> tree = createSearchTree(refined);
 		List<SearchTreeNode<V>> terminalNodes = tree.getTerminalNodes();
 

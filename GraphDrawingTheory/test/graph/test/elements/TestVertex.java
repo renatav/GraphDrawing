@@ -35,6 +35,11 @@ public class TestVertex implements Vertex{
 
 	private String content;
 	public double minDistance = Double.POSITIVE_INFINITY;
+	private Dimension size;
+	
+	public TestVertex(){
+		
+	}
 	
 	public TestVertex(String content) {
 		this.content = content;
@@ -43,8 +48,16 @@ public class TestVertex implements Vertex{
 	
 	@Override
 	public Dimension getSize() {
-		// TODO Auto-generated method stub
-		return null;
+		return size;
+	}
+	
+	public void setSize(Dimension size) {
+		this.size = size;
+	}
+	
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 

@@ -11,7 +11,7 @@ import graph.drawing.Drawing;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.DSLException;
-import graph.layout.dsl.UserDescriptionLayout;
+import graph.layout.dsl.DSLLayouter;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
@@ -434,7 +434,7 @@ public class CommandPanel extends JPanel{
 
 		else if (command.startsWith(commands[25])){
 			//Layout DSL input
-			UserDescriptionLayout<GraphVertex, GraphEdge> dslLayout = new UserDescriptionLayout<GraphVertex, GraphEdge>(graph.getVertices(), 
+			DSLLayouter<GraphVertex, GraphEdge> dslLayout = new DSLLayouter<GraphVertex, GraphEdge>(graph.getVertices(), 
 					graph.getEdges(), command);
 			try{
 				Drawing<GraphVertex, GraphEdge> drawing = dslLayout.layout();

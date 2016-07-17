@@ -78,6 +78,7 @@ public class Permutation {
 			}
 			ret.add(cycle);
 		}
+		
 		return ret;
 	}
 	

@@ -72,6 +72,8 @@ public class BoxLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLa
 					break;
 				currentElement = elementsToLayout.get(currentIndex);
 				currentDim = currentElement.getSize();
+				if (currentDim == null)
+					currentDim = new Dimension(10, 10);
 				if (currentDim.getHeight() > maxYInRow)
 					maxYInRow = (int) currentDim.getHeight();
 				currentIndex ++;

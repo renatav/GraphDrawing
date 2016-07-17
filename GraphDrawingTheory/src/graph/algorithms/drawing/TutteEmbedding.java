@@ -24,7 +24,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 
 	public Map<V, Point2D> execute (List<V> J, Point2D center, double treshold) {
 
-		
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
 		//		BoyerMyrvoldPlanarity<V, E> planarity = new BoyerMyrvoldPlanarity<V,E>();
@@ -36,8 +35,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 		//calculate positions of the outside face
 
 		CircleLayoutCalc<V> circleCalc = new CircleLayoutCalc<V>();
-		
-		
 		double radius = circleCalc.calculateRadius(J, treshold);
 		Map<V,Point2D> positions = circleCalc.calculatePosition(J, radius, center);
 		ret.putAll(positions);
@@ -66,7 +63,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 
 		for (int i = 0; i < m; i++)
 			for (int j = 0; j < m; j++){
-
 				V vi = orderedVertices.get(i);
 				V vj = orderedVertices.get(j);
 				if (vi == vj){
