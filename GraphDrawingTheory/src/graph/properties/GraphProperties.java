@@ -119,7 +119,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public boolean isConnected(List<V> excluding){
-		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<>(graph);
+		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>(graph);
 		for (V v1 : graph.getVertices()){
 			if (excluding.contains(v1))
 				continue;

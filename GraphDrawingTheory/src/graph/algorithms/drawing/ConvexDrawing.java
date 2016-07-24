@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -156,12 +157,19 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//store deleted vertices in order to position them later
 		Map<V, E> deletedAdjacentMap = new HashMap<V,E>();
 
+
+		//once a vertex is deleted and its two edges are deleted
+		//and a new one is created
+		//there might be a vertex with degree 2 connected to the deleted vertex
+		//we don't want to create an edge containing the deleted vertex
+		//the newly created edge should be taken into account
+
 		Iterator<V> iter = gPrim.getVertices().iterator();
 		while (iter.hasNext()){
 			V v = iter.next();
-			if (!Svertices.contains(v) && graph.vertexDegree(v) == 2){
+			if (!Svertices.contains(v) && gPrim.vertexDegree(v) == 2){
 				log.info("Deleting " + v);
-				List<E> edges = graph.adjacentEdges(v);
+				List<E> edges = gPrim.adjacentEdges(v);
 				E e1 = edges.get(0);
 				E e2 = edges.get(1);
 				log.info("removing " + e1);
@@ -174,34 +182,130 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				log.info("Creating " + newEdge);
 				gPrim.addEdge(newEdge);
 				deletedAdjacentMap.put(v,newEdge);
-				
 			}
 		}
-		
+
 		for (V v : deletedAdjacentMap.keySet()){
 			gPrim.removeVertex(v);
 		}
-		
-		
+
+
 		log.info("G': " + gPrim);
 		//step 2 - call Draw on (G', S, S*) to extend S* into a convex drawing of G'
 		draw(gPrim, S.getPath(), Svertices, ret);
 
 		//step 3 For each deleted vertex of degree 2 determine its position on the straight 
 		//line segment joining the two vertices adjacent to the vertex
-		//TODO what if both vertex and adjacent were delete
-		for (V v : deletedAdjacentMap.keySet()){
-//			V firstAdjacent = deletedAdjacentMap.get(v).getOrigin();
-//			V secondAdjacent = deletedAdjacentMap.get(v).getDestination();
-//			Point2D pos1 = ret.get(firstAdjacent);
-//			Point2D pos2 = ret.get(secondAdjacent);
-//			Point2D.Double pos = new Point2D.Double((pos1.getX() + pos2.getX())/2,
-//					(pos1.getY() + pos2.getY())/2);
-			ret.put(v, new Point2D.Double(0,0));
+
+		Set<V> deletedVertices = deletedAdjacentMap.keySet();
+		List<V> coveredVertices = new ArrayList<V>();
+
+		log.info("deleted vertices: " + deletedVertices);
+		
+		for (V v : deletedVertices){
+			
+			if (coveredVertices.contains(v))
+				continue;
+			
+			E addedEdge = deletedAdjacentMap.get(v);
+			V firstAdjacent = addedEdge.getOrigin();
+			V secondAdjacent = addedEdge.getDestination();
+			Point2D pos1 = ret.get(firstAdjacent);
+			Point2D pos2 = ret.get(secondAdjacent);
+			if (pos1 != null && pos2 != null){
+				//find deleted vertices on this line
+
+				List<E> adjacentEdges = graph.adjacentEdges(v);
+				E e1 = adjacentEdges.get(0);
+				E e2 = adjacentEdges.get(1);
+				V e1Next = e1.getOrigin() == v ? e1.getDestination() : e1.getOrigin();
+				V e2Next = e2.getOrigin() == v ? e2.getDestination() : e2.getOrigin();
+
+				if ((e1Next == firstAdjacent && e2Next == secondAdjacent) ||
+						(e2Next == firstAdjacent && e1Next == secondAdjacent)){
+					
+					//just one vertex between two known
+					
+					double xPos =  ret.get(e1Next).getX() + ((ret.get(e2Next).getX() - ret.get(e1Next).getX()) / 2);
+					double yPos =  ret.get(e1Next).getY() + ((ret.get(e2Next).getY() - ret.get(e1Next).getY()) / 2);
+					ret.put(v, new Point2D.Double(xPos, yPos));
+				}
+				else{
+
+					List<V> verticesOnLine = new ArrayList<V>();
+					verticesOnLine.add(v);
+
+					//in all probability, traversing e1 is enough as the
+					//vertex won't be somewhere in the middle, but directly 
+					//connected to one of the vertices whose positions are known
+					//keep both for now
+					//traverse e1
+					E currentE = e1;
+					int numberThroughE1 = 0;
+					while (e1Next != firstAdjacent && e1Next != secondAdjacent){
+						if (!verticesOnLine.contains(e1Next)){
+							verticesOnLine.add(e1Next);
+							numberThroughE1++;
+						}
+						List<E> currentAdjacent = graph.adjacentEdges(e1Next);
+						if (currentAdjacent.get(0) == currentE)
+							currentE = currentAdjacent.get(1);
+						else if (currentAdjacent.get(1) == currentE)
+							currentE = currentAdjacent.get(0);
+
+						e1Next = currentE.getOrigin() == e1Next ? currentE.getDestination() : currentE.getOrigin();
+					}
+					
+
+					//traverse e2
+					currentE = e2;
+					while (e2Next != firstAdjacent && e2Next != secondAdjacent){
+						if (!verticesOnLine.contains(e2Next))
+							verticesOnLine.add(e2Next);
+						
+						List<E> currentAdjacent = graph.adjacentEdges(e2Next);
+						if (currentAdjacent.get(0) == currentE)
+							currentE = currentAdjacent.get(1);
+						else if (currentAdjacent.get(1) == currentE)
+							currentE = currentAdjacent.get(0);
+
+						e2Next = currentE.getOrigin() == e2Next ? currentE.getDestination() : currentE.getOrigin();
+					}
+
+					log.info("vertices on line: " + verticesOnLine);
+					coveredVertices.addAll(verticesOnLine);
+					
+					int numberOfVerticesOnLine = verticesOnLine.size();
+					double incrementX = (ret.get(e2Next).getX() - ret.get(e1Next).getX()) / (numberOfVerticesOnLine + 1);
+					double incrementY = (ret.get(e2Next).getY() - ret.get(e1Next).getY()) / (numberOfVerticesOnLine + 1);
+					
+					Point2D currentPosition = ret.get(e1Next); //e1Next holds a vertex whose position is known
+					
+					 for (int i = numberThroughE1; i >= 0; i--){
+						 V currentV = verticesOnLine.get(i);
+						 Point2D position = new Point2D.Double(currentPosition.getX() + incrementX, currentPosition.getY() + incrementY);
+						 ret.put(currentV, position);
+						 currentPosition = position;
+					 }
+					 
+
+					 for (int i = numberThroughE1 + 1; i< numberOfVerticesOnLine; i++){
+						 V currentV = verticesOnLine.get(i);
+						 Point2D position = new Point2D.Double(currentPosition.getX() + incrementX, currentPosition.getY() + incrementY);
+						 ret.put(currentV, position);
+						 currentPosition = position;
+					 }
+				}
+
+			
+			}
+
 		}
+
 
 		return ret;
 	}
+
 
 	//when calling draw for the first time, positions should already 
 	//contain position of vertices on S
@@ -215,7 +319,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @param positions
 	 */
 	private void draw(Graph<V,E> G, List<E> S, List<V> Svertices, Map<V,Point2D> positions){
-		
+
 		log.info("Calling draw for " + G);
 
 		//if G has at most 3 vertices
@@ -225,7 +329,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		//select and arbitrary vertex of S* and let G' = G-v (remove v from G)
 		V v = arbitraryApex(Svertices);
-		
+
 		log.info("Selected arbitrary vertex " + v);
 
 		//find vertices v1 and vp+1 as vertices on S adjacent to v
@@ -238,19 +342,19 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		v1 = Svertices.get(Math.min(next, previous));
 		vp_1 = Svertices.get(Math.max(next, previous));
-		
+
 		log.info("Previous " + v1);
 		log.info("Next " + vp_1);
 
 		//remove v, determine which vertices are adjacent to it
-		
+
 		List<V> adjacentVertices = new ArrayList<V>();
 		adjacentVertices.addAll(G.adjacentVertices(v));
 		log.info("Adjacent vertices: " + adjacentVertices);
 		G.removeVertex(v);
 		log.info("Removed vertex " + v);
 		log.info(G);
-		
+
 
 		//divide the G into blocks and find cut vertices
 
@@ -269,7 +373,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//Vi is in Bi-1 and Bi
 		//vi , 2<=i<=p is a cut vertex if G'
 		V currentV = v1;
-		
+
 		//Step 2 - Draw each block bi convex
 
 		//Step 2.1 Determine Si*
@@ -288,7 +392,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		List<V> verticesOnS = new ArrayList<V>();
 		List<V> SiVerticesNotOnSAdjToV = new ArrayList<V>();
 		List<V> SiVerticesNotOnSNotAdjToV = new ArrayList<V>();
-		
+
 		while (blocks.size() > 0){
 			//find the block which contains the current vertex
 			Graph<V, E> foundBlock = null;
@@ -299,7 +403,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				}
 			blocks.remove(foundBlock);
 			log.info("Block " + foundBlock);
-			
+
 			//find the next vertex (the one both on S and in the block)
 			V otherVertex = null;
 			for (V sVertex : vis)
@@ -307,8 +411,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					otherVertex = sVertex;
 					break;
 				}
-			
-			
+
+
 			//now that the current block was determined
 			//find its extendable facial cycle
 			//for each Bi, Si is the union of Vi-Vi+1 path on S and on the block not counting edges of S
@@ -318,18 +422,18 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//it will later be used to calculate the positions of other vertices
 			//on Si and not on S
 			verticesOnS.clear();
-			
+
 			for (E e : foundBlock.getEdges())
 				if (S.contains(e)){
 					blockEdgesOnS.add(e);
 				}
 				else
 					otherBlockEdges.add(e);
-			
+
 			log.info("S: " + S);
 			log.info("Block edges on S: " + blockEdgesOnS);
 			log.info("Other block edges: " + otherBlockEdges);
-			
+
 			//TODO sta ako ne postoji putanja?
 			//da li se moze desiti ako je ok da ne postoji?
 			//ovo se desilo kada je tako proslo da nema cut vertex-a
@@ -339,14 +443,14 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				log.info("Other path: (from " + currentV + " to " + otherVertex + ": " + otherPath);
 				blockEdgesOnS.addAll(otherPath);
 			}
-			
+
 			//form Si and Si vertices, which will be used during the recursive call
-			
+
 			List<E> Si;
 			List<V> SiVertices;
-			
+
 			if (blockEdgesOnS.size() > 1){
-				
+
 				dijkstra.setEdges(blockEdgesOnS);
 				E first = blockEdgesOnS.get(0);
 				blockEdgesOnS.remove(0);
@@ -366,15 +470,15 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 						SiVertices.add(e.getDestination());
 				}
 			}
-			
-			
+
+
 			//we know positions of Si vertices which are on S
 			//it's now necessary to determine positions of those which are not
 			//for each such vertex, do the following:
 			//if it is adjacent to v (previously selected arbitrary apex)
 			//make it an apex of the polygon (for the block) and inside triangle v-vi-vi+1
 			//else, place it on a straight line segment
-			
+
 			SiVerticesNotOnSAdjToV.clear();
 			SiVerticesNotOnSNotAdjToV.clear();
 			for (E e : otherBlockEdges){
@@ -399,40 +503,40 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					}
 				}
 			}
-			
+
 			log.info("Vertices not on S adjacent to v " + SiVerticesNotOnSAdjToV);
 			log.info("Vertices not on S not adjacent to v " + SiVerticesNotOnSNotAdjToV);
-			
+
 			if (SiVerticesNotOnSAdjToV.size() > 0)
 				positionVerticesAsApices(currentV, otherVertex,v, positions, SiVerticesNotOnSAdjToV);
-			
+
 			List<V> apices = new ArrayList<V>();
 			for (V vert : SiVertices)
 				if (!SiVerticesNotOnSNotAdjToV.contains(vert))
 					apices.add(vert);	
-			
+
 			if (SiVerticesNotOnSNotAdjToV.size() > 0)
 				positionVerticesOnStraightLineSegments(apices, positions, SiVerticesNotOnSNotAdjToV);
-			
+
 			draw(foundBlock, Si, SiVertices, positions);
-			
+
 			vis.remove(otherVertex);
 			currentV = otherVertex;
-				
+
 		}
 	}
-	
+
 	private void positionVerticesAsApices(V vi, V vi_1, V v, Map<V,Point2D> positions, List<V> vertices){
 		//vertices should be apices of a polygon and should be placed inside the triangle whose
 		//apices are vi, vi_1 and v
 		Point2D viPoint = positions.get(vi);
 		Point2D vi_1Point = positions.get(vi_1);
 		Point2D vPoint = positions.get(v);
-		
+
 		log.info("viPoint " + viPoint);
 		log.info("vi_1Point " + vi_1Point);
 		log.info("vPoint " + vPoint);
-	
+
 		//second idea
 		//find centroid of the triangle
 		////place one vertex there
@@ -454,7 +558,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//intersection of the median containing the new centroid and that parallel line
 
 		int positionedVertices = 0;
-		
+
 		int currentIndex = 0;
 		V current;
 		Map<Integer, List<Triangle>> trianglesLevelsMap = new HashMap<Integer, List<Triangle>>();
@@ -463,7 +567,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		List<Triangle> levelOne = new ArrayList<Triangle>();
 		levelOne.add(t);
 		trianglesLevelsMap.put(1, levelOne);
-		
+
 		while (positionedVertices < vertices.size()){
 			current = vertices.get(currentIndex);
 			List<Triangle> triangles = trianglesLevelsMap.get(level);
@@ -487,17 +591,17 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//and vi+i, intersection 2, centroid
 			//try to establish some convention regarding which point will be a,b and c
 			//use that to generalize division and creation of new triangles
-			
+
 			Line parallelTo = Calc.lineThroughTwoPoints(t.getA(), t.getB());
 			Line parallelLine = Calc.parallelLineThroughPoint(parallelTo, centroid);
 			List<Triangle> nextLevelTriangls = trianglesLevelsMap.get(level + 1);
 			Triangle t1, t2;
-			
+
 			if (nextLevelTriangls == null){
 				nextLevelTriangls = new ArrayList<Triangle>();
 				trianglesLevelsMap.put(level + 1, nextLevelTriangls);
 			}
-			
+
 			if (level == 1){
 				Line l1 = Calc.lineThroughTwoPoints(t.getA(), t.getC()); //vi and v
 				Point2D intersection1 = Calc.intersectionOfLines(l1, parallelLine);
@@ -507,16 +611,16 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				t2 = new Triangle(t.getB(), intersection2, centroid);
 			}
 			else{
-				
+
 				//TODO proveriti izbor temena
-				
+
 				//for the side which has two points on the parallel line
 				//take the new point as the intersection with the median
 				//with that line, new centroid, old centroid
 				//for the other one, draw new parallel line
 				//form the triangle taking intersection with the appropriate triangle side
 				//one old vertex and new centroid
-				
+
 				//each triangle should be formed in the way such that
 				//b and c are on the same parallel line
 				//a is the remaining apex
@@ -524,18 +628,18 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				Line median = Calc.lineThroughTwoPoints(t.getA(), centroid);
 				Point2D intersection1 = Calc.intersectionOfLines(parallelSide, median);
 				t1 = new Triangle(centroid, intersection1, t.getC());
-				
+
 				//the side that doesn't have C 
 				Line intersectionSide = Calc.lineThroughTwoPoints(t.getA(), t.getB());
 				Point2D intersection = Calc.intersectionOfLines(parallelLine, intersectionSide);
 				t2 = new Triangle(t.getA(), intersection, centroid);
 			}
-		
+
 			nextLevelTriangls.add(t1);
 			nextLevelTriangls.add(t2);
 		}
 	}
-	
+
 	private void positionVerticesOnStraightLineSegments(List<V> apices, Map<V,Point2D> positions, List<V> vertices){
 		//position vertices on straight line segments
 		//TODO
@@ -576,7 +680,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		else if (criticalSeparationPairs.size() == 1){
 			//set S based on figure 4 from Chibba's paper
 			//finds those seven possible cycles
-			//the extendable facial cycle should contain two vertices belonging to the separation pairs
+			//the extendable facial cycle should contain the two vertices belonging to the separation pairs
 			//it should be a cycle
 			//there are either two or three split components of that pair
 			//two triconnected graphs
@@ -930,7 +1034,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		Path<V,E> result = dijkstra.getPath(first.getDestination(), first.getOrigin());
 		List<E> resultingEdges = result.getPath();
 		result.addEdge(first, EdgeDirection.TO_DESTINATION);
-		log.info("Resulting path edgees" + resultingEdges);
+		log.info("Resulting path edges" + resultingEdges);
 
 		//face.addAll(result.pathVertices());
 		//log.info("Face " + face);
