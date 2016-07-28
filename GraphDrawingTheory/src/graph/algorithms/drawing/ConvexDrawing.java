@@ -1,5 +1,19 @@
 package graph.algorithms.drawing;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Edge;
@@ -17,21 +31,8 @@ import graph.properties.components.SplitTriconnectedComponentType;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.traversal.DijkstraAlgorithm;
+import graph.traversal.TraversalUtil;
 import graph.util.Util;
-
-import java.awt.Point;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
 
 public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
@@ -423,12 +424,20 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//on Si and not on S
 			verticesOnS.clear();
 
-			for (E e : foundBlock.getEdges())
-				if (S.contains(e)){
+			for (E e : foundBlock.getEdges()){
+				if (S.contains(e))
 					blockEdgesOnS.add(e);
-				}
 				else
 					otherBlockEdges.add(e);
+				if (S.contains(e.getDestination()))
+					verticesOnS.add(e.getDestination());
+				if (S.contains(e.getOrigin()))
+					verticesOnS.add(e.getOrigin());
+				
+			}
+			
+			verticesOnS.remove(currentV);
+			verticesOnS.remove(otherVertex);
 
 			log.info("S: " + S);
 			log.info("Block edges on S: " + blockEdgesOnS);
@@ -439,7 +448,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//ovo se desilo kada je tako proslo da nema cut vertex-a
 			if (otherBlockEdges.size() > 0){
 				dijkstra.setEdges(otherBlockEdges);
-				List<E> otherPath = dijkstra.getPath(currentV, otherVertex).getPath();
+				//exclude vertices on S in the block 
+				List<E> otherPath = dijkstra.getPath(currentV, otherVertex, verticesOnS).getPath();
 				log.info("Other path: (from " + currentV + " to " + otherVertex + ": " + otherPath);
 				blockEdgesOnS.addAll(otherPath);
 			}
@@ -517,8 +527,13 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 			if (SiVerticesNotOnSNotAdjToV.size() > 0)
 				positionVerticesOnStraightLineSegments(apices, positions, SiVerticesNotOnSNotAdjToV);
-
-			draw(foundBlock, Si, SiVertices, positions);
+			
+			
+			log.info("Si " + SiVertices);
+			
+			//don't call draw if all vertices have been positioned
+			if (SiVertices.size() != foundBlock.getVertices().size())
+				draw(foundBlock, Si, SiVertices, positions);
 
 			vis.remove(otherVertex);
 			currentV = otherVertex;
@@ -765,6 +780,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//test if G2 is planar
 			//if it isn't, G doesn't have a convex drawing
 			//otherwise set S as v-cycle of planar graph G2  ? 
+			//G1 is created in the following way:
+			//for each critical separation pair {x,y} of G
+			//is (x,y) in E, delete edge (x,y) from G
+			//if exactly one {X,y} split component is a ring
+			//delete the x-y path in the component from G
+			
 			log.info("Creating graph G1");
 			Graph<V, E> G1 = Util.copyGraph(graph);
 
@@ -772,6 +793,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			int index = -1;
 
 			for (E criticalSeparationPair : criticalSeparationPairs){
+				
+				//System.out.println("separation pair " + criticalSeparationPair);
 				V x = criticalSeparationPair.getOrigin();
 				V y = criticalSeparationPair.getDestination();
 
@@ -801,6 +824,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 					int ringsCount = 0;
 					HopcroftTarjanSplitComponent<V, E> ring = null;
 					for (HopcroftTarjanSplitComponent<V, E> splitComponent : pairComponents){
+						//System.out.println(splitComponent);
 						if (splitComponent.getType() == SplitTriconnectedComponentType.RING){
 							ring = splitComponent;
 							ringsCount ++;
@@ -830,6 +854,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			Graph<V,E> G2 = G1;
 			log.info("Creating graph G2");
 			V v = Util.createVertex(vertexClass);
+			v.setContent("v");
 			G2.addVertex(v);
 
 			//if one vertex belongs to two or more separation pairs, only create one edge between it and v
@@ -856,7 +881,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//The main idea here is based on the second condition
 			//For each {x,y} critical separation pair there exists at most one component having no edges in S
 			//that component is either a bond (if (x,y) in E or a ring otherwise
-			//S should contain of critical separation pair vertices
+			//S should contain all of the critical separation pair vertices
 			//If {x,y} is a critical separation pair, it has either 2 {x,y} split component which are triconnected graphs
 			//or 3 split components including a bond or a ring
 
@@ -881,7 +906,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			List<List<E>> optionalPaths = new ArrayList<List<E>>();
 			int simpleComponentsAdded;
 
-			//used later to find path between critical separation pair vertices
+			//used later to find a path between critical separation pair vertices
 			//for optimization
 			int size = indexedCriticalSeparationPairVertices.size();
 			boolean[][] criticalSeparationPairsConnectivity = new boolean[size][size];
@@ -933,14 +958,20 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 							optionalPaths.add(searchEdges);
 						}
 						else if (splitComponent.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH){
-							dijkstra.setEdges(searchEdges);
-							List<E> path = dijkstra.getPath(v1, v2).getPath();
+							//it is necessary to find a planar embedding here
+							//not just any path
+							//find a cycle containing v1 and v2
+							//using dfs
+							System.out.println("DFS!!!!!!!!");
+							List<E> path = TraversalUtil.circularNoCrossingsPath(v1, v2, splitComponent.adjacencyMap(), false);
+							//dijkstra.setEdges(searchEdges);
+							//List<E> path = dijkstra.getPath(v1, v2).getPath();
 							pathEdges.addAll(path);
 							log.info("Adding path edges: " + path);
 							simpleComponentsAdded++;
 						}
 
-						//remove the edges, they will either be added to path or discarded (won't be in the resulting facial cycle
+						//remove the edges, they will either be added to the path or discarded (won't be in the resulting facial cycle)
 						for (E e : splitComponent.getEdges()){
 							if (e != criticalPair)
 								graphEdges.remove(e);

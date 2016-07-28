@@ -46,13 +46,16 @@ public class GraphVertex extends GraphElement implements Vertex{
 		this.size = size;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
-	}
 
 	@Override
 	public String toString() {
 		return content;
+	}
+
+	@Override
+	public void setContent(Object content) {
+		this.content = (String) content;
+		
 	}
 
 }

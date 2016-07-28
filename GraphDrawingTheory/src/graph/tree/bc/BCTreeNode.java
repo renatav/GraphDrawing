@@ -30,4 +30,16 @@ public class BCTreeNode implements Vertex {
 		return "BCTreeNode [" + content + "]";
 	}
 
+	@Override
+	public void setSize(Dimension size) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setContent(Object content) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

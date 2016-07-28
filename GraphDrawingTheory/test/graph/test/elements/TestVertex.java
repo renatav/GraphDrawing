@@ -73,5 +73,12 @@ public class TestVertex implements Vertex{
 	}
 
 
+	@Override
+	public void setContent(Object content) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

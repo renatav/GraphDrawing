@@ -1,10 +1,12 @@
 package graph.properties.components;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import graph.elements.Edge;
 import graph.elements.Vertex;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> extends Component<V,E>{
 
@@ -47,6 +49,31 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 	public HopcroftTarjanSplitComponent(SplitTriconnectedComponentType type, List<E> edges) {
 		super(edges);
 		this.type = type;
+	}
+	
+	public Map<V,List<E>> adjacencyMap(){
+		Map<V,List<E>> ret = new HashMap<V,List<E>>();
+		for (E e : edges){
+			if (virtualEdges.contains(e))
+				continue;
+			List<E> list;
+			if (!ret.containsKey(e.getOrigin())){
+				list = new ArrayList<E>();
+				ret.put(e.getOrigin(), list);
+			}
+			else
+				list = ret.get(e.getOrigin());
+			list.add(e);
+			
+			if (!ret.containsKey(e.getDestination())){
+				list = new ArrayList<E>();
+				ret.put(e.getDestination(), list);
+			}
+			else
+				list = ret.get(e.getDestination());
+			list.add(e);
+		}
+		return ret;
 	}
 	
 	public void setVertices(){

@@ -9,5 +9,9 @@ public interface Vertex {
 	
 	Object getContent();
 	
+	void setSize(Dimension size);
+	
+	void setContent(Object content);
+	
 
 }

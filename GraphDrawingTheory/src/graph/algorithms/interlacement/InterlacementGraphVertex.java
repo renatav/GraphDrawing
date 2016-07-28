@@ -31,6 +31,18 @@ public class InterlacementGraphVertex<V extends Vertex,E extends Edge<V>> implem
 		return "InterlacementGraphVertex [content=" + content + "]";
 	}
 
+	@Override
+	public void setSize(Dimension size) {
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void setContent(Object content) {
+		this.content = (Path<V, E>) content;
+		
+	}
+
 	
 
 }
