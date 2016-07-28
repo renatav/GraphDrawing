@@ -24,7 +24,7 @@ public class TraversalUtil{
 	 * @param debug Indicator if debug information should be shown
 	 * @return Path from v1 to v2
 	 */
-	public static <V extends Vertex,E extends Edge<V>> List<E> circularNoCrossingsPath(V v1, V v2, Map<V,List<E>> adj, boolean debug){
+	public static <V extends Vertex,E extends Edge<V>> List<E> circularNoCrossingsPath(V v1, V v2, Map<V,List<E>> adj, boolean debug, List<V> excluding, List<E> excludingEdges){
 		//The basic idea is to follow a path, keeping a record of which edges joining one vertex of the path to some other ones
 		//which are not on the path. Test if some of them overlap. If they do, go back and try some other path
 		//"back edge" here is called an edge connecting a vertex of the path to some other vertex of the path
@@ -32,12 +32,13 @@ public class TraversalUtil{
 		//If there are two such edges where one starts "above" the start of the other one and ends "above" the end
 		//of the other one - not planar
 		//If a vertex between two vertices of a "back edge" is connected to a vertex not on the path - not planar
-		
-		
+
+
 		List<E> ret = new ArrayList<E>();
 		Map<V, Integer> indexesMap = new HashMap<V, Integer>();
 		Map<Integer, V> inverseIndexesMap = new HashMap<Integer, V>();
 		Map<E, V> otherEdges = new HashMap<E, V>();
+		List<E> testList = new ArrayList<E>();
 
 		Map<V, List<E>> edgesToTryForVertex = new HashMap<V, List<E>>();
 
@@ -48,8 +49,31 @@ public class TraversalUtil{
 		edgesToTryForVertex.put(v1, firstVertexEdges);
 		indexesMap.put(v1, 0);
 		inverseIndexesMap.put(0,v1);
+
+
+		//ignore edges in excludingEdges list
+		//and those where start or destination is a member of excluding vertices
+		
+		if (excluding != null && excluding.size() > 0){
+			testList.clear();
+			testList.addAll(firstVertexEdges);
+			
+			for (int i = 0; i < firstVertexEdges.size(); i++){
+				E edge = firstVertexEdges.get(i);
+				if (excludingEdges != null && excludingEdges.contains(edge))
+					continue;
+				V other = edge.getOrigin() == v1 ? edge.getDestination() : edge.getOrigin();
+				if (excluding.contains(other))
+					continue;
+				testList.add(edge);
+			}
+			firstVertexEdges.clear();
+			firstVertexEdges.addAll(testList);
+		}
+
+
 		E currentEdge = adj.get(v1).get(0);
-		edgesToTryForVertex.get(v1).remove(0);
+		firstVertexEdges.remove(0);
 		ret.add(currentEdge);
 
 		for (E e : firstVertexEdges)
@@ -60,7 +84,12 @@ public class TraversalUtil{
 
 		while (!found){
 
-			V current = indexesMap.containsKey(currentEdge.getOrigin()) ? currentEdge.getDestination() : currentEdge.getOrigin(); 
+			V current = indexesMap.containsKey(currentEdge.getOrigin()) ? currentEdge.getDestination() : currentEdge.getOrigin();
+
+			//could happen if there is just one edge
+			if (current == v2)
+				break;
+
 			indexesMap.put(current, currentIndex);
 			inverseIndexesMap.put(currentIndex, current);
 
@@ -145,7 +174,7 @@ public class TraversalUtil{
 			if (conflict || edgesToTry.size() == 0){
 				//the current embedding is not OK
 				E lastEdge = ret.get(ret.size() - 1);
-				
+
 				//remove the last entry from everything
 				//see where to start the next path
 
@@ -161,7 +190,7 @@ public class TraversalUtil{
 					V v = inverseIndexesMap.get(index);
 					if (debug)
 						System.out.println("current v " + v + " of index " + index);
-					
+
 					lastEdge = ret.get(ret.size() - 1);
 					ret.remove(ret.size() - 1);
 
@@ -217,6 +246,26 @@ public class TraversalUtil{
 					//the edges which are connecting the vertex to another vertex already 
 					//on the path should not be considered as the next ones
 					//pick the first one as the next, add others to to try category
+
+
+
+					if (excluding != null && excluding.size() > 0){
+						testList.clear();
+						testList.addAll(edgesToTry);
+						for (int i = 0; i < edgesToTry.size(); i++){
+							E edge = firstVertexEdges.get(i);
+							if (excludingEdges != null && excludingEdges.contains(edge))
+								continue;
+							V other = edge.getOrigin() == v1 ? edge.getDestination() : edge.getOrigin();
+							if (excluding.contains(other))
+								continue;
+							testList.add(edge);
+						}
+						edgesToTry.clear();
+						edgesToTry.addAll(testList);
+					}
+
+
 					currentEdge = edgesToTry.get(0);
 					edgesToTry.remove(0);
 					otherEdges.remove(currentEdge);

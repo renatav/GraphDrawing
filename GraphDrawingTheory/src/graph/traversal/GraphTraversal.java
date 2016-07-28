@@ -1,16 +1,15 @@
 package graph.traversal;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+
 import graph.elements.Edge;
 import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Path;
 import graph.elements.Vertex;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
 
 /**
  * Contains methods which implement certain graph traversal algorithms
@@ -82,7 +81,7 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 				return;
 			}
 		}
-		LinkedList<E> edges;
+		List<E> edges;
 		if (graph.isDirected())
 			edges = graph.outEdges(currentVertex);
 		else
@@ -132,7 +131,7 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 		Stack<List<EdgeDirection>> directionsStack = new Stack<List<EdgeDirection>>();
 
 
-		LinkedList<E> edges;
+		List	<E> edges;
 		if (graph.isDirected())
 			edges = graph.outEdges(start);
 		else

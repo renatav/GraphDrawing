@@ -205,7 +205,7 @@ public class JohnsonSimpleCycles<V extends Vertex, E extends Edge<V>>{
         path.push(vertex);
         pathSet.add(vertex);
 
-        LinkedList<E> edges = graph.outEdges(vertex);
+        List<E> edges = graph.outEdges(vertex);
         for (E e : edges) {
             V successor = e.getDestination();
             int successorIndex = toI(successor);

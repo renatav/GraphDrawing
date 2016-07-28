@@ -449,7 +449,20 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			if (otherBlockEdges.size() > 0){
 				dijkstra.setEdges(otherBlockEdges);
 				//exclude vertices on S in the block 
-				List<E> otherPath = dijkstra.getPath(currentV, otherVertex, verticesOnS).getPath();
+				//List<E> otherPath = dijkstra.getPath(currentV, otherVertex, verticesOnS).getPath();
+				//we need to find a path from the two vertices on the facial cycle
+				//but no edges from the cycle should be on it
+				//and there should be no edges between a vertex on the path
+				//and a vertex on the facial cycle
+				//not counting the two cut vertices
+			
+				//set adjacent in such way that those edges connecting a vertex to a vertex on S are given priority
+				//as long as they are not in the block
+				//skip edges on S that are in the block and those which connect a vertex to an edge
+				//in the block and on S
+				Map<V,List<E>> blockAdjacency = prepareAdjacencyLists(currentV, otherVertex, foundBlock, Svertices, blockEdgesOnS);
+				
+				List<E> otherPath = TraversalUtil.circularNoCrossingsPath(currentV, otherVertex, foundBlock.getAdjacentLists(), true, verticesOnS, blockEdgesOnS);
 				log.info("Other path: (from " + currentV + " to " + otherVertex + ": " + otherPath);
 				blockEdgesOnS.addAll(otherPath);
 			}
@@ -540,6 +553,33 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 		}
 	}
+
+	/**
+	 * Prepares the adjacency lists map to be used to determine the face cycle of a block
+	 * The path should connect v1 and v2
+	 * @param v1
+	 * @param v2
+	 * @param foundBlock
+	 * @param svertices
+	 * @param blockEdgesOnS
+	 * @return
+	 */
+	private Map<V, List<E>> prepareAdjacencyLists(V v1, V v2, Graph<V, E> foundBlock, List<V> sVertices,
+			List<E> blockEdgesOnS) {
+		
+		//organize adjacency list so that edges between a vertex and vertices on S (not on block) 
+		//are given priority
+		
+		List<E> vertexAdj = new ArrayList<E>();
+		for (V v : foundBlock.getVertices()){
+			
+		}
+		
+		
+		
+		return null;
+	}
+
 
 	private void positionVerticesAsApices(V vi, V vi_1, V v, Map<V,Point2D> positions, List<V> vertices){
 		//vertices should be apices of a polygon and should be placed inside the triangle whose
@@ -963,7 +1003,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 							//find a cycle containing v1 and v2
 							//using dfs
 							System.out.println("DFS!!!!!!!!");
-							List<E> path = TraversalUtil.circularNoCrossingsPath(v1, v2, splitComponent.adjacencyMap(), false);
+							List<E> path = TraversalUtil.circularNoCrossingsPath(v1, v2, splitComponent.adjacencyMap(), false, null, null);
 							//dijkstra.setEdges(searchEdges);
 							//List<E> path = dijkstra.getPath(v1, v2).getPath();
 							pathEdges.addAll(path);

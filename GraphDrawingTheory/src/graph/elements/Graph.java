@@ -33,7 +33,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	/**
 	 * An adjacent list contains a list of all the edges leaving the vertex
 	 */
-	protected Map<V, LinkedList<E>> adjacentLists;
+	protected Map<V, List<E>> adjacentLists;
 
 	/**
 	 * Vertex by content map
@@ -43,7 +43,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public Graph(){
 		vertices = new ArrayList<V>();
 		edges = new ArrayList<E>();
-		adjacentLists = new HashMap<V, LinkedList<E>>();
+		adjacentLists = new HashMap<V, List<E>>();
 		vertexByContentMap = new HashMap<Object,V>();
 		properties = new GraphProperties<V, E>(this);
 	}
@@ -192,7 +192,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @param v
 	 * @return
 	 */
-	public LinkedList<E> outEdges(V v){
+	public List<E> outEdges(V v){
 		return adjacentLists.get(v);
 	}
 
@@ -558,7 +558,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	/**
 	 * @return the adjacentLists
 	 */
-	public Map<V, LinkedList<E>> getAdjacentLists() {
+	public Map<V, List<E>> getAdjacentLists() {
 		return adjacentLists;
 	}
 

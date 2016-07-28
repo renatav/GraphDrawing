@@ -1,13 +1,12 @@
 package graph.traversal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.trees.DFSTree;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class DFSTreeTraversal<V extends Vertex, E extends Edge<V>> {
 	
@@ -47,7 +46,7 @@ public class DFSTreeTraversal<V extends Vertex, E extends Edge<V>> {
 			tree.addTreeEdge(currentEdge);
 		}
 		
-		LinkedList<E> edges;
+		List<E> edges;
 		if (graph.isDirected())
 			edges = graph.outEdges(current);
 		else
