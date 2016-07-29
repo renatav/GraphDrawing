@@ -443,9 +443,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			log.info("Block edges on S: " + blockEdgesOnS);
 			log.info("Other block edges: " + otherBlockEdges);
 
-			//TODO sta ako ne postoji putanja?
-			//da li se moze desiti ako je ok da ne postoji?
-			//ovo se desilo kada je tako proslo da nema cut vertex-a
+
 			if (otherBlockEdges.size() > 0){
 				dijkstra.setEdges(otherBlockEdges);
 				//exclude vertices on S in the block 
@@ -570,12 +568,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//organize adjacency list so that edges between a vertex and vertices on S (not on block) 
 		//are given priority
 		
-		log.info("ordering adjacency lists");
+		//log.info("ordering adjacency lists");
 		List<V> blockVertices = block.getVertices();
 		
 		List<E> vertexAdj = new ArrayList<E>();
 		for (V v : block.getVertices()){
-			log.info("V: " + v);
+			//log.info("V: " + v);
 			vertexAdj.clear();
 			for (E e : block.adjacentEdges(v)){
 				if (blockEdgesOnS.contains(e))
@@ -599,7 +597,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 			
-			log.info(vertexAdj);
+			//log.info(vertexAdj);
 			block.adjacentEdges(v).clear();
 			block.adjacentEdges(v).addAll(vertexAdj);
 		}
@@ -614,6 +612,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		Point2D vi_1Point = positions.get(vi_1);
 		Point2D vPoint = positions.get(v);
 
+		log.info("positioning apices");
 		log.info("viPoint " + viPoint);
 		log.info("vi_1Point " + vi_1Point);
 		log.info("vPoint " + vPoint);
@@ -724,6 +723,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	private void positionVerticesOnStraightLineSegments(List<V> apices, Map<V,Point2D> positions, List<V> vertices){
 		//position vertices on straight line segments
 		//TODO
+		
+		log.info("Should position on straight line segments: " + vertices);
 	}
 
 

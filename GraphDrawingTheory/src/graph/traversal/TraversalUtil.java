@@ -255,7 +255,7 @@ public class TraversalUtil{
 						testList.clear();
 						testList.addAll(edgesToTry);
 						for (int i = 0; i < edgesToTry.size(); i++){
-							E edge = firstVertexEdges.get(i);
+							E edge = edgesToTry.get(i);
 							if (excludingEdges != null && excludingEdges.contains(edge))
 								continue;
 							V other = edge.getOrigin() == v1 ? edge.getDestination() : edge.getOrigin();
