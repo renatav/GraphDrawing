@@ -460,9 +460,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 				//as long as they are not in the block
 				//skip edges on S that are in the block and those which connect a vertex to an edge
 				//in the block and on S
-				Map<V,List<E>> blockAdjacency = prepareAdjacencyLists(currentV, otherVertex, foundBlock, Svertices, blockEdgesOnS);
+				prepareAdjacencyLists(currentV, otherVertex, foundBlock, graph, Svertices, blockEdgesOnS);
 				
-				List<E> otherPath = TraversalUtil.circularNoCrossingsPath(currentV, otherVertex, foundBlock.getAdjacentLists(), true, verticesOnS, blockEdgesOnS);
+				List<E> otherPath = TraversalUtil.circularNoCrossingsPath(currentV, otherVertex, foundBlock.getAdjacentLists(), true, Svertices, blockEdgesOnS);
 				log.info("Other path: (from " + currentV + " to " + otherVertex + ": " + otherPath);
 				blockEdgesOnS.addAll(otherPath);
 			}
@@ -564,20 +564,46 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @param blockEdgesOnS
 	 * @return
 	 */
-	private Map<V, List<E>> prepareAdjacencyLists(V v1, V v2, Graph<V, E> foundBlock, List<V> sVertices,
+	private void prepareAdjacencyLists(V v1, V v2, Graph<V, E> block, Graph<V,E> graph, List<V> sVertices,
 			List<E> blockEdgesOnS) {
 		
 		//organize adjacency list so that edges between a vertex and vertices on S (not on block) 
 		//are given priority
 		
+		log.info("ordering adjacency lists");
+		List<V> blockVertices = block.getVertices();
+		
 		List<E> vertexAdj = new ArrayList<E>();
-		for (V v : foundBlock.getVertices()){
+		for (V v : block.getVertices()){
+			log.info("V: " + v);
+			vertexAdj.clear();
+			for (E e : block.adjacentEdges(v)){
+				if (blockEdgesOnS.contains(e))
+					vertexAdj.add(e);
+				else{
+					V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
+					//see if this vertex is connected to some vertex of the facial cycle
+					//which isn't in the block
+					boolean connectedToFacialvertex = false;
+					for (E e1 : graph.adjacentEdges(w)){
+						V other = e1.getOrigin() == w ? e1.getDestination() : e1.getOrigin();
+						if (sVertices.contains(other) && !blockVertices.contains(other)){
+							connectedToFacialvertex = true;
+							break;
+						}
+					}
+					if (connectedToFacialvertex)
+						vertexAdj.add(0, e);
+					else
+						vertexAdj.add(e);
+				}
+			}
 			
+			log.info(vertexAdj);
+			block.adjacentEdges(v).clear();
+			block.adjacentEdges(v).addAll(vertexAdj);
 		}
 		
-		
-		
-		return null;
 	}
 
 

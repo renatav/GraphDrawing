@@ -34,6 +34,9 @@ public class TraversalUtil{
 		//If a vertex between two vertices of a "back edge" is connected to a vertex not on the path - not planar
 
 
+		System.out.println("Excluding vertices: " + excluding);
+		System.out.println("Excluding edges: " + excludingEdges);
+		
 		List<E> ret = new ArrayList<E>();
 		Map<V, Integer> indexesMap = new HashMap<V, Integer>();
 		Map<Integer, V> inverseIndexesMap = new HashMap<Integer, V>();
@@ -72,23 +75,22 @@ public class TraversalUtil{
 		}
 
 
-		E currentEdge = adj.get(v1).get(0);
+		E currentEdge = firstVertexEdges.get(0);
 		firstVertexEdges.remove(0);
 		ret.add(currentEdge);
 
 		for (E e : firstVertexEdges)
 			otherEdges.put(e, v1);
 
-		boolean found = false;
+		V firstVertex = currentEdge.getOrigin() == v1 ? currentEdge.getDestination() : currentEdge.getOrigin();
+		
+		boolean found = firstVertex == v2;
+		
 		int currentIndex = 1;
 
 		while (!found){
 
 			V current = indexesMap.containsKey(currentEdge.getOrigin()) ? currentEdge.getDestination() : currentEdge.getOrigin();
-
-			//could happen if there is just one edge
-			if (current == v2)
-				break;
 
 			indexesMap.put(current, currentIndex);
 			inverseIndexesMap.put(currentIndex, current);
@@ -171,7 +173,7 @@ public class TraversalUtil{
 			if (edgesToTry.size() == 0 && currentIndex == 0)
 				return null;
 
-			if (conflict || edgesToTry.size() == 0){
+			if (conflict || (edgesToTry.size() == 0 && current != v2)){
 				//the current embedding is not OK
 				E lastEdge = ret.get(ret.size() - 1);
 
