@@ -33,9 +33,16 @@ public class TraversalUtil{
 		//of the other one - not planar
 		//If a vertex between two vertices of a "back edge" is connected to a vertex not on the path - not planar
 
-
-		System.out.println("Excluding vertices: " + excluding);
-		System.out.println("Excluding edges: " + excludingEdges);
+		if (debug){
+			System.out.println("Excluding vertices: " + excluding);
+			System.out.println("Excluding edges: " + excludingEdges);
+			System.out.println("from " + v1 + " to " + v2);
+		}
+		
+		if (excluding != null){
+			excluding.remove(v1);
+			excluding.remove(v2);
+		}
 		
 		List<E> ret = new ArrayList<E>();
 		Map<V, Integer> indexesMap = new HashMap<V, Integer>();
@@ -59,7 +66,6 @@ public class TraversalUtil{
 		
 		if (excluding != null && excluding.size() > 0){
 			testList.clear();
-			testList.addAll(firstVertexEdges);
 			
 			for (int i = 0; i < firstVertexEdges.size(); i++){
 				E edge = firstVertexEdges.get(i);
@@ -74,6 +80,8 @@ public class TraversalUtil{
 			firstVertexEdges.addAll(testList);
 		}
 
+		
+		System.out.println("first vertex edges: " + firstVertexEdges);
 
 		E currentEdge = firstVertexEdges.get(0);
 		firstVertexEdges.remove(0);
@@ -249,16 +257,13 @@ public class TraversalUtil{
 					//on the path should not be considered as the next ones
 					//pick the first one as the next, add others to to try category
 
-
-
 					if (excluding != null && excluding.size() > 0){
 						testList.clear();
-						testList.addAll(edgesToTry);
 						for (int i = 0; i < edgesToTry.size(); i++){
 							E edge = edgesToTry.get(i);
 							if (excludingEdges != null && excludingEdges.contains(edge))
 								continue;
-							V other = edge.getOrigin() == v1 ? edge.getDestination() : edge.getOrigin();
+							V other = edge.getOrigin() == current ? edge.getDestination() : edge.getOrigin();
 							if (excluding.contains(other))
 								continue;
 							testList.add(edge);
