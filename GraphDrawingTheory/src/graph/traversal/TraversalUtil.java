@@ -52,7 +52,7 @@ public class TraversalUtil{
 		Map<Integer, V> inverseIndexesMap = new HashMap<Integer, V>();
 		List<E> testList = new ArrayList<E>();
 
-		Map<V, List<V>> connectedOnThePath = new HashMap<V, List<V>>();
+		Map<V, List<List<V>>> connectedOnThePath = new HashMap<V, List<List<V>>>();
 
 		Map<V, List<E>> edgesToTryForVertex = new HashMap<V, List<E>>();
 
@@ -124,37 +124,82 @@ public class TraversalUtil{
 
 			boolean conflict = false;
 
-			List<V> connectedPathVertices = connectedWith(current, indexesMap.keySet(), ret, adj, debug, excludingEdges, excluding);
-			System.out.println("Connected path vertices: " + connectedPathVertices);
+			//these paths could later contain edges and vertices that are placed on the path
+			//so that should be checked
+			List<List<V>> connectedPathVertices = connectedWith(current, indexesMap.keySet(), ret, adj, excludingEdges, excluding, debug);
 
 			if (connectedPathVertices.size() > 0){
 				//the keys will be vertices which have higher indexes
 				connectedOnThePath.put(current,  connectedPathVertices);
-				//check for conflicts
 
+
+				//check for conflicts
 				int higher = currentIndex;
 
-				for (V connectedVertex : connectedPathVertices){
-					int lower = indexesMap.get(connectedVertex);
+				for (List<V> connectedPath : connectedPathVertices){
+					
+					//connected path is "fresh"
+					//just calculated
+					//so there is no way that there are some path edges and vertices on it
+					
+					V last = connectedPath.get(connectedPath.size() - 1);
+					int lower = indexesMap.get(last);
 					//vertices between the two connected
 					for (int index = higher - 1; index > lower; index--){
 						V vertexBetween = inverseIndexesMap.get(index);
+
+						//check if vertex between is connected to some vertex belonging to the excluded list
+						if (excluding != null && excluding.size() > 0)
+							if (pathBetween(vertexBetween, excluding, adj, ret, indexesMap.keySet())){
+								conflict = true;
+								break;
+							}
+
 						if (connectedOnThePath.containsKey(vertexBetween))
-							for (V otherEnd : connectedOnThePath.get(vertexBetween)){
+							for (List<V> otherPath : connectedOnThePath.get(vertexBetween)){
+								//other path might not be "fresh"
+								//it could contain so edges that were added to the path
+								//after it was calculated
+								//so, check that
+								//it wouldn't be optimal to find the paths again
+								//just check these for obsolete ones
+								V otherEnd = otherPath.get(otherPath.size() - 1);
 								int otherEndIndex = indexesMap.get(otherEnd);
 								if (otherEndIndex < lower){
+									//check if the path between the vertices
+									//calculated in some earlier step
+									//contains a vertex that is now on the path
+									
 									if (debug)
 										System.out.println("Possible conflict with path " + vertexBetween + " " + otherEnd);
-									
+
 									//there still might not be a conflict
 									//if there is a vertex that the paths have in common
 									//than they are not in conflict
 									//try to find such vertex
 									//there also be more paths between the two vertices
 									//so while some might not cause the conflict, others might
+
+									//TODO ovo treba jos proveriti i osmisliti
+
+									boolean containsSame = false;
+									boolean obsoletePath = false;
+									for (int i = 1; i < connectedPath.size() - 1; i++){
+										if (indexesMap.containsKey(connectedPath.get(i))){
+											obsoletePath = true;
+											break;
+										}
+										if (otherPath.contains(connectedPath.get(i))){
+											containsSame = true;
+										}
+									}
+
+									if (obsoletePath)
+										continue;
 									
-									conflict = true;
-									break;
+									conflict = !containsSame;
+									if (conflict)
+										break;
 								}
 							}
 						if (conflict)
@@ -170,9 +215,9 @@ public class TraversalUtil{
 
 				if (ret.contains(e))
 					continue;
-				
+
 				V w = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
-				
+
 				if (!indexesMap.containsKey(w))
 					edgesToTry.add(e);
 			} 
@@ -228,7 +273,7 @@ public class TraversalUtil{
 						indexesMap.remove(v);
 						inverseIndexesMap.remove(index);
 						connectedOnThePath.remove(v);
-						
+
 						index--;
 						if (index < 0)
 							break;
@@ -284,63 +329,123 @@ public class TraversalUtil{
 		return ret;
 	}
 
-	private static<V extends Vertex, E extends Edge<V>> List<V> connectedWith (V v, Set<V> pathVertices, List<E> pathEdges, 
-			Map<V,List<E>> adjacency, boolean debug, List<E> excludingEdges, List<V> excludingVertices){
 
-//		if (debug){
-//			System.out.println("finding path vertices to which the current vertex is connected");
-//			System.out.println("start vertex: " + v);
-//			System.out.println("path vertices " + pathVertices);
-//			System.out.println("path edges " + pathEdges);
-//		}
+
+	private static<V extends Vertex, E extends Edge<V>> List<List<V>> connectedWith (V v, Set<V> pathVertices, List<E> pathEdges, 
+			Map<V,List<E>> adjacency,List<E> excludingEdges, List<V> excludingVertices, boolean debug){
+
+
+		List<V> visited = new ArrayList<V>();
+		visited.add(v);
+		List<E> visitedEdges = new ArrayList<E>();
+		List<List<V>> paths = new ArrayList<List<V>>();
+		connectedWith(v, v, pathVertices, pathEdges, adjacency, excludingEdges, excludingVertices, visited, visitedEdges, paths, debug);
+		if (debug){
+			System.out.println("Paths with other path vertices: " + paths);
+		}
+		return paths;
+
+
+	}
+
+	/**
+	 * The method returns paths with other vertices specified as parameters
+	 * i.e. other vertices of the current cyclic planar path
+	 * @param v Start vertex
+	 * @param pathVertices Vertices for which it is checked if there is a path from the start vertex to them
+	 * @param pathEdges Edges of the cyclic path - should not be traversed
+	 * @param adjacency Adjacency lists
+	 * @param debug
+	 * @param excludingEdges Edges that should not be traversed
+	 * @param excludingVertices Vertices that should be skipped
+	 * @param paths List of path with the supplied vertices
+	 */
+	private static<V extends Vertex, E extends Edge<V>> void connectedWith (V v, V startVertex, Set<V> pathVertices, List<E> pathEdges, 
+			Map<V,List<E>> adjacency, List<E> excludingEdges, List<V> excludingVertices, List<V> visited, List<E> visitedEdges, List<List<V>> paths,
+			boolean debug){
+
+		for (E edge : adjacency.get(v)){
+
+			if (excludingEdges != null && excludingEdges.contains(edge))
+				continue;
+			if (visitedEdges.contains(edge))
+				continue;
+			if (pathEdges.contains(edge))
+				continue;
+
+			visitedEdges.add(edge);
+
+			V other = edge.getOrigin() == v ? edge.getDestination() : edge.getOrigin();
+			if (excludingVertices != null && excludingVertices.contains(other))
+				continue;
+
+			if (visited.contains(other))
+				continue;
+			
+			if (other != startVertex && pathVertices.contains(other)){
+			//	if (debug)
+				//	System.out.println("found path vertex: " + other);
+
+				//save path
+				List<V> currentPath = new ArrayList<V>();
+				currentPath.addAll(visited);
+				currentPath.add(other);
+				paths.add(currentPath);
+				//don't continue dfs
+			}
+			else{
+				visited.add(other);
+				connectedWith(other, startVertex, pathVertices, pathEdges, adjacency, excludingEdges, excludingVertices, visited, visitedEdges, paths, debug);
+				visited.remove(visited.size() - 1);
+			}
+		}
+	}
+
+	/**
+	 * Checks if there is a path between a vertex and any of the vertices belonging to a list of vertices
+	 * @param v
+	 * @param endVertices
+	 * @param adjacency
+	 * @param excludingEdges
+	 * @param excludingVertices
+	 * @return
+	 */
+	private static<V extends Vertex, E extends Edge<V>> boolean pathBetween(V v, List<V> endVertices, Map<V,List<E>> adjacency, List<E> excludingEdges, Set<V> excludingVertices){
 
 		List<V> visited = new ArrayList<V>();
 		List<E> visitedEdges = new ArrayList<E>();
-		List<V> ret = new ArrayList<V>();
 		Stack<V> stack = new Stack<V>();
 		stack.push(v);
 		V current;
-		List<List<E>> paths = new ArrayList<List<E>>();
-
-
-
 		while (!stack.isEmpty()){
 			current = stack.pop();
-			//System.out.println("current " + current);
 			if (visited.contains(current))
 				continue;
 			visited.add(current);
+
 			for (E edge : adjacency.get(current)){
-				
+
 				if (excludingEdges != null && excludingEdges.contains(edge))
 					continue;
 				if (visitedEdges.contains(edge))
 					continue;
-				if (pathEdges.contains(edge))
-					continue;
-				
+
 				visitedEdges.add(edge);
 
 				V other = edge.getOrigin() == current ? edge.getDestination() : edge.getOrigin();
 				if (excludingVertices != null && excludingVertices.contains(other))
 					continue;
-				
-				
-				System.out.println("edge: " + edge);
-				
-				if (other != v && pathVertices.contains(other) && !ret.contains(other)){
-					if (debug)
-						System.out.println("found path vertex: " + other);
-					ret.add(other); 
-					//don't continue dfs
-				}
-				else{
-					stack.push(other);	
-				}
+
+				if (visited.contains(other))
+					continue;
+
+				if (endVertices.contains(other))
+					return true;
+
+				stack.push(other);	
 			}
 		}
-
-		return ret;
+		return false;
 	}
 
 }
