@@ -20,7 +20,7 @@ public class Calc {
 			return new Line(null, x1); 
 			
 		else
-			k = Math.abs((y1 - y2)/(x1-x2));
+			k = (y1 - y2)/(x1-x2);
 		double n = y1 - k*x1;
 		
 		return new Line(k,n);

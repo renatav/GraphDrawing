@@ -497,7 +497,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			log.info("Vertices not on S not adjacent to v " + SiVerticesNotOnSNotAdjToV);
 
 			boolean inBlock = foundBlock.getVertices().contains(v);
-			
+
 			if (SiVerticesNotOnSAdjToV.size() > 0)
 				positionVerticesAsApices(currentV, otherVertex,v, positions, SiVerticesNotOnSAdjToV, inBlock);
 
@@ -583,12 +583,12 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		Point2D viPoint = positions.get(vi);
 		Point2D vi_1Point = positions.get(vi_1);
 		Point2D vPoint = positions.get(v);
-		
+
 
 		log.info("positioning apices " + vertices);
-		log.info("viPoint " + viPoint);
-		log.info("vi_1Point " + vi_1Point);
-		log.info("vPoint " + vPoint);
+		log.info("viPoint " + vi +" "+ viPoint);
+		log.info("vi_1Point " + vi_1 + " " + vi_1Point);
+		log.info("vPoint " + v + " "+ vPoint);
 
 		//second idea
 		//find centroid of the triangle
@@ -621,7 +621,23 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		levelOne.add(t);
 		trianglesLevelsMap.put(1, levelOne);
 
+		//ne postavljati ondmah cvoroce, posto se tu 
+		//dodaju i trouglovi koji su blize temenima originalnih
+		//ne znamo unapred sta ce u koji biti stavljeno
+		//nego kako se kreiraju i odredjuju ti centroidi
+		//gde ce biti pozicionirani cvorovi
+		//dodavati ih u neku listu tako  da se na kraju poredak
+		//tacno bude onakav kao i cvorova
+		//u prvu centroidu smestamo prvi cvor, u drugi drugu...
+		//s tim sto onu prvu centralnu centroidu treba uzeti
+		//samo ako je broj cvorova za pozicioniranje neparan
+		
 		while (positionedVertices < vertices.size()){
+			//current vertex to be positioned should be chosen
+			//based on the current position
+			//which triangle is being used
+			//which vertices does it have
+			//which are adjacent to them
 			current = vertices.get(currentIndex);
 			List<Triangle> triangles = trianglesLevelsMap.get(level);
 			if (triangles.size() == 0){
@@ -631,11 +647,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			}
 			//TODO
 			//this shouldn't be random and neither should the first one
-			//always be selcted
+			//always be selected
 			//it should be noted to which vertices the one to be positioned is connected
 			//and position it so that there are no intersections
 			t = triangles.get(0); 
-			
+
 			triangles.remove(t);
 			//position current vertex
 			Point2D centroid = Calc.triangleCentroid(t);
@@ -701,89 +717,89 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			nextLevelTriangls.add(t1);
 			nextLevelTriangls.add(t2);
 		}
-}
-
-private void positionVerticesOnStraightLineSegments(List<E> Si, Map<V,Point2D> positions){
-	//position vertices on straight line segments
-	log.info("Positioning vertices on straight line segments");
-
-
-	//the first one should be the vertex that the first two edges do not have in common
-	E e1 = Si.get(0);
-	E e2 = Si.get(1);
-	V current = e1.getOrigin();
-	if (e2.getOrigin() == current || e2.getDestination() == current)
-		current = e1.getDestination();
-
-	V firstPositioned = null;
-	V secondPositioned = null;
-	List<V> toPosition = new ArrayList<V>();
-	V firstPositionedEncountered = null;
-
-	if (positions.containsKey(current)){
-		firstPositioned = current;
-		firstPositionedEncountered = firstPositioned;
 	}
 
-	boolean allPostioned = false;
-	int currentEdgeIndex = 0;
-	while (!allPostioned){
-		E e = Si.get(currentEdgeIndex);
-		log.info(Si);
-		log.info("current edge:" + e);
-		V other = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
-		log.info("Other: " + other);
-		log.info(firstPositionedEncountered);
-		log.info(firstPositioned);
+	private void positionVerticesOnStraightLineSegments(List<E> Si, Map<V,Point2D> positions){
+		//position vertices on straight line segments
+		log.info("Positioning vertices on straight line segments");
 
-		if (positions.containsKey(other)){
-			if (firstPositioned == null){
-				firstPositioned = other;
-				firstPositionedEncountered = firstPositioned;
-			}
-			else
-				secondPositioned = other;
+
+		//the first one should be the vertex that the first two edges do not have in common
+		E e1 = Si.get(0);
+		E e2 = Si.get(1);
+		V current = e1.getOrigin();
+		if (e2.getOrigin() == current || e2.getDestination() == current)
+			current = e1.getDestination();
+
+		V firstPositioned = null;
+		V secondPositioned = null;
+		List<V> toPosition = new ArrayList<V>();
+		V firstPositionedEncountered = null;
+
+		if (positions.containsKey(current)){
+			firstPositioned = current;
+			firstPositionedEncountered = firstPositioned;
 		}
-		else if (firstPositioned != null)
-			toPosition.add(other);
 
-		if (secondPositioned == firstPositionedEncountered)
-			allPostioned = true;
+		boolean allPostioned = false;
+		int currentEdgeIndex = 0;
+		while (!allPostioned){
+			E e = Si.get(currentEdgeIndex);
+			log.info(Si);
+			log.info("current edge:" + e);
+			V other = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
+			log.info("Other: " + other);
+			log.info(firstPositionedEncountered);
+			log.info(firstPositioned);
 
-		if (secondPositioned != null){
-			if (toPosition.size() > 0){//not to adjacent positioned vertices
-				//place vertices of to position between first and second
-
-				log.info("Positioning " + toPosition + " between " + firstPositioned + " and " + secondPositioned);
-				Point2D p1 = positions.get(firstPositioned);
-				Point2D p2 = positions.get(secondPositioned);
-				double xDiff = (p2.getX() - p1.getX()) / (toPosition.size() + 1);
-				double yDiff = (p2.getY() - p1.getY()) / (toPosition.size() + 1);
-				int increment = 1;
-				for (V v : toPosition){
-					positions.put(v, new Point2D.Double(p1.getX() + increment * xDiff, p1.getY() + increment * yDiff));
-					increment++;
+			if (positions.containsKey(other)){
+				if (firstPositioned == null){
+					firstPositioned = other;
+					firstPositionedEncountered = firstPositioned;
 				}
-				toPosition.clear();
+				else
+					secondPositioned = other;
 			}
+			else if (firstPositioned != null)
+				toPosition.add(other);
 
-			firstPositioned = secondPositioned;
-			secondPositioned = null;
+			if (secondPositioned == firstPositionedEncountered)
+				allPostioned = true;
+
+			if (secondPositioned != null){
+				if (toPosition.size() > 0){//not to adjacent positioned vertices
+					//place vertices of to position between first and second
+
+					log.info("Positioning " + toPosition + " between " + firstPositioned + " and " + secondPositioned);
+					Point2D p1 = positions.get(firstPositioned);
+					Point2D p2 = positions.get(secondPositioned);
+					double xDiff = (p2.getX() - p1.getX()) / (toPosition.size() + 1);
+					double yDiff = (p2.getY() - p1.getY()) / (toPosition.size() + 1);
+					int increment = 1;
+					for (V v : toPosition){
+						positions.put(v, new Point2D.Double(p1.getX() + increment * xDiff, p1.getY() + increment * yDiff));
+						increment++;
+					}
+					toPosition.clear();
+				}
+
+				firstPositioned = secondPositioned;
+				secondPositioned = null;
+			}
+			current = other;
+			if (currentEdgeIndex == Si.size() - 1)
+				currentEdgeIndex = 0;
+			else
+				currentEdgeIndex++;
 		}
-		current = other;
-		if (currentEdgeIndex == Si.size() - 1)
-			currentEdgeIndex = 0;
-		else
-			currentEdgeIndex++;
 	}
-}
 
 
-private V arbitraryApex(List<V> Sstar){
-	int i = rand.nextInt(Sstar.size());
-	return Sstar.get(i);
+	private V arbitraryApex(List<V> Sstar){
+		int i = rand.nextInt(Sstar.size());
+		return Sstar.get(i);
 
-}
+	}
 
 
 }
