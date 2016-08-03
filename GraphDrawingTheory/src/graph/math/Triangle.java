@@ -4,9 +4,12 @@ import java.awt.geom.Point2D;
 
 public class Triangle {
 
-	public Point2D a;
-	public Point2D b;
-	public Point2D c;
+	private Point2D a;
+	private Point2D b;
+	private Point2D c;
+	private Point2D centroid;
+	private Triangle parentTriangle;
+	private boolean beforeParent;
 	
 	public Triangle(Point2D a, Point2D b, Point2D c) {
 		super();
@@ -42,6 +45,48 @@ public class Triangle {
 	@Override
 	public String toString() {
 		return "Triangle [a=" + a + ", b=" + b + ", c=" + c + "]";
+	}
+
+	/**
+	 * @return the centroid
+	 */
+	public Point2D getCentroid() {
+		return centroid;
+	}
+
+	/**
+	 * @param centroid the centroid to set
+	 */
+	public void setCentroid(Point2D centroid) {
+		this.centroid = centroid;
+	}
+
+	/**
+	 * @return the parentTriangle
+	 */
+	public Triangle getParentTriangle() {
+		return parentTriangle;
+	}
+
+	/**
+	 * @param parentTriangle the parentTriangle to set
+	 */
+	public void setParentTriangle(Triangle parentTriangle) {
+		this.parentTriangle = parentTriangle;
+	}
+
+	/**
+	 * @return the beforeParent
+	 */
+	public boolean isBeforeParent() {
+		return beforeParent;
+	}
+
+	/**
+	 * @param beforeParent the beforeParent to set
+	 */
+	public void setBeforeParent(boolean beforeParent) {
+		this.beforeParent = beforeParent;
 	}
 	
 	

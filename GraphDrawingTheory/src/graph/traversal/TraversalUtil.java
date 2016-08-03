@@ -280,9 +280,6 @@ public class TraversalUtil{
 					}
 				}
 
-				System.out.println("INDEX MAP" + indexesMap);
-				System.out.println("PATH: " + ret);
-
 				currentIndex = index + 1;
 				if (debug)
 					System.out.println("next edge " + nextEdge);

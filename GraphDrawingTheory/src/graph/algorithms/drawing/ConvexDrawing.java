@@ -40,7 +40,7 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Distance when positioning the face vertices
 	 */
-	private int treshold = 100;
+	private int treshold = 150;
 
 	public ConvexDrawing(Graph<V,E> graph){
 		this.graph = graph;
@@ -496,10 +496,9 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			log.info("Vertices not on S adjacent to v " + SiVerticesNotOnSAdjToV);
 			log.info("Vertices not on S not adjacent to v " + SiVerticesNotOnSNotAdjToV);
 
-			boolean inBlock = foundBlock.getVertices().contains(v);
 
 			if (SiVerticesNotOnSAdjToV.size() > 0)
-				positionVerticesAsApices(currentV, otherVertex,v, positions, SiVerticesNotOnSAdjToV, inBlock);
+				positionVerticesAsApices(currentV, otherVertex,v, positions, Si, SiVerticesNotOnSAdjToV);
 
 			List<V> apices = new ArrayList<V>();
 			for (V vert : SiVertices)
@@ -574,10 +573,8 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 
-	//TODO check this positioning
-	//in some cases, an apex get positioned on the wrong side of the facial cycle
 
-	private void positionVerticesAsApices(V vi, V vi_1, V v, Map<V,Point2D> positions, List<V> vertices, boolean inBlock){
+	private void positionVerticesAsApices(V vi, V vi_1, V v, Map<V,Point2D> positions, List<E> Si, List<V> vertices){
 		//vertices should be apices of a polygon and should be placed inside the triangle whose
 		//apices are vi, vi_1 and v
 		Point2D viPoint = positions.get(vi);
@@ -589,8 +586,24 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		log.info("viPoint " + vi +" "+ viPoint);
 		log.info("vi_1Point " + vi_1 + " " + vi_1Point);
 		log.info("vPoint " + v + " "+ vPoint);
+		
+		//this is done so that the vertex linked with vi would be next to it
+		//prevent wrong order
+		boolean reverse = false;
+		
+		for (E e : Si){
+			if ((e.getOrigin() == vi && e.getDestination() == vertices.get(0)) || 
+				(e.getDestination() == vi && e.getOrigin() == vertices.get(0))){
+				reverse = true;
+				break;
+			}
+		}
+		
 
-		//second idea
+		//might not be the ideal solution, but it gets the job done
+		//with solid results which are in accordance to the algorithms
+		//requirements regarding this positioning
+		
 		//find centroid of the triangle
 		////place one vertex there
 		//draw a line parallel to vi,vi+1 through the controid
@@ -610,55 +623,41 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		//the other apex should be on the parallel line drawn to contain it
 		//intersection of the median containing the new centroid and that parallel line
 
-		int positionedVertices = 0;
-
-		int currentIndex = 0;
-		V current;
 		Map<Integer, List<Triangle>> trianglesLevelsMap = new HashMap<Integer, List<Triangle>>();
 		int level = 1;
-		Triangle t = new Triangle(viPoint, vi_1Point, vPoint);
+		Triangle firstTriangle = new Triangle(viPoint, vi_1Point, vPoint);
+		if (vertices.size() == 1){
+			positions.put(vertices.get(0), Calc.triangleCentroid(firstTriangle));
+			return;
+		}
+		
+		
 		List<Triangle> levelOne = new ArrayList<Triangle>();
-		levelOne.add(t);
+		levelOne.add(firstTriangle);
 		trianglesLevelsMap.put(1, levelOne);
 
-		//ne postavljati ondmah cvoroce, posto se tu 
-		//dodaju i trouglovi koji su blize temenima originalnih
-		//ne znamo unapred sta ce u koji biti stavljeno
-		//nego kako se kreiraju i odredjuju ti centroidi
-		//gde ce biti pozicionirani cvorovi
-		//dodavati ih u neku listu tako  da se na kraju poredak
-		//tacno bude onakav kao i cvorova
-		//u prvu centroidu smestamo prvi cvor, u drugi drugu...
-		//s tim sto onu prvu centralnu centroidu treba uzeti
-		//samo ako je broj cvorova za pozicioniranje neparan
+		//not going to position vertices as soon 
+		//as a centroid is calculated
+		//the centroids closest to the vi and vi_1 and
+		//those belonging to the lastly formed triangles
+		//are where the first two vertices should be positioned
+		//so, firstly just calculate all centroid
+		//place these positions in a list so that
+		//the first vertex should be positioned
+		//on the point of the first centroid
+		//last on the point of the last centroid
+		//when placing the vertices later
+		//pick one from the start, position it
+		//pick one from the back, position it
+		//not all centroid positions will be used
+		//but this guarantees symmetry 
 		
-		while (positionedVertices < vertices.size()){
-			//current vertex to be positioned should be chosen
-			//based on the current position
-			//which triangle is being used
-			//which vertices does it have
-			//which are adjacent to them
-			current = vertices.get(currentIndex);
+		List<Point2D> centroidPositions = new ArrayList<Point2D>(); 
+		
+		while (centroidPositions.size() < vertices.size()){
+			
 			List<Triangle> triangles = trianglesLevelsMap.get(level);
-			if (triangles.size() == 0){
-				trianglesLevelsMap.remove(level);
-				level ++;
-				triangles = trianglesLevelsMap.get(level);
-			}
-			//TODO
-			//this shouldn't be random and neither should the first one
-			//always be selected
-			//it should be noted to which vertices the one to be positioned is connected
-			//and position it so that there are no intersections
-			t = triangles.get(0); 
-
-			triangles.remove(t);
-			//position current vertex
-			Point2D centroid = Calc.triangleCentroid(t);
-			positions.put(current, centroid);
-			log.info("Setting position of " + current + ": " + centroid);
-			positionedVertices++;
-			currentIndex++;
+			
 			//divide the triangle,form new ones
 			//if current triangle is at level one (vi, vi+1, v)
 			//draw a line through centroid parallel to vi,vi+1
@@ -667,55 +666,106 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 			//try to establish some convention regarding which point will be a,b and c
 			//use that to generalize division and creation of new triangles
 
-			Line parallelTo = Calc.lineThroughTwoPoints(t.getA(), t.getB());
-			System.out.println("parallel to: " + parallelTo);
-			Line parallelLine = Calc.parallelLineThroughPoint(parallelTo, centroid);
-			System.out.println("parallel line: " + parallelLine);
-			List<Triangle> nextLevelTriangls = trianglesLevelsMap.get(level + 1);
-			Triangle t1, t2;
-
-			if (nextLevelTriangls == null){
-				nextLevelTriangls = new ArrayList<Triangle>();
-				trianglesLevelsMap.put(level + 1, nextLevelTriangls);
+			
+			for(Triangle t : triangles){
+				
+				Point2D centroid = Calc.triangleCentroid(t);
+				t.setCentroid(centroid);
+				
+				//see where to put this centroid
+				if (t.getParentTriangle() == null)
+					centroidPositions.add(centroid);
+				else{
+					Point2D parentCentroid = t.getParentTriangle().getCentroid();
+					int parentIndex = centroidPositions.indexOf(parentCentroid);
+					if (t.isBeforeParent())
+						centroidPositions.add(parentIndex, centroid);
+					else
+						centroidPositions.add(parentIndex + 1, centroid);
+				}
+				
+				
+				Line parallelTo = Calc.lineThroughTwoPoints(t.getA(), t.getB());
+				Line parallelLine = Calc.parallelLineThroughPoint(parallelTo, centroid);
+				List<Triangle> nextLevelTriangls = trianglesLevelsMap.get(level + 1);
+				Triangle t1, t2;
+	
+				if (nextLevelTriangls == null){
+					nextLevelTriangls = new ArrayList<Triangle>();
+					trianglesLevelsMap.put(level + 1, nextLevelTriangls);
+				}
+	
+				if (level == 1){
+					Line l1 = Calc.lineThroughTwoPoints(t.getA(), t.getC()); //vi and v
+					Point2D intersection1 = Calc.intersectionOfLines(l1, parallelLine);
+					Line l2 = Calc.lineThroughTwoPoints(t.getB(), t.getC()); //vi+1 and v
+					Point2D intersection2 = Calc.intersectionOfLines(l2, parallelLine);
+					t1 = new Triangle(t.getA(), intersection1, centroid);
+					t2 = new Triangle(t.getB(), intersection2, centroid);
+					t1.setParentTriangle(t);
+					t2.setParentTriangle(t);
+					
+					//to get the right order
+					//before parent states if this centroid should be used before the parent's one
+					//out of the two newly formed triangles, one goes before the parent's centroid, one after 
+					if (!reverse){
+						t1.setBeforeParent(false);
+						t2.setBeforeParent(true);
+					}
+					else{
+						t1.setBeforeParent(true);
+						t2.setBeforeParent(false);
+					}
+				}
+				else{
+	
+					//TODO 
+					//check if the apices of the triangles are correctly picked
+					//and is set before parent OK
+					//should anything else be checked?
+					//a test case with more than 3 vertices to be positioned as apices
+					//should be created 
+					
+	
+					//for the side which has two points on the parallel line
+					//take the new point as the intersection with the median
+					//with that line, new centroid, old centroid
+					//for the other one, draw new parallel line
+					//form the triangle taking intersection with the appropriate triangle side
+					//one old vertex and new centroid
+	
+					//each triangle should be formed in the way such that
+					//b and c are on the same parallel line
+					//a is the remaining apex
+					Line parallelSide = Calc.lineThroughTwoPoints(t.getB(), t.getC());
+					Line median = Calc.lineThroughTwoPoints(t.getA(), centroid);
+					Point2D intersection1 = Calc.intersectionOfLines(parallelSide, median);
+					t1 = new Triangle(centroid, intersection1, t.getC());
+					t1.setParentTriangle(t);
+	
+					//the side that doesn't have C 
+					Line intersectionSide = Calc.lineThroughTwoPoints(t.getA(), t.getB());
+					Point2D intersection = Calc.intersectionOfLines(parallelLine, intersectionSide);
+					t2 = new Triangle(t.getA(), intersection, centroid);
+					t2.setParentTriangle(t);
+					
+					t1.setBeforeParent(true);
+					t2.setBeforeParent(false);
+				}
+	
+				level ++;
+				nextLevelTriangls.add(t1);
+				nextLevelTriangls.add(t2);
 			}
-
-			if (level == 1){
-				Line l1 = Calc.lineThroughTwoPoints(t.getA(), t.getC()); //vi and v
-				Point2D intersection1 = Calc.intersectionOfLines(l1, parallelLine);
-				Line l2 = Calc.lineThroughTwoPoints(t.getB(), t.getC()); //vi+1 and v
-				Point2D intersection2 = Calc.intersectionOfLines(l2, parallelLine);
-				t1 = new Triangle(t.getA(), intersection1, centroid);
-				t2 = new Triangle(t.getB(), intersection2, centroid);
-				System.out.println("triangle 1" + t1);
-				System.out.println("triangle 2" + t2);
-			}
-			else{
-
-				//TODO proveriti izbor temena
-
-				//for the side which has two points on the parallel line
-				//take the new point as the intersection with the median
-				//with that line, new centroid, old centroid
-				//for the other one, draw new parallel line
-				//form the triangle taking intersection with the appropriate triangle side
-				//one old vertex and new centroid
-
-				//each triangle should be formed in the way such that
-				//b and c are on the same parallel line
-				//a is the remaining apex
-				Line parallelSide = Calc.lineThroughTwoPoints(t.getB(), t.getC());
-				Line median = Calc.lineThroughTwoPoints(t.getA(), centroid);
-				Point2D intersection1 = Calc.intersectionOfLines(parallelSide, median);
-				t1 = new Triangle(centroid, intersection1, t.getC());
-
-				//the side that doesn't have C 
-				Line intersectionSide = Calc.lineThroughTwoPoints(t.getA(), t.getB());
-				Point2D intersection = Calc.intersectionOfLines(parallelLine, intersectionSide);
-				t2 = new Triangle(t.getA(), intersection, centroid);
-			}
-
-			nextLevelTriangls.add(t1);
-			nextLevelTriangls.add(t2);
+		}
+		
+		
+		//while loop over, now position vertices
+		int verticesSize = vertices.size();
+		int centroidPositionsSize = centroidPositions.size();
+		for (int i = 0; i < vertices.size()/2; i++){
+			positions.put(vertices.get(i), centroidPositions.get(i));
+			positions.put(vertices.get(verticesSize - i - 1), centroidPositions.get(centroidPositionsSize - i - 1));
 		}
 	}
 
