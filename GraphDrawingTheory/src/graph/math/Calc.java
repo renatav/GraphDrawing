@@ -14,7 +14,13 @@ public class Calc {
 		//y1 = k*x1 + n
 		//y2 = k*x2 + n
 		
-		double k = Math.abs((x1 - x2)/(y1-y2));
+		double k;
+		if (x1 == x2)
+			//parallel to y axis
+			return new Line(null, x1); 
+			
+		else
+			k = Math.abs((y1 - y2)/(x1-x2));
 		double n = y1 - k*x1;
 		
 		return new Line(k,n);
@@ -43,15 +49,30 @@ public class Calc {
 		//x*(k1-k2) = n2 - n1
 		//x = (n2-n1)/(k1-k2)
 		
-		double k1 = l1.getK();
-		double k2 = l2.getK();
-		double n1 = l1.getN();
-		double n2 = l2.getN();
+		Double k1 = l1.getK();
+		Double k2 = l2.getK();
+		Double n1 = l1.getN();
+		Double n2 = l2.getN();
 		
-		x = (n2-n1)/(k1-k2);
-		y = k1*x + n1;
+		System.out.println("Intersection of lines: " + l1 + " " + l2);
 		
-		return new Point2D.Double(x, y);
+		if (k1 != null && k2 != null){
+			x = (n2-n1)/(k1-k2);
+			y = k1*x + n1;
+			return new Point2D.Double(x, y); 
+		}
+		else if (k1 != null && k2 == null){
+			//line 2 is parallel to the y axis
+			//y = k1*x + n1
+			//x = n2 -> y = n1 + k1*n2
+			return new Point2D.Double(n2, n1+k1*n2);
+		}
+		else if (k1 == null && k2 != null)
+			return new Point2D.Double(n1, n2+k2*n1);
+		else
+			return null;
+		
+		
 	}
 	
 	public static double[] angleBetweenTwoLines(Line l1, Line l2){
@@ -101,11 +122,37 @@ public class Calc {
 	}
 	
 	public static Line parallelLineThroughPoint(Line line1, Point2D point){
-		double k = line1.getK();
-		//y = kx + n
+		Double k = line1.getK();
+		if (k == null) //parallel to y axis
+			return new Line(null, point.getX());
+		//y = kx + n1
 		//n = y - k*x
 		double n = point.getY() - k * point.getX();
 		return new Line(k,n);
+	}
+	
+	public static Point2D symmetricPoint(Point2D p1, Line line){
+		
+		//(x,y)-> 1/(a^2 + b^2)(((b^2 - a^2)-4a^2b^2)(x,y)-(2ac, 2bc)
+		//line ax+by+c = 0  
+		//y = kx + n
+		//kx-y+n =0 -> b = -1
+		
+		double a = line.getK();
+		double b = -1;
+		double c = line.getN();
+		
+		double divider = 1/(Math.pow(a, 2) +Math.pow(b,2));
+		double determinant = ((Math.pow(b,2) - Math.pow(a, 2) *(Math.pow(a, 2) - Math.pow(b, 2)))
+				- 4*Math.pow(a, 2)*Math.pow(b, 2));
+		
+		double x = divider*(determinant * p1.getX() - 2*a*c);
+		double y = divider*(determinant * p1.getY() - 2*b*c);
+		
+		return new Point2D.Double(x,y);
+		
+		
+		
 	}
 
 	

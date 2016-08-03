@@ -38,6 +38,11 @@ public class Triangle {
 	public void setC(Point2D c) {
 		this.c = c;
 	}
+
+	@Override
+	public String toString() {
+		return "Triangle [a=" + a + ", b=" + b + ", c=" + c + "]";
+	}
 	
 	
 	

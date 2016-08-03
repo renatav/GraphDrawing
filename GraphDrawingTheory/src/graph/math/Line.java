@@ -2,25 +2,25 @@ package graph.math;
 
 public class Line {
 
-	private double k;
-	private double n;
+	private Double k;
+	private Double n;
 	
-	public Line(double k, double n) {
+	public Line(Double k, Double n) {
 		super();
 		this.k = k;
 		this.n = n;
 	}
 	
-	public double getK() {
+	public Double getK() {
 		return k;
 	}
-	public void setK(double k) {
+	public void setK(Double k) {
 		this.k = k;
 	}
-	public double getN() {
+	public Double getN() {
 		return n;
 	}
-	public void setN(double n) {
+	public void setN(Double n) {
 		this.n = n;
 	}
 
