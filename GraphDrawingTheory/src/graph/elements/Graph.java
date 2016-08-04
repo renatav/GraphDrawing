@@ -253,6 +253,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public int outDegree (V v){
+		if (!outgoingEdges.containsKey(v))
+			return 0;
 		return outEdges(v).size();
 	}
 
@@ -271,6 +273,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public int inDegree(V v){
+		if (!incomingEdges.containsKey(v))
+			return 0;
 		return inEdges(v).size();
 	}
 

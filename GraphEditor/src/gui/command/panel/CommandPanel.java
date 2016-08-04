@@ -1,5 +1,17 @@
 package gui.command.panel;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
@@ -12,6 +24,7 @@ import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.DSLException;
 import graph.layout.dsl.DSLLayouter;
+import graph.ordering.TopologicalOrdering;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
@@ -20,6 +33,7 @@ import graph.properties.splitting.Splitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
+import graph.test.elements.TestVertex;
 import graph.tree.binary.BinaryTree;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
@@ -28,18 +42,6 @@ import gui.model.GraphVertex;
 import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import net.miginfocom.swing.MigLayout;
 
 public class CommandPanel extends JPanel{
@@ -462,6 +464,15 @@ public class CommandPanel extends JPanel{
 		else if (command.trim().equals("is ring")){
 			return graph.isRing() + "";
 		}
+		else if (command.trim().equals("test")){
+			//execute whatever that is being tested
+			try {
+				Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
+				System.out.println(ordering);
+			} catch (CannotBeAppliedException e) {
+				e.printStackTrace();
+			}
+		}
 
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
@@ -488,7 +499,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[28];
+		commands = new String[29];
 
 		commands[0] = "quit";
 		commands[1] = "create graph";
@@ -518,6 +529,7 @@ public class CommandPanel extends JPanel{
 		commands[25] = "layout";
 		commands[26] = "binary tree";
 		commands[27] = "is ring";
+		commands[28] = "test";
 	}
 
 
