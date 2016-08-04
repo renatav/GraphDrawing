@@ -27,10 +27,9 @@ public class TestGraph extends TestCase{
 		graph.addVertex(vert1,vert2,vert3);
 		graph.addEdge(edge1,edge2,edge3);
 
-		GraphTraversal<TestVertex, TestEdge> traversal = new GraphTraversal<>(graph);
 
-		assertEquals(2, traversal.nonrecursiveDFS(vert1, vert3).size());
-		assertEquals(2, traversal.findAllPathsDFS(vert1, vert3).size());
+		assertNotNull(GraphTraversal.nonrecursiveDFSPath(graph, vert1, vert3));
+		assertNotNull(GraphTraversal.findAllPathsDFS(graph, vert1, vert3));
 
 
 
@@ -40,8 +39,8 @@ public class TestGraph extends TestCase{
 		graph.addVertex(vert4);
 		graph.addEdge(edge4, edge5);
 
-		assertEquals(4, traversal.nonrecursiveDFS(vert3, vert4).size());
-		assertEquals(4, traversal.findAllPathsDFS(vert3, vert4).size());
+		assertNotNull(GraphTraversal.nonrecursiveDFSPath(graph, vert3, vert4).size());
+		assertNotNull(GraphTraversal.findAllPathsDFS(graph, vert3, vert4).size());
 
 		assertTrue(graph.isBiconnected());
 

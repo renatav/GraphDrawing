@@ -37,10 +37,9 @@ public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> exten
 			return null;
 
 		Path<V,E> cycle = null;
-		GraphTraversal<V, E> treeTraversal = new GraphTraversal<V,E>(tree);
 		V start = edge.getOrigin();
 		V end = edge.getDestination();
-		List<Path<V,E>> paths = treeTraversal.findAllPathsDFS(start, end);
+		List<Path<V,E>> paths = GraphTraversal.findAllPathsDFS(tree, start, end);
 		cycle = paths.get(0);
 		cycle.getPath().add(edge);
 		E last = cycle.getPath().get(cycle.getPath().size() - 1);

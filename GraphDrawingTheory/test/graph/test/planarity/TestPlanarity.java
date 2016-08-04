@@ -1,14 +1,13 @@
 package graph.test.planarity;
 
-import graph.algorithms.planarity.AuslanderParterPlanarity;
+import org.junit.Test;
+
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.MaximumPlanaritySubgraph;
 import graph.elements.Graph;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
 import junit.framework.TestCase;
-
-import org.junit.Test;
 
 public class TestPlanarity extends TestCase{
 
@@ -82,16 +81,6 @@ public class TestPlanarity extends TestCase{
  
 	}
 
-	public void testPlanarAuslander(){
-
-
-		AuslanderParterPlanarity<TestVertex, TestEdge> planarTest = new 
-				AuslanderParterPlanarity<TestVertex, TestEdge> ();
-
-		assertEquals(true, planarTest.isPlannar(planarGraph));
-
-		assertEquals(false, planarTest.isPlannar(nonPlanarGraph));
-	}
 	
 	public void testFraysseixMendez(){
 		

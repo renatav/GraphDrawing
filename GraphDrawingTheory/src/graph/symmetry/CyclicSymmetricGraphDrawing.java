@@ -233,6 +233,7 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	//maximize k*m
 	//k = number of cycles
 	//m = length of a cycles
+	@SuppressWarnings("unused")
 	private Pair<List<List<Integer>>,Integer> findPermutation(){
 
 		List<Permutation> automorphisms = nauty.findAutomorphisms();

@@ -24,6 +24,7 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 
 	public List<V> circularOrdering(){
 
+		log.info("Executing circular ordering");
 		/*
 		 * Define a wave front node to be adjacent to the last node processed; see Figure 9.3.
 		A wave center node is adjacent to some other node that has already been processed.
@@ -166,8 +167,7 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 		
 		
 		//step 14 - Perform a DFS (or a longest path heuristic) on G (copy in this case)
-		GraphTraversal<V, E> traversal = new GraphTraversal<>(originalGraphCopy);
-		Path<V,E> longestPath = traversal.findLongestPath();
+		Path<V,E> longestPath = GraphTraversal.findLongestPath(copyGraph);
 		
 		List<V> embeddingOrder = longestPath.pathVertivesWithoutDuplicates();
 		//System.out.println(embeddingOrder);

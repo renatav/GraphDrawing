@@ -18,13 +18,7 @@ import graph.elements.Vertex;
  * @param <V>
  * @param <E>
  */
-public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
-
-	private Graph<V,E> graph;
-
-	public GraphTraversal(Graph<V,E> graph){
-		this.graph = graph;
-	}
+public class GraphTraversal {
 
 
 	/**
@@ -36,12 +30,12 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 	 * @param target
 	 * @return
 	 */
-	public List<Path<V, E>> findAllPathsDFS(V first, V target){
+	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V first, V target){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
-		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
+		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
 		return paths;
 	}
-	
+
 	/**
 	 * Finds all paths between first and target which contains all specified vertices
 	 * @param first
@@ -49,9 +43,9 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 	 * @param containing
 	 * @return
 	 */
-	public List<Path<V,E>> findAllPathsDFSContaining(V first, V target, List<V> containing){
+	public static <V extends Vertex,E extends Edge<V>>List<Path<V,E>> findAllPathsDFSContaining(Graph<V,E> graph, V first, V target, List<V> containing){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
-		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
+		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
 		Iterator<Path<V,E>> pathsIter = paths.iterator();
 		while (pathsIter.hasNext()){
 			Path<V,E> path = pathsIter.next();
@@ -59,20 +53,20 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 				if (!path.getUniqueVertices().contains(v))
 					pathsIter.remove();
 		}
-		
+
 		return paths;
 	}
-	
 
 
-	public List<Path<V, E>> findAllPathsDFS(V first, V target, List<V> excluding){
+
+	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V first, V target, List<V> excluding){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
-		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, excluding);
+		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, excluding);
 		return paths;
 	}
-	
 
-	private void findAllPathsDFS(List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, 
+
+	private static <V extends Vertex,E extends Edge<V>> void findAllPathsDFS(Graph<V,E> graph,  List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, 
 			V currentVertex, V start, V end, List<V> excluding) {        
 
 		if (currentVertex.equals(end)) { 
@@ -110,135 +104,115 @@ public class GraphTraversal<V extends Vertex,E extends Edge<V>> {
 				directionsTemp.add(EdgeDirection.TO_ORIGIN);
 			}
 
-			findAllPathsDFS(temp, directionsTemp, paths, nextVert, start, end, excluding);
+			findAllPathsDFS(graph, temp, directionsTemp, paths, nextVert, start, end, excluding);
 		}
 	}
-	
-	
-	
 
+	public static <V extends Vertex,E extends Edge<V>> Path<V,E> nonrecursiveDFSPath(Graph<V,E> graph, V start, V end){
 
-	
-	//TODO ovo popraviti
-	public List<Path<V,E>> nonrecursiveDFS(V start, V end){
-		List<Path<V,E>> ret = new ArrayList<Path<V,E>>();
-
-		List<E> visited;
+		List<V> visited = new ArrayList<V>();
+		List<E> visitedEdges = new ArrayList<E>();
+		
 		List<EdgeDirection> directions = new ArrayList<EdgeDirection>();
-		Stack<E> stack = new Stack<E>();
-		Stack<EdgeDirection> directionStack = new Stack<EdgeDirection>();
-		Stack<List<E>> visitedStack = new Stack<List<E>>();
-		Stack<List<EdgeDirection>> directionsStack = new Stack<List<EdgeDirection>>();
+		Stack<V> stack = new Stack<V>();
+		Stack<E> edgesStack = new Stack<E>();
+		List<E> pathEdges = new ArrayList<E>();
+		List<E> edges;
 
+		stack.push(start);
 
-		List	<E> edges;
-		if (graph.isDirected())
-			edges = graph.outEdges(start);
-		else
-			edges = graph.allEdges(start);
-
-		for (E e : edges){
-			EdgeDirection direction = e.getOrigin() == start ? EdgeDirection.TO_DESTINATION : EdgeDirection.TO_ORIGIN;
-			stack.add(0, e);
-			directionStack.add(0, direction);
-			visitedStack.add(0, new ArrayList<E>());
-			directionsStack.add(0, new ArrayList<EdgeDirection>());
-		}
-
-
-
-		E current;
+		V current;
+		E currentEdge = null;
 		EdgeDirection currentDirection;
+		
 		while (!stack.empty()){
 
 			current = stack.pop();
-			currentDirection = directionStack.pop();
-			visited = visitedStack.pop();
-			directions = directionsStack.pop();
+			if (!edgesStack.isEmpty())
+				currentEdge = edgesStack.pop();
 			
-			
-			if (visited.contains(current)){
+			if (visitedEdges.contains(currentEdge)){
 				continue;
 			}
 
-			List<E> newVisited = new ArrayList<E>(visited);
-			List<EdgeDirection> newDirections = new ArrayList<EdgeDirection>(directions);
+			if (currentEdge != null){
+
+				visitedEdges.add(currentEdge);
+				
+				V other = currentEdge.getOrigin() == current ? currentEdge.getDestination() : currentEdge.getOrigin();
+				
+				if (visited.get(visited.size() - 1) != other){
+					for (int i = visited.size() - 1; i > 0; i--){
+						V w = visited.get(i);
+						if (w == other)
+							break;
+						if (pathEdges.size() > 0){
+							pathEdges.remove(pathEdges.size() - 1);
+							directions.remove(directions.size() - 1);
+						}
+						else
+							break;
+					}
+				}
+
+				pathEdges.add(currentEdge);
+				currentDirection = currentEdge.getDestination() == current ? EdgeDirection.TO_DESTINATION : EdgeDirection.TO_ORIGIN;
+				directions.add(currentDirection);
+			}
+
+			visited.add(current);
 			
-			newVisited.add(current);
-			newDirections.add(currentDirection);
-			
-		
-			
-			V nextVertex = currentDirection == EdgeDirection.TO_DESTINATION ? current.getDestination() : current.getOrigin();
-			if (nextVertex == end){
-				ret.add(new Path<V,E>(newVisited, newDirections));
+			if (current == end){
+				//make path
+				Path<V,E> path = new Path<V,E>(pathEdges, directions);
+				return path;
 			}
 
 			if (graph.isDirected())
-				edges = graph.outEdges(nextVertex);
+				edges = graph.outEdges(current);
 			else
-				edges = graph.allEdges(nextVertex);
+				edges = graph.adjacentEdges(current);
+			
+			if (edges == null)
+				continue;
 
 			for (E e : edges){
-				if (!visited.contains(e)){
-					EdgeDirection direction = e.getOrigin() == nextVertex ? EdgeDirection.TO_DESTINATION : EdgeDirection.TO_ORIGIN;
-					stack.add(0,e);
-					directionStack.add(0,direction);
-					visitedStack.add(0,newVisited);
-					directionsStack.add(0,newDirections);
-				}
+				V other = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
+				edgesStack.push(e);
+				stack.push(other);
 			}
-
 		}
-
-		return ret;
-
-	}
-	
-
-	public Path<V,E> getShortestPath(V source, V target){
-		Path<V,E> ret = null;
-		List<Path<V, E>> paths = new ArrayList<Path<V, E>>();
-		paths = findAllPathsDFS(source, target);
-		for (Path<V,E> path : paths)
-			if (ret == null || path.size() < ret.size())
-				ret = path;
-		return ret;
+		
+		return null;
+		
 	}
 
-	public List<Path<V,E>> findAllCycles(){
-		List<Path<V,E>> ret = new ArrayList<Path<V,E>>();
-		for (V v : graph.getVertices()){
-			ret.addAll(nonrecursiveDFS(v, v));
-		}
-		return ret;
-	}
 
 	/**
 	 * Finds the longest path in a graph
 	 * @return
 	 */
 	//TODO efikasnije napraviti ovo
-	public Path<V,E> findLongestPath(){
+	public static <V extends Vertex,E extends Edge<V>> Path<V,E> findLongestPath(Graph<V,E> graph){
 		Path<V,E> longestPath = null;
-		
-		
+
+
 		for (V v1 : graph.getVertices())
 			for (V v2 : graph.getVertices()){
-				
+
 				if (v1 == v2)
 					continue;
-				
-				
-				List<Path<V,E>> paths = findAllPathsDFS(v1, v2);
+
+
+				List<Path<V,E>> paths = findAllPathsDFS(graph, v1, v2);
 				for (Path<V,E> path : paths)
 					if (longestPath == null || path.size() > longestPath.size())
 						longestPath = path;
-				
+
 			}
-		
+
 		return longestPath;
 	}
-	
+
 
 }

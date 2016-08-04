@@ -1,7 +1,5 @@
 package graph.elements;
 
-import graph.properties.GraphProperties;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import graph.properties.GraphProperties;
 
 /**
  * /**
@@ -26,14 +26,14 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	protected boolean directed = false;
 	protected GraphProperties<V,E> properties;
 
-	//TODO mozda u svakom slucaju 2 adjacency liste
-	//po jedna  za direcred i undirected
-	//iako je directed, nekada treba obradjivati sve susedne...
-
 	/**
 	 * An adjacent list contains a list of all the edges leaving the vertex
 	 */
 	protected Map<V, List<E>> adjacentLists;
+
+	protected Map<V, List<E>> outgoingEdges;
+
+	protected Map<V, List<E>> incomingEdges;
 
 	/**
 	 * Vertex by content map
@@ -46,6 +46,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		adjacentLists = new HashMap<V, List<E>>();
 		vertexByContentMap = new HashMap<Object,V>();
 		properties = new GraphProperties<V, E>(this);
+		outgoingEdges = new HashMap<V, List<E>>();
+		incomingEdges = new HashMap<V, List<E>>();
 	}
 
 
@@ -74,7 +76,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		for (V v : vert){
 			if (!vertices.contains(v)){
 				vertices.add(v);
-				adjacentLists.put(v, new LinkedList<E>());
+				adjacentLists.put(v, new ArrayList<E>());
 				vertexByContentMap.put(v.getContent(), v);
 			}
 		}
@@ -84,13 +86,13 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		if (vertices.contains(v))
 			return;
 		vertices.add(v);
-		adjacentLists.put(v, new LinkedList<E>());
+		adjacentLists.put(v, new ArrayList<E>());
 		vertexByContentMap.put(v.getContent(), v);
 	}
 
 	public void addVertexBeginning(V v){
 		vertices.add(0, v);
-		adjacentLists.put(v, new LinkedList<E>());
+		adjacentLists.put(v, new ArrayList<E>());
 	}
 
 	public void removeVertex(V v){
@@ -101,7 +103,9 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			removeEdge(e);
 		}
 		adjacentLists.remove(v);
-		
+		outgoingEdges.remove(v);
+		incomingEdges.remove(v);
+
 	}
 
 
@@ -112,12 +116,27 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			if (edges.contains(e))
 				continue;
 			edges.add(e);
-			if (adjacentLists.get(e.getOrigin()) != null){
-				adjacentLists.get(e.getOrigin()).add(e);
+
+			V origin = e.getOrigin();
+			V destination = e.getDestination();
+
+			if (adjacentLists.get(origin) != null){
+				adjacentLists.get(origin).add(e);
 			}
-			if (!directed && (adjacentLists.get(e.getDestination()) != null)){
+			//add it even if the graph is directed
+			if (adjacentLists.get(e.getDestination()) != null){
 				adjacentLists.get(e.getDestination()).add(e);
 			}
+
+			if (!incomingEdges.containsKey(destination))
+				incomingEdges.put(destination, new ArrayList<E>());
+
+			if (!outgoingEdges.containsKey(origin))
+				outgoingEdges.put(origin, new ArrayList<E>());
+
+			incomingEdges.get(destination).add(e);
+			outgoingEdges.get(origin).add(e);
+
 
 		}
 	}
@@ -130,17 +149,26 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 */
 	public boolean hasEdge(V v1, V v2){
 
-		for (E e : adjacentLists.get(v1)){
-			V other =  e.getOrigin() == v1 ?  e.getDestination() : e.getOrigin();
-			if (other == v2)
-				return true;
-		}
-		if (!directed)
+		if (!directed){
+			for (E e : adjacentLists.get(v1)){
+				V other =  e.getOrigin() == v1 ?  e.getDestination() : e.getOrigin();
+				if (other == v2)
+					return true;
+			}
 			for (E e : adjacentLists.get(v2)){
 				V other =  e.getOrigin() == v2 ?  e.getDestination() : e.getOrigin();
 				if (other == v1)
 					return true;
 			}
+		}
+		else{
+			if (outgoingEdges.containsKey(v1))
+				for (E e : outgoingEdges.get(v1)){
+					V other =  e.getOrigin() == v1 ?  e.getDestination() : e.getOrigin();
+					if (other == v2)
+						return true;
+				} 
+		}
 		return false;
 	}
 
@@ -153,16 +181,18 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public List<E> edgeesBetween (V v1, V v2){
 		List<E> ret = new ArrayList<E>();
 
-		if (adjacentLists.get(v1) != null)
-			for (E e : adjacentLists.get(v1))
-				if (e.getDestination() == v2)
-					ret.add(e);
-		if (!directed)
-			if (adjacentLists.get(v2) != null)
-				for (E e : adjacentLists.get(v2))
-					if (e.getDestination() == v1){
+		if (!directed){
+			if (adjacentLists.get(v1) != null)
+				for (E e : adjacentLists.get(v1))
+					if (e.getDestination() == v2 || e.getOrigin() == v2)
 						ret.add(e);
-					}
+		}
+		else{
+			if (outgoingEdges.containsKey(v1))
+				for (E e : outgoingEdges.get(v1))
+					if (e.getDestination() == v2)
+						ret.add(e);
+		}
 
 		return ret;
 	}
@@ -181,6 +211,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			adjacentLists.get(e.getOrigin()).remove(e);
 		if (adjacentLists.get(e.getDestination()) != null)
 			adjacentLists.get(e.getDestination()).remove(e);
+		if (outgoingEdges.get(e.getOrigin()) != null)
+			outgoingEdges.get(e.getOrigin()).remove(e);
+		if (incomingEdges.get(e.getDestination()) != null)
+			incomingEdges.get(e.getDestination()).remove(e);
 	}
 
 	public List<E> adjacentEdges(V v){
@@ -193,7 +227,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @return
 	 */
 	public List<E> outEdges(V v){
-		return adjacentLists.get(v);
+		return outgoingEdges.get(v);
 	}
 
 	/**
@@ -227,12 +261,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * @param v
 	 * @return
 	 */
-	public LinkedList<E> inEdges(V v){
-		LinkedList<E> ret = new LinkedList<E>();
-		for (E e : edges)
-			if (e.getDestination() == v)
-				ret.add(e);
-		return ret;
+	public List<E> inEdges(V v){
+		return incomingEdges.get(v);
 	}
 
 	/**
@@ -275,7 +305,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(e);
 		return ret;
 	}
-	
+
 	public List<E> edgesBetween(List<V> vertices){
 		List<E> ret = new ArrayList<E>();
 		for (V v : vertices)
@@ -286,7 +316,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 						ret.add(e);
 				}
 			}
-		
+
 		return ret;
 	}
 
@@ -363,7 +393,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public boolean isConnected(){
 		return properties.isConnected();
 	}
-	
+
 	/**
 	 * Check if the graph is a tree
 	 * @return true if the graph is a tree, false otherwise
@@ -371,7 +401,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public boolean isTree(){
 		return properties.isTree();
 	}
-	
+
 	/**
 	 * @param root Root of the tree
 	 * @return list of vertices which are tree leaves 
@@ -400,15 +430,15 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(v);
 		return ret;
 	}
-	
+
 	public List<List<E>> listMultiEdges(){
 		return properties.listMultiEdges();
 	}
-	
+
 	public boolean isRing(){
 		return properties.isRing();
 	}
-	
+
 
 	/**
 	 * Checks if a graph is biconnected. 
@@ -418,11 +448,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public boolean isBiconnected(){
 		return properties.isBiconnected();
 	}
-	
+
 	public List<V> listCutVertices(){
 		return properties.getCutVertices();
 	}
-	
+
 	public List<Graph<V,E>>listBiconnectedComponents(){
 		return properties.listBiconnectedComponents();
 	}
@@ -484,7 +514,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public void setDirected(boolean directed) {
 		this.directed = directed;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Graph [vertices=" + vertices + ", edges=" + edges + "]";

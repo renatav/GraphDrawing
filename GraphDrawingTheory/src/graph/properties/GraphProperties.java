@@ -1,5 +1,11 @@
 package graph.properties;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
+import graph.algorithm.cycles.JohnsonSimpleCycles;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
@@ -7,12 +13,6 @@ import graph.properties.splitting.BiconnectedSplitting;
 import graph.traversal.DFSTreeTraversal;
 import graph.traversal.DijkstraAlgorithm;
 import graph.trees.DFSTree;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
 
 public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 
@@ -136,11 +136,21 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	}
 
 	public boolean isCyclic(){
-		//TODO umesto pravljenja celog stabla, prekinuti kada se naidje na back ivivu
-		//proveriti da li je ok i za directed i za undirected 
-		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
-		DFSTree<V, E> tree = traversal.formDFSTree(graph.getVertices().get(0));
-		return tree.getBackEdges().size() > 0;
+
+		//if graph is not directed
+		//form a dfs tree and check if it has back edges
+		if (!graph.isDirected()){
+			DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
+			DFSTree<V, E> tree = traversal.formDFSTree(graph.getVertices().get(0));
+			return tree.getBackEdges().size() > 0;
+		}
+		//if graph is directed
+		//a more sophisticated algorithm is needed
+		//using johnson's
+		else{
+			JohnsonSimpleCycles<V,E> johnsonCycles = new JohnsonSimpleCycles<V,E>(graph, true);
+			return johnsonCycles.findSimpleCycles().size() > 0;
+		}
 	}
 	
 	/**

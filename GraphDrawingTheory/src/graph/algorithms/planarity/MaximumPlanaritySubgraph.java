@@ -31,7 +31,7 @@ public class MaximumPlanaritySubgraph<V extends Vertex, E extends Edge<V>> {
 	
 	public MaximumPlanaritySubgraph(Graph<V,E> graph){
 		this.graph = graph;
-		planarityTest = new AuslanderParterPlanarity<>();
+		planarityTest = new FraysseixMendezPlanarity<V,E>();
 		remainingEdges = new ArrayList<E>();
 		planarSubgraph = calculateMaximumPlanarityGraph();
 	}

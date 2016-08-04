@@ -12,12 +12,10 @@ import java.util.Map;
 
 public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 
-	private Graph<V,E> graph;
 	private List<Permutation> permutations;
 
 	public PermutationAnalyzator(Graph<V, E> graph) {
 		super();
-		this.graph = graph;
 		McKayGraphLabelingAlgorithm<V, E> nauty = new McKayGraphLabelingAlgorithm<V,E>(graph);
 		permutations = nauty.findAutomorphisms();
 	}
