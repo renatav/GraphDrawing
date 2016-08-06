@@ -33,7 +33,7 @@ import graph.properties.splitting.Splitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
-import graph.test.elements.TestVertex;
+import graph.tree.bc.BCTree;
 import graph.tree.binary.BinaryTree;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
@@ -218,7 +218,7 @@ public class CommandPanel extends JPanel{
 		if (command.startsWith(commands[9])){
 			if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
 				return "Graph is biconnected.";
-			return splitting.findAllBlocks(MainFrame.getInstance().getCurrentView().getModel().getGraph()).toString(); 
+			return graph.listBiconnectedComponents() + ""; 
 		}	
 
 		if (command.startsWith(commands[10])){
@@ -466,12 +466,14 @@ public class CommandPanel extends JPanel{
 		}
 		else if (command.trim().equals("test")){
 			//execute whatever that is being tested
-			try {
-				Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
-				System.out.println(ordering);
-			} catch (CannotBeAppliedException e) {
-				e.printStackTrace();
-			}
+			//try {
+				//Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
+				//System.out.println(ordering);
+				BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
+				System.out.println(bcTree);
+//			} catch (CannotBeAppliedException e) {
+//				e.printStackTrace();
+//			}
 		}
 
 		if (command.equals(commands[15])){

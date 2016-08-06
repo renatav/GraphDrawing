@@ -1,19 +1,18 @@
 package graph.tree.spqr;
 
-import graph.elements.Edge;
-import graph.elements.Graph;
-import graph.elements.Vertex;
-import graph.operations.GraphOperations;
-import graph.properties.components.Block;
-import graph.properties.components.SplitComponent;
-import graph.properties.components.SplitPair;
-import graph.properties.splitting.Splitting;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import graph.elements.Edge;
+import graph.elements.Graph;
+import graph.elements.Vertex;
+import graph.operations.GraphOperations;
+import graph.properties.components.SplitComponent;
+import graph.properties.components.SplitPair;
+import graph.properties.splitting.Splitting;
 
 /**
  * Used in the construction of spqr trees
@@ -33,10 +32,13 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 
 
 	private Logger log = Logger.getLogger(ProtoSPQRTree.class);
+	
+	private Splitting<V,E> splitting;
 
 
 	public ProtoSPQRTree(E referenceEdge, Graph<V, E> graph) {
 		super(referenceEdge, graph);
+		splitting = new Splitting<V,E>();
 
 		GraphOperations<V, E> operations = new GraphOperations<>();
 		gPrim = operations.removeEdgeFromGraph(graph, referenceEdge);
@@ -57,8 +59,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 	private void constructTree(){
 
 		log.info("Constructing Proto-SPQR tree");
-
-		Splitting<V, E> splitting = new Splitting<>();
+		
 		GraphOperations<V,E> operations = new GraphOperations<>();
 		V s = referenceEdge.getOrigin();
 		V t = referenceEdge.getDestination();
@@ -84,11 +85,11 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 
 			log.info("Series case: creating S root node");
 
-			List<V> cutVertices = splitting.findAllCutVertices(gPrim);
+			List<V> cutVertices = gPrim.listCutVertices();
 
 			log.info("Found cut vertices og G': " + cutVertices);
 
-			List<Block<V, E>> blocks = splitting.findAllBlocks(gPrim, cutVertices);
+			List<Graph<V, E>> blocks = gPrim.listBiconnectedComponents();
 
 			log.info("Split G' into blocks: " +blocks);
 
@@ -130,7 +131,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 			 * ei is an edge between vi-1 and vi
 			 * Children are roots of Proto-SPQR trees for the subgraphs
 			 */
-			Block<V,E> currentBlock;
+			Graph<V,E> currentBlock;
 			SPQRTreeNode<V, TreeEdgeWithContent<V,E>> childNode;
 			E referenceEdge;
 			for (int i = 0; i < blocks.size(); i++ ){
@@ -335,7 +336,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 	 * @param vertices
 	 * @param blocks
 	 */
-	private void organizeBlocksAndVertices(V s, V t, List<V> vertices, List<Block<V, E>> blocks){
+	private void organizeBlocksAndVertices(V s, V t, List<V> vertices, List<Graph<V, E>> blocks){
 
 		log.info("Organizing vertices and blocks");
 
@@ -347,19 +348,19 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 		 * A cut vertex vi is contained in b1 and bi+1
 		 */
 
-		Block<V, E> firstBlock = blocksContainingVertex(blocks, s).get(0);
+		Graph<V, E> firstBlock = blocksContainingVertex(blocks, s).get(0);
 		if (firstBlock == null)
 			throw new RuntimeException("S vertex not containined in any of the blocks. Error!");
 		vertices.add(0, s);
 		Collections.swap(blocks, 0, blocks.indexOf(firstBlock));
 
-		Block<V, E> lastBlock = blocksContainingVertex(blocks, t).get(0);
+		Graph<V, E> lastBlock = blocksContainingVertex(blocks, t).get(0);
 		if (lastBlock == null)
 			throw new RuntimeException("T vertex not containined in any of the blocks. Error!");
 		vertices.add(t);
 		Collections.swap(blocks, blocks.size() - 1, blocks.indexOf(lastBlock));
 
-		Block<V, E> currentBlock = firstBlock;
+		Graph<V, E> currentBlock = firstBlock;
 		V currentVertex, previousVertex = s;
 
 		//current block contains current vertex and another one from the list, find it
@@ -370,10 +371,10 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 		while (true){
 			currentVertex = otherVertexInBlock(currentBlock, previousVertex, vertices);
 			Collections.swap(vertices, currentIndex, vertices.indexOf(currentVertex));
-			List<Block<V,E>> blocksContainingVertex = blocksContainingVertex(blocks, currentVertex);
+			List<Graph<V,E>> blocksContainingVertex = blocksContainingVertex(blocks, currentVertex);
 			if (blocksContainingVertex.size() != 2)
 				throw new RuntimeException("Cut vertix not conatained in exactly two blocks! Error");
-			for (Block<V, E> block : blocksContainingVertex)
+			for (Graph<V, E> block : blocksContainingVertex)
 				if (block != currentBlock){
 					currentBlock = block;
 					break;
@@ -388,7 +389,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 
 	}
 
-	private V otherVertexInBlock(Block<V,E> block, V containedVertex, List<V> vertices){
+	private V otherVertexInBlock(Graph<V,E> block, V containedVertex, List<V> vertices){
 		for (V v : vertices){
 			if (v != containedVertex && block.hasVertex(v))
 				return v;
@@ -396,10 +397,10 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 		return null;
 	}
 
-	private List<Block<V,E>> blocksContainingVertex(List<Block<V, E>> blocks, V v){
+	private List<Graph<V,E>> blocksContainingVertex(List<Graph<V, E>> blocks, V v){
 
-		List<Block<V, E>> ret = new ArrayList<>();
-		for (Block<V, E> block : blocks){
+		List<Graph<V, E>> ret = new ArrayList<>();
+		for (Graph<V, E> block : blocks){
 			if (block.hasVertex(v))
 				ret.add(block);
 		}

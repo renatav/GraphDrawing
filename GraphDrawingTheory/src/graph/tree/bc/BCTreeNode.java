@@ -7,6 +7,13 @@ import graph.elements.Vertex;
 public class BCTreeNode implements Vertex {
 
 	private Object content;
+	private VertexType type;
+	private BCTreeNode parent;
+	
+	public BCTreeNode(VertexType type, Object content){
+		this.type = type;
+		this.content = content;
+	}
 
 
 	public BCTreeNode(Object content) {
@@ -27,7 +34,7 @@ public class BCTreeNode implements Vertex {
 	
 	@Override
 	public String toString() {
-		return "BCTreeNode [" + content + "]";
+		return "BCTreeNode [" + content +  " parent = " + (parent == null ? parent : parent.getContent()) + "]\n";
 	}
 
 	@Override
@@ -40,6 +47,38 @@ public class BCTreeNode implements Vertex {
 	public void setContent(Object content) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	/**
+	 * @return the type
+	 */
+	public VertexType getType() {
+		return type;
+	}
+
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(VertexType type) {
+		this.type = type;
+	}
+
+
+	/**
+	 * @return the parent
+	 */
+	public BCTreeNode getParent() {
+		return parent;
+	}
+
+
+	/**
+	 * @param parent the parent to set
+	 */
+	public void setParent(BCTreeNode parent) {
+		this.parent = parent;
 	}
 
 }
