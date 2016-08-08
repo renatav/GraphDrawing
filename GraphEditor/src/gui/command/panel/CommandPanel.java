@@ -16,6 +16,7 @@ import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
+import graph.algorithms.connectivity.PlanarAugmentation;
 import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
@@ -466,14 +467,17 @@ public class CommandPanel extends JPanel{
 		}
 		else if (command.trim().equals("test")){
 			//execute whatever that is being tested
-			//try {
+			try {
 				//Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
 				//System.out.println(ordering);
-				BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
-				System.out.println(bcTree);
-//			} catch (CannotBeAppliedException e) {
-//				e.printStackTrace();
-//			}
+				//BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
+				//System.out.println(bcTree);
+			PlanarAugmentation<GraphVertex, GraphEdge> planarAugmentation = new PlanarAugmentation<GraphVertex, GraphEdge>();
+			Graph<GraphVertex,GraphEdge> biconnected = planarAugmentation.planarBiconnected(graph);
+			return biconnected.toString();
+			} catch (CannotBeAppliedException e) {
+				e.printStackTrace();
+			}
 		}
 
 		if (command.equals(commands[15])){

@@ -17,13 +17,17 @@ public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> exten
 
 	private Logger log = Logger.getLogger(FraysseixMendezPlanarity.class);
 	
+	private boolean debug = false;
+	
 	@Override
 	public boolean isPlannar(Graph<V,E> graph) {
 
-		log.info("checking cyclic");
+		if (debug)
+			log.info("checking cyclic");
 		if (!graph.isCyclic())
 			return true;
-		log.info("finished checking cyclic");
+		if (debug)
+			log.info("finished checking cyclic");
 		
 		LRPartition<V, E> partition = new LRPartition<V,E>(graph);
 		

@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * A partition B = L U R of DFS oriented graph's 
  * back edges into two classes, referred to as left and right, is called left-right
  * partition , or LR partition for short
- * @author xxx
+ * @author xx
  */
 public class LRPartition<V extends Vertex, E extends Edge<V>> {
 
@@ -24,6 +24,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	private List<E> right, left;
 	private Graph<V,E> graph;
 	private Logger log = Logger.getLogger(LRPartition.class);
+	private boolean debug;
 
 	public LRPartition(Graph<V,E> graph){
 		right = new ArrayList<E>();
@@ -40,14 +41,18 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	 * @return true if it can be partitioned, false otherwise
 	 */
 	public boolean createLRPartition(){
-		log.info("creating traversal");
+		if (debug)
+			log.info("creating traversal");
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
-		log.info("finished creating traversal");
-		log.info("creating dfs tree");
+		if (debug){
+			log.info("finished creating traversal");
+			log.info("creating dfs tree");
+		}
 		DFSTree<V, E> tree = traversal.formDFSTree(graph.getVertices().get(0));
-		log.info("finished creating dfs tree");
-
-		System.out.println(tree);
+		if (debug){
+			log.info("finished creating dfs tree");
+			log.info(tree);
+		}
 
 		return createLRPartition(tree);
 	}
@@ -68,11 +73,11 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 
 		createLRPartitionNew(tree.getRoot(), partitionSet, tree);
 
-		
+
 		if (!partitionSet.organizePartitions())
 			return false;
 		partitionSet.printPartitions();
-		
+
 
 		return true;
 
@@ -84,7 +89,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 		//log.info("\nProcessing " + current);
 
 		List<E> outgoingEdges = tree.allOutgoingEdges(current);
-		
+
 
 		for (int i = 0; i < outgoingEdges.size(); i++)
 			for (int j = i + 1; j < outgoingEdges.size(); j++){
@@ -123,7 +128,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 					if (index > lowptE1)
 						class2.add(e);
 				}
-				
+
 				partitionSet.add(class1, class2);
 			}
 
@@ -132,10 +137,6 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 			createLRPartitionNew(v, partitionSet, tree);
 
 	}
-	
-	
-
-	
 
 
 	public List<E> getRight() {
