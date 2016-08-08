@@ -32,6 +32,24 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 		constructTree();
 
 	}
+	
+	@Override
+	public void addVertex(BCTreeNode node){
+		super.addVertex(node);
+		if (node.getType() == VertexType.C)
+			cVertices.add(node);
+		if (node.getType() == VertexType.B)
+			bVertices.add(node);
+	}
+	
+	@Override
+	public void removeVertex(BCTreeNode node){
+		super.removeVertex(node);
+		if (node.getType() == VertexType.C)
+			cVertices.remove(node);
+		if (node.getType() == VertexType.B)
+			bVertices.remove(node);
+	}
 
 	private void constructTree(){
 		
@@ -43,13 +61,11 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 			addVertex(node);
 			if (root == null)
 				root = node;
-			cVertices.add(node);
 		}
 
 		for (Graph<V,E> block : blocks){
 			BCTreeNode node  = new BCTreeNode(VertexType.B, block);
 			addVertex(node);
-			bVertices.add(node);
 			int containedCutVerticesCount = 0;
 			for (V cutVertex : cutVertices){
 				if (block.hasVertex(cutVertex)){
