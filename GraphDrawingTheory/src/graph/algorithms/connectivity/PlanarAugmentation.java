@@ -77,9 +77,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 
 		List<Graph<V,E>> pendants = bcTree.getPendants(); 
 		//initialize the list of labels by calling reduce chains
-		List<PlanarAugmentationLabel<V, E>> labels = 
-				new ArrayList<PlanarAugmentationLabel<V,E>>();
-		reduceChains(graph, pendants, labels);
+		List<PlanarAugmentationLabel<V, E>> labels = reduceChains(graph, pendants);
 		PlanarAugmentationLabel<V, E> l1, l2;
 
 		Set<BCTreeNode> pathNodes = new HashSet<BCTreeNode>();
@@ -87,7 +85,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		//and add them when merging the blocks
 		List<E> addedEdges = new ArrayList<E>();
 		BCTreeNode pPrimNode;
-		List<BCTreeNode> cutVertices = new ArrayList<BCTreeNode>();
+		Set<BCTreeNode> cutVertices = new HashSet<BCTreeNode>();
 
 		//while T(G) has c-vertices
 		while(bcTree.getcVertices().size() > 0){
@@ -96,7 +94,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 
 			l1 = labels.get(0); 
 			for (int i = 1; i < labels.size(); i++){
-				PlanarAugmentationLabel<V, E> label = labels.get(0);
+				PlanarAugmentationLabel<V, E> label = labels.get(i);
 				if (labels.size() > l1.size())
 					l1 = label;
 			}
@@ -141,19 +139,52 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				currentPath = GraphTraversal.nonrecursiveDFSPath(bcTree, bcTree.getVertexByContent(firstChild), 
 						l1.getParent()).getUniqueVertices();
 				pathNodes.addAll(currentPath);
-				for (int i = 1; i < l1.getChildren().size() - 1; i++){
+				for (int i = 0; i < l1.getChildren().size(); i++){
 					Graph<V,E> child1 = l1.getChildren().get(i);
-					currentPath = GraphTraversal.nonrecursiveDFSPath(bcTree, bcTree.getVertexByContent(child1), 
-							l1.getParent()).getUniqueVertices();
+					currentPath = GraphTraversal.nonrecursiveDFSPath(bcTree, l1.getParent(), bcTree.getVertexByContent(child1)).pathVertices();
 					pathNodes.addAll(currentPath);
-					for (int j = 2; j < l1.getChildren().size(); j++){
-						Graph<V,E> child2 = l1.getChildren().get(j);
-						currentPath = GraphTraversal.nonrecursiveDFSPath(bcTree, bcTree.getVertexByContent(child1), 
-								bcTree.getVertexByContent(child2)).getUniqueVertices();
-						pathNodes.addAll(currentPath);
-					}
-				}
 
+					//if a nodes on the path is not a child (and it can't be since only pendants are children of a label)
+					//and since the nodes are supposed to be merged to form a new pendant
+					//the formed graph (block) must be biconnected
+					//that means that these non-pendant blocks on the path also need to be connected
+					//to other blocks
+					log.info("l1 child " + child1 + " path: " + currentPath);
+					log.info("Connect blocks on this path");
+					for (int j = 1; j < currentPath.size() - 2; j+=2){
+						Graph<V,E> block1 = (Graph<V, E>) currentPath.get(j).getContent();
+						Graph<V,E> block2 = (Graph<V, E>) currentPath.get(j + 2).getContent();
+						System.out.println("block 1 " + block1);
+						System.out.println("block 2 " + block2);
+						boyerMyrvold.isPlannar(block1);
+						V cutVertex = (V) currentPath.get(j + 1).getContent();
+						System.out.println("cut vertex");
+						List<V> face1 = boyerMyrvold.getOutsideFace();
+						System.out.println(face1);
+						face1.remove(cutVertex);
+						boyerMyrvold.isPlannar(block2);
+						List<V> face2 = boyerMyrvold.getOutsideFace();
+						System.out.println(face2);
+						face2.remove(cutVertex);
+						System.out.println(cutVertex);
+						V block1V = face1.get(0);
+						V block2V = face2.get(0);
+						E newEdge = Util.createEdge(block1V, block2V, graph.getEdges().get(0).getClass());
+						log.info("added edge: " + newEdge);
+						addedEdges.add(newEdge);
+						ret.addEdge(newEdge);
+					}
+					if (i == 0)
+						continue;
+
+					if (i < l1.getChildren().size() - 1)
+						for (int j = 2; j < l1.getChildren().size(); j++){
+							Graph<V,E> child2 = l1.getChildren().get(j);
+							currentPath = GraphTraversal.nonrecursiveDFSPath(bcTree, bcTree.getVertexByContent(child1), 
+									bcTree.getVertexByContent(child2)).getUniqueVertices();
+							pathNodes.addAll(currentPath);
+						}
+				}
 
 
 				log.info("All nodes on paths: "  + pathNodes);
@@ -164,6 +195,8 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				for (E e : addedEdges)
 					pPrim.addEdge(e);
 
+				log.info("P' " + pPrim);
+
 				//after merging the nodes, the bc tree should be updated
 				//the old nodes removed, the new ones added
 				//if l1 is c1-label
@@ -172,7 +205,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				//set parent of the node
 				pPrimNode.setParent(l1.getParent());
 				pPrimNode.setType(VertexType.B);
-				
+
 				bcTree.addVertex(pPrimNode);
 				//connect the new node to c1
 				BCTreeEdge pPrimEdge = new BCTreeEdge(c1, pPrimNode);
@@ -199,6 +232,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 
 				//add an edge from an outside node of p' to a node of b adjacent to f
 				//choose a node of p' that is adjacent to c1
+
 				v1 = pPrim.adjacentVertices((V)c1.getContent()).get(0);
 
 				Graph<V,E> bBlock = (Graph<V, E>) b.getContent();
@@ -216,46 +250,64 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				log.info("Forming new p' from " + pathNodes);
 				//p' - construct in T(G) a new block from p', b and bc_nodes along the path {p', b)
 
-				
-				//TODO check 
+
 				//how is this new node connected to the rest of the tree
 				//idea
 				//find all blocks on the path and see to which 
 				//cut vertices they are connected
-				//if it is not on the path
-				//connect the new node to it
+				//if the vertex is connected to some other block not on the path
+				//it is still a cut vertex and there should be an edge between it and the new block
 				//done before the tree is changed
-				//TODO its parent?
+				//---determining the parent of the new node
+				//the edges in the bc trees are between cut vertices and blocks that contain them
+				//if a cut vertex is on a lower level than the block, the block is its parent
+				//otherwise, the vertex is the parent
+				//so, some cut vertices of this block will have it as the parent
+				//the cut vertex that has none of the blocks of the path as its parent
+				//should be the new parent of the block
+				
 				cutVertices.clear();
 				for (BCTreeNode pathNode : pathNodes){
+					System.out.println("current path node " + pathNode);
 					if (pathNode.getType() == VertexType.B){
 						for (BCTreeEdge bcEdge : bcTree.adjacentEdges(pathNode)){
 							BCTreeNode other = bcEdge.getOrigin() == pathNode ? bcEdge.getDestination() : bcEdge.getOrigin();
-							if (!pathNodes.contains(other) && other.getType() == VertexType.C){
-								cutVertices.add(other);
+							if (other.getType() == VertexType.C){
+								//see if this vertex has an edge to a block not on the current path
+								for (BCTreeEdge cutVertexEdge : bcTree.adjacentEdges(other)){
+									BCTreeNode connected = cutVertexEdge.getOrigin() == other ? cutVertexEdge.getDestination() : cutVertexEdge.getOrigin();
+									if (!pathNodes.contains(connected)){
+										cutVertices.add(other);
+										break;
+									}
+								}
 							}
 						}
 					}
 				}
 
-				log.info("BC tree after creation of a new p' node " + bcTree);
-				
-				
+
 				Graph<V,E> pPrimNew = new Graph<V,E>();
 				mergeNodes(pathNodes, pPrimNew);
 				pPrimNew.addEdge(newEdge);
 				pPrimNode = new BCTreeNode(pPrimNew);
 				bcTree.addVertex(pPrimNode);
-				log.info("Created new p' node: " + pPrimNew);
 				pPrimNode.setType(VertexType.B);
-				
-				//what to do with cut vertices
-				//should they be removed, like the blocks were?
-				
+
+
 				for (BCTreeNode cNode : cutVertices){
+					System.out.println("cut vertex: " + cNode);
 					BCTreeEdge newPPrimEdge = new BCTreeEdge(pPrimNode, cNode);
 					bcTree.addEdge(newPPrimEdge);
+					if (cNode.getParent() == null || !pathNodes.contains(cNode.getParent()))
+						pPrimNode.setParent(cNode);
+					else if (cNode.getParent() != null)
+						cNode.setParent(pPrimNode); //also updating the parent of the cut vertex since its parent was merged
+					
 				}
+				
+				log.info("Created new p' node: " + pPrimNode);
+				log.info("BC tree after creation of a new p' node " + bcTree);
 			}
 
 
@@ -265,6 +317,17 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				//let's merge all of the with the first child of l1
 				//because it is not specified with which child
 				//revise this if the result is not satisfactory
+				
+				//TODO fale neke veze
+				//takodje, ne vezivati cut vertex-e, njih izbaciti iz kombinacije
+				//nego povezati neke druge cvorove
+				//to se mozda jos negde javi
+				//druga stvar, fale neke ivice
+				//pogledati kao u gornjem slucaju kada se onako izmedju svih na putanji vuklo
+				//ili stvarno svako dete l2 sa svakim iz l2?
+				//ili deca iz l1 medjusobno
+				//moguce da je to problem i da je to dovoljno 
+				//pogledati jos to spajanje
 
 				List<V> outsideFace1, outsideFace2;
 				addedEdges.clear();
@@ -314,6 +377,30 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				pathNodes.addAll(currentPath);
 
 				log.info("Should merge all on path " + pathNodes);
+				
+				
+				//now to determine how to connect it
+				//try the same logic as before
+				cutVertices.clear();
+				for (BCTreeNode pathNode : pathNodes){
+					System.out.println("current path node " + pathNode);
+					if (pathNode.getType() == VertexType.B){
+						for (BCTreeEdge bcEdge : bcTree.adjacentEdges(pathNode)){
+							BCTreeNode other = bcEdge.getOrigin() == pathNode ? bcEdge.getDestination() : bcEdge.getOrigin();
+							if (other.getType() == VertexType.C){
+								//see if this vertex has an edge to a block not on the current path
+								for (BCTreeEdge cutVertexEdge : bcTree.adjacentEdges(other)){
+									BCTreeNode connected = cutVertexEdge.getOrigin() == other ? cutVertexEdge.getDestination() : cutVertexEdge.getOrigin();
+									if (!pathNodes.contains(connected)){
+										cutVertices.add(other);
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+
 
 				Graph<V,E> pPrim = new Graph<V,E>();
 				mergeNodes(pathNodes, pPrim);
@@ -324,46 +411,50 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				pPrimNode.setType(VertexType.B);
 				bcTree.addVertex(pPrimNode);
 
-				log.info("p' node: " + pPrimNode);
-
-				//now to determine how to connect it
-				//try the same logic as before
-
-				//TODO 
-				for (BCTreeNode pathNode : pathNodes){
-					if (pathNode.getType() == VertexType.B){
-						for (BCTreeEdge bcEdge : bcTree.adjacentEdges(pathNode)){
-							BCTreeNode other = bcEdge.getOrigin() == pathNode ? bcEdge.getDestination() : bcEdge.getOrigin();
-							if (!pathNodes.contains(pathNode) && pathNode.getType() == VertexType.C){
-								BCTreeEdge newPPrimEdge = new BCTreeEdge(pPrimNode, other);
-								bcTree.addEdge(newPPrimEdge);
-							}
-						}
-					}
+				for (BCTreeNode cNode : cutVertices){
+					System.out.println("cut vertex: " + cNode);
+					BCTreeEdge newPPrimEdge = new BCTreeEdge(pPrimNode, cNode);
+					bcTree.addEdge(newPPrimEdge);
+					if (cNode.getParent() == null || !pathNodes.contains(cNode.getParent()))
+						pPrimNode.setParent(cNode);
+					else if (cNode.getParent() != null)
+						cNode.setParent(pPrimNode); //also updating the parent of the cut vertex since its parent was merged
+					
 				}
-
+				
+				
+				log.info("p' node: " + pPrimNode);
 				log.info("BC tree after creation of a new p' node " + bcTree);
 			}
 
+			
+			//Updates after the main part is completed
+			
 			//update degrees
 			deg.clear();
 			for (BCTreeNode bcNode : bcTree.getVertices()){
 				deg.put(bcNode, bcTree.vertexDegree(bcNode));
 			}
+			//update pendants
+			bcTree.updatePendants();
+			pendants = bcTree.getPendants();
+			labels = reduceChains(ret, pendants);
 
 			if (l2 != null && l1.size() == l2.size()) //l1 has no more children
 				labels.remove(l1); //remove l1 form the list of labels
 
 			//if degree(p') == 1 //a new pendant occurs
 			//find the parent of p' via reduce_chains
-			if (deg.get(pPrimNode) == 1){
-				log.info("new pendant, applying reduce chains");
-				pendants.clear();
-				pendants.add((Graph<V, E>) pPrimNode.getContent());
-				//TODO
-				//use graph or ret?
-				reduceChains(ret, pendants, labels);
-			}
+			//did this a bit differently
+			//keep this in mind in case something does not work properly
+//			if (deg.get(pPrimNode) == 1){
+//				log.info("new pendant, applying reduce chains");
+//				pendants.clear();
+//				pendants.add((Graph<V, E>) pPrimNode.getContent());
+//				//TODO
+//				//use graph or ret?
+//				reduceChains(ret, pendants, labels);
+//			}
 
 			//if (l1 is b-label) and (L(l2) == 1)
 			//apply reduce chains to the remaining child of l1
@@ -373,8 +464,9 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				//let's assume it's the last one
 				pendants.clear();
 				pendants.add(l1.getChildren().get(l1.getChildren().size() - 1));
-				reduceChains(ret, pendants, labels);
+				reduceChains(ret, pendants);
 			}
+			
 		}
 
 		return ret;
@@ -470,11 +562,14 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	 * @param pendants
 	 * @param labels List of labels to be updated or formed
 	 */
-	private void reduceChains(Graph<V,E> graph, List<Graph<V,E>> pendants, List<PlanarAugmentationLabel<V, E>> labels){
+	private List<PlanarAugmentationLabel<V, E>> reduceChains(Graph<V,E> graph, List<Graph<V,E>> pendants){
 
 		//for each p in pendants
 		//the first pass
 
+		List<PlanarAugmentationLabel<V, E>> labels = 
+				new ArrayList<PlanarAugmentationLabel<V,E>>();
+		
 		Map<BCTreeNode, PlanarAugmentationLabel<V,E>> nodeLabelsMap = 
 				new HashMap<BCTreeNode, PlanarAugmentationLabel<V,E>>();
 		for (PlanarAugmentationLabel<V,E> label : labels)
@@ -562,6 +657,8 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 			labels.add(bLabel);
 			log.info("created b label " + bLabel);
 		}
+		
+		return labels;
 	}
 
 
@@ -580,7 +677,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		//return planar(G+(l1,l2))
 		if (l1.getParent().getType() == VertexType.C && l2.getParent().getType() == VertexType.C){
 			log.info("Two c labels");
-			return checkPlanarity(graph, (V) l1.getParent(), (V) l2.getParent());
+			return checkPlanarity(graph, (V) l1.getParent().getContent(), (V) l2.getParent().getContent());
 		}
 
 		//let v1 be a b-label and c11 and c12 cut vertices

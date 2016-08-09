@@ -19,6 +19,7 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 	private List<ExclusivePair> exclusivePairs;
 	private DFSTree<V,E> tree;
 	private Logger log = Logger.getLogger(LRPartitionSet.class);
+	private boolean debug = false;
 
 
 	public LRPartitionSet(DFSTree<V,E> tree){
@@ -50,7 +51,8 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 
 	public boolean organizePartitions(){
 		
-		log.info("organizing partitions started");
+		if (debug)
+			log.info("organizing partitions started");
 		
 		//firstly, join all classes that contain the same edge
 		boolean shouldContinue = true;
@@ -108,9 +110,10 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 				same.add(new ArrayList<E>());
 		}
 		
-		System.out.println("Same size: " + same.size());
+		//System.out.println("Same size: " + same.size());
 		addRemainingEdges();
-		log.info("organizing partitions ended");
+		if (debug)
+			log.info("organizing partitions ended");
 		return true;
 	}
 

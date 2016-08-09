@@ -80,6 +80,16 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 		setParents(root, new ArrayList<BCTreeNode>());
 	}
 	
+
+	@SuppressWarnings("unchecked")
+	public void updatePendants(){
+		pendants.clear();
+		for (BCTreeNode blockNode : bVertices){
+			if (vertexDegree(blockNode) == 1)
+				pendants.add((Graph<V, E>) blockNode.getContent());
+		}
+	}
+	
 	private void setParents(BCTreeNode currentNode, List<BCTreeNode> processed){
 		processed.add(currentNode);
 		for (BCTreeEdge edge : adjacentEdges(currentNode)){

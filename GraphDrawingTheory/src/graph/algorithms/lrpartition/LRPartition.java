@@ -24,7 +24,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	private List<E> right, left;
 	private Graph<V,E> graph;
 	private Logger log = Logger.getLogger(LRPartition.class);
-	private boolean debug;
+	private boolean debug = false;
 
 	public LRPartition(Graph<V,E> graph){
 		right = new ArrayList<E>();
@@ -103,8 +103,6 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 
 				int lowptE1 = tree.lowpt(e1);
 				int lowptE2 = tree.lowpt(e2);
-
-
 
 				List<E> class1 = new ArrayList<E>();
 				List<E> class2 = new ArrayList<E>();

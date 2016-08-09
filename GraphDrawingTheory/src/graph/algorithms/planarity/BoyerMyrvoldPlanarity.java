@@ -231,7 +231,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		//basically, traversing the external face of the relevant block and searching for 
 		//ednpoints and pertinent vertices
 
-		System.out.println(edgesToEmbed);
+		//System.out.println(edgesToEmbed);
 		Collections.sort(edgesToEmbed, new Comparator<E>() {
 
 			@Override
@@ -246,7 +246,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				Map<V,Block> pertinent2 = pertinentBlocksForEdge.get(o2);
 
 				//System.out.println("pertinent1 " + pertinent1);
-				//	System.out.println("pertinent2 " + pertinent2);
+				//System.out.println("pertinent2 " + pertinent2);
 
 				List<Block> overlappingBlocks = new ArrayList<Block>(pertinent1.values());
 				overlappingBlocks.retainAll(pertinent2.values());
