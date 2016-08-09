@@ -112,17 +112,28 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				//merge all bc nodes along the paths between l1 and the children of l1
 				//and the children themselves to a new pendant p'
 
+				//don't connect cut vertices, connect vertices inside blocks
+				//all children are pendants, which means that 
+				//they only have one cut vertex and one edge
+				
 				BCTreeNode c1 = l1.getParent();
 				Graph<V,E> firstChild = l1.getChildren().get(0);
 				boyerMyrvold.isPlannar(firstChild);
 				List<V> outsideFace = boyerMyrvold.getOutsideFace();
+				BCTreeEdge edge = bcTree.adjacentEdges(bcTree.getVertexByContent(firstChild)).get(0);
+				BCTreeNode cutNode = edge.getOrigin() == bcTree.getVertexByContent(firstChild) ? edge.getDestination() : edge.getOrigin();
+				outsideFace.remove(cutNode.getContent());
 				V v1 = outsideFace.get(0);
+				
 				pathNodes.clear();
 
 				for (int i = 1; i < l1.getChildren().size(); i++){
 					Graph<V,E> otherChild = l1.getChildren().get(i);
 					boyerMyrvold.isPlannar(otherChild);
 					outsideFace = boyerMyrvold.getOutsideFace();
+					edge = bcTree.adjacentEdges(bcTree.getVertexByContent(otherChild)).get(0);
+					cutNode = edge.getOrigin() == bcTree.getVertexByContent(firstChild) ? edge.getDestination() : edge.getOrigin();
+					outsideFace.remove(cutNode.getContent());
 					V v2 = outsideFace.get(0);
 					E newEdge = Util.createEdge(v1, v2, graph.getEdges().get(0).getClass());
 					addedEdges.add(newEdge);
@@ -334,7 +345,12 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				Graph<V,E> l1Child = l1.getChildren().get(0);
 				boyerMyrvold.isPlannar(l1Child);
 				outsideFace1 = boyerMyrvold.getOutsideFace();
+				BCTreeEdge edge = bcTree.adjacentEdges(bcTree.getVertexByContent(l1Child)).get(0);
+				BCTreeNode cutNode = edge.getOrigin() == bcTree.getVertexByContent(l1Child) ? edge.getDestination() : edge.getOrigin();
+				outsideFace1.remove(cutNode.getContent());
 				V v1 = outsideFace1.get(0);
+				
+				
 
 				log.info("labels l1 " + l1 + " and l2 " + l2);
 				log.info("choose child " + l1Child + " of l1 to merge");
@@ -347,6 +363,9 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 					l2ChildNodes.add(bcTree.getVertexByContent(l2Child));
 					boyerMyrvold.isPlannar(l2Child);
 					outsideFace2 = boyerMyrvold.getOutsideFace();
+					edge = bcTree.adjacentEdges(bcTree.getVertexByContent(l2Child)).get(0);
+					cutNode = edge.getOrigin() == bcTree.getVertexByContent(l2Child) ? edge.getDestination() : edge.getOrigin();
+					outsideFace2.remove(cutNode.getContent());
 					V v2 = outsideFace2.get(0);
 					E newEdge = Util.createEdge(v1, v2, graph.getEdges().get(0).getClass());
 					addedEdges.add(newEdge);
