@@ -5,7 +5,6 @@ import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -25,7 +24,6 @@ import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.DSLException;
 import graph.layout.dsl.DSLLayouter;
-import graph.ordering.TopologicalOrdering;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
@@ -34,7 +32,6 @@ import graph.properties.splitting.Splitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
-import graph.tree.bc.BCTree;
 import graph.tree.binary.BinaryTree;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
@@ -473,8 +470,8 @@ public class CommandPanel extends JPanel{
 				//BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
 				//System.out.println(bcTree);
 			PlanarAugmentation<GraphVertex, GraphEdge> planarAugmentation = new PlanarAugmentation<GraphVertex, GraphEdge>();
-			Graph<GraphVertex,GraphEdge> biconnected = planarAugmentation.planarBiconnected(graph);
-			return biconnected.toString();
+			List<GraphEdge> edges = planarAugmentation.planarBiconnected(graph);
+			return "Should add: " + edges;
 			} catch (CannotBeAppliedException e) {
 				e.printStackTrace();
 			}

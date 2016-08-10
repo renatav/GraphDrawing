@@ -84,9 +84,6 @@ public class TraversalUtil{
 			firstVertexEdges.addAll(testList);
 		}
 
-
-		System.out.println("first vertex edges: " + firstVertexEdges);
-
 		E currentEdge = firstVertexEdges.get(0);
 		firstVertexEdges.remove(0);
 		ret.add(currentEdge);

@@ -229,7 +229,6 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 		for (List<E> list : same){
 			for (E e : list)
 				System.out.print(e);
-			System.out.println("kraj");
 		}
 
 	}

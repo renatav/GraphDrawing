@@ -76,8 +76,8 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 
 		if (!partitionSet.organizePartitions())
 			return false;
-		partitionSet.printPartitions();
-
+		
+		//partitionSet.printPartitions();
 
 		return true;
 
