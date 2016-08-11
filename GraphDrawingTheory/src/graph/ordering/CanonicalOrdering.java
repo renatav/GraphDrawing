@@ -1,28 +1,25 @@
 package graph.ordering;
 
+import java.util.Map;
+
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.exception.CannotBeAppliedException;
 
-public class CanonicalOrdering<V extends Vertex,E extends Edge<V>> implements Ordering<V,E>{
+/**
+ * Canonical ordering is a technique for embedding a planr graph on a grid
+ * @author xx
+ *
+ */
+public class CanonicalOrdering {
 
-	@Override
-	public Graph<V, E> order() {
-		// TODO Auto-generated method stub
+	
+	public static <V extends Vertex,E extends Edge<V>>  Map<V,Integer> calculateOrdering(Graph<V,E> graph) throws CannotBeAppliedException{
+		
+		
 		return null;
 	}
-
-	@Override
-	public boolean canOrder() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Graph<V, E> getGraph() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+		
 
 }

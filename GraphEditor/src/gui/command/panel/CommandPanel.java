@@ -17,6 +17,7 @@ import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.connectivity.PlanarAugmentation;
 import graph.algorithms.drawing.ConvexDrawing;
+import graph.algorithms.numbering.STNumbering;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.drawing.Drawing;
@@ -464,17 +465,18 @@ public class CommandPanel extends JPanel{
 		}
 		else if (command.trim().equals("test")){
 			//execute whatever that is being tested
-			try {
-				//Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
-				//System.out.println(ordering);
-				//BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
-				//System.out.println(bcTree);
-			PlanarAugmentation<GraphVertex, GraphEdge> planarAugmentation = new PlanarAugmentation<GraphVertex, GraphEdge>();
-			List<GraphEdge> edges = planarAugmentation.planarBiconnected(graph);
-			return "Should add: " + edges;
-			} catch (CannotBeAppliedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				//Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
+//				//System.out.println(ordering);
+//				//BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
+//				//System.out.println(bcTree);
+//			PlanarAugmentation<GraphVertex, GraphEdge> planarAugmentation = new PlanarAugmentation<GraphVertex, GraphEdge>();
+//			List<GraphEdge> edges = planarAugmentation.planarBiconnected(graph);
+//			return "Should add: " + edges;
+//			} catch (CannotBeAppliedException e) {
+//				e.printStackTrace();
+//			}
+			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph);
 		}
 
 		if (command.equals(commands[15])){
@@ -518,7 +520,7 @@ public class CommandPanel extends JPanel{
 		commands[11] = "list split components";
 		commands[12] = "split graph";
 		commands[13] = "maximal split pairs";
-		commands[14] = "construct spqr";
+		commands[14] = "spqr";
 		commands[15] = "help";
 		commands[16] = "automorphisms";
 		commands[17] = "list base cycles";

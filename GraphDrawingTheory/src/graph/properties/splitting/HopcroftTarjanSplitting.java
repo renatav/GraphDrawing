@@ -503,7 +503,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 							degree[xIndex]--;
 							degree[yIndex]--;
 						}
-						else{ //Added this to solve the problem of triple bonds not being detected and being joined with other components //TODO is there a mistake that let to this necessity? 
+						else{ //Added this to solve the problem of triple bonds not being detected and being joined with other components //TODO is there a mistake that lead to this necessity? 
 							HopcroftTarjanSplitComponent<V, E> tripleBond = new HopcroftTarjanSplitComponent<V,E>();
 							
 							addEdgeToSplitComponent(tripleBond, currentEdge);

@@ -158,6 +158,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		if (debug)
 			log.info(blocks);
 		
+		
 		return true;
 	}
 

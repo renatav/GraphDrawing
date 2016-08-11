@@ -17,5 +17,6 @@ public abstract class Numbering<V extends Vertex,  E extends Edge<V>> {
 		return order;
 	}
 	
+	
 
 }

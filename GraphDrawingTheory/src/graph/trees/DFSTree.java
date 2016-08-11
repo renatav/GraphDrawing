@@ -45,8 +45,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	public void formBackEdges(List<E> allEdges){
 		for (E e : allEdges)
-			if (!treeEdges.contains(e))
+			if (!treeEdges.contains(e)){
 				backEdges.add(e);
+				//consider adding this
+				//super.addEdge(e);
+			}
 	}
 
 	public int getIndex(V  v){

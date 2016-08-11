@@ -434,6 +434,14 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(v);
 		return ret;
 	}
+	
+	public List<V> getAllSources(){
+		List<V> ret = new ArrayList<V>();
+		for (V v : vertices)
+			if (isSource(v))
+				ret.add(v);
+		return ret;
+	}
 
 	public List<List<E>> listMultiEdges(){
 		return properties.listMultiEdges();

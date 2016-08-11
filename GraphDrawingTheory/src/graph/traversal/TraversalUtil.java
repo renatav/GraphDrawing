@@ -34,7 +34,7 @@ public class TraversalUtil{
 		//If there are two such edges where one starts "above" the start of the other one and ends "above" the end
 		//of the other one - not planar
 		//If a vertex between two vertices of a "back edge" is connected to a vertex not on the path - not planar
-
+		
 		if (debug){
 			System.out.println("Excluding vertices: " + excluding);
 			System.out.println("Excluding edges: " + excludingEdges);
