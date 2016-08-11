@@ -1,21 +1,21 @@
 package graph.algorithms.numbering;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.traversal.DFSTreeTraversal;
 import graph.trees.DFSTree;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numbering<V,E>{
 
 	private Map<V,Integer> numbering = new HashMap<V,Integer>();
-	private int currentNumber = 1;
 	
 	//L(v) = min({v} U {u, there is w such that v*->w and w--u}
 	private Map<V,V> LMap = new HashMap<V,V>();
@@ -29,7 +29,11 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
 		DFSTree<V,E> dfsTree = traversal.formDFSTree(graph.getVertices().get(0));
-		preorder(dfsTree);
+		
+		//initial numbering can be the dfs numbering
+		numbering = dfsTree.getVerticesWithIndexes();
+		System.out.println(numbering);
+		System.out.println(dfsTree);
 		
 		//initialize L
 		//to improve efficiency
@@ -37,6 +41,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		for (V v : dfsTree.getVertices()){
 			LMap.put(v, L(dfsTree,v));
 		}
+		
+		System.out.println(LMap);
 		
 		//st should be an edge between
 		//s and t
@@ -54,30 +60,13 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			t = st.getDestination();
 		}
 		
-
-		
+		System.out.println("s " + s);
+		System.out.println("t " + t);
 		stNumber(s, t, st, dfsTree);
 		System.out.println("numbering");
 		System.out.println(numbering);
 	}
 
-	public void preorder(DFSTree<V,E> dfsTree){
-		search(dfsTree, dfsTree.getRoot());
-		System.out.println("numbering after preoder " + numbering);
-	}
-
-	private void search(DFSTree<V,E> dfsTree, V v){
-		//assign v a number higher than all previously assigned numbers
-		//for w such that v->w
-
-		numbering.put(v, currentNumber);
-		currentNumber++;
-
-		for (E e : dfsTree.allOutgoingTreeEdges(v)){
-			V w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
-			search(dfsTree,w);
-		}
-	}
 
 	/**
 	 * Finds a simple path of new edges from old vertex v to some
@@ -148,17 +137,26 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		else if (newTreeEdge != null) {
 			///mark {v,w} old
 			//initialize the path to be {v,w}
+			
+			System.out.println("tree edge");
+			
 			oldEdges.add(newTreeEdge);
 			newEdges.remove(newTreeEdge);
 			path.add(newTreeEdge);
 
 			//while w is new
-			w = newTreeEdge.getOrigin() == v ? newTreeEdge.getDestination() : newTreeEdge.getDestination();
+			w = newTreeEdge.getOrigin() == v ? newTreeEdge.getDestination() : newTreeEdge.getOrigin();
 			while (newVertices.contains(w)){
-				//find the new edge {w,x} with
+				
+
+				System.out.println("current vertex " + w);
+				//find the new edge {w,x}
 				//with x = L(w) or L(x) = L(w)
 				V x;
-				for (E e : newEdges){
+				Iterator<E> iter = newEdges.iterator();
+				while (iter.hasNext()){
+					E e = iter.next();
+					//System.out.println(e);
 					if (e.getOrigin() == w || e.getDestination() == w){
 						x = e.getOrigin() == w ? e.getDestination() : e.getOrigin();
 						if (LMap.get(w) == x || LMap.get(x) == LMap.get(w)){
@@ -169,7 +167,9 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 							newEdges.remove(e);
 							oldVertices.add(w);
 							newVertices.remove(w);
+							path.add(e);
 							w = x;
+							//System.out.println("x " + x);
 							break;
 						}
 					}
@@ -189,7 +189,9 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			V x;
 			while (newVertices.contains(w)){
 				//find the new edge {w,x} with x->w
-				for (E e : newEdges){
+				Iterator<E> iter = newEdges.iterator();
+				while (iter.hasNext()){
+					E e = iter.next();
 					if (e.getOrigin() == w || e.getDestination() == w){
 						if (!dfsTree.getTreeEdges().contains(e))
 							continue;
@@ -203,7 +205,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 							//TODO just the idea, remove so that concurrent modification exception is not thrown
 							//and everywhere else where this occurs
 							oldEdges.add(e);
-							newEdges.remove(e);
+							iter.remove();
 							path.add(e);
 						}
 					}
@@ -211,7 +213,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			}
 		}
 		
-		System.out.println(path);
+		//System.out.println(path);
 		return path;
 
 	}
@@ -236,6 +238,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		for (E e : dfsTree.getAllEdges())
 			if (e != st)
 				newEdges.add(e);
+		
+		System.out.println(newEdges);
 		
 		for (V v : dfsTree.getVertices())
 			if (v != s && v != t)
@@ -265,6 +269,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			if (path != null){
 				pathVertices.clear();
 				V current = v;
+				System.out.println(path);
 				for (E e : path){
 					pathVertices.add(current);
 					V other = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
@@ -282,12 +287,12 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		}
 	}
 
-	//L(v) = min({v} U {u, there is w such that v*->w and w--u}
+	//L(v) = min({v} U {u, if there is w such that v*->w and w--u}
 	private V L(DFSTree<V,E> dfsTree, V v){
 
 		V min = v;
 		V u;
-		for (V w : dfsTree.allDescendantsOf(v, false)){
+		for (V w : dfsTree.allDescendantsOf(v, true)){
 			for (E backEdge : dfsTree.getBackEdges()){
 				if (backEdge.getOrigin() == w || backEdge.getDestination() == w){
 					u = backEdge.getOrigin() == w ? backEdge.getDestination() : backEdge.getOrigin();
