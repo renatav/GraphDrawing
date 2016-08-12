@@ -13,27 +13,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+/**
+ * Given any edge {s,t} in a biconnected graph G with n vertices, 
+ * the vertices can be numbered from 1 to n so that vertex s receives the number 1
+ * and vertex t the number n
+ * This is called the st-numbering
+ * This implementation is based on an algoritm by Even and Tarjan from their paper
+ * titled  "Computing an st-numbering"
+ * @author xx
+ *
+ * @param <V>
+ * @param <E>
+ */
 public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numbering<V,E>{
 
 	private Map<V,Integer> numbering = new HashMap<V,Integer>();
+	private Map<Integer, V> inverseNumbering = new HashMap<Integer, V>();
 	
 	//L(v) = min({v} U {u, there is w such that v*->w and w--u}
 	private Map<V,V> LMap = new HashMap<V,V>();
 
-	public STNumbering(Graph<V,E> graph){
+	public STNumbering(Graph<V,E> graph, V s, V t){
 		order = new ArrayList<V>();
-		formOrder(graph);
+		formOrder(graph, s, t);
 	}
 
-	public void formOrder(Graph<V,E> graph){
+	public void formOrder(Graph<V,E> graph, V s, V t){
+		
+		//find the edge
+		E st = null;
+		for (E e : graph.adjacentEdges(s)){
+			V v = e.getOrigin() == s ? e.getDestination() : e.getOrigin();
+			if (v == t){
+				st = e;
+				break;
+			}
+		}
+		
+		//the given vertices are not connected
+		if (st == null)
+			return;
+			
 		
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
-		DFSTree<V,E> dfsTree = traversal.formDFSTree(graph.getVertices().get(0));
+		DFSTree<V,E> dfsTree = traversal.formDFSTree(t);
 		
 		//initial numbering can be the dfs numbering
 		numbering = dfsTree.getVerticesWithIndexes();
-		System.out.println(numbering);
-		System.out.println(dfsTree);
 		
 		//initialize L
 		//to improve efficiency
@@ -42,29 +68,12 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			LMap.put(v, L(dfsTree,v));
 		}
 		
-		System.out.println(LMap);
-		
-		//st should be an edge between
-		//s and t
-		//t->s is in the tree
-		V s = null, t = null;
-		E st = null;
-		
-		st = dfsTree.getTreeEdges().get(0);
-		if (dfsTree.getIndex(st.getOrigin()) < dfsTree.getIndex(st.getDestination())){
-			t = st.getOrigin();
-			s = st.getDestination();
-		}
-		else{
-			s = st.getOrigin();
-			t = st.getDestination();
-		}
-		
-		System.out.println("s " + s);
-		System.out.println("t " + t);
 		stNumber(s, t, st, dfsTree);
-		System.out.println("numbering");
-		System.out.println(numbering);
+		
+		//now order the vertices in the list order so that they are sorded based on
+		//the st-number
+		for (int i = 0; i < graph.getVertices().size(); i++)
+			order.add(inverseNumbering.get(i));
 	}
 
 
@@ -90,10 +99,6 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		//if there is a new cycle edge {v,w} with  v*->w
 		E newCycle2 = null;
 		
-		System.out.println("pathfinder");
-		System.out.println("v " + v);
-		System.out.println("new edges " + newEdges);
-
 		V w;
 		for (E e : newEdges){
 
@@ -116,11 +121,6 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			}
 		}
 		
-		System.out.println("new cycle 1 " + newCycle1);
-		System.out.println("new cycle 2 " + newCycle2);
-		System.out.println("tree edge " + newTreeEdge);
-		
-		
 
 		if (newTreeEdge == null && newCycle1 == null && newCycle2 == null)
 			return null;
@@ -138,8 +138,6 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			///mark {v,w} old
 			//initialize the path to be {v,w}
 			
-			System.out.println("tree edge");
-			
 			oldEdges.add(newTreeEdge);
 			newEdges.remove(newTreeEdge);
 			path.add(newTreeEdge);
@@ -148,8 +146,6 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			w = newTreeEdge.getOrigin() == v ? newTreeEdge.getDestination() : newTreeEdge.getOrigin();
 			while (newVertices.contains(w)){
 				
-
-				System.out.println("current vertex " + w);
 				//find the new edge {w,x}
 				//with x = L(w) or L(x) = L(w)
 				V x;
@@ -202,8 +198,6 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 							//w = x
 							oldVertices.add(w);
 							newVertices.remove(w);
-							//TODO just the idea, remove so that concurrent modification exception is not thrown
-							//and everywhere else where this occurs
 							oldEdges.add(e);
 							iter.remove();
 							path.add(e);
@@ -239,8 +233,6 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			if (e != st)
 				newEdges.add(e);
 		
-		System.out.println(newEdges);
-		
 		for (V v : dfsTree.getVertices())
 			if (v != s && v != t)
 				newVertices.add(v);
@@ -257,7 +249,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		V v;
 		while (!stack.isEmpty()){
 			
-			System.out.println("current stack " + stack);
+			//System.out.println("current stack " + stack);
 			
 			//let v be the top vertex on the stack
 			//delete v from stack
@@ -269,19 +261,20 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			if (path != null){
 				pathVertices.clear();
 				V current = v;
-				System.out.println(path);
+				//System.out.println(path);
 				for (E e : path){
 					pathVertices.add(current);
 					V other = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
 					current = other;
 				}
-				System.out.println("path vertices " + pathVertices);
-				//the last vertex shouldn't be added
-				for (V pathVertex : pathVertices)
-					stack.push(pathVertex);
+				//add vk-1...v1 to stack
+				//the last vertex shouldn't be added to stack and its not in the list for that reason
+				for (int j = pathVertices.size() -1; j >=0; j--)
+					stack.push(pathVertices.get(j));
 			}
 			else{
 				numbering.put(v, i);
+				inverseNumbering.put(i, v);
 				i++;
 			}
 		}
@@ -303,5 +296,12 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			}
 		}
 		return min;
+	}
+
+	/**
+	 * @return the numbering
+	 */
+	public Map<V, Integer> getNumbering() {
+		return numbering;
 	}
 }

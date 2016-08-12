@@ -476,7 +476,10 @@ public class CommandPanel extends JPanel{
 //			} catch (CannotBeAppliedException e) {
 //				e.printStackTrace();
 //			}
-			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph);
+			GraphVertex s = graph.getVertices().get(0);
+			GraphVertex t = graph.getVertices().get(1);
+			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph, s,t);
+			return stNumbering.getOrder() + "";
 		}
 
 		if (command.equals(commands[15])){
