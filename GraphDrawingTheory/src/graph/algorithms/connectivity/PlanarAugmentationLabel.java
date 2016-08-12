@@ -7,7 +7,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.tree.bc.BCTreeNode;
-import graph.tree.bc.VertexType;
+import graph.tree.bc.BCNodeType;
 
 /**
  * A bundle of pendants together with its parent
@@ -39,7 +39,7 @@ public class PlanarAugmentationLabel<V extends Vertex, E extends Edge<V>> {
 		children.add(pendant);
 	}
 	
-	public VertexType getType(){
+	public BCNodeType getType(){
 		return parent.getType();
 	}
 	

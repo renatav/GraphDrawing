@@ -7,10 +7,10 @@ import graph.elements.Vertex;
 public class BCTreeNode implements Vertex {
 
 	private Object content;
-	private VertexType type;
+	private BCNodeType type;
 	private BCTreeNode parent;
 	
-	public BCTreeNode(VertexType type, Object content){
+	public BCTreeNode(BCNodeType type, Object content){
 		this.type = type;
 		this.content = content;
 	}
@@ -53,7 +53,7 @@ public class BCTreeNode implements Vertex {
 	/**
 	 * @return the type
 	 */
-	public VertexType getType() {
+	public BCNodeType getType() {
 		return type;
 	}
 
@@ -61,7 +61,7 @@ public class BCTreeNode implements Vertex {
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(VertexType type) {
+	public void setType(BCNodeType type) {
 		this.type = type;
 	}
 

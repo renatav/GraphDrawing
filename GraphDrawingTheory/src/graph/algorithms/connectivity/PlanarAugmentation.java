@@ -20,7 +20,7 @@ import graph.traversal.GraphTraversal;
 import graph.tree.bc.BCTree;
 import graph.tree.bc.BCTreeEdge;
 import graph.tree.bc.BCTreeNode;
-import graph.tree.bc.VertexType;
+import graph.tree.bc.BCNodeType;
 import graph.util.Util;
 
 /**
@@ -250,7 +250,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				pPrimNode = new BCTreeNode(pPrim);
 				//set parent of the node
 				pPrimNode.setParent(l1.getParent());
-				pPrimNode.setType(VertexType.B);
+				pPrimNode.setType(BCNodeType.B);
 
 				bcTree.addVertex(pPrimNode);
 				//connect the new node to c1
@@ -276,7 +276,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				BCTreeNode b = null;
 				for (BCTreeEdge bcEdge : bcTree.adjacentEdges(f)){
 					BCTreeNode otherNode = bcEdge.getOrigin() == f ? bcEdge.getDestination() : bcEdge.getOrigin();
-					if (otherNode.getType() == VertexType.B)
+					if (otherNode.getType() == BCNodeType.B)
 						if (!pPrimFPath.contains(otherNode)){
 							b = otherNode;
 							break;
@@ -315,7 +315,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				pPrimNew.addEdge(newEdge);
 				pPrimNode = new BCTreeNode(pPrimNew);
 				bcTree.addVertex(pPrimNode);
-				pPrimNode.setType(VertexType.B);
+				pPrimNode.setType(BCNodeType.B);
 
 				setNewParents(cutVertices, pathNodes, pPrimNode);
 
@@ -410,7 +410,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 					pPrim.addEdge(e);
 
 				pPrimNode = new BCTreeNode(pPrim);
-				pPrimNode.setType(VertexType.B);
+				pPrimNode.setType(BCNodeType.B);
 				bcTree.addVertex(pPrimNode);
 
 				setNewParents(cutVertices, pathNodes, pPrimNode);
@@ -484,10 +484,10 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	private void initCutVerticesOnPath(Set<BCTreeNode> pathNodes, Set<BCTreeNode> cutVertices){
 		cutVertices.clear();
 		for (BCTreeNode pathNode : pathNodes){
-			if (pathNode.getType() == VertexType.B){
+			if (pathNode.getType() == BCNodeType.B){
 				for (BCTreeEdge bcEdge : bcTree.adjacentEdges(pathNode)){
 					BCTreeNode other = bcEdge.getOrigin() == pathNode ? bcEdge.getDestination() : bcEdge.getOrigin();
-					if (other.getType() == VertexType.C){
+					if (other.getType() == BCNodeType.C){
 						//see if this vertex has an edge to a block not on the current path
 						for (BCTreeEdge cutVertexEdge : bcTree.adjacentEdges(other)){
 							BCTreeNode connected = cutVertexEdge.getOrigin() == other ? cutVertexEdge.getDestination() : cutVertexEdge.getOrigin();
@@ -511,7 +511,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		for (BCTreeNode pathNode : nodes){
 			if (debug)
 				log.info("curent node: " + pathNode);
-			if (pathNode.getType() == VertexType.B){
+			if (pathNode.getType() == BCNodeType.B){
 				Graph<V,E> currentPendant = (Graph<V, E>) pathNode.getContent();
 				if (debug)
 					log.info("curent pendant: " + currentPendant);
@@ -528,7 +528,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		//and it is not adjacent to any edges other than the ones that were on the path
 		//it is no longer a cut vertex, so remove it 
 		for (BCTreeNode pathNode : nodes)
-			if (pathNode.getType() == VertexType.C && bcTree.adjacentEdges(pathNode).size() == 0)
+			if (pathNode.getType() == BCNodeType.C && bcTree.adjacentEdges(pathNode).size() == 0)
 				bcTree.removeVertex(pathNode);
 	}
 
@@ -539,7 +539,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		BCTreeNode pendantNode = bcTree.getVertexByContent(p);
 		BCTreeNode c = null;
 		for (BCTreeNode adj : bcTree.adjacentVertices(pendantNode)){
-			if (adj.getType() == VertexType.C){
+			if (adj.getType() == BCNodeType.C){
 				c = adj;
 				break;
 			}
@@ -555,7 +555,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		while (c != bcTree.getRoot() && deg.get(c) == 2){
 
 			//if c is a b-vertex
-			if (c.getType() == VertexType.B){
+			if (c.getType() == BCNodeType.B){
 				List<BCTreeEdge> edges = bcTree.adjacentEdges(c);
 				//let c1 and c2 be 2 cut vertices adjacent to b
 				BCTreeEdge e1 = edges.get(0);
@@ -584,7 +584,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		}
 
 		//if c is a b-vertex
-		if (c.getType() == VertexType.B){
+		if (c.getType() == BCNodeType.B){
 			//c - the last cut vertex that we have reached
 			c = lastC;
 		}
@@ -655,7 +655,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 
 			for (BCTreeEdge bcEdge : bcTree.adjacentEdges(cNode)){
 				BCTreeNode other = bcEdge.getOrigin() == cNode ? bcEdge.getDestination() : bcEdge.getOrigin();
-				if (other.getType() == VertexType.B && deg.get(other) == 3){
+				if (other.getType() == BCNodeType.B && deg.get(other) == 3){
 					block = other;
 					break;
 				}
@@ -722,7 +722,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 
 		//if l1 and l2 are c labels
 		//return planar(G+(l1,l2))
-		if (l1.getParent().getType() == VertexType.C && l2.getParent().getType() == VertexType.C){
+		if (l1.getParent().getType() == BCNodeType.C && l2.getParent().getType() == BCNodeType.C){
 			if (debug)
 				log.info("Two c labels");
 			return checkPlanarity(graph, (V) l1.getParent().getContent(), (V) l2.getParent().getContent());
@@ -732,7 +732,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		//adjacent to 2 children of l1 in T(G)
 
 		//at least one of them is a block
-		PlanarAugmentationLabel<V, E> blockLabel = l1.getType() == VertexType.B ? l1 : l2;
+		PlanarAugmentationLabel<V, E> blockLabel = l1.getType() == BCNodeType.B ? l1 : l2;
 		PlanarAugmentationLabel<V, E> otherLabel = blockLabel == l1 ? l2 : l1;
 
 		if (debug){
@@ -745,7 +745,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 			BCTreeNode pendantNode = bcTree.getVertexByContent(pendant);
 			for (BCTreeEdge bcEdge : bcTree.adjacentEdges(pendantNode)){
 				BCTreeNode other = bcEdge.getOrigin() == pendantNode ? bcEdge.getDestination() : bcEdge.getOrigin();
-				if (other.getType() == VertexType.C){
+				if (other.getType() == BCNodeType.C){
 					if (c11 == null)
 						c11 = (V) other.getContent();
 					else
@@ -761,7 +761,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		}
 
 		//if l2 is a c-label
-		if (otherLabel.getType() == VertexType.C){
+		if (otherLabel.getType() == BCNodeType.C){
 			//if L(l2) == 1
 			V cutVertex = (V) otherLabel.getParent();
 			log.info("Other label of c type and size " + otherLabel.size());
@@ -784,7 +784,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 				BCTreeNode pendantNode = bcTree.getVertexByContent(pendant);
 				for (BCTreeEdge bcEdge : bcTree.adjacentEdges(pendantNode)){
 					BCTreeNode other = bcEdge.getOrigin() == pendantNode ? bcEdge.getDestination() : bcEdge.getOrigin();
-					if (other.getType() == VertexType.C){
+					if (other.getType() == BCNodeType.C){
 						if (c21 == null)
 							c21 = (V) other.getContent();
 						else
@@ -900,7 +900,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 		for (BCTreeNode node  : P)
 			if (deg.get(node) == 3)
 				nodesOfDegree3++;
-			else if (node.getType() == VertexType.B && deg.get(node) == 4)
+			else if (node.getType() == BCNodeType.B && deg.get(node) == 4)
 				blocksOfDegree4++;
 
 		ret = nodesOfDegree3 == 2 || blocksOfDegree4 == 1;

@@ -1,5 +1,5 @@
 package graph.tree.bc;
 
-public enum VertexType {
+public enum BCNodeType {
 	B,C;
 }

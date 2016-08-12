@@ -36,18 +36,18 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 	@Override
 	public void addVertex(BCTreeNode node){
 		super.addVertex(node);
-		if (node.getType() == VertexType.C)
+		if (node.getType() == BCNodeType.C)
 			cVertices.add(node);
-		if (node.getType() == VertexType.B)
+		if (node.getType() == BCNodeType.B)
 			bVertices.add(node);
 	}
 	
 	@Override
 	public void removeVertex(BCTreeNode node){
 		super.removeVertex(node);
-		if (node.getType() == VertexType.C)
+		if (node.getType() == BCNodeType.C)
 			cVertices.remove(node);
-		if (node.getType() == VertexType.B)
+		if (node.getType() == BCNodeType.B)
 			bVertices.remove(node);
 	}
 
@@ -57,14 +57,14 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 		List<Graph<V,E>> blocks = graph.listBiconnectedComponents();
 		
 		for (V cutVertex : cutVertices){
-			BCTreeNode node = new BCTreeNode( VertexType.C, cutVertex);
+			BCTreeNode node = new BCTreeNode( BCNodeType.C, cutVertex);
 			addVertex(node);
 			if (root == null)
 				root = node;
 		}
 
 		for (Graph<V,E> block : blocks){
-			BCTreeNode node  = new BCTreeNode(VertexType.B, block);
+			BCTreeNode node  = new BCTreeNode(BCNodeType.B, block);
 			addVertex(node);
 			int containedCutVerticesCount = 0;
 			for (V cutVertex : cutVertices){
