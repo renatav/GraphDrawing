@@ -47,7 +47,7 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 		super.removeVertex(node);
 		if (node.getType() == BCNodeType.C)
 			cVertices.remove(node);
-		if (node.getType() == BCNodeType.B)
+		else if (node.getType() == BCNodeType.B)
 			bVertices.remove(node);
 	}
 
@@ -69,7 +69,7 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 			int containedCutVerticesCount = 0;
 			for (V cutVertex : cutVertices){
 				if (block.hasVertex(cutVertex)){
-					addEdge(new BCTreeEdge(getVertexByContent(cutVertex),getVertexByContent(block)));
+					addEdge(new BCTreeEdge(getVertexByContent(cutVertex),node));
 					containedCutVerticesCount++;
 				}
 			}

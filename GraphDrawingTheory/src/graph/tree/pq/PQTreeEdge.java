@@ -8,6 +8,12 @@ public class PQTreeEdge implements Edge<PQTreeNode>{
 	private PQTreeNode destination;
 	
 	
+	public PQTreeEdge(PQTreeNode origin, PQTreeNode destination) {
+		super();
+		this.origin = origin;
+		this.destination = destination;
+	}
+	
 	@Override
 	public PQTreeNode getOrigin() {
 		// TODO Auto-generated method stub
@@ -39,5 +45,11 @@ public class PQTreeEdge implements Edge<PQTreeNode>{
 	public void setWeight(int weight) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public String toString() {
+		return "PQTreeEdge [origin=" + origin + ", destination=" + destination
+				+ "]";
 	}
 }
