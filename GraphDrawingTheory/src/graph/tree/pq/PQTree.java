@@ -99,6 +99,9 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				PQTreeNode leafNode = getVertexByContent(graphVirtualVerticesMap.get(cutVertex));
 				addEdge(new PQTreeEdge(node,leafNode));
 			}
+			
+			if (root == null)
+				root = node;
 		}
 
 		for (Graph<V,E> block : blocks){

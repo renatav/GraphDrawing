@@ -57,7 +57,7 @@ public class PQTreeNode implements Vertex{
 	 * of Q-nodes have only one immediate sibling and the interior
 	 * children of Q-nodes have two immediate siblings
 	 */
-	private Set<PQTreeNode> immediateSimblins;
+	private List<PQTreeNode> immediateSimblings;
 
 	/**
 	 * All children of a node 
@@ -114,7 +114,7 @@ public class PQTreeNode implements Vertex{
 			children = new ArrayList<PQTreeNode>();
 			fullChildren = new ArrayList<PQTreeNode>();
 			partialChildren = new ArrayList<PQTreeNode>();
-			immediateSimblins = new HashSet<PQTreeNode>();
+			immediateSimblings = new ArrayList<PQTreeNode>();
 
 			if (type == PQNodeType.P){
 				circularLink = new DoubleLinkedList<PQTreeNode>();
@@ -222,8 +222,8 @@ public class PQTreeNode implements Vertex{
 		return fullChildren;
 	}
 
-	public Set<PQTreeNode> getImmediateSimblins() {
-		return immediateSimblins;
+	public List<PQTreeNode> getImmediateSimblings() {
+		return immediateSimblings;
 	}
 
 	public PQNodeLabel getLabel() {
