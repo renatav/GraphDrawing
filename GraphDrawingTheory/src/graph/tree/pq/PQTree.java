@@ -22,6 +22,10 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 
 	private List<PQTreeNode> pNodes, qNodes, leaves;
 	private Graph<V,E> graph;
+	/**
+	 * The root of the PQ-tree is the unique node having no immediate siblings and no parent
+	 */
+	private PQTreeNode root;
 
 	public PQTree(Graph<V,E> graph, List<E> virtualEdges){
 		super();
@@ -61,7 +65,14 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 		//with the exception that the tree also contains the leaves
 		//which represent virtual vertices
 
+		System.out.println(graph);
+		
 		List<V> cutVertices = graph.listCutVertices();
+		if (graph.getVertices().size() < 3) //TODO check this. Should definitely add the one vertex if there is only one
+			cutVertices.addAll(graph.getVertices());
+		
+		System.out.println(cutVertices);
+		
 		List<Graph<V,E>> blocks = graph.listBiconnectedComponents();
 
 		//graph vertex is key, virtual vertex is values
@@ -110,6 +121,16 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	public String toString() {
 		return "PQTree [pNodes=" + pNodes + ", qNodes=" + qNodes + ", leaves="
 				+ leaves + "]";
+	}
+
+
+	public PQTreeNode getRoot() {
+		return root;
+	}
+
+
+	public void setRoot(PQTreeNode root) {
+		this.root = root;
 	}
 	
 	

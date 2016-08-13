@@ -434,7 +434,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 				ret.add(v);
 		return ret;
 	}
-	
+
 	public List<V> getAllSources(){
 		List<V> ret = new ArrayList<V>();
 		for (V v : vertices)
@@ -467,6 +467,26 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	public List<Graph<V,E>>listBiconnectedComponents(){
 		return properties.listBiconnectedComponents();
+	}
+
+	/**
+	 * Creates a subgraph of the graph containing the
+	 * given vertices
+	 * @param subgraphVertices Vertices that should be in the subgraph
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Graph<V,E> subgraph(List<V> subgraphVertices){
+		Graph<V,E> subgraph = new Graph<V,E>();
+		for (V v : subgraphVertices)
+			subgraph.addVertex(v);
+
+		for (E e : edges)
+			if (subgraphVertices.contains(e.getDestination()) && 
+					subgraphVertices.contains(e.getOrigin()))
+				subgraph.addEdge(e);
+
+		return subgraph;
 	}
 
 	public int[][] adjacencyMatrix(){

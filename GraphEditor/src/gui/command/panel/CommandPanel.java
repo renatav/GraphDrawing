@@ -1,24 +1,13 @@
 package gui.command.panel;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
-import graph.algorithms.connectivity.PlanarAugmentation;
 import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.numbering.STNumbering;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
+import graph.algorithms.planarity.PlanarEmbedding;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.drawing.Drawing;
 import graph.elements.Graph;
@@ -41,6 +30,18 @@ import gui.model.GraphVertex;
 import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import net.miginfocom.swing.MigLayout;
 
 public class CommandPanel extends JPanel{
@@ -476,10 +477,13 @@ public class CommandPanel extends JPanel{
 //			} catch (CannotBeAppliedException e) {
 //				e.printStackTrace();
 //			}
-			GraphVertex s = graph.getVertices().get(0);
-			GraphVertex t = graph.getVertices().get(1);
-			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph, s,t);
-			return stNumbering.getOrder() + "";
+//			GraphVertex s = graph.getVertices().get(0);
+//			GraphVertex t = graph.getVertices().get(1);
+//			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph, s,t);
+//			return stNumbering.getOrder() + "";
+			
+			PlanarEmbedding<GraphVertex, GraphEdge> planarEmbedding = new PlanarEmbedding<GraphVertex, GraphEdge>(graph);
+			planarEmbedding.execute();
 		}
 
 		if (command.equals(commands[15])){
