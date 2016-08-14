@@ -8,13 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
+
 public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 	/**
 	 * The number of blocks of blocked nodes during the bubbling up pass
 	 */
 	private int blockCount;
-	
+
 	/**
 	 * The number of blocked nodes during the bubbling up pass.
 	 * This is only needed for the case when a pseudonode is used.
@@ -22,7 +24,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * children for the pseudonode
 	 */
 	private int blockedNodes;
-	
+
 	/**
 	 * A variable which is either 0 (the initial value) or 1 (if the 
 	 * root of the tree has been processed during the first pass). It acts
@@ -31,17 +33,19 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * 
 	 */
 	private int offTheTop;
-	
+
 	/**
 	 * A first-in first-out list which is used during both passes for
 	 * sequencing the order in which nodes are processed
 	 */
 	private Queue<PQTreeNode> queue;
-	
+
+	private Logger log = Logger.getLogger(PQTreeReduction.class);
+
 	public PQTreeReduction(){
 		queue = new LinkedList<PQTreeNode>();
 	}
-	
+
 	/**
 	 * @param pqTree
 	 * @param S A subset of all nodes
@@ -155,7 +159,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		//naturally, no need to do it here since the object itself 
 		//is modified
 	}
-	
+
 	public void reduce(PQTree<V,E> pqTree, List<PQTreeNode> S){
 		//initialize queue to be empty
 		queue.clear();
@@ -171,7 +175,107 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			PQTreeNode x = queue.remove();
 			if (x.getPertinentLeafCount() < S.size()){
 				//X is not root(T,S)
+				PQTreeNode y = x.getParent();
+				int yPertinent = y.getPertinentLeafCount();
+				int xPertinent = x.getPertinentLeafCount();
+				y.setPertinentLeafCount(xPertinent + yPertinent);
+				y.decrementPertinentChildCount();
+				if (y.getPertinendChildCount() == 0)
+					queue.add(y);
+				//try templates
+				//the order is very important
+				if (!templateL1(x))
+					if (!templateP1(x))
+						if (!templateP3(x))
+							if (!templateP5(x))
+								if (!templateQ1(x))
+									if (!templateQ2(x)){
+										pqTree = null;
+										break;
+									}
+			}
+			else{
+				//x is root(T,S)
+				//try templates a bit differently
+				if (!templateL1(x))
+					if (!templateP1(x))
+						if (!templateP2(x))
+							if (!templateP4(x))
+								if (!templateP6(x))
+									if (!templateQ1(x))
+										if (!templateQ2(x))
+											if (!templateQ3(x)){
+												pqTree = null;
+												break;
+											}
 			}
 		}
+		
+		log.info("Tree reduced");
+		log.info(pqTree);
 	}
+
+
+
+private boolean templateL1(PQTreeNode node){
+	log.info("Trying template L1 for node " + node);
+
+	return true;
+}
+
+private boolean templateP1(PQTreeNode node){
+	log.info("Trying template P1 for node " + node);
+
+	return true;
+}
+
+private boolean templateP2(PQTreeNode node){
+	log.info("Trying template P2 for node " + node);
+
+	return true;
+}
+
+private boolean templateP3(PQTreeNode node){
+	log.info("Trying template P3 for node " + node);
+
+	return true;
+}
+
+private boolean templateP4(PQTreeNode node){
+	log.info("Trying template P4 for node " + node);
+
+	return true;
+}
+
+private boolean templateP5(PQTreeNode node){
+	log.info("Trying template P5 for node " + node);
+
+	return true;
+}
+
+private boolean templateP6(PQTreeNode node){
+	log.info("Trying template P6 for node " + node);
+
+	return true;
+}
+
+private boolean templateQ1(PQTreeNode node){
+	log.info("Trying template Q1 for node " + node);
+
+	return true;
+}
+
+private boolean templateQ2(PQTreeNode node){
+	log.info("Trying template Q2 for node " + node);
+
+	return true;
+}
+
+private boolean templateQ3(PQTreeNode node){
+	log.info("Trying template Q3 for node " + node);
+
+	return true;
+}
+
+
 }
