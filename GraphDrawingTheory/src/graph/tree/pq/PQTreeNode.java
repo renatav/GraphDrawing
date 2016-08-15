@@ -50,6 +50,12 @@ public class PQTreeNode implements Vertex{
 	 * the node would not match a legal template 
 	 */
 	private List<PQTreeNode> partialChildren;
+	
+	/**
+	 * Contains all of the children of the node
+	 * that are known to be empty
+	 */
+	private List<PQTreeNode> emptyChildren;
 
 	/**
 	 * A set containing 0,1, or 2 other nodes
@@ -66,7 +72,7 @@ public class PQTreeNode implements Vertex{
 	
 	/**
 	 * A count of the number of pertinent children currently possessed by the node
-	 * The count is initially zero and is incremented by one eah time
+	 * The count is initially zero and is incremented by one each time
 	 * a child of the node is processed during the bubbling up. During the 
 	 * matching pass the count is decremented by one each time a child is matched
 	 * The node is queued for matching when the pertinent child count reaches zero
@@ -76,8 +82,8 @@ public class PQTreeNode implements Vertex{
 	
 	/**
 	 * A count of the number of pertinent leaves which are descendants of this node
-	 * The field is built up during the second pass as each child of the node is mathced
-	 * It is the sum of the pertinent leaf counts for all of the ertinent children
+	 * The field is built up during the second pass as each child of the node is matched
+	 * It is the sum of the pertinent leaf counts for all of the pertinent children
 	 */
 	private int pertinentLeafCount;
 	
@@ -103,10 +109,9 @@ public class PQTreeNode implements Vertex{
 	private PQTreeNode parent;
 	
 	
-	public PQTreeNode(PQNodeType type, Object content) {
+	public PQTreeNode(PQNodeType type){
 		super();
 		this.type = type;
-		this.content = content;
 		mark = PQNodeMark.UNMARKED;
 		
 		//initialize structures specific to certain nodes
@@ -114,6 +119,7 @@ public class PQTreeNode implements Vertex{
 			children = new ArrayList<PQTreeNode>();
 			fullChildren = new ArrayList<PQTreeNode>();
 			partialChildren = new ArrayList<PQTreeNode>();
+			emptyChildren = new ArrayList<PQTreeNode>();
 			immediateSimblings = new ArrayList<PQTreeNode>();
 
 			if (type == PQNodeType.P){
@@ -125,6 +131,12 @@ public class PQTreeNode implements Vertex{
 		}
 	}
 	
+	
+	public PQTreeNode(PQNodeType type, Object content) {
+		this(type);
+		this.content = content;
+	}
+	
 	/**
 	 * The number of children currently possessed by the nodes.
 	 * Only used for P-nodes
@@ -132,6 +144,19 @@ public class PQTreeNode implements Vertex{
 	public int childrenCount(){
 		return children.size();
 	}
+	
+	public int fullChildrenCount(){
+		return fullChildren.size();
+	}
+	
+	public int partialChildrenCount(){
+		return partialChildren.size();
+	}
+	
+	public int emptyChildrenCount(){
+		return emptyChildren.size();
+	}
+	
 	
 	public void incrementPertinentChildCount(){
 		pertinendChildCount++;
@@ -143,10 +168,76 @@ public class PQTreeNode implements Vertex{
 
 	public void addChild(PQTreeNode node){
 		children.add(node);
+		if (node.getLabel() == PQNodeLabel.FULL)
+			fullChildren.add(node);
+		else if (node.getLabel() == PQNodeLabel.SINGLY_PARTIAL)
+			partialChildren.add(node);
+		else if (node.getLabel() == PQNodeLabel.EMPTY)
+			emptyChildren.add(node);
+		node.setParent(this);
 	}
 
 	public void removeChild(PQTreeNode node){
 		children.remove(node);
+		if (node.getLabel() == PQNodeLabel.FULL)
+			fullChildren.remove(node);
+		else if (node.getLabel() == PQNodeLabel.SINGLY_PARTIAL)
+			partialChildren.remove(node);
+		else if (node.getLabel() == PQNodeLabel.EMPTY)
+			emptyChildren.remove(node);
+		node.setParent(null);
+	}
+	
+	/**
+	 * Changes the label to full
+	 * while updating the lists of the 
+	 * empty, partial and full children
+	 */
+	public void labelAsFull(){
+		PQNodeLabel oldLabel = label;
+		label = PQNodeLabel.FULL;
+		if (parent != null){
+			parent.getFullChildren().add(this);
+			if (oldLabel == PQNodeLabel.SINGLY_PARTIAL)
+				parent.getPartialChildren().remove(this);
+			else if (oldLabel == PQNodeLabel.EMPTY)
+				parent.getEmptyChildren().remove(this);
+		}
+	}
+	
+	/**
+	 * Changes the label to empty
+	 * while updating the lists of the 
+	 * empty, partial and full children
+	 */
+	public void labelAsEmpty(){
+		PQNodeLabel oldLabel = label;
+		label = PQNodeLabel.EMPTY;
+		if (parent != null){
+			parent.getEmptyChildren().add(this);
+			if (oldLabel == PQNodeLabel.SINGLY_PARTIAL)
+				parent.getPartialChildren().remove(this);
+			else if (oldLabel == PQNodeLabel.FULL)
+				parent.getFullChildren().remove(this);
+		}
+	}
+	
+	/**
+	 * Changes the label to partial
+	 * while updating the lists of the 
+	 * empty, partial and full children
+	 * @param label - Singly partial or doubly partial
+	 */
+	public void labelAsPartial(PQNodeLabel label){
+		PQNodeLabel oldLabel = this.label;
+		this.label = label;
+		if (parent != null){
+			parent.getPartialChildren().add(this);
+			if (oldLabel == PQNodeLabel.EMPTY)
+				parent.getEmptyChildren().remove(this);
+			else if (oldLabel == PQNodeLabel.FULL)
+				parent.getFullChildren().remove(this);
+		}
 	}
 
 	/**
@@ -260,6 +351,14 @@ public class PQTreeNode implements Vertex{
 
 	public void setPertinentLeafCount(int pertinentLeafCount) {
 		this.pertinentLeafCount = pertinentLeafCount;
+	}
+
+
+	/**
+	 * @return the emptyChildren
+	 */
+	public List<PQTreeNode> getEmptyChildren() {
+		return emptyChildren;
 	}
 
 

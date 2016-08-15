@@ -184,7 +184,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					queue.add(y);
 				//try templates
 				//the order is very important
-				if (!templateL1(x))
+				if (!templateL1(x, S))
 					if (!templateP1(x))
 						if (!templateP3(x))
 							if (!templateP5(x))
@@ -197,7 +197,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			else{
 				//x is root(T,S)
 				//try templates a bit differently
-				if (!templateL1(x))
+				if (!templateL1(x, S))
 					if (!templateP1(x))
 						if (!templateP2(x))
 							if (!templateP4(x))
@@ -210,72 +210,396 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 											}
 			}
 		}
-		
+
 		log.info("Tree reduced");
 		log.info(pqTree);
 	}
 
 
+	//During the reduction the edges in the tree are not updated
+	//only parent references
+	//don't add these updates unless they are necessary
+	//maybe do that at the end based on the parent property of nodes
+	//doens't seem like the algorithm needs the edges
 
-private boolean templateL1(PQTreeNode node){
-	log.info("Trying template L1 for node " + node);
+	/**
+	 * Template matching for leaves. The simplest case, the node is simply
+	 * marked as empty or full depending on if it belongs to S or not 
+	 * @param node
+	 * @return
+	 */
+	private boolean templateL1(PQTreeNode node, List<PQTreeNode> S){
+		log.info("Trying template L1 for node " + node);
+		if (node.getType() != PQNodeType.LEAF)
+			return false;
 
-	return true;
-}
+		//label node
+		if (S.contains(node))
+			node.labelAsFull();
+		else
+			node.labelAsEmpty();
 
-private boolean templateP1(PQTreeNode node){
-	log.info("Trying template P1 for node " + node);
+		log.info("Template matched. Labeled the leaf as " + node.getLabel());
+		return true;
+	}
 
-	return true;
-}
+	//TODO what about P0?
 
-private boolean templateP2(PQTreeNode node){
-	log.info("Trying template P2 for node " + node);
+	/**
+	 * The simplest case for a P-node. If all children of the node
+	 * are labeled full, then the node can be labeled full.
+	 * @param node
+	 * @return
+	 */
+	private boolean templateP1(PQTreeNode node){
+		log.info("Trying template P1 for node " + node);
+		if (node.getType() != PQNodeType.P)
+			return false;
 
-	return true;
-}
+		//all children are full
+		if (node.fullChildrenCount() == node.childrenCount()){
+			node.labelAsFull();
+			log.info("Templated matched. Labeled the P node as full");
+			return true;
+		}
+		//		else if (node.fullChildrenCount() == 0){
+		//			node.setLabel(PQNodeLabel.EMPTY);
+		//			log.info("Templated matched. Labeled the P node as empty");
+		//			return true;
+		//		}
+		//		
+		return false;
+	}
 
-private boolean templateP3(PQTreeNode node){
-	log.info("Trying template P3 for node " + node);
+	/**
+	 * The P-node should be the root of the pertinent subtree
+	 * The children of the node have different labels
+	 * The full children are grouped under a new P-node
+	 * which is made a child of the root node, which is left unlabeled
+	 * @param node
+	 * @return
+	 */
+	private boolean templateP2(PQTreeNode node){
+		log.info("Trying template P2 for node " + node);
 
-	return true;
-}
+		if (node.getType() != PQNodeType.P)
+			return false;
 
-private boolean templateP4(PQTreeNode node){
-	log.info("Trying template P4 for node " + node);
+		//TODO what is there is only one full child?
 
-	return true;
-}
+		//checking if there are children with different labels
+		//and that there are full children
+		if (node.fullChildrenCount() > 0 &&  node.emptyChildrenCount() > 0
+				&& node.partialChildrenCount() == 0){
+			PQTreeNode newNode = new PQTreeNode(PQNodeType.P);
+			for (PQTreeNode fullChild : node.getFullChildren()){
+				newNode.addChild(fullChild);
+				node.getChildren().remove(fullChild);
+			}
+			node.getFullChildren().clear();
+			newNode.setLabel(PQNodeLabel.FULL);
 
-private boolean templateP5(PQTreeNode node){
-	log.info("Trying template P5 for node " + node);
+			//this also sets the parent of the new node
+			//and updates the list of full nodes
+			node.addChild(newNode); 
+			log.info("Template matched");
+			log.info("Created the node: " + newNode);
+			log.info("Node after the change: " + node);
+			return true;
+		}
 
-	return true;
-}
+		return false;
+	}
 
-private boolean templateP6(PQTreeNode node){
-	log.info("Trying template P6 for node " + node);
+	/**
+	 * If the P-node is not the root of the tree and it has both
+	 * empty and full children, the empty children are grouped are
+	 * children of a new empty p-node, the full as children of 
+	 * a new full p-node
+	 * The node itself is turned into a singly partial Q-node
+	 * If there is only one empty or full child
+	 * the additional p-node is not created
+	 * @param node
+	 * @return
+	 */
+	private boolean templateP3(PQTreeNode node){
+		log.info("Trying template P3 for node " + node);
+		if (node.getType() != PQNodeType.P)
+			return false;
 
-	return true;
-}
+		//and that there are full children
+		if (node.fullChildrenCount() > 0 && node.emptyChildrenCount() > 0
+				&& node.partialChildrenCount() == 0){
 
-private boolean templateQ1(PQTreeNode node){
-	log.info("Trying template Q1 for node " + node);
+			PQTreeNode qNode = new PQTreeNode(PQNodeType.Q);
+			qNode.setLabel(PQNodeLabel.SINGLY_PARTIAL);
+			PQTreeNode parent = node.getParent();
+			parent.removeChild(node);
+			parent.addChild(qNode);
 
-	return true;
-}
 
-private boolean templateQ2(PQTreeNode node){
-	log.info("Trying template Q2 for node " + node);
+			//should create a new p-node for the empty children
+			if (node.emptyChildrenCount() > 1){
+				log.info("Creating a new p node for the empty children");
+				PQTreeNode emptyPNode = new PQTreeNode(PQNodeType.P);
+				for (PQTreeNode emptyNode : node.getEmptyChildren()){
+					emptyPNode.addChild(emptyNode);
+				}
+				emptyPNode.setLabel(PQNodeLabel.EMPTY);
+				qNode.addChild(emptyPNode);
+				log.info("New node: " + emptyPNode);
+			}
+			else{
+				//add the single empty node to the q-node
+				qNode.addChild(node.getEmptyChildren().get(0));
+			}
 
-	return true;
-}
+			//should create a new p-node for the full children
+			if (node.fullChildrenCount() > 1){
+				log.info("Creating a new p node for the full children");
+				PQTreeNode fullPNode = new PQTreeNode(PQNodeType.P);
+				for (PQTreeNode fullNode : node.getFullChildren()){
+					fullPNode.addChild(fullNode);
+				}
+				fullPNode.setLabel(PQNodeLabel.FULL);
+				qNode.addChild(fullPNode);
+				log.info("New node: " + fullPNode);
+			}
+			else{
+				//add the single full node to the q-node
+				qNode.addChild(node.getFullChildren().get(0));
+			}
 
-private boolean templateQ3(PQTreeNode node){
-	log.info("Trying template Q3 for node " + node);
 
-	return true;
-}
+			log.info("Template matched");
+			log.info("Partial q-node: " + qNode);
+			return true;
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * If a P-node has exactly one partial child, it is
+	 * labeled singly partial. Template P4 is tried if
+	 * the node is the root of the pertinent subtree
+	 * @param node
+	 * @return
+	 */
+	private boolean templateP4(PQTreeNode node){
+		log.info("Trying template P4 for node " + node);
+		if (node.getType() != PQNodeType.P)
+			return false;
+
+		//if the node has exactly one partial child
+		if (node.partialChildrenCount() == 1){
+			node.labelAsPartial(PQNodeLabel.SINGLY_PARTIAL);
+
+			log.info("Labeling node as singly partial ");
+
+			//leave empty children as they are
+			//add full children as children of a new p-node
+			//which itself is a child of the partial node
+			//don't add the p-node is there are less than
+			//two full children of the P-node in question
+
+			PQTreeNode partialChild = node.getPartialChildren().get(0);
+			if (node.fullChildrenCount() == 1){
+				log.info("Only one full child");
+				PQTreeNode fullChild = node.getFullChildren().get(0);
+				node.removeChild(fullChild);
+				partialChild.addChild(fullChild);
+				log.info("Partial child " + partialChild);
+			}
+			else if (node.fullChildrenCount() > 1){
+				log.info("Two or more full children, creating a new P-node");
+				PQTreeNode newPNode = new PQTreeNode(PQNodeType.P);
+				for (PQTreeNode fullChild : node.getFullChildren()){
+					newPNode.addChild(fullChild);
+					node.getChildren().remove(fullChild);
+				}
+				newPNode.setLabel(PQNodeLabel.FULL);
+				node.getFullChildren().clear();
+				partialChild.addChild(newPNode);
+				log.info("New p-node: " + newPNode);
+				log.info("Partial child " + partialChild);
+			}
+			log.info("Template mathced");
+			log.info("Node " + node);
+			return true;
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * If a P-node has exactly one partial child, it is
+	 * labeled singly partial. Template P5 is tried if
+	 * the node is not the root of the pertinent subtree
+	 * A new singly partial node is created, as well as the p-nodes
+	 * for empty and full nodes, similarly to the template P3
+	 * The new partial node has these p nodes as well as the 
+	 * empty and full nodes of the child partial node as its children
+	 * That original partial node is removed from the list of children
+	 * @param node
+	 * @return
+	 */
+	private boolean templateP5(PQTreeNode node){
+		log.info("Trying template P5 for node " + node);
+		if (node.getType() != PQNodeType.P)
+			return false;
+
+		if (node.partialChildrenCount() == 1){
+			PQTreeNode qNode = new PQTreeNode(PQNodeType.Q);
+			qNode.setLabel(PQNodeLabel.SINGLY_PARTIAL);
+			PQTreeNode parent = node.getParent();
+			parent.removeChild(node);
+			parent.addChild(qNode);
+
+
+			//should create a new p-node for the empty children
+			if (node.emptyChildrenCount() > 1){
+				log.info("Creating a new p node for the empty children");
+				PQTreeNode emptyPNode = new PQTreeNode(PQNodeType.P);
+				for (PQTreeNode emptyNode : node.getEmptyChildren()){
+					emptyPNode.addChild(emptyNode);
+				}
+				emptyPNode.setLabel(PQNodeLabel.EMPTY);
+				qNode.addChild(emptyPNode);
+				log.info("New node: " + emptyPNode);
+			}
+			else{
+				//add the single empty node to the q-node
+				qNode.addChild(node.getEmptyChildren().get(0));
+			}
+			
+			//now add the empty children of the partial node 
+			//followed my the full children of the partial node
+			PQTreeNode partialChild = node.getPartialChildren().get(0);
+			for (PQTreeNode emptyChild : partialChild.getEmptyChildren())
+				qNode.addChild(emptyChild);
+			for (PQTreeNode fullChild : partialChild.getFullChildren())
+				qNode.addChild(fullChild);
+
+			//should create a new p-node for the full children
+			if (node.fullChildrenCount() > 1){
+				log.info("Creating a new p node for the full children");
+				PQTreeNode fullPNode = new PQTreeNode(PQNodeType.P);
+				for (PQTreeNode fullNode : node.getFullChildren()){
+					fullPNode.addChild(fullNode);
+				}
+				fullPNode.setLabel(PQNodeLabel.FULL);
+				qNode.addChild(fullPNode);
+				log.info("New node: " + fullPNode);
+			}
+			else{
+				//add the single full node to the q-node
+				qNode.addChild(node.getFullChildren().get(0));
+			}
+			
+			log.info("Template matched");
+			log.info("Partial q-node: " + qNode);
+			return true;
+		}
+		
+		return false;
+	}
+
+	/**
+	 * If a P-node has two partial children
+	 * It must be the root of the pertinent subtree
+	 * The two partial children are joined and a p-node
+	 * is created for the full nodes of the root
+	 * and added as the child of the newly created partial child
+	 * @param node
+	 * @return
+	 */
+	private boolean templateP6(PQTreeNode node){
+		log.info("Trying template P6 for node " + node);
+		//if the node has exactly one partial child
+		if (node.partialChildrenCount() == 2){
+			node.labelAsPartial(PQNodeLabel.DOUBLY_PARTIAL);
+
+			log.info("Labeling node as doubly partial ");
+
+			//leave empty children as they are
+			//join the partial children and full children
+			//create a new partial child and add to it:
+			//all empty children of the first partial child
+			//all full children of the first partial child
+			//full children (using the new P-node if there is more than one)
+			//all full children of the second partial child
+			//all empty children of the second partial child
+			
+			PQTreeNode newPartialChild = new PQTreeNode(PQNodeType.Q);
+			newPartialChild.setLabel(PQNodeLabel.SINGLY_PARTIAL);
+			
+			PQTreeNode firstPartialChild = node.getPartialChildren().get(0);
+			for (PQTreeNode emptyChild : firstPartialChild.getEmptyChildren())
+				newPartialChild.addChild(emptyChild);
+			for (PQTreeNode fullChild : firstPartialChild.getFullChildren())
+				newPartialChild.addChild(fullChild);
+			node.removeChild(firstPartialChild);
+
+			
+			if (node.fullChildrenCount() == 1){
+				log.info("Only one full child");
+				PQTreeNode fullChild = node.getFullChildren().get(0);
+				node.removeChild(fullChild);
+				newPartialChild.addChild(fullChild);
+				log.info("Partial child " + newPartialChild);
+			}
+			else if (node.fullChildrenCount() > 1){
+				log.info("Two or more full children, creating a new P-node");
+				PQTreeNode newPNode = new PQTreeNode(PQNodeType.P);
+				for (PQTreeNode fullChild : node.getFullChildren()){
+					newPNode.addChild(fullChild);
+					node.getChildren().remove(fullChild);
+				}
+				newPNode.setLabel(PQNodeLabel.FULL);
+				node.getFullChildren().clear();
+				newPartialChild.addChild(newPNode);
+				log.info("New p-node: " + newPNode);
+				log.info("Partial child " + newPartialChild);
+			}
+			
+			//already removed the first one
+			PQTreeNode secondPartialChild = node.getPartialChildren().get(0);
+			for (PQTreeNode fullChild : secondPartialChild.getFullChildren())
+				newPartialChild.addChild(fullChild);
+			for (PQTreeNode emptyChild : secondPartialChild.getEmptyChildren())
+				newPartialChild.addChild(emptyChild);
+			node.removeChild(secondPartialChild);
+			
+			node.addChild(newPartialChild);
+			
+			log.info("Template mathced");
+			log.info("Node " + node);
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean templateQ1(PQTreeNode node){
+		log.info("Trying template Q1 for node " + node);
+
+		return true;
+	}
+
+	private boolean templateQ2(PQTreeNode node){
+		log.info("Trying template Q2 for node " + node);
+
+		return true;
+	}
+
+	private boolean templateQ3(PQTreeNode node){
+		log.info("Trying template Q3 for node " + node);
+
+		return true;
+	}
 
 
 }
