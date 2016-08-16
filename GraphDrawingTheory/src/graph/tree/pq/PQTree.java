@@ -60,17 +60,26 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 			leaves.remove(node);
 	}
 
+	@Override
+	public void addEdge(PQTreeEdge...edges){
+		super.addEdge(edges);
+		for (PQTreeEdge edge : edges)
+			edge.getDestination().setParent(edge.getOrigin());
+	}
+
+	@SuppressWarnings("unchecked")
 	private void constructTree(List<E> virtualEdges){
 		//this is similar to forming a bc tree
 		//with the exception that the tree also contains the leaves
 		//which represent virtual vertices
+		//pay attention to the fact that there could be more leaves referencing the same vertex
 
 		List<V> cutVertices = graph.listCutVertices();
 		if (graph.getVertices().size() < 3) //TODO check this. Should definitely add the one vertex if there is only one
 			cutVertices.addAll(graph.getVertices());
-		
+
 		System.out.println(cutVertices);
-		
+
 		List<Graph<V,E>> blocks = graph.listBiconnectedComponents();
 
 		//graph vertex is key, virtual vertex is values
@@ -80,7 +89,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 		for (V cutVertex : cutVertices){
 			PQTreeNode node = new PQTreeNode( PQNodeType.P, cutVertex);
 			addVertex(node);
-			
+
 			if (root == null)
 				root = node;
 		}
@@ -98,25 +107,47 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				}
 			}
 		}
-		
+
 		for (E e : virtualEdges){
 			if (graph.getVertices().contains(e.getOrigin())){
 				PQTreeNode node = new PQTreeNode(PQNodeType.LEAF,  e.getDestination());
 				addVertex(node);
 				PQTreeNode treeNode = getVertexByContent(e.getOrigin());
-				addEdge(new PQTreeEdge(treeNode, node));
+				if (treeNode != null)
+					addEdge(new PQTreeEdge(treeNode, node));
+				else{
+					//find the block that contains this vertex
+					for (PQTreeNode qNode : qNodes){
+						Graph<V,E> block = (Graph<V, E>) qNode.getContent();
+						if (block.hasVertex(e.getOrigin())){
+							addEdge(new PQTreeEdge(qNode, node));
+							break;
+						}
+					}
+				}
 			}
 			else if (graph.getVertices().contains(e.getDestination())){
 				PQTreeNode node = new PQTreeNode(PQNodeType.LEAF,  e.getOrigin());
 				addVertex(node);
 				PQTreeNode treeNode = getVertexByContent(e.getDestination());
-				addEdge(new PQTreeEdge(treeNode, node));
+				if (treeNode != null){
+					addEdge(new PQTreeEdge(treeNode, node));
+				}
+				else{
+					//find the block that contains this vertex
+					for (PQTreeNode qNode : qNodes){
+						Graph<V,E> block = (Graph<V, E>) qNode.getContent();
+						if (block.hasVertex(e.getDestination())){
+							addEdge(new PQTreeEdge(qNode, node));
+							break;
+						}
+					}
+				}
 			}
 		}
 
-
 	}
-	
+
 	public List<PQTreeNode> findLeavesOf(List<E> virtualEdges){
 		List<PQTreeNode> ret = new ArrayList<PQTreeNode>();
 		for (E e : virtualEdges){
@@ -126,7 +157,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				ret.add(getVertexByContent(e.getDestination())); 
 		}
 		return ret;
-		
+
 	}
 
 
@@ -145,6 +176,6 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	public void setRoot(PQTreeNode root) {
 		this.root = root;
 	}
-	
-	
+
+
 }

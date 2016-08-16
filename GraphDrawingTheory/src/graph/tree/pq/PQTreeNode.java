@@ -431,7 +431,7 @@ public class PQTreeNode implements Vertex{
 
 	@Override
 	public String toString() {
-		return "PQTreeNode [type=" + type + ", content=" + content + "]";
+		return "PQTreeNode [type=" + type + ", content=" + content + " parent = " + parent + " ]";
 	}
 
 	public List<PQTreeNode> getChildren() {
