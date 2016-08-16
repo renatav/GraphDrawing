@@ -4,6 +4,7 @@ import graph.algorithms.numbering.STNumbering;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.tree.pq.PQNodeType;
 import graph.tree.pq.PQTree;
 import graph.tree.pq.PQTreeEdge;
 import graph.tree.pq.PQTreeNode;
@@ -94,13 +95,26 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 					!treeReduction.reduce(T, S))
 				return false;
 
+			//TODO pogledati kada se desava da je root Q cvor
+			//i srediti postavljanje root-a
+			//inicijalno kada se kontruise je P-covr
+			//a onda kasnije kako se menja, u redukciji?
+			//ima tamo u onom kodu JGraphEd nesto sa menjanjem root-a
+			//pogledati
+			
 			//S' - the set of edges whose lower-numbered index is i
 			//if root(T,S) is a Q-node
-			//replace the full children of root(T,S) and their
-			//descendants by T(S', S')
-			//else replace root(T,S) and its descendants by T(S', S')
-			//U = U - S union S'
-
+			if (T.getRoot().getType() == PQNodeType.Q){
+				//replace the full children of root(T,S) and their
+				//descendants by T(S', S')
+				System.out.println("Replace the full children of root(T,s) and their descentants by T(S', S')");
+			}
+			else{
+				//else replace root(T,S) and its descendants by T(S', S')
+				//basically, construct a new tree
+				constructGk(i + 1);
+				//U = U - S union S'
+			}
 
 		}
 
