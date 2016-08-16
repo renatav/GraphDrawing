@@ -137,7 +137,6 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			incomingEdges.get(destination).add(e);
 			outgoingEdges.get(origin).add(e);
 
-
 		}
 	}
 

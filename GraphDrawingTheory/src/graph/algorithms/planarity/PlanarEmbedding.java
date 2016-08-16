@@ -63,7 +63,7 @@ public class PlanarEmbedding<V extends Vertex, E extends Edge<V>> {
 	
 	private Graph<V,E> constructGk(int k){
 		//vertices in the subgraph
-		List<V> vertices = stOrder.subList(0,k); //the second index isexclusive
+		List<V> vertices = stOrder.subList(0,k); //the second index is exclusive
 		
 		Graph<V,E> Gk = graph.subgraph(vertices);
 		List<E> virtualEdges = new ArrayList<E>();

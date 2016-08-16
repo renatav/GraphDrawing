@@ -4,7 +4,6 @@ import graph.elements.Edge;
 import graph.elements.Vertex;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -46,12 +45,13 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	public PQTreeReduction(){
 		queue = new LinkedList<PQTreeNode>();
 	}
-
+	
+	
 	/**
 	 * @param pqTree
 	 * @param S A subset of all nodes
 	 */
-	public void bubblet(PQTree<V,E> pqTree, List<PQTreeNode> S){
+	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
 		//initialize queue to be empty
 		queue.clear();
 		blockCount = 0;
@@ -60,7 +60,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		List<PQTreeNode> BS = new ArrayList<PQTreeNode>();
 		List<PQTreeNode> US = new ArrayList<PQTreeNode>();
 		List<PQTreeNode> list = new ArrayList<PQTreeNode>();
-		List<PQTreeNode> listCurrent = new ArrayList<PQTreeNode>();
+		List<PQTreeNode> right = new ArrayList<PQTreeNode>();
+		List<PQTreeNode> left = new ArrayList<PQTreeNode>();
 		//for x in s place x onto queue
 		for (PQTreeNode x : S)
 			queue.add(x);
@@ -68,8 +69,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		while (queue.size() + blockCount + offTheTop > 1){
 			if (queue.size() > 0){
 				//input tree is a null tree
-				pqTree = null;
-				break;
+				return false;
 			}
 			//remove x from the from of queue
 			PQTreeNode x = queue.remove();
@@ -99,34 +99,32 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					list.clear();
 					//list is the maximal consecutive set of blocked siblings
 					//adjacent to x
-					//list can be computed using immediate siblings
-					//starting at any unblocked node x
-					//we may traverse its chain of siblings in either direction
-					//siblings are added to list until one is encountered that is not blocked
-					PQTreeNode unblocked = null;
-					int currentIndex = 0;
-					List<PQTreeNode> siblings = x.getImmediateSimblings();
-					PQTreeNode currentNode;
-					while (currentIndex < siblings.size()){
-						currentNode = siblings.get(currentIndex);
-						if (currentNode.getMark() == PQNodeMark.BLOCKED){
-							if (unblocked == null){
-								unblocked = currentNode;
-								listCurrent.clear();
-							}
-							listCurrent.add(currentNode);
-						}
-						else{
-							if (unblocked != null){
-								if (listCurrent.size() > list.size()){
-									list.clear();
-									list.addAll(listCurrent);
-								}
-								unblocked = null;
-							}
-						}
-						currentIndex++;
-					}
+					//since x is unblocked, the next on or the previous one 
+					//could be blocked, thus starting the chain
+					//check the left and right side 
+					List<PQTreeNode> siblings = y.getChildren();
+					int xIndex = siblings.indexOf(x);
+					left.clear();
+					right.clear();
+					
+					for (int i = xIndex + 1; i < siblings.size(); i++)
+						if (siblings.get(i).getMark() == PQNodeMark.BLOCKED)
+							right.add(siblings.get(i));
+						else
+							break;
+					
+					for (int i = xIndex - 1; i >= 0; i--)
+						if (siblings.get(i).getMark() == PQNodeMark.BLOCKED)
+							left.add(siblings.get(i));
+						else
+							break;
+					
+					if (left.size() > right.size())
+						list.addAll(left);
+					else
+						list.addAll(right);
+					
+			
 					System.out.println("LIST: " + list);
 					for (PQTreeNode z : list){
 						//mark z unblocked
@@ -159,9 +157,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		//return tree received as the input parameter
 		//naturally, no need to do it here since the object itself 
 		//is modified
+		return true;
 	}
 
-	public void reduce(PQTree<V,E> pqTree, List<PQTreeNode> S){
+	public boolean reduce(PQTree<V,E> pqTree, List<PQTreeNode> S){
 		//initialize queue to be empty
 		queue.clear();
 		//for each leaf x in S
@@ -191,8 +190,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 							if (!templateP5(x))
 								if (!templateQ1(x))
 									if (!templateQ2(x)){
-										pqTree = null;
-										break;
+										return false;
 									}
 			}
 			else{
@@ -206,22 +204,21 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 									if (!templateQ1(x))
 										if (!templateQ2(x))
 											if (!templateQ3(x)){
-												pqTree = null;
-												break;
+												return false;
 											}
 			}
 		}
 
 		log.info("Tree reduced");
 		log.info(pqTree);
+		return true;
 	}
 
 
+	//TODO
 	//During the reduction the edges in the tree are not updated
 	//only parent references
-	//don't add these updates unless they are necessary
-	//maybe do that at the end based on the parent property of nodes
-	//doens't seem like the algorithm needs the edges
+	//update all edges!
 
 	/**
 	 * Template matching for leaves. The simplest case, the node is simply
@@ -251,6 +248,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @param node
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private boolean templateP0(PQTreeNode node){
 		log.info("Trying template P0 for node " + node);
 		if (node.getType() != PQNodeType.P)
@@ -304,7 +302,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 		//checking if there are children with different labels
 		//and that there are full children
-		if (node.fullChildrenCount() > 0 &&  node.emptyChildrenCount() > 0
+		if (node.fullChildrenCount() > 1 &&  node.emptyChildrenCount() > 0
 				&& node.partialChildrenCount() == 0){
 			PQTreeNode newNode = new PQTreeNode(PQNodeType.P);
 			for (PQTreeNode fullChild : node.getFullChildren()){
@@ -609,6 +607,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @param node
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private boolean templateQ0(PQTreeNode node){
 		log.info("Trying template Q0 for node " + node);
 		if (node.getType() != PQNodeType.Q)

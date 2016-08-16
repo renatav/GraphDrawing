@@ -7,6 +7,7 @@ import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.numbering.STNumbering;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
+import graph.algorithms.planarity.PQTreePlanarity;
 import graph.algorithms.planarity.PlanarEmbedding;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.drawing.Drawing;
@@ -23,6 +24,7 @@ import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.tree.binary.BinaryTree;
+import graph.tree.pq.PQTree;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
@@ -54,7 +56,8 @@ public class CommandPanel extends JPanel{
 	private List<String> allCommands = new ArrayList<String>();
 	private int currentCommandIndex;
 	//private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
-	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
+	//private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
+	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new PQTreePlanarity<GraphVertex, GraphEdge>();
 	private static Splitting<GraphVertex, GraphEdge> splitting = new Splitting<>();
 
 	public CommandPanel(){
