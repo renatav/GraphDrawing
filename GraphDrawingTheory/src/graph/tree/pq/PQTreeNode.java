@@ -102,6 +102,9 @@ public class PQTreeNode implements Vertex{
 	 */
 	private PQNodeMark mark;
 	
+	
+	private Object virtualEdge;
+	
 	/**
 	 * The immediate ancestor of the node. The field os always valid for children
 	 * of P-nodes and for endmost children of Q--nodes.
@@ -115,14 +118,19 @@ public class PQTreeNode implements Vertex{
 		this.type = type;
 		mark = PQNodeMark.UNMARKED;
 		
+		immediateSimblings = new ArrayList<PQTreeNode>();
+		
+		//label leaves as empty
+		if (type == PQNodeType.LEAF)
+			label = PQNodeLabel.EMPTY;
+		
 		//initialize structures specific to certain nodes
 		if (type != PQNodeType.LEAF){
 			children = new ArrayList<PQTreeNode>();
 			fullChildren = new ArrayList<PQTreeNode>();
 			partialChildren = new ArrayList<PQTreeNode>();
 			emptyChildren = new ArrayList<PQTreeNode>();
-			immediateSimblings = new ArrayList<PQTreeNode>();
-
+			
 			if (type == PQNodeType.P){
 				circularLink = new DoubleLinkedList<PQTreeNode>();
 			}
@@ -431,7 +439,7 @@ public class PQTreeNode implements Vertex{
 
 	@Override
 	public String toString() {
-		return "PQTreeNode [type=" + type + ", content=" + content + " parent = " + parent + " ]";
+		return "PQTreeNode [type=" + type + ", content=" + content + " parent = " + parent +  " ve " + virtualEdge + " ]";
 	}
 
 	public List<PQTreeNode> getChildren() {
@@ -464,7 +472,7 @@ public class PQTreeNode implements Vertex{
 
 	public List<PQTreeNode> getImmediateSimblings() {
 		immediateSimblings.clear();
-		if (parent.getType() == PQNodeType.Q){
+		if (parent != null && parent.getType() == PQNodeType.Q){
 			List<PQTreeNode> siblings = parent.getChildren();
 			int index = siblings.indexOf(this);
 			if (index == 0)
@@ -522,6 +530,22 @@ public class PQTreeNode implements Vertex{
 	 */
 	public List<PQTreeNode> getEmptyChildren() {
 		return emptyChildren;
+	}
+
+
+	/**
+	 * @return the virtualEdge
+	 */
+	public Object getVirtualEdge() {
+		return virtualEdge;
+	}
+
+
+	/**
+	 * @param virtualEdge the virtualEdge to set
+	 */
+	public void setVirtualEdge(Object virtualEdge) {
+		this.virtualEdge = virtualEdge;
 	}
 
 

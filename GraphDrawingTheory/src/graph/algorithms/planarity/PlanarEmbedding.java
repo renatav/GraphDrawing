@@ -41,24 +41,24 @@ public class PlanarEmbedding<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	public void execute(){
-		//assign st-numbers to all vertices of G
-		//s and t should be connected, but it is not stated
-		//that they should meet any special condition
-		//so, let st be the first edge
-		E st = graph.getEdges().get(0);
-		V s = st.getOrigin();
-		V t = st.getDestination();
-		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
-		stOrder = stNumbering.getOrder();
-		
-		System.out.println("s " + s);
-		System.out.println("t " + t);
-		
-		//construct a PQ-tree corresponding to G1'
-		Graph<V,E> g = constructGk(1);
-		PQTree<V, E> pqTree = new PQTree<>(g, gPrimMap.get(g));
-
-		System.out.println(pqTree);
+//		//assign st-numbers to all vertices of G
+//		//s and t should be connected, but it is not stated
+//		//that they should meet any special condition
+//		//so, let st be the first edge
+//		E st = graph.getEdges().get(0);
+//		V s = st.getOrigin();
+//		V t = st.getDestination();
+//		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
+//		stOrder = stNumbering.getOrder();
+//		
+//		System.out.println("s " + s);
+//		System.out.println("t " + t);
+//		
+//		//construct a PQ-tree corresponding to G1'
+//		Graph<V,E> g = constructGk(1);
+//		PQTree<V, E> pqTree = new PQTree<>(g, gPrimMap.get(g));
+//
+//		System.out.println(pqTree);
 	}
 	
 	private Graph<V,E> constructGk(int k){
