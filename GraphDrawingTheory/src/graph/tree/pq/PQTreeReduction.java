@@ -387,6 +387,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			tree.removeVertex(node);
 			tree.addVertex(qNode);
 			tree.addEdge(new PQTreeEdge(parent, qNode));
+			qNode.setContent(node.getContent());
 
 			//should create a new p-node for the empty children
 			if (node.emptyChildrenCount() > 1){
@@ -461,6 +462,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//which itself is a child of the partial node
 			//don't add the p-node is there are less than
 			//two full children of the P-node in question
+			
+			System.out.println("FULL CHILDREN");
+			System.out.println(node.getFullChildren());
 
 			PQTreeNode partialChild = node.getPartialChildren().get(0);
 			if (node.fullChildrenCount() == 1){
@@ -530,6 +534,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			tree.removeVertex(node);
 			tree.addVertex(qNode);
 			tree.addEdge(new PQTreeEdge(parent, qNode));
+			qNode.setContent(node.getContent());
 
 
 			//should create a new p-node for the empty children

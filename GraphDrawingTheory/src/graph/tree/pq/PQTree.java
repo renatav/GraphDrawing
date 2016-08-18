@@ -25,9 +25,9 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	 * The root of the PQ-tree is the unique node having no immediate siblings and no parent
 	 */
 	private PQTreeNode root;
-	
+
 	private Map<V, Integer> stNumbering;
-	
+
 
 	public PQTree(Graph<V,E> graph, List<E> virtualEdges, Map<V, Integer> stNumbering){
 		super();
@@ -84,11 +84,11 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 			if (root == null)
 				root = node;
 		}
-		
+
 		for (E edge : graph.getEdges()){
 			V v1 = edge.getOrigin();
 			V v2 = edge.getDestination();
-			
+
 			if (stNumbering.get(v1) < stNumbering.get(v2)){
 				addEdge(new PQTreeEdge(getVertexByContent(v1), getVertexByContent(v2)));
 				getVertexByContent(v1).addChild(getVertexByContent(v2));
@@ -97,7 +97,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				addEdge(new PQTreeEdge(getVertexByContent(v2), getVertexByContent(v1)));
 				getVertexByContent(v2).addChild(getVertexByContent(v1));
 			}
-				
+
 		}
 
 
@@ -110,7 +110,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				addVertex(node);
 				treeNode = getVertexByContent(e.getOrigin());
 
-			
+
 			}
 			else if (graph.getVertices().contains(e.getDestination())){
 				node = new PQTreeNode(PQNodeType.LEAF,  e.getOrigin());
@@ -118,7 +118,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				addVertex(node);
 				treeNode = getVertexByContent(e.getDestination());
 			}
-			
+
 			if (treeNode != null){
 				addEdge(new PQTreeEdge(treeNode, node));
 				treeNode.addChild(node);
@@ -139,6 +139,25 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 
 	}
 
+	/**
+	 * Finds all descendants of a tree node
+	 * @param node Node
+	 * @return A list of descendants
+	 */
+	public List<PQTreeNode> allDescendantsOf(PQTreeNode node){
+		List<PQTreeNode> ret = new ArrayList<PQTreeNode>();
+		allDescendantsRecursive(node, ret);
+		return ret;
+	}
+
+	private void allDescendantsRecursive(PQTreeNode node, List<PQTreeNode> descendants){
+		if (node.getChildren() != null)
+			for (PQTreeNode child : node.getChildren()){
+				descendants.add(child);
+				allDescendantsRecursive(child, descendants);
+			}
+	}
+
 
 	@Override
 	public String toString() {
@@ -154,6 +173,54 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 
 	public void setRoot(PQTreeNode root) {
 		this.root = root;
+	}
+
+
+	/**
+	 * @return the pNodes
+	 */
+	public List<PQTreeNode> getpNodes() {
+		return pNodes;
+	}
+
+
+	/**
+	 * @param pNodes the pNodes to set
+	 */
+	public void setpNodes(List<PQTreeNode> pNodes) {
+		this.pNodes = pNodes;
+	}
+
+
+	/**
+	 * @return the qNodes
+	 */
+	public List<PQTreeNode> getqNodes() {
+		return qNodes;
+	}
+
+
+	/**
+	 * @param qNodes the qNodes to set
+	 */
+	public void setqNodes(List<PQTreeNode> qNodes) {
+		this.qNodes = qNodes;
+	}
+
+
+	/**
+	 * @return the leaves
+	 */
+	public List<PQTreeNode> getLeaves() {
+		return leaves;
+	}
+
+
+	/**
+	 * @param leaves the leaves to set
+	 */
+	public void setLeaves(List<PQTreeNode> leaves) {
+		this.leaves = leaves;
 	}
 
 
