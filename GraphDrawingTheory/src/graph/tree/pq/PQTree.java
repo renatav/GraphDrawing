@@ -72,7 +72,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	}
 
 	private void constructTree(List<E> virtualEdges){
-		//with the exception that the tree also contains the leaves
+		//the tree contains leaves
 		//which represent virtual vertices
 		//pay attention to the fact that there could be more leaves referencing the same vertex
 

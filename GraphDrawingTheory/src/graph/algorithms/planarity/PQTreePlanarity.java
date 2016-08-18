@@ -62,7 +62,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		//S - the set of edges whose higher-numbered vertex is j
 		List<PQTreeNode> S = new ArrayList<PQTreeNode>();
 		//S' - the set of edges whose lower-numbered vertex is j
-		List<PQTreeNode> Sprim = new ArrayList<PQTreeNode>();
+		List<V> Sprim = new ArrayList<V>();
 
 		PQTreeReduction<V, E> treeReduction = new PQTreeReduction<V,E>();
 		
@@ -89,14 +89,23 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 			Sprim.clear();
 
 			for (PQTreeNode jNode : nodesWithContent){
-				for (PQTreeEdge edge : T.adjacentEdges(jNode)){
-					PQTreeNode other = edge.getOrigin() == jNode ? edge.getDestination() : edge.getOrigin();
-					if (stMapping.get(((V)other.getContent())) < j)
-						S.add(jNode);
-					else
-						Sprim.add(other);
+				System.out.println("jNode " + jNode);
+				V content = (V) jNode.getContent();
+				//don't just search the vertices of the tree, S' also needs to be populated
+				for (E edge : graph.adjacentEdges(content)){
+					V other = edge.getOrigin() == content ? edge.getDestination() : edge.getOrigin();
+					if (stMapping.get(other) < j){
+						if (!S.contains(jNode))
+							S.add(jNode);
+					}
+					else{
+						if (!Sprim.contains(other))
+							Sprim.add(other);
+					}
 				}
 			}
+			
+			System.out.println(Sprim);
 			
 			//sort S so that lower indexes are processed later
 			//bottom up
@@ -146,6 +155,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				//replace the full children of root(T,S) and their
 				//descendants by T(S', S')
 				System.out.println("Replace the full children of root(T,s) and their descentants by T(S', S')");
+				System.out.println(Sprim);
 			}
 			else{
 				//else replace root(T,S) and its descendants by T(S', S')
