@@ -246,11 +246,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	}
 
 
-	//TODO
-	//During the reduction the edges in the tree are not updated
-	//only parent references
-	//update all edges!
-
 	/**
 	 * Template matching for leaves. The simplest case, the node is simply
 	 * marked as empty or full depending on if it belongs to S or not 
@@ -752,6 +747,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	private boolean templateQ2(PQTreeNode node, PQTree<V,E> tree){
 		log.info("Trying template Q2 for node " + node);
+		
+		if (node.getType() != PQNodeType.Q)
+			return false;
 
 		if (node.fullChildrenCount() < node.childrenCount() && 
 				node.emptyChildrenCount() < node.childrenCount() && 
@@ -810,6 +808,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	private boolean templateQ3(PQTreeNode node, PQTree<V,E> tree){
 		log.info("Trying template Q3 for node " + node);
+		
+		if (node.getType() != PQNodeType.Q)
+			return false;
 
 		if (node.fullChildrenCount() < node.childrenCount() && 
 				node.emptyChildrenCount() < node.childrenCount() && 
