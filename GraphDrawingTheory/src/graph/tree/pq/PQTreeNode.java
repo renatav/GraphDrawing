@@ -439,7 +439,12 @@ public class PQTreeNode implements Vertex{
 
 	@Override
 	public String toString() {
-		return "PQTreeNode [type=" + type + ", content=" + content + " parent = " + parent +  " ve " + virtualEdge + " ]";
+		
+		if (type == PQNodeType.LEAF)
+			return "LEAF " + virtualEdge;
+		
+		return type + " node =" + content;// + parent == null ? " root " : "parent = " + parent.getContent();  
+		
 	}
 
 	public List<PQTreeNode> getChildren() {

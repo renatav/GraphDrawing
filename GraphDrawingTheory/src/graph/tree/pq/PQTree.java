@@ -157,10 +157,11 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				allDescendantsRecursive(child, descendants);
 			}
 	}
-
+	
 
 	@Override
 	public String toString() {
+		
 		return "PQTree [pNodes=" + pNodes + ", qNodes=" + qNodes + ", leaves="
 				+ leaves + " " + edges + "] ";
 	}

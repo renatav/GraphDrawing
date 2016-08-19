@@ -62,7 +62,6 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		//construct a PQ-tree corresponding to G1'
 		Graph<V,E> g = constructGk(1);
 		PQTree<V, E> T = new PQTree<>(g, gPrimMap.get(g), stMapping);
-		List<E> U = gPrimMap.get(g); //the list of edges whose lower numbered vertex is 1
 
 		//S - the set of edges whose higher-numbered vertex is j
 		List<PQTreeNode> S = new ArrayList<PQTreeNode>();
@@ -124,32 +123,23 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				@Override
 				public int compare(PQTreeNode node1, PQTreeNode node2) {
 
-					//TODO this is very important
-					
-					int level1 = 0, level2 = 0;
-					
+
 					PQTreeNode parent1 = node1.getParent();
 					PQTreeNode parent2 = node2.getParent();
-					
+
 					while (parent1.getContent() == null){
 						parent1 = parent1.getParent();
-						level1++;
 					}
-					
+
 					while (parent2.getContent() == null){
 						parent2 = parent2.getParent();
-						level2++;
 					}
-					
+
 					//parent are now P nodes
 					V v1 = (V) parent1.getContent();
 					V v2 = (V) parent2.getContent();
 
-//					if (level1 < level2)
-//						return -1;
-//					else if (level1 > level2)
-//						return 1;
-					
+
 					if  (stMapping.get(v1) < stMapping.get(v2))
 						return 1;
 					else if  (stMapping.get(v1) == stMapping.get(v2))
@@ -159,12 +149,15 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				}
 			});
 
-			System.out.println("S: " + S);
+			log.info("S: " + S);
+
+			PQTreeNode pertRoot = pertinentSubtreeRoot(T, S);
+			log.info("PERTINENT SUBTREE ROOT: " + pertRoot);
 
 			//bubble(T,S)
 			//reduce(T,S)
-			if (!treeReduction.bubble(T, S) ||
-					!treeReduction.reduce(T, S))
+			treeReduction.bubble(T, S);
+			if (!treeReduction.reduce(T, S, pertRoot))
 				return false;
 
 			//S' - the set of edges whose lower-numbered index is i
@@ -172,23 +165,24 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 			//that is, the check if the root of the pertinent subtree is a Q-node
 			//a pertinent subtree is a tree of minimal height whose frontier contains all S nodes
 
-			PQTreeNode pertRoot = pertinentSubtreeRoot(T, S);
-			log.info("PERTINENT SUBTREE ROOT: " + pertRoot);
 
 			PQTreeNode newNode = constructTSprim(stOrder.get(j), Sprim);
 			log.info("Constructed new node T(S',S')");
 			log.info(newNode);
 
 			T.addVertex(newNode);
-			for (PQTreeNode child : newNode.getChildren()){
-				T.addVertex(child);
-				T.addEdge(new PQTreeEdge(newNode, child));
+			if (newNode.getType() != PQNodeType.LEAF){
+				for (PQTreeNode child : newNode.getChildren()){
+					T.addVertex(child);
+					T.addEdge(new PQTreeEdge(newNode, child));
+				}
 			}
-			
+
 			//when removing certain nodes, it is not only important
 			//to update the tree
 			//but also list of children of nodes
 
+			pertRoot = pertinentSubtreeRoot(T, S);
 			if (pertRoot.getType() == PQNodeType.Q){
 				//replace the full children of root(T,S) and their
 				//descendants by T(S', S')
@@ -224,13 +218,15 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 					T.getpNodes().add(pertRoot);
 				}
 
+
+				System.out.println(T);
 			}
 			else{
 				//else replace root(T,S) and its descendants by T(S', S')
 				List<PQTreeNode> descendants = T.allDescendantsOf(pertRoot);
 				descendants.add(pertRoot);
 
-				
+
 				//remove all children of pertinent root
 				if (pertRoot.getChildren() != null){
 					children.clear();
@@ -278,12 +274,23 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	}
 
 	private PQTreeNode constructTSprim(V v, List<E> Sprim){
-		PQTreeNode newNode = new PQTreeNode(PQNodeType.P, v);
-		for (E edge : Sprim){
+
+		PQTreeNode newNode;
+
+		if (Sprim.size() > 1){
+			newNode = new PQTreeNode(PQNodeType.P, v);
+			for (E edge : Sprim){
+				V other = edge.getOrigin() == v ? edge.getDestination() : edge.getOrigin();
+				PQTreeNode leafNode = new PQTreeNode(PQNodeType.LEAF, other);
+				leafNode.setVirtualEdge(edge);
+				newNode.addChild(leafNode);
+			}
+		}
+		else{
+			E edge = Sprim.get(0);
 			V other = edge.getOrigin() == v ? edge.getDestination() : edge.getOrigin();
-			PQTreeNode leafNode = new PQTreeNode(PQNodeType.LEAF, other);
-			leafNode.setVirtualEdge(edge);
-			newNode.addChild(leafNode);
+			newNode = new PQTreeNode(PQNodeType.LEAF, other);
+			newNode.setVirtualEdge(edge);
 		}
 
 		return newNode;
@@ -298,6 +305,8 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	 */
 	private PQTreeNode pertinentSubtreeRoot(PQTree<V,E> T, List<PQTreeNode> S){
 
+		log.info("Finding the pertinent subtree root");
+
 		//trivial case
 		if (S.size() == 1)
 			return S.get(0);
@@ -311,26 +320,31 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		//System.out.println(T.getEdges());
 
 		for (PQTreeNode node : S){
-			paths.add(dijkstra.getPath(node, T.getRoot()).pathVertices());
+			//System.out.println("node " + node);
+			List<PQTreeNode> path = dijkstra.getPath(node, T.getRoot()).pathVertices();
+			//System.out.println("path " + path);
+			paths.add(path);
 		}
-
 
 		List<PQTreeNode> aPath = paths.get(0);
 
 		PQTreeNode root = null;
+		PQTreeNode current = null;
 
 		for (int i = aPath.size() - 1; i > 0; i--){
 			boolean doesnContain = false;
+			current = aPath.get(i);
+
 			for (List<PQTreeNode> path : paths){
-				if (path.contains(aPath.get(i)))
-					root = aPath.get(i);
-				else{
+				if (!path.contains(current)){
 					doesnContain = true;
 					break;
 				}
-				if (doesnContain)
-					break;
 			}
+
+			if (doesnContain)
+				break;
+			root = current;
 		}
 
 		return root;

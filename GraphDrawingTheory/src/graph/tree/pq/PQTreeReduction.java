@@ -51,6 +51,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @param pqTree
 	 * @param S A subset of all nodes
 	 */
+	/**
+	 * @param pqTree
+	 * @param S A subset of all nodes
+	 */
 	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
 		//initialize queue to be empty
 		
@@ -182,7 +186,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		return true;
 	}
 
-	public boolean reduce(PQTree<V,E> pqTree, List<PQTreeNode> S){
+	public boolean reduce(PQTree<V,E> pqTree, List<PQTreeNode> S, PQTreeNode pertRoot){
 
 		log.info("Reduction");
 		
@@ -198,7 +202,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//remove x from the from the front of the queue
 			PQTreeNode x = queue.remove();
 			log.info("Current x " + x);
-			if (x.getParent() != null){
+			if (x != pertRoot){
 				//X is not root(T,S)
 				PQTreeNode y = x.getParent();
 				log.info("Y (parent of x): " + y); 
@@ -683,6 +687,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			node.removeChild(secondPartialChild);
 			tree.removeVertex(secondPartialChild);
 			node.addChild(newPartialChild);
+			tree.addEdge(new PQTreeEdge(node, newPartialChild));
 
 			log.info("Template mathced");
 			log.info("Node " + node);
