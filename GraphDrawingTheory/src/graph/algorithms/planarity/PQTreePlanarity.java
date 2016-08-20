@@ -1,5 +1,14 @@
 package graph.algorithms.planarity;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import graph.algorithms.numbering.STNumbering;
 import graph.elements.Edge;
 import graph.elements.Graph;
@@ -10,16 +19,6 @@ import graph.tree.pq.PQTree;
 import graph.tree.pq.PQTreeEdge;
 import graph.tree.pq.PQTreeNode;
 import graph.tree.pq.PQTreeReduction;
-import graph.tree.spqr.NodeType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V, E>{
 
@@ -188,6 +187,8 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				//replace the full children of root(T,S) and their
 				//descendants by T(S', S')
 				log.info("Replace the full children of root(T,s) and their descentants by T(S', S')");
+				
+				System.out.println("CHILDREN: " + pertRoot.getChildren());
 
 
 				//to prevent concurrent modification exception

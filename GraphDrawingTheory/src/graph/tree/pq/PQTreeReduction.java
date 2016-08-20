@@ -42,6 +42,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 	private Logger log = Logger.getLogger(PQTreeReduction.class);
 
+	private boolean debug1 = false, debug2= true;
+
 	public PQTreeReduction(){
 		queue = new LinkedList<PQTreeNode>();
 	}
@@ -58,7 +60,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
 		//initialize queue to be empty
 
-		log.info("Bubble");
+		if (debug1)
+			log.info("Bubble");
 
 		queue.clear();
 		blockCount = 0;
@@ -81,15 +84,20 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 			//remove x from the from of queue
 			PQTreeNode x = queue.remove();
-			log.info("Current x: " + x);
-			log.info("Mark x as blocked");
+			if (debug1){
+				log.info("Current x: " + x);
+				log.info("Mark x as blocked");
+			}
+			
+			log.info("queue: " + queue);
 			//mark x blocked
 			x.setMark(PQNodeMark.BLOCKED);
 			//bs = {y in immediate siblings of x, y is blocked
 			//us = {y in immediate siblings of x, y is unblocked
 			for (PQTreeNode y : x.getImmediateSimblings()){
 
-				log.info("Immediate sibling " + y);
+				if (debug1)
+					log.info("Immediate sibling " + y);
 
 				if (y.getMark() == PQNodeMark.BLOCKED)
 					BS.add(y);
@@ -97,8 +105,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					US.add(y);
 			}
 
-			log.info("Blocked siblings: " + BS);
-			log.info("Unblocked siblings: " + US);
+			if (debug1){
+				log.info("Blocked siblings: " + BS);
+				log.info("Unblocked siblings: " + US);
+			}
 
 			if (US.size() > 0){
 				//choose any Y in US
@@ -107,18 +117,22 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				PQTreeNode y = US.get(0);
 				x.setParent(y.getParent());
 				x.setMark(PQNodeMark.UNBLOCKED);
-				log.info("Parent of x: " + x.getParent());
-				log.info("X marked as unblocked");
+				if (debug1){
+					log.info("Parent of x: " + x.getParent());
+					log.info("X marked as unblocked");
+				}
 			}
 			else if (x.getImmediateSimblings().size() < 2){
 				x.setMark(PQNodeMark.UNBLOCKED);
-				log.info("X marked as unblocked");
+				if (debug1)
+					log.info("X marked as unblocked");
 			}
 			if (x.getMark() == PQNodeMark.UNBLOCKED){
 				PQTreeNode y = x.getParent();
 				if (BS.size() > 0){
 					//TODO to check
-					log.info("Forming the list of the maximal consecutive chain of blocked siblings");
+					if (debug1)
+						log.info("Forming the list of the maximal consecutive chain of blocked siblings");
 					list.clear();
 					//list is the maximal consecutive set of blocked siblings
 					//adjacent to x
@@ -147,8 +161,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					else
 						list.addAll(right);
 
+					if (debug1)
+						log.info("LIST: " + list);
 
-					System.out.println("LIST: " + list);
 					for (PQTreeNode z : list){
 						//mark z unblocked
 						//parent z = y
@@ -156,19 +171,24 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 						z.setMark(PQNodeMark.UNBLOCKED);
 						z.setParent(y);
 						y.incrementPertinentChildCount();
-						log.info("Marking " + z + " as unblocked");
-						log.info("Setting parent of " + z + " to " + y);
+						log.info("Increment pertinent child count of " + y);
+						if (debug1){
+							log.info("Marking " + z + " as unblocked");
+							log.info("Setting parent of " + z + " to " + y);
+						}
 					}
 				}
 				if (y == null)
 					offTheTop = 1;
 				else{
 					y.incrementPertinentChildCount();
+					log.info("Increment pertinent child count of " + y);
 					if (y.getMark() == PQNodeMark.UNMARKED){
 						//place y onto queue
 						//mark y queued
 						queue.add(y);
-						log.info("Adding " + y + " to queue");
+						if (debug1)
+							log.info("Adding " + y + " to queue");
 						y.setMark(PQNodeMark.QUEUED);
 					}
 				}
@@ -208,10 +228,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				log.info("Y (parent of x): " + y); 
 				log.info("Y pertinent child count " + y.getPertinendChildCount());
 				y.decrementPertinentChildCount();
-				if (y.getPertinendChildCount() == 0){
-					queue.add(y);
-					log.info("Adding " + y + "  to queue");
-				}
+//				if (y.getPertinendChildCount() == 0){
+//					queue.add(y);
+//					log.info("Adding " + y + "  to queue");
+//				}
 				//try templates
 				//the order is very important
 				log.info("Trying templates");
@@ -223,6 +243,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 									if (!templateQ2(x, pqTree)){
 										return false;
 									}
+				if (y.fullChildrenCount() + y.partialChildrenCount() == 1){
+					queue.add(y);
+					log.info("Adding " + y + "  to queue");
+				}
 			}
 			else{
 				//x is root(T,S)
@@ -353,14 +377,14 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				tree.addEdge(new PQTreeEdge(node, newNode));
 				log.info("Created the node: " + newNode);
 			}
-			
+
 			else{
 				PQTreeNode fullNode = node.getFullChildren().get(0);
 				node.getChildren().remove(fullNode);
 				node.getChildren().add(fullNode);
 			}
-		
-			
+
+
 			log.info("Template matched");
 			log.info("Node after the change: " + node);
 			return true;
