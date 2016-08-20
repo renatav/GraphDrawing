@@ -45,8 +45,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	public PQTreeReduction(){
 		queue = new LinkedList<PQTreeNode>();
 	}
-	
-	
+
+
 	/**
 	 * @param pqTree
 	 * @param S A subset of all nodes
@@ -57,9 +57,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
 		//initialize queue to be empty
-		
+
 		log.info("Bubble");
-		
+
 		queue.clear();
 		blockCount = 0;
 		blockedNodes = 0;
@@ -72,7 +72,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		//for x in s place x onto queue
 		for (PQTreeNode x : S)
 			queue.add(x);
-		
+
 		//while size of queue + block count + off the top > 1
 		while (queue.size() + blockCount + offTheTop > 1){
 			if (queue.size() == 0){
@@ -88,18 +88,18 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//bs = {y in immediate siblings of x, y is blocked
 			//us = {y in immediate siblings of x, y is unblocked
 			for (PQTreeNode y : x.getImmediateSimblings()){
-				
+
 				log.info("Immediate sibling " + y);
-				
+
 				if (y.getMark() == PQNodeMark.BLOCKED)
 					BS.add(y);
 				else if (y.getMark() == PQNodeMark.UNBLOCKED)
 					US.add(y);
 			}
-			
+
 			log.info("Blocked siblings: " + BS);
 			log.info("Unblocked siblings: " + US);
-			
+
 			if (US.size() > 0){
 				//choose any Y in US
 				//parent(x) = parent(Y)
@@ -129,25 +129,25 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					int xIndex = siblings.indexOf(x);
 					left.clear();
 					right.clear();
-					
+
 					for (int i = xIndex + 1; i < siblings.size(); i++)
 						if (siblings.get(i).getMark() == PQNodeMark.BLOCKED)
 							right.add(siblings.get(i));
 						else
 							break;
-					
+
 					for (int i = xIndex - 1; i >= 0; i--)
 						if (siblings.get(i).getMark() == PQNodeMark.BLOCKED)
 							left.add(siblings.get(i));
 						else
 							break;
-					
+
 					if (left.size() > right.size())
 						list.addAll(left);
 					else
 						list.addAll(right);
-					
-			
+
+
 					System.out.println("LIST: " + list);
 					for (PQTreeNode z : list){
 						//mark z unblocked
@@ -189,7 +189,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	public boolean reduce(PQTree<V,E> pqTree, List<PQTreeNode> S, PQTreeNode pertRoot){
 
 		log.info("Reduction");
-		
+
 		//initialize queue to be empty
 		queue.clear();
 		//for each leaf x in S
@@ -328,25 +328,40 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 		//checking if there are children with different labels
 		//and that there are full children
-		if (node.fullChildrenCount() > 1 &&  node.emptyChildrenCount() > 0
+		if (node.fullChildrenCount() > 0 &&  node.emptyChildrenCount() > 0
 				&& node.partialChildrenCount() == 0){
-			PQTreeNode newNode = new PQTreeNode(PQNodeType.P);
-			tree.addVertex(newNode);
-			for (PQTreeNode fullChild : node.getFullChildren()){
-				newNode.addChild(fullChild);
-				node.getChildren().remove(fullChild);
-				tree.removeEdge(tree.edgeBetween(node, fullChild));
-				tree.addEdge(new PQTreeEdge(newNode, fullChild));
-			}
-			node.getFullChildren().clear();
-			newNode.setLabel(PQNodeLabel.FULL);
 
-			//this also sets the parent of the new node
-			//and updates the list of full nodes
-			node.addChild(newNode);
-			tree.addEdge(new PQTreeEdge(node, newNode));
+			//if there is only one child, just place it on one of the ends
+			//else create a new P-node and group the full children
+
+			if (node.fullChildrenCount() > 1){
+
+				PQTreeNode newNode = new PQTreeNode(PQNodeType.P);
+				tree.addVertex(newNode);
+				for (PQTreeNode fullChild : node.getFullChildren()){
+					newNode.addChild(fullChild);
+					node.getChildren().remove(fullChild);
+					tree.removeEdge(tree.edgeBetween(node, fullChild));
+					tree.addEdge(new PQTreeEdge(newNode, fullChild));
+				}
+				node.getFullChildren().clear();
+				newNode.setLabel(PQNodeLabel.FULL);
+
+				//this also sets the parent of the new node
+				//and updates the list of full nodes
+				node.addChild(newNode);
+				tree.addEdge(new PQTreeEdge(node, newNode));
+				log.info("Created the node: " + newNode);
+			}
+			
+			else{
+				PQTreeNode fullNode = node.getFullChildren().get(0);
+				node.getChildren().remove(fullNode);
+				node.getChildren().add(fullNode);
+			}
+		
+			
 			log.info("Template matched");
-			log.info("Created the node: " + newNode);
 			log.info("Node after the change: " + node);
 			return true;
 		}
@@ -381,7 +396,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			parent.removeChild(node);
 			//add on the same position where the node was
 			parent.addChild(qNode, index);
-			
+
 			//update tree
 			tree.removeVertex(node);
 			tree.addVertex(qNode);
@@ -461,17 +476,29 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//which itself is a child of the partial node
 			//don't add the p-node is there are less than
 			//two full children of the P-node in question
-			
-			System.out.println("FULL CHILDREN");
-			System.out.println(node.getFullChildren());
+
+			log.info("FULL CHILDREN");
+			log.info(node.getFullChildren());
 
 			PQTreeNode partialChild = node.getPartialChildren().get(0);
+
+			//add new full children in correct place, next to another full child
+			int partialChildFullIndex = -1;
+			if (partialChild.fullChildrenCount() > 0){
+				partialChildFullIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(0));
+			}
+
 			if (node.fullChildrenCount() == 1){
 				log.info("Only one full child");
 				PQTreeNode fullChild = node.getFullChildren().get(0);
 				node.removeChild(fullChild);
 				tree.removeEdge(tree.edgeBetween(node, fullChild));
-				partialChild.addChild(fullChild);
+
+				if (partialChildFullIndex != -1)
+					partialChild.addChild(fullChild, partialChildFullIndex);
+				else
+					partialChild.addChild(fullChild);
+
 				tree.addEdge(new PQTreeEdge(partialChild, fullChild));
 				log.info("Partial child " + partialChild);
 				log.info("Partial child children: " + partialChild.getChildren());
@@ -488,7 +515,12 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				}
 				newPNode.setLabel(PQNodeLabel.FULL);
 				node.getFullChildren().clear();
-				partialChild.addChild(newPNode);
+
+				if (partialChildFullIndex != -1)
+					partialChild.addChild(newPNode, partialChildFullIndex);
+				else
+					partialChild.addChild(newPNode);
+
 				tree.addEdge(new PQTreeEdge(partialChild, newPNode));
 				log.info("New p-node: " + newPNode);
 				log.info("Partial child " + partialChild);
@@ -529,7 +561,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			int index = parent.getChildren().indexOf(node);
 			parent.removeChild(node);
 			parent.addChild(qNode, index);
-			
+
 			tree.removeVertex(node);
 			tree.addVertex(qNode);
 			tree.addEdge(new PQTreeEdge(parent, qNode));
@@ -551,8 +583,11 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 			else{
 				//add the single empty node to the q-node
-				qNode.addChild(node.getEmptyChildren().get(0));
-				tree.addEdge(new PQTreeEdge(qNode, node.getEmptyChildren().get(0)));
+				//there could be no empty children as well
+				if (node.emptyChildrenCount() == 1){
+					qNode.addChild(node.getEmptyChildren().get(0));
+					tree.addEdge(new PQTreeEdge(qNode, node.getEmptyChildren().get(0)));
+				}
 			}
 
 			//now add the empty children of the partial node 
@@ -584,8 +619,11 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 			else{
 				//add the single full node to the q-node
-				qNode.addChild(node.getFullChildren().get(0));
-				tree.addEdge(new PQTreeEdge(qNode, node.getFullChildren().get(0)));
+				//there could be no full children
+				if (node.fullChildrenCount() == 1){
+					qNode.addChild(node.getFullChildren().get(0));
+					tree.addEdge(new PQTreeEdge(qNode, node.getFullChildren().get(0)));
+				}
 			}
 
 			log.info("Template matched");
@@ -627,8 +665,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			newPartialChild.setLabel(PQNodeLabel.SINGLY_PARTIAL);
 
 			PQTreeNode firstPartialChild = node.getPartialChildren().get(0);
-			
-			
+
+
 			for (PQTreeNode emptyChild : firstPartialChild.getEmptyChildren()){
 				newPartialChild.addChild(emptyChild);
 				tree.addEdge(new PQTreeEdge(newPartialChild, emptyChild));
@@ -637,7 +675,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				newPartialChild.addChild(fullChild);
 				tree.addEdge(new PQTreeEdge(newPartialChild, fullChild));
 			}
-			
+
 			node.removeChild(firstPartialChild);
 			tree.removeVertex(firstPartialChild);
 
@@ -678,7 +716,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				newPartialChild.addChild(emptyChild);
 				tree.addEdge(new PQTreeEdge(newPartialChild, emptyChild));
 			}
-			
+
 			node.removeChild(secondPartialChild);
 			tree.removeVertex(secondPartialChild);
 			node.addChild(newPartialChild);
@@ -747,7 +785,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	private boolean templateQ2(PQTreeNode node, PQTree<V,E> tree){
 		log.info("Trying template Q2 for node " + node);
-		
+
 		if (node.getType() != PQNodeType.Q)
 			return false;
 
@@ -755,7 +793,11 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				node.emptyChildrenCount() < node.childrenCount() && 
 				node.partialChildrenCount() <= 1){
 
+
 			//check the order
+			//only looks for singly partial
+			//so if the partial child is doubly partial, that should be
+			//recognized as invalid
 			if (!node.orderValidUpToOnePartial())
 				return false;
 
@@ -763,9 +805,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//eliminate the partial child and add its children to the parent
 			//keep the order empty-full
 			if (node.partialChildrenCount() == 1){
-				PQTreeNode partialChild = node.getPartialChildren().get(0);
-				
 
+				PQTreeNode partialChild = node.getPartialChildren().get(0);
 				//check the partial child
 				//are its children mixed
 				if (!partialChild.orderValidUpToOnePartial())
@@ -808,8 +849,12 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	private boolean templateQ3(PQTreeNode node, PQTree<V,E> tree){
 		log.info("Trying template Q3 for node " + node);
-		
+
 		if (node.getType() != PQNodeType.Q)
+			return false;
+
+		//node must be doubly partial
+		if (node.getLabel() != PQNodeLabel.DOUBLY_PARTIAL)
 			return false;
 
 		if (node.fullChildrenCount() < node.childrenCount() && 
@@ -824,6 +869,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			//process the first group of empty nodes
 			//the beginning
+			//firstEmpty counts how many empty nodes are at the beginning
 			int firstEmpty = 0;
 
 			for (PQTreeNode child : children){
@@ -837,7 +883,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				PQTreeNode partialChild = children.get(firstEmpty);
 				if (!partialChild.orderValidUpToOnePartial())
 					return false;
-				
+
 				int index = firstEmpty;
 
 				for (PQTreeNode partialEmpty : partialChild.getEmptyChildren()){
@@ -850,7 +896,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					tree.addEdge(new PQTreeEdge(node, partialFull));
 					index++;
 				}
-				
+
 				node.removeChild(partialChild);
 				tree.removeVertex(partialChild);
 			}
@@ -870,29 +916,34 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			if (children.get(lastEmpty).getLabel() == PQNodeLabel.SINGLY_PARTIAL){
 
 				PQTreeNode partialChild = children.get(lastEmpty);
-				
+
 				if (!partialChild.orderValidUpToOnePartial())
 					return false;
-				
+
 				int index = lastEmpty;
-				
+
+				//not decreasing the index here
+				//if nodes are added at that position, it'll always be the
+				//beginning of the part where nodes of the second
+				//child are added
+
 				for (PQTreeNode partialEmpty : partialChild.getEmptyChildren()){
 					node.addChild(partialEmpty, index);
 					tree.addEdge(new PQTreeEdge(node, partialEmpty));
-					index--;
+					//index--;
 				}
-				
+
 				for (PQTreeNode partialFull : partialChild.getFullChildren()){
 					node.addChild(partialFull, index);
 					tree.addEdge(new PQTreeEdge(node, partialFull));
-					index--;
+					//index--;
 				}
-				
+
 				node.removeChild(partialChild);
 				tree.removeVertex(partialChild);
-			
+
 			}
-			
+
 			node.setLabel(PQNodeLabel.DOUBLY_PARTIAL);
 			log.info("Template matched");
 			log.info("Node: " + node);

@@ -43,7 +43,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 		this.graph = graph;
 		gPrimMap = new HashMap<Graph<V,E>, List<E>>();
-
+		
 		//assign st-numbers to all vertices of G
 		//s and t should be connected, but it is not stated
 		//that they should meet any special condition
@@ -51,6 +51,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		E st = graph.getEdges().get(0);
 		V s = st.getOrigin();
 		V t = st.getDestination();
+		
 		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
 		stOrder = stNumbering.getOrder();
 		final Map<V, Integer> stMapping = stNumbering.getNumbering();
@@ -195,8 +196,13 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				log.info("Full children: " + fullChildren);
 
 				List<PQTreeNode> descendants = new ArrayList<PQTreeNode>();
+				//find the minimal index of a full child
+				int index = -1;
 				for (PQTreeNode fullChild : fullChildren){
 					descendants.addAll(T.allDescendantsOf(fullChild));
+					int currentIndex = pertRoot.getChildren().indexOf(fullChild); 
+					if (index == -1 || currentIndex < index)
+						index = currentIndex;
 					pertRoot.removeChild(fullChild);
 				}
 				//now add the full children
@@ -209,13 +215,22 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				for (PQTreeNode descendant : descendants)
 					T.removeVertex(descendant);
 
-				pertRoot.addChild(newNode);
+				//the order is important, so don't
+				//just add the child at the end
+				//replace the removed children
+				
+				pertRoot.addChild(newNode, index);
 				T.addEdge(new PQTreeEdge(pertRoot, newNode));
 
 				if (pertRoot.childrenCount() == 2){
 					pertRoot.setType(PQNodeType.P);
 					T.getqNodes().remove(pertRoot);
 					T.getpNodes().add(pertRoot);
+					PQTreeNode parent = pertRoot.getParent();
+					if (parent != null){
+						parent.getPartialChildren().remove(pertRoot);
+					}
+						
 				}
 
 

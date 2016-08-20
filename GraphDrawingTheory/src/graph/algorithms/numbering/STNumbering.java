@@ -29,7 +29,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 
 	private Map<V,Integer> numbering = new HashMap<V,Integer>();
 	private Map<Integer, V> inverseNumbering = new HashMap<Integer, V>();
-	
+	private boolean debug = false;
+
 	//L(v) = min({v} U {u, there is w such that v*->w and w--u}
 	private Map<V,V> LMap = new HashMap<V,V>();
 
@@ -39,7 +40,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 	}
 
 	public void formOrder(Graph<V,E> graph, V s, V t){
-		
+
 		//find the edge
 		E st = null;
 		for (E e : graph.adjacentEdges(s)){
@@ -49,27 +50,33 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 				break;
 			}
 		}
-		
+
 		//the given vertices are not connected
 		if (st == null)
 			return;
-			
-		
+
+
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
 		DFSTree<V,E> dfsTree = traversal.formDFSTree(t);
-		
+
 		//initial numbering can be the dfs numbering
 		numbering = dfsTree.getVerticesWithIndexes();
-		
+
 		//initialize L
 		//to improve efficiency
 		//this step can be couple with the creation of the dfs tree
 		for (V v : dfsTree.getVertices()){
 			LMap.put(v, L(dfsTree,v));
 		}
-		
+
+		if (debug){
+			System.out.println(dfsTree);
+			System.out.println("L map " + LMap);
+		}
+
 		stNumber(s, t, st, dfsTree);
-		
+
+
 		//now order the vertices in the list order so that they are sorded based on
 		//the st-number
 		for (int i = 0; i < graph.getVertices().size(); i++)
@@ -91,6 +98,13 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 	 */
 	private List<E> pathfinder(V v, DFSTree<V,E> dfsTree, List<E> newEdges, List<E> oldEdges, List<V> newVertices, List<V> oldVertices){
 
+		if (debug){
+			System.out.println("pathfinder");
+			System.out.println("new Edges " + newEdges);
+			System.out.println("old Edges " + oldEdges);
+			System.out.println("new vertices " + newVertices);
+			System.out.println("old vertices " + oldVertices);
+		}
 
 		//if there is a new tree edge v->v
 		E newTreeEdge = null;
@@ -98,14 +112,14 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		E newCycle1 = null;
 		//if there is a new cycle edge {v,w} with  v*->w
 		E newCycle2 = null;
-		
+
 		V w;
 		for (E e : newEdges){
 
 			if (e.getOrigin() == v || e.getDestination() == v){
-				
+
 				w = e.getOrigin() == v ? e.getDestination() : e.getOrigin();
-						
+
 				if (dfsTree.getBackEdges().contains(e)){
 					if (dfsTree.getIndex(v) > dfsTree.getIndex(w)){ //w*->v 
 						newCycle1 = e;
@@ -120,7 +134,13 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 				}
 			}
 		}
-		
+
+		if (debug){
+			System.out.println("new cycle 1 " + newCycle1);
+			System.out.println("new cycle 2 " + newCycle2);
+			System.out.println("new tree edge " + newTreeEdge);
+		}
+
 
 		if (newTreeEdge == null && newCycle1 == null && newCycle2 == null)
 			return null;
@@ -137,7 +157,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		else if (newTreeEdge != null) {
 			///mark {v,w} old
 			//initialize the path to be {v,w}
-			
+
 			oldEdges.add(newTreeEdge);
 			newEdges.remove(newTreeEdge);
 			path.add(newTreeEdge);
@@ -145,15 +165,16 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			//while w is new
 			w = newTreeEdge.getOrigin() == v ? newTreeEdge.getDestination() : newTreeEdge.getOrigin();
 			while (newVertices.contains(w)){
-				
+
 				//find the new edge {w,x}
 				//with x = L(w) or L(x) = L(w)
 				V x;
 				Iterator<E> iter = newEdges.iterator();
+				//System.out.println("new edges " + newEdges);
 				while (iter.hasNext()){
 					E e = iter.next();
-					//System.out.println(e);
 					if (e.getOrigin() == w || e.getDestination() == w){
+
 						x = e.getOrigin() == w ? e.getDestination() : e.getOrigin();
 						if (LMap.get(w) == x || LMap.get(x) == LMap.get(w)){
 							//mark w and {w,x} old
@@ -179,9 +200,9 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			oldEdges.add(newCycle2);
 			newEdges.remove(newCycle2);
 			path.add(newCycle2);
-			
+
 			//while w is new
-			w = newCycle2.getOrigin() == v ? newCycle2.getDestination() : newCycle2.getDestination();
+			w = newCycle2.getOrigin() == v ? newCycle2.getDestination() : newCycle2.getOrigin();
 			V x;
 			while (newVertices.contains(w)){
 				//find the new edge {w,x} with x->w
@@ -206,12 +227,12 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 				}
 			}
 		}
-		
+
 		//System.out.println(path);
 		return path;
 
 	}
-	
+
 	/**
 	 * Computes the st-numbering of biconnected graph 
 	 * @param s
@@ -224,20 +245,20 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		List<E> newEdges = new ArrayList<E>();
 		List<V> oldVertices = new ArrayList<V>();
 		List<E> oldEdges = new ArrayList<E>();
-		
+
 		oldVertices.add(s);
 		oldVertices.add(t);
 		oldEdges.add(st);
-		
+
 		for (E e : dfsTree.getAllEdges())
 			if (e != st)
 				newEdges.add(e);
-		
+
 		for (V v : dfsTree.getVertices())
 			if (v != s && v != t)
 				newVertices.add(v);
-		
-		
+
+
 		//initialize stack to contain s on top of t
 		Stack<V> stack = new Stack<V>();
 		stack.push(t);
@@ -248,9 +269,10 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		//while stack is not empty do
 		V v;
 		while (!stack.isEmpty()){
-			
-			//System.out.println("current stack " + stack);
-			
+
+			if (debug)
+				System.out.println("current stack " + stack);
+
 			//let v be the top vertex on the stack
 			//delete v from stack
 			v = stack.pop();
