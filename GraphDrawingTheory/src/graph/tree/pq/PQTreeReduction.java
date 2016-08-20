@@ -3,7 +3,6 @@ package graph.tree.pq;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -12,27 +11,6 @@ import org.apache.log4j.Logger;
 
 public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
-	/**
-	 * The number of blocks of blocked nodes during the bubbling up pass
-	 */
-	private int blockCount;
-
-	/**
-	 * The number of blocked nodes during the bubbling up pass.
-	 * This is only needed for the case when a pseudonode is used.
-	 * The count at the end of the first pass is exactly the number of pretinent 
-	 * children for the pseudonode
-	 */
-	private int blockedNodes;
-
-	/**
-	 * A variable which is either 0 (the initial value) or 1 (if the 
-	 * root of the tree has been processed during the first pass). It acts
-	 * as a count of the number of virtual nodes which are imagined to be in the queue during
-	 * the bubbling up.
-	 * 
-	 */
-	private int offTheTop;
 
 	/**
 	 * A first-in first-out list which is used during both passes for
@@ -58,151 +36,19 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @param S A subset of all nodes
 	 */
 	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
-		//initialize queue to be empty
 
 		if (debug1)
 			log.info("Bubble");
-
-		queue.clear();
-		blockCount = 0;
-		blockedNodes = 0;
-		offTheTop = 0;
-		List<PQTreeNode> BS = new ArrayList<PQTreeNode>();
-		List<PQTreeNode> US = new ArrayList<PQTreeNode>();
-		List<PQTreeNode> list = new ArrayList<PQTreeNode>();
-		List<PQTreeNode> right = new ArrayList<PQTreeNode>();
-		List<PQTreeNode> left = new ArrayList<PQTreeNode>();
-		//for x in s place x onto queue
-		for (PQTreeNode x : S)
-			queue.add(x);
-
-		//while size of queue + block count + off the top > 1
-		while (queue.size() + blockCount + offTheTop > 1){
-			if (queue.size() == 0){
-				//input tree is a null tree
-				return false;
-			}
-			//remove x from the from of queue
-			PQTreeNode x = queue.remove();
-			if (debug1){
-				log.info("Current x: " + x);
-				log.info("Mark x as blocked");
-			}
-			
-			log.info("queue: " + queue);
-			//mark x blocked
-			x.setMark(PQNodeMark.BLOCKED);
-			//bs = {y in immediate siblings of x, y is blocked
-			//us = {y in immediate siblings of x, y is unblocked
-			for (PQTreeNode y : x.getImmediateSimblings()){
-
-				if (debug1)
-					log.info("Immediate sibling " + y);
-
-				if (y.getMark() == PQNodeMark.BLOCKED)
-					BS.add(y);
-				else if (y.getMark() == PQNodeMark.UNBLOCKED)
-					US.add(y);
-			}
-
-			if (debug1){
-				log.info("Blocked siblings: " + BS);
-				log.info("Unblocked siblings: " + US);
-			}
-
-			if (US.size() > 0){
-				//choose any Y in US
-				//parent(x) = parent(Y)
-				//mark(x) unblocked
-				PQTreeNode y = US.get(0);
-				x.setParent(y.getParent());
-				x.setMark(PQNodeMark.UNBLOCKED);
-				if (debug1){
-					log.info("Parent of x: " + x.getParent());
-					log.info("X marked as unblocked");
-				}
-			}
-			else if (x.getImmediateSimblings().size() < 2){
-				x.setMark(PQNodeMark.UNBLOCKED);
-				if (debug1)
-					log.info("X marked as unblocked");
-			}
-			if (x.getMark() == PQNodeMark.UNBLOCKED){
-				PQTreeNode y = x.getParent();
-				if (BS.size() > 0){
-					//TODO to check
-					if (debug1)
-						log.info("Forming the list of the maximal consecutive chain of blocked siblings");
-					list.clear();
-					//list is the maximal consecutive set of blocked siblings
-					//adjacent to x
-					//since x is unblocked, the next on or the previous one 
-					//could be blocked, thus starting the chain
-					//check the left and right side 
-					List<PQTreeNode> siblings = y.getChildren();
-					int xIndex = siblings.indexOf(x);
-					left.clear();
-					right.clear();
-
-					for (int i = xIndex + 1; i < siblings.size(); i++)
-						if (siblings.get(i).getMark() == PQNodeMark.BLOCKED)
-							right.add(siblings.get(i));
-						else
-							break;
-
-					for (int i = xIndex - 1; i >= 0; i--)
-						if (siblings.get(i).getMark() == PQNodeMark.BLOCKED)
-							left.add(siblings.get(i));
-						else
-							break;
-
-					if (left.size() > right.size())
-						list.addAll(left);
-					else
-						list.addAll(right);
-
-					if (debug1)
-						log.info("LIST: " + list);
-
-					for (PQTreeNode z : list){
-						//mark z unblocked
-						//parent z = y
-						//increase pertinent child count of y
-						z.setMark(PQNodeMark.UNBLOCKED);
-						z.setParent(y);
-						y.incrementPertinentChildCount();
-						log.info("Increment pertinent child count of " + y);
-						if (debug1){
-							log.info("Marking " + z + " as unblocked");
-							log.info("Setting parent of " + z + " to " + y);
-						}
-					}
-				}
-				if (y == null)
-					offTheTop = 1;
-				else{
-					y.incrementPertinentChildCount();
-					log.info("Increment pertinent child count of " + y);
-					if (y.getMark() == PQNodeMark.UNMARKED){
-						//place y onto queue
-						//mark y queued
-						queue.add(y);
-						if (debug1)
-							log.info("Adding " + y + " to queue");
-						y.setMark(PQNodeMark.QUEUED);
-					}
-				}
-				blockCount -= BS.size();
-				blockedNodes -= list.size();
-			}
-			else{
-				blockCount = blockCount + 1 - BS.size();
-				blockedNodes++;
-			}
+		
+		for (PQTreeNode node : pqTree.getVertices()){
+			List<PQTreeNode> descendants = pqTree.allDescendantsOf(node);
+			int num = 0;
+			for (PQTreeNode descendant : descendants)
+				if (S.contains(descendant))
+					num++;
+			node.setPertinendChildCount(num);
 		}
-		//return tree received as the input parameter
-		//naturally, no need to do it here since the object itself 
-		//is modified
+		
 		return true;
 	}
 
@@ -228,10 +74,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				log.info("Y (parent of x): " + y); 
 				log.info("Y pertinent child count " + y.getPertinendChildCount());
 				y.decrementPertinentChildCount();
-//				if (y.getPertinendChildCount() == 0){
-//					queue.add(y);
-//					log.info("Adding " + y + "  to queue");
-//				}
+				if (y.getPertinendChildCount() == 0){
+					queue.add(y);
+					log.info("Adding " + y + "  to queue");
+				}
 				//try templates
 				//the order is very important
 				log.info("Trying templates");
@@ -243,10 +89,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 									if (!templateQ2(x, pqTree)){
 										return false;
 									}
-				if (y.fullChildrenCount() + y.partialChildrenCount() == 1){
-					queue.add(y);
-					log.info("Adding " + y + "  to queue");
-				}
+//				if (y.fullChildrenCount() + y.partialChildrenCount() == 1){
+//					queue.add(y);
+//					log.info("Adding " + y + "  to queue");
+//				}
 			}
 			else{
 				//x is root(T,S)

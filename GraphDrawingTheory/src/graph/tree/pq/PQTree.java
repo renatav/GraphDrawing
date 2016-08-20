@@ -145,6 +145,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	 * @return A list of descendants
 	 */
 	public List<PQTreeNode> allDescendantsOf(PQTreeNode node){
+		System.out.println("finding descendants of " + node);
 		List<PQTreeNode> ret = new ArrayList<PQTreeNode>();
 		allDescendantsRecursive(node, ret);
 		return ret;
@@ -153,6 +154,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	private void allDescendantsRecursive(PQTreeNode node, List<PQTreeNode> descendants){
 		if (node.getChildren() != null)
 			for (PQTreeNode child : node.getChildren()){
+				System.out.println(child);
 				descendants.add(child);
 				allDescendantsRecursive(child, descendants);
 			}

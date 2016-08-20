@@ -29,10 +29,14 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 
 	private Map<V,Integer> numbering = new HashMap<V,Integer>();
 	private Map<Integer, V> inverseNumbering = new HashMap<Integer, V>();
-	private boolean debug = false;
+	private boolean debug = true;
 
 	//L(v) = min({v} U {u, there is w such that v*->w and w--u}
 	private Map<V,V> LMap = new HashMap<V,V>();
+	
+	//TODO zapucava path finder
+	//a ocigledno ne bi ni nasao ispravnu kombinaciju
+	//u newEdges ostane jedna ivica, ne nadje se sta treba  
 
 	public STNumbering(Graph<V,E> graph, V s, V t){
 		order = new ArrayList<V>();
@@ -171,6 +175,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 				V x;
 				Iterator<E> iter = newEdges.iterator();
 				//System.out.println("new edges " + newEdges);
+				
 				while (iter.hasNext()){
 					E e = iter.next();
 					if (e.getOrigin() == w || e.getDestination() == w){
@@ -295,6 +300,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 					stack.push(pathVertices.get(j));
 			}
 			else{
+				System.out.println(i + ": " + v);
 				numbering.put(v, i);
 				inverseNumbering.put(i, v);
 				i++;

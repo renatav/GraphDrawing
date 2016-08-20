@@ -206,6 +206,9 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 						index = currentIndex;
 					pertRoot.removeChild(fullChild);
 				}
+				if (index == -1)
+					index = 0;
+				
 				//now add the full children
 				descendants.addAll(fullChildren);
 				log.info("All descendants: " + descendants);
