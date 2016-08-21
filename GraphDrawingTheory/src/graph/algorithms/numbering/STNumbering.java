@@ -108,9 +108,10 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			System.out.println("old Edges " + oldEdges);
 			System.out.println("new vertices " + newVertices);
 			System.out.println("old vertices " + oldVertices);
+			System.out.println("current vertex: " + v);
 		}
 
-		//if there is a new tree edge v->v
+		//if there is a new tree edge v->w
 		E newTreeEdge = null;
 		//if there is a new cycle edge {v,w} with  w*->v
 		E newCycle1 = null;
@@ -132,7 +133,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 					else
 						newCycle2 = e;
 				}
-				else{
+				else if (dfsTree.getIndex(v) < dfsTree.getIndex(w)){
 					//must be a tree edge
 					newTreeEdge = e;
 				}
@@ -168,13 +169,16 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 
 			//while w is new
 			w = newTreeEdge.getOrigin() == v ? newTreeEdge.getDestination() : newTreeEdge.getOrigin();
+			System.out.println("w: " + w);
+			
 			while (newVertices.contains(w)){
 
 				//find the new edge {w,x}
 				//with x = L(w) or L(x) = L(w)
 				V x;
 				Iterator<E> iter = newEdges.iterator();
-				//System.out.println("new edges " + newEdges);
+				//if(debug)
+				//	System.out.println("new edges " + newEdges);
 				
 				while (iter.hasNext()){
 					E e = iter.next();
@@ -191,7 +195,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 							newVertices.remove(w);
 							path.add(e);
 							w = x;
-							//System.out.println("x " + x);
+							if (debug)
+								System.out.println("x " + x);
 							break;
 						}
 					}
@@ -255,7 +260,10 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		oldVertices.add(t);
 		oldEdges.add(st);
 
-		for (E e : dfsTree.getAllEdges())
+		for (E e : dfsTree.getTreeEdges())
+			if (e != st)
+				newEdges.add(e);
+		for (E e : dfsTree.getBackEdges())
 			if (e != st)
 				newEdges.add(e);
 
@@ -288,9 +296,11 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 			if (path != null){
 				pathVertices.clear();
 				V current = v;
-				//System.out.println(path);
+				if (debug)
+					System.out.println("PATH " + path);
 				for (E e : path){
 					pathVertices.add(current);
+					System.out.println("current " + current);
 					V other = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
 					current = other;
 				}
