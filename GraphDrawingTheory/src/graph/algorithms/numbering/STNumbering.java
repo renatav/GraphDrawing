@@ -29,14 +29,13 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 
 	private Map<V,Integer> numbering = new HashMap<V,Integer>();
 	private Map<Integer, V> inverseNumbering = new HashMap<Integer, V>();
-	private boolean debug = true;
+	private boolean debug = false;
 
 	//L(v) = min({v} U {u, there is w such that v*->w and w--u}
 	private Map<V,V> LMap = new HashMap<V,V>();
 	
-	//TODO zapucava path finder
-	//a ocigledno ne bi ni nasao ispravnu kombinaciju
-	//u newEdges ostane jedna ivica, ne nadje se sta treba  
+	//TODO it seems that the order of edges in new edges can affect the outcome,
+	//causing problems in some cases, returning good result in others
 
 	public STNumbering(Graph<V,E> graph, V s, V t){
 		order = new ArrayList<V>();
