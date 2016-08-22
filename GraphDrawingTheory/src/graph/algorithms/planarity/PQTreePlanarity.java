@@ -24,13 +24,23 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 	private List<V> stOrder;
 	private Graph<V,E> graph;
+	
+	/**
+	 * The embedding of the graph computed during planarity testing
+	 * For each vertex v, the map contains a list of edges entering that
+	 * vertex in the appropriate order
+	 * Even though the graph is undirected, the st-numbering of the vertices
+	 * determines the flow of edges (which vertex is the source and which is the destination)
+	 * The edges go from a vertex with lower number to a vertex with a higher number) 
+	 */
+	private Map<V, List<E>> embedding = new HashMap<V, List<E>>();
 
 	/**
 	 * A map containing graph (subgraphs G1,G2...Gn)
 	 * and the lists of virtual edges turning them into
 	 * Gk'
 	 */
-	private Map<Graph<V,E>, List<E>> gPrimMap; 
+	private Map<Graph<V,E>, List<E>> gPrimMap = new HashMap<Graph<V,E>, List<E>>();; 
 
 	private DijkstraAlgorithm<PQTreeNode, PQTreeEdge> dijkstra = new DijkstraAlgorithm<PQTreeNode, PQTreeEdge>();
 
@@ -41,7 +51,8 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	public boolean isPlannar(Graph<V, E> graph) {
 
 		this.graph = graph;
-		gPrimMap = new HashMap<Graph<V,E>, List<E>>();
+		gPrimMap.clear();
+		embedding.clear();
 		
 		//assign st-numbers to all vertices of G
 		//s and t should be connected, but it is not stated
@@ -50,6 +61,8 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		E st = graph.getEdges().get(0);
 		V s = st.getOrigin();
 		V t = st.getDestination();
+		
+		PQTreeNode pertRoot = null;
 		
 		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
 		stOrder = stNumbering.getOrder();
@@ -151,7 +164,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 			log.info("S: " + S);
 
-			PQTreeNode pertRoot = pertinentSubtreeRoot(T, S);
+			pertRoot = pertinentSubtreeRoot(T, S);
 			log.info("PERTINENT SUBTREE ROOT: " + pertRoot);
 
 			//bubble(T,S)
@@ -159,7 +172,19 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 			treeReduction.bubble(T, S);
 			if (!treeReduction.reduce(T, S, pertRoot))
 				return false;
-
+			
+			//if the reduction was successful, note the embedding
+			 
+			
+			pertRoot = pertinentSubtreeRoot(T, S);
+			List<E> currentEmbedding = new ArrayList<E>();
+			System.out.println("embed vertex = " + stOrder.get(j));
+			embed(pertRoot, currentEmbedding, S);
+			log.info("embed");
+			embedding.put(stOrder.get(j), currentEmbedding);
+			log.info(currentEmbedding);
+			
+			
 			//S' - the set of edges whose lower-numbered index is i
 			//if root(T,S) is a Q-node
 			//that is, the check if the root of the pertinent subtree is a Q-node
@@ -182,7 +207,6 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 			//to update the tree
 			//but also list of children of nodes
 
-			pertRoot = pertinentSubtreeRoot(T, S);
 			if (pertRoot.getType() == PQNodeType.Q){
 				//replace the full children of root(T,S) and their
 				//descendants by T(S', S')
@@ -269,8 +293,11 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 			}
 
 		}
-
-
+		
+		//embed the last node
+		
+		embedding.put(stOrder.get(stOrder.size() - 1), Sprim);
+		log.info("Embedding: " + embedding);
 
 		return true;
 	}
@@ -367,6 +394,34 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		}
 
 		return root;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void embed(PQTreeNode currentNode, List<E> embedding, List<PQTreeNode> S){
+		//the main idea is to start with the root of the pertinent subtree
+		//and recursively examine the children
+		//embed pertinent nodes, call embed for other children
+		//the children in the children list of nodes are in the 
+		//specific order, determined during the reduction step
+		//go from left to right, and recursively go deeper
+		//place every found child at the end of the list
+		log.info(currentNode);
+		log.info(currentNode.getChildren());
+		
+		if (currentNode.getType() == PQNodeType.LEAF && S.contains(currentNode))
+			embedding.add((E) currentNode.getVirtualEdge());
+		else if (currentNode.getType() != PQNodeType.LEAF)
+			for (PQTreeNode child : currentNode.getChildren()){
+				embed(child, embedding, S);
+		}
+	}
+
+
+	/**
+	 * @return the embedding
+	 */
+	public Map<V, List<E>> getEmbedding() {
+		return embedding;
 	}
 
 }

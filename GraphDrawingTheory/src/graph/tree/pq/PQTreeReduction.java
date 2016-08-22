@@ -20,7 +20,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 	private Logger log = Logger.getLogger(PQTreeReduction.class);
 
-	private boolean debug1 = false, debug2= true;
+	private boolean debug;
 
 	public PQTreeReduction(){
 		queue = new LinkedList<PQTreeNode>();
@@ -37,19 +37,41 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
 
-		if (debug1)
+		if (debug)
 			log.info("Bubble");
+//		
+//		for (PQTreeNode node : pqTree.getVertices()){
+//			List<PQTreeNode> descendants = pqTree.allDescendantsOf(node);
+//			int num = 0;
+//			for (PQTreeNode descendant : descendants)
+//				if (S.contains(descendant))
+//					num++;
+//			node.setPertinendChildCount(num);
+//		}
+//		
+		setPertinendChildren(pqTree.getRoot(), S);
 		
-		for (PQTreeNode node : pqTree.getVertices()){
-			List<PQTreeNode> descendants = pqTree.allDescendantsOf(node);
-			int num = 0;
-			for (PQTreeNode descendant : descendants)
-				if (S.contains(descendant))
-					num++;
-			node.setPertinendChildCount(num);
-		}
-		
+		for (PQTreeNode node : pqTree.getVertices())
+			log.info("Pertinent children count of " + node + " = " +  node.getPertinendChildCount() );
 		return true;
+	}
+	
+	private void setPertinendChildren(PQTreeNode node, List<PQTreeNode> S){
+		node.setPertinendChildCount(0);
+		if (node.getType() == PQNodeType.LEAF){
+			if (S.contains(node)){
+				node.setPertinendChildCount(1);
+			}
+		}
+		else{
+		
+			for (PQTreeNode child : node.getChildren()){
+					setPertinendChildren(child, S);
+					if (child.getPertinendChildCount() >= 1){
+						node.incrementPertinentChildCount();
+					}
+				}
+		}
 	}
 
 	public boolean reduce(PQTree<V,E> pqTree, List<PQTreeNode> S, PQTreeNode pertRoot){
@@ -355,7 +377,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//add new full children in correct place, next to another full child
 			int partialChildFullIndex = -1;
 			if (partialChild.fullChildrenCount() > 0){
-				partialChildFullIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(0));
+				partialChildFullIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(partialChild.getFullChildren().size() - 1));
 			}
 
 			if (node.fullChildrenCount() == 1){
@@ -473,6 +495,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				tree.removeEdge(tree.edgeBetween(partialChild, fullChild));
 				tree.addEdge(new PQTreeEdge(qNode, fullChild));
 			}
+			
+			tree.removeVertex(partialChild);
+			
 
 			//should create a new p-node for the full children
 			if (node.fullChildrenCount() > 1){
