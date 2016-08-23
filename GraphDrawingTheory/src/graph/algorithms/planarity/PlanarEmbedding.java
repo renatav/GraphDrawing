@@ -1,80 +1,73 @@
 package graph.algorithms.planarity;
 
-import graph.algorithms.numbering.STNumbering;
-import graph.elements.Edge;
-import graph.elements.Graph;
-import graph.elements.Vertex;
-import graph.tree.pq.PQTree;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Implementation of an algorithm for embedding a planar graph in th plane
- * Based on the work of Chiba, Nishizeki, Abe and Ozava prezented in their paper
- * "A Linear Algorithm for Embedding Planar Graphs Using PQ-trees"
- * The algorithm is based on the vertex algorithm of Lempel, Even and
- * Cederbaum for planarity testing and is a modification of Boot and Lucker's implementation
- * of planarity testing using a PQ-tree
- *
- * @param <V>
- * @param <E>
- */
-public class PlanarEmbedding<V extends Vertex, E extends Edge<V>> {
-	
-	private Graph<V,E> graph;
-	private Map<V, List<V>> embedding;
-	private List<V> stOrder;
+import graph.algorithms.drawing.NotPlanarException;
+import graph.elements.Edge;
+import graph.elements.Graph;
+import graph.elements.Vertex;
+import graph.exception.CannotBeAppliedException;
+
+public class PlanarEmbedding {
+
 	/**
-	 * A map containing graph (subgraphs G1,G2...Gn)
-	 * and the lists of virtual edges turning them into
-	 * Gk'
+	 * Calculates a planar embedding of a graph based on the work of Chiba, Nishizeki, Abe and Ozava
+	 * @param graph
+	 * @return
+	 * @throws CannotBeAppliedException
 	 */
-	private Map<Graph<V,E>, List<E>> gPrimMap; 
-	
-	public PlanarEmbedding(Graph<V,E> graph){
-		this.graph = graph;
-		embedding = new HashMap<V, List<V>>();
-		gPrimMap = new HashMap<Graph<V,E>, List<E>>();
+	public static <V extends Vertex, E extends Edge<V>> Map<V,List<E>> emedGraph(Graph<V,E> graph) throws NotPlanarException{
+		Map<V,List<E>> embedding = new HashMap<V, List<E>>();
+
+		//get upwards embedding
+		PQTreePlanarity<V, E> pqPlanarity = new PQTreePlanarity<V,E>();
+		if (!pqPlanarity.isPlannar(graph))
+			throw new NotPlanarException();
+
+		//copy upwards embedding
+		Map<V, List<E>> upwardsEmbedding = pqPlanarity.getUpwardsEmbedding();
+
+		for (V v : upwardsEmbedding.keySet()){
+			List<E> list = new ArrayList<E>();
+			list.addAll(upwardsEmbedding.get(v));
+			embedding.put(v, list);
+		}
+
+		List<V> covered = new ArrayList<V>();
+
+		List<V> stOrder = pqPlanarity.getStOrder();
+		dfs(stOrder.get(stOrder.size() - 1), covered, upwardsEmbedding, embedding);
+
+		return embedding;
+
 	}
-	
-	public void execute(){
-//		//assign st-numbers to all vertices of G
-//		//s and t should be connected, but it is not stated
-//		//that they should meet any special condition
-//		//so, let st be the first edge
-//		E st = graph.getEdges().get(0);
-//		V s = st.getOrigin();
-//		V t = st.getDestination();
-//		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
-//		stOrder = stNumbering.getOrder();
-//		
-//		System.out.println("s " + s);
-//		System.out.println("t " + t);
-//		
-//		//construct a PQ-tree corresponding to G1'
-//		Graph<V,E> g = constructGk(1);
-//		PQTree<V, E> pqTree = new PQTree<>(g, gPrimMap.get(g));
-//
-//		System.out.println(pqTree);
+
+	private static <V extends Vertex, E extends Edge<V>> void dfs(V y, List<V> covered, Map<V,List<E>> upwardsEmbedding, Map<V,List<E>> embedding){
+		//mark vertex y as old - adding  it to the list
+		covered.add(y);
+
+		//for each vertex v in Au(y) insert y to the top of Au(v)
+		//modified this a little and adding edges
+
+		if (upwardsEmbedding.containsKey(y))
+
+			for (E e : upwardsEmbedding.get(y)){
+				V v = e.getOrigin() == y ? e.getDestination() : e.getOrigin();
+				List<E> list = embedding.get(v);
+				if (list == null){
+					list = new ArrayList<E>();
+					embedding.put(v, list);
+				}
+				list.add(e);
+				//if v is new - not in the list
+				if (!covered.contains(v))
+					dfs(v, covered, upwardsEmbedding, embedding);
+			}
+
 	}
-	
-	private Graph<V,E> constructGk(int k){
-		//vertices in the subgraph
-		List<V> vertices = stOrder.subList(0,k); //the second index is exclusive
-		
-		Graph<V,E> Gk = graph.subgraph(vertices);
-		List<E> virtualEdges = new ArrayList<E>();
-		for (E e : graph.getEdges())
-			if (vertices.contains(e.getOrigin()) && !vertices.contains(e.getDestination()) || 
-					vertices.contains(e.getDestination()) && !vertices.contains(e.getOrigin()))
-				virtualEdges.add(e);
-				
-		gPrimMap.put(Gk, virtualEdges);
-		return Gk;
-		
-	}
+
 
 }

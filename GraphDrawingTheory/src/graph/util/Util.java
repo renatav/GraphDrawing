@@ -69,7 +69,6 @@ public class Util {
 		
 		List<V> vertices = new ArrayList<V>();
 		List<E> edges = new ArrayList<E>();
-		String content;
 		
 		for (int i = 0; i < numberOfVertices; i++){
 			V v = createVertex(vertexClass);

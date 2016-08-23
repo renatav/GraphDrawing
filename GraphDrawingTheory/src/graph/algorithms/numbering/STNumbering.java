@@ -1,5 +1,6 @@
 package graph.algorithms.numbering;
 
+import graph.algorithms.planarity.PQTreePlanarity;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
@@ -12,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+
+import org.apache.log4j.Logger;
 
 /**
  * Given any edge {s,t} in a biconnected graph G with n vertices, 
@@ -33,6 +36,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 
 	//L(v) = min({v} U {u, there is w such that v*->w and w--u}
 	private Map<V,V> LMap = new HashMap<V,V>();
+	
+	private Logger log = Logger.getLogger(STNumbering.class);
 	
 	//TODO it seems that the order of edges in new edges can affect the outcome,
 	//causing problems in some cases, returning good result in others
@@ -73,8 +78,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		}
 
 		if (debug){
-			System.out.println(dfsTree);
-			System.out.println("L map " + LMap);
+			log.info(dfsTree);
+			log.info("L map " + LMap);
 		}
 
 		stNumber(s, t, st, dfsTree);
@@ -102,12 +107,12 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 	private List<E> pathfinder(V v, DFSTree<V,E> dfsTree, List<E> newEdges, List<E> oldEdges, List<V> newVertices, List<V> oldVertices){
 
 		if (debug){
-			System.out.println("pathfinder");
-			System.out.println("new Edges " + newEdges);
-			System.out.println("old Edges " + oldEdges);
-			System.out.println("new vertices " + newVertices);
-			System.out.println("old vertices " + oldVertices);
-			System.out.println("current vertex: " + v);
+			log.info("pathfinder");
+			log.info("new Edges " + newEdges);
+			log.info("old Edges " + oldEdges);
+			log.info("new vertices " + newVertices);
+			log.info("old vertices " + oldVertices);
+			log.info("current vertex: " + v);
 		}
 
 		//if there is a new tree edge v->w
@@ -140,9 +145,9 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		}
 
 		if (debug){
-			System.out.println("new cycle 1 " + newCycle1);
-			System.out.println("new cycle 2 " + newCycle2);
-			System.out.println("new tree edge " + newTreeEdge);
+			log.info("new cycle 1 " + newCycle1);
+			log.info("new cycle 2 " + newCycle2);
+			log.info("new tree edge " + newTreeEdge);
 		}
 
 
@@ -168,7 +173,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 
 			//while w is new
 			w = newTreeEdge.getOrigin() == v ? newTreeEdge.getDestination() : newTreeEdge.getOrigin();
-			System.out.println("w: " + w);
+			if (debug)
+				log.info("w: " + w);
 			
 			while (newVertices.contains(w)){
 
@@ -195,7 +201,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 							path.add(e);
 							w = x;
 							if (debug)
-								System.out.println("x " + x);
+								log.info("x " + x);
 							break;
 						}
 					}
@@ -283,7 +289,7 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		while (!stack.isEmpty()){
 
 			if (debug)
-				System.out.println("current stack " + stack);
+				log.info("current stack " + stack);
 
 			//let v be the top vertex on the stack
 			//delete v from stack
@@ -296,10 +302,11 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 				pathVertices.clear();
 				V current = v;
 				if (debug)
-					System.out.println("PATH " + path);
+					log.info("PATH " + path);
 				for (E e : path){
 					pathVertices.add(current);
-					System.out.println("current " + current);
+					if (debug)
+						log.info("current " + current);
 					V other = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
 					current = other;
 				}
@@ -309,7 +316,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 					stack.push(pathVertices.get(j));
 			}
 			else{
-				System.out.println(i + ": " + v);
+				if (debug)
+					System.out.println(i + ": " + v);
 				numbering.put(v, i);
 				inverseNumbering.put(i, v);
 				i++;

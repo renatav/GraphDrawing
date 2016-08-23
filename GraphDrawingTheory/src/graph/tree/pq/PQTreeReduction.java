@@ -39,23 +39,16 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 		if (debug)
 			log.info("Bubble");
-//		
-//		for (PQTreeNode node : pqTree.getVertices()){
-//			List<PQTreeNode> descendants = pqTree.allDescendantsOf(node);
-//			int num = 0;
-//			for (PQTreeNode descendant : descendants)
-//				if (S.contains(descendant))
-//					num++;
-//			node.setPertinendChildCount(num);
-//		}
-//		
+
 		setPertinendChildren(pqTree.getRoot(), S);
-		
-		for (PQTreeNode node : pqTree.getVertices())
-			log.info("Pertinent children count of " + node + " = " +  node.getPertinendChildCount() );
+
+		if (debug){
+			for (PQTreeNode node : pqTree.getVertices())
+				log.info("Pertinent children count of " + node + " = " +  node.getPertinendChildCount() );
+		}
 		return true;
 	}
-	
+
 	private void setPertinendChildren(PQTreeNode node, List<PQTreeNode> S){
 		node.setPertinendChildCount(0);
 		if (node.getType() == PQNodeType.LEAF){
@@ -64,19 +57,20 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 		}
 		else{
-		
+
 			for (PQTreeNode child : node.getChildren()){
-					setPertinendChildren(child, S);
-					if (child.getPertinendChildCount() >= 1){
-						node.incrementPertinentChildCount();
-					}
+				setPertinendChildren(child, S);
+				if (child.getPertinendChildCount() >= 1){
+					node.incrementPertinentChildCount();
 				}
+			}
 		}
 	}
 
 	public boolean reduce(PQTree<V,E> pqTree, List<PQTreeNode> S, PQTreeNode pertRoot){
 
-		log.info("Reduction");
+		if (debug)
+			log.info("Reduction");
 
 		//initialize queue to be empty
 		queue.clear();
@@ -89,20 +83,25 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		while (queue.size() > 0){
 			//remove x from the from the front of the queue
 			PQTreeNode x = queue.remove();
-			log.info("Current x " + x);
+			if (debug)
+				log.info("Current x " + x);
 			if (x != pertRoot){
 				//X is not root(T,S)
 				PQTreeNode y = x.getParent();
-				log.info("Y (parent of x): " + y); 
-				log.info("Y pertinent child count " + y.getPertinendChildCount());
+				if (debug){
+					log.info("Y (parent of x): " + y); 
+					log.info("Y pertinent child count " + y.getPertinendChildCount());
+				}
 				y.decrementPertinentChildCount();
 				if (y.getPertinendChildCount() == 0){
 					queue.add(y);
-					log.info("Adding " + y + "  to queue");
+					if (debug)
+						log.info("Adding " + y + "  to queue");
 				}
 				//try templates
 				//the order is very important
-				log.info("Trying templates");
+				if (debug)
+					log.info("Trying templates");
 				if (!templateL1(x, S))
 					if (!templateP1(x))
 						if (!templateP3(x, pqTree))
@@ -111,10 +110,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 									if (!templateQ2(x, pqTree)){
 										return false;
 									}
-//				if (y.fullChildrenCount() + y.partialChildrenCount() == 1){
-//					queue.add(y);
-//					log.info("Adding " + y + "  to queue");
-//				}
 			}
 			else{
 				//x is root(T,S)
@@ -132,8 +127,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 		}
 
-		log.info("Tree reduced");
-		log.info(pqTree);
+		if (debug){
+			log.info("Tree reduced");
+			log.info(pqTree);
+		}
 		return true;
 	}
 
@@ -145,7 +142,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateL1(PQTreeNode node, List<PQTreeNode> S){
-		log.info("Trying template L1 for node " + node);
+		if (debug)
+			log.info("Trying template L1 for node " + node);
 		if (node.getType() != PQNodeType.LEAF)
 			return false;
 
@@ -155,7 +153,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		else
 			node.labelAsEmpty();
 
-		log.info("Template matched. Labeled the leaf as " + node.getLabel());
+		if (debug)
+			log.info("Template matched. Labeled the leaf as " + node.getLabel());
 		return true;
 	}
 
@@ -168,14 +167,16 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	@SuppressWarnings("unused")
 	private boolean templateP0(PQTreeNode node){
-		log.info("Trying template P0 for node " + node);
+		if (debug)
+			log.info("Trying template P0 for node " + node);
 		if (node.getType() != PQNodeType.P)
 			return false;
 
 		//all children are empty
 		if (node.emptyChildrenCount() == node.childrenCount()){
 			node.labelAsEmpty();
-			log.info("Templated matched. Labeled the P node as empty");
+			if (debug)
+				log.info("Templated matched. Labeled the P node as empty");
 			return true;
 		}
 
@@ -189,14 +190,16 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateP1(PQTreeNode node){
-		log.info("Trying template P1 for node " + node);
+		if (debug)
+			log.info("Trying template P1 for node " + node);
 		if (node.getType() != PQNodeType.P)
 			return false;
 
 		//all children are full
 		if (node.fullChildrenCount() == node.childrenCount()){
 			node.labelAsFull();
-			log.info("Templated matched. Labeled the P node as full");
+			if (debug)
+				log.info("Templated matched. Labeled the P node as full");
 			return true;
 		}
 		return false;
@@ -211,7 +214,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateP2(PQTreeNode node, PQTree<V,E> tree){
-		log.info("Trying template P2 for node " + node);
+		if (debug)
+			log.info("Trying template P2 for node " + node);
 
 		if (node.getType() != PQNodeType.P)
 			return false;
@@ -243,7 +247,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				//and updates the list of full nodes
 				node.addChild(newNode);
 				tree.addEdge(new PQTreeEdge(node, newNode));
-				log.info("Created the node: " + newNode);
+				if (debug)
+					log.info("Created the node: " + newNode);
 			}
 
 			else{
@@ -252,9 +257,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				node.getChildren().add(fullNode);
 			}
 
-
-			log.info("Template matched");
-			log.info("Node after the change: " + node);
+			if (debug){
+				log.info("Template matched");
+				log.info("Node after the change: " + node);
+			}
 			return true;
 		}
 
@@ -273,7 +279,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateP3(PQTreeNode node, PQTree<V,E> tree){
-		log.info("Trying template P3 for node " + node);
+		if (debug)
+			log.info("Trying template P3 for node " + node);
 		if (node.getType() != PQNodeType.P)
 			return false;
 
@@ -297,7 +304,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			//should create a new p-node for the empty children
 			if (node.emptyChildrenCount() > 1){
-				log.info("Creating a new p node for the empty children");
+				if (debug)
+					log.info("Creating a new p node for the empty children");
 				PQTreeNode emptyPNode = new PQTreeNode(PQNodeType.P);
 				tree.addVertex(emptyPNode);
 				for (PQTreeNode emptyNode : node.getEmptyChildren()){
@@ -307,7 +315,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				emptyPNode.setLabel(PQNodeLabel.EMPTY);
 				qNode.addChild(emptyPNode);
 				tree.addEdge(new PQTreeEdge(qNode, emptyPNode));
-				log.info("New node: " + emptyPNode);
+				if (debug)
+					log.info("New node: " + emptyPNode);
 			}
 			else{
 				//add the single empty node to the q-node
@@ -317,7 +326,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			//should create a new p-node for the full children
 			if (node.fullChildrenCount() > 1){
-				log.info("Creating a new p node for the full children");
+				if (debug)
+					log.info("Creating a new p node for the full children");
 				PQTreeNode fullPNode = new PQTreeNode(PQNodeType.P);
 				tree.addVertex(fullPNode);
 				for (PQTreeNode fullNode : node.getFullChildren()){
@@ -327,7 +337,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				fullPNode.setLabel(PQNodeLabel.FULL);
 				qNode.addChild(fullPNode);
 				tree.addEdge(new PQTreeEdge(qNode, fullPNode));
-				log.info("New node: " + fullPNode);
+				if (debug)
+					log.info("New node: " + fullPNode);
 			}
 			else{
 				//add the single full node to the q-node
@@ -335,9 +346,11 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				tree.addEdge(new PQTreeEdge(qNode, node.getFullChildren().get(0)));
 			}
 
-			log.info("Template matched");
-			log.info("Partial q-node: " + qNode);
-			log.info("Children: " + qNode.getChildren());
+			if (debug){
+				log.info("Template matched");
+				log.info("Partial q-node: " + qNode);
+				log.info("Children: " + qNode.getChildren());
+			}
 			return true;
 		}
 
@@ -353,7 +366,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateP4(PQTreeNode node, PQTree<V,E> tree){
-		log.info("Trying template P4 for node " + node);
+		if (debug)
+			log.info("Trying template P4 for node " + node);
 		if (node.getType() != PQNodeType.P)
 			return false;
 
@@ -361,7 +375,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		if (node.partialChildrenCount() == 1){
 			node.labelAsPartial(PQNodeLabel.SINGLY_PARTIAL);
 
-			log.info("Labeling node as singly partial ");
+			if (debug)
+				log.info("Labeling node as singly partial ");
 
 			//leave empty children as they are
 			//add full children as children of a new p-node
@@ -369,8 +384,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//don't add the p-node is there are less than
 			//two full children of the P-node in question
 
-			log.info("FULL CHILDREN");
-			log.info(node.getFullChildren());
+			if (debug){
+				log.info("FULL CHILDREN");
+				log.info(node.getFullChildren());
+			}
 
 			PQTreeNode partialChild = node.getPartialChildren().get(0);
 
@@ -381,7 +398,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 
 			if (node.fullChildrenCount() == 1){
-				log.info("Only one full child");
+				if (debug)
+					log.info("Only one full child");
 				PQTreeNode fullChild = node.getFullChildren().get(0);
 				node.removeChild(fullChild);
 				tree.removeEdge(tree.edgeBetween(node, fullChild));
@@ -392,11 +410,14 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					partialChild.addChild(fullChild);
 
 				tree.addEdge(new PQTreeEdge(partialChild, fullChild));
-				log.info("Partial child " + partialChild);
-				log.info("Partial child children: " + partialChild.getChildren());
+				if (debug){
+					log.info("Partial child " + partialChild);
+					log.info("Partial child children: " + partialChild.getChildren());
+				}
 			}
 			else if (node.fullChildrenCount() > 1){
-				log.info("Two or more full children, creating a new P-node");
+				if (debug)
+					log.info("Two or more full children, creating a new P-node");
 				PQTreeNode newPNode = new PQTreeNode(PQNodeType.P);
 				tree.addVertex(newPNode);
 				for (PQTreeNode fullChild : node.getFullChildren()){
@@ -414,13 +435,17 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					partialChild.addChild(newPNode);
 
 				tree.addEdge(new PQTreeEdge(partialChild, newPNode));
-				log.info("New p-node: " + newPNode);
-				log.info("Partial child " + partialChild);
-				log.info("Partial child children: " + partialChild.getChildren());
+				if (debug){
+					log.info("New p-node: " + newPNode);
+					log.info("Partial child " + partialChild);
+					log.info("Partial child children: " + partialChild.getChildren());
+				}
 			}
-			log.info("Template matched");
-			log.info("Node " + node);
-			log.info("Children: " + node.getChildren());
+			if (debug){
+				log.info("Template matched");
+				log.info("Node " + node);
+				log.info("Children: " + node.getChildren());
+			}
 			return true;
 		}
 
@@ -441,7 +466,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateP5(PQTreeNode node, PQTree<V,E> tree){
-		log.info("Trying template P5 for node " + node);
+		if (debug)
+			log.info("Trying template P5 for node " + node);
 		if (node.getType() != PQNodeType.P)
 			return false;
 
@@ -462,7 +488,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			//should create a new p-node for the empty children
 			if (node.emptyChildrenCount() > 1){
-				log.info("Creating a new p node for the empty children");
+				if (debug)
+					log.info("Creating a new p node for the empty children");
 				PQTreeNode emptyPNode = new PQTreeNode(PQNodeType.P);
 				for (PQTreeNode emptyNode : node.getEmptyChildren()){
 					emptyPNode.addChild(emptyNode);
@@ -471,7 +498,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				emptyPNode.setLabel(PQNodeLabel.EMPTY);
 				qNode.addChild(emptyPNode);
 				tree.addEdge(new PQTreeEdge(qNode, emptyPNode));
-				log.info("New node: " + emptyPNode);
+				if (debug)
+					log.info("New node: " + emptyPNode);
 			}
 			else{
 				//add the single empty node to the q-node
@@ -495,13 +523,14 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				tree.removeEdge(tree.edgeBetween(partialChild, fullChild));
 				tree.addEdge(new PQTreeEdge(qNode, fullChild));
 			}
-			
+
 			tree.removeVertex(partialChild);
-			
+
 
 			//should create a new p-node for the full children
 			if (node.fullChildrenCount() > 1){
-				log.info("Creating a new p node for the full children");
+				if (debug)
+					log.info("Creating a new p node for the full children");
 				PQTreeNode fullPNode = new PQTreeNode(PQNodeType.P);
 				for (PQTreeNode fullNode : node.getFullChildren()){
 					fullPNode.addChild(fullNode);
@@ -510,7 +539,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				fullPNode.setLabel(PQNodeLabel.FULL);
 				qNode.addChild(fullPNode);
 				tree.addEdge(new PQTreeEdge(qNode, fullPNode));
-				log.info("New node: " + fullPNode);
+				if (debug)
+					log.info("New node: " + fullPNode);
 			}
 			else{
 				//add the single full node to the q-node
@@ -521,8 +551,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 
-			log.info("Template matched");
-			log.info("Partial q-node: " + qNode);
+			if (debug){
+				log.info("Template matched");
+				log.info("Partial q-node: " + qNode);
+			}
 			return true;
 		}
 
@@ -539,12 +571,14 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateP6(PQTreeNode node, PQTree<V,E> tree){
-		log.info("Trying template P6 for node " + node);
+		if (debug)
+			log.info("Trying template P6 for node " + node);
 		//if the node has exactly one partial child
 		if (node.partialChildrenCount() == 2){
 			node.labelAsPartial(PQNodeLabel.DOUBLY_PARTIAL);
 
-			log.info("Labeling node as doubly partial ");
+			if (debug)
+				log.info("Labeling node as doubly partial ");
 
 			//leave empty children as they are
 			//join the partial children and full children
@@ -576,16 +610,19 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 
 			if (node.fullChildrenCount() == 1){
-				log.info("Only one full child");
+				if (debug)
+					log.info("Only one full child");
 				PQTreeNode fullChild = node.getFullChildren().get(0);
 				node.removeChild(fullChild);
 				newPartialChild.addChild(fullChild);
 				tree.removeEdge(tree.edgeBetween(node, fullChild));
 				tree.addEdge(new PQTreeEdge(newPartialChild, fullChild));
-				log.info("Partial child " + newPartialChild);
+				if (debug)
+					log.info("Partial child " + newPartialChild);
 			}
 			else if (node.fullChildrenCount() > 1){
-				log.info("Two or more full children, creating a new P-node");
+				if (debug)
+					log.info("Two or more full children, creating a new P-node");
 				PQTreeNode newPNode = new PQTreeNode(PQNodeType.P);
 				for (PQTreeNode fullChild : node.getFullChildren()){
 					newPNode.addChild(fullChild);
@@ -597,8 +634,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				node.getFullChildren().clear();
 				newPartialChild.addChild(newPNode);
 				tree.addEdge(new PQTreeEdge(newPartialChild, newPNode));
-				log.info("New p-node: " + newPNode);
-				log.info("Partial child " + newPartialChild);
+				if (debug){
+					log.info("New p-node: " + newPNode);
+					log.info("Partial child " + newPartialChild);
+				}
 			}
 
 			//already removed the first one
@@ -617,8 +656,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			node.addChild(newPartialChild);
 			tree.addEdge(new PQTreeEdge(node, newPartialChild));
 
-			log.info("Template mathced");
-			log.info("Node " + node);
+			if (debug){
+				log.info("Template mathced");
+				log.info("Node " + node);
+			}
 			return true;
 		}
 
@@ -634,14 +675,16 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	@SuppressWarnings("unused")
 	private boolean templateQ0(PQTreeNode node){
-		log.info("Trying template Q0 for node " + node);
+		if (debug)
+			log.info("Trying template Q0 for node " + node);
 		if (node.getType() != PQNodeType.Q)
 			return false;
 
 		//all children are empty
 		if (node.emptyChildrenCount() == node.childrenCount()){
 			node.labelAsEmpty();
-			log.info("Templated matched. Labeled the Q node as empty");
+			if (debug)
+				log.info("Templated matched. Labeled the Q node as empty");
 			return true;
 		}
 
@@ -655,14 +698,16 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateQ1(PQTreeNode node){
-		log.info("Trying template Q1 for node " + node);
+		if (debug)
+			log.info("Trying template Q1 for node " + node);
 		if (node.getType() != PQNodeType.Q)
 			return false;
 
 		//all children are full
 		if (node.fullChildrenCount() == node.childrenCount()){
 			node.labelAsFull();
-			log.info("Templated matched. Labeled the Q node as full");
+			if (debug)
+				log.info("Templated matched. Labeled the Q node as full");
 			return true;
 		}
 
@@ -679,7 +724,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateQ2(PQTreeNode node, PQTree<V,E> tree){
-		log.info("Trying template Q2 for node " + node);
+		if (debug)
+			log.info("Trying template Q2 for node " + node);
 
 		if (node.getType() != PQNodeType.Q)
 			return false;
@@ -725,8 +771,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 
 			node.setLabel(PQNodeLabel.SINGLY_PARTIAL);
-			log.info("Template matched");
-			log.info("Node: " + node);
+			if (debug){
+				log.info("Template matched");
+				log.info("Node: " + node);
+			}
 
 			return true;
 		}
@@ -743,7 +791,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * @return
 	 */
 	private boolean templateQ3(PQTreeNode node, PQTree<V,E> tree){
-		log.info("Trying template Q3 for node " + node);
+		if (debug)
+			log.info("Trying template Q3 for node " + node);
 
 		if (node.getType() != PQNodeType.Q)
 			return false;
@@ -840,8 +889,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			}
 
 			node.setLabel(PQNodeLabel.DOUBLY_PARTIAL);
-			log.info("Template matched");
-			log.info("Node: " + node);
+			if (debug){
+				log.info("Template matched");
+				log.info("Node: " + node);
+			}
 
 		}
 		return true;

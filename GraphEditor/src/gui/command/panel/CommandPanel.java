@@ -1,12 +1,23 @@
 package gui.command.panel;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.drawing.ConvexDrawing;
-import graph.algorithms.numbering.STNumbering;
-import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
+import graph.algorithms.drawing.NotPlanarException;
 import graph.algorithms.planarity.PQTreePlanarity;
 import graph.algorithms.planarity.PlanarEmbedding;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
@@ -24,7 +35,6 @@ import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.tree.binary.BinaryTree;
-import graph.tree.pq.PQTree;
 import graph.tree.spqr.SPQRTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
@@ -32,18 +42,6 @@ import gui.model.GraphVertex;
 import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import net.miginfocom.swing.MigLayout;
 
 public class CommandPanel extends JPanel{
@@ -485,8 +483,14 @@ public class CommandPanel extends JPanel{
 //			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph, s,t);
 //			return stNumbering.getOrder() + "";
 			
-			PlanarEmbedding<GraphVertex, GraphEdge> planarEmbedding = new PlanarEmbedding<GraphVertex, GraphEdge>(graph);
-			planarEmbedding.execute();
+			try {
+				Map<GraphVertex, List<GraphEdge>> embedding = PlanarEmbedding.emedGraph(graph);
+				return embedding + "";
+			} catch (NotPlanarException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 
 		if (command.equals(commands[15])){

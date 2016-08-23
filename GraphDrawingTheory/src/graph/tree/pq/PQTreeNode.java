@@ -1,14 +1,11 @@
 package graph.tree.pq;
 
-import graph.elements.Vertex;
-import graph.util.DoubleLinkedList;
-
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import graph.elements.Vertex;
 
 public class PQTreeNode implements Vertex{
 
@@ -21,21 +18,6 @@ public class PQTreeNode implements Vertex{
 	 * a block if the type is Q. Virtual vertex if it is a leaf
 	 */
 	private Object content;
-
-	/**
-	 * A set of links which form the children of a P-node into
-	 * a doubly-linked circular list. The order of the of the lists is arbitrary.
-	 * The sole purpose f the circular list is to enable a P-node
-	 * to find its only empty child when all other children are full or partial
-	 * Not used for children of Q nodes
-	 */
-	private DoubleLinkedList<PQTreeNode> circularLink;
-
-	/**
-	 * Set which contains the two endmost children of a Q-node
-	 * Only used for Q-nodes
-	 */
-	private Set<PQTreeNode> endmostChildren; 
 
 	/**
 	 * Contains all of the children of a node which are 
@@ -57,14 +39,6 @@ public class PQTreeNode implements Vertex{
 	 * that are known to be empty
 	 */
 	private List<PQTreeNode> emptyChildren;
-
-	/**
-	 * A set containing 0,1, or 2 other nodes
-	 * A child of a P-node has no immediate siblings, the endmost children
-	 * of Q-nodes have only one immediate sibling and the interior
-	 * children of Q-nodes have two immediate siblings
-	 */
-	private List<PQTreeNode> immediateSimblings;
 
 	/**
 	 * All children of a node 
@@ -118,8 +92,6 @@ public class PQTreeNode implements Vertex{
 		this.type = type;
 		mark = PQNodeMark.UNMARKED;
 		
-		immediateSimblings = new ArrayList<PQTreeNode>();
-		
 		//label leaves as empty
 		if (type == PQNodeType.LEAF)
 			label = PQNodeLabel.EMPTY;
@@ -131,12 +103,6 @@ public class PQTreeNode implements Vertex{
 			partialChildren = new ArrayList<PQTreeNode>();
 			emptyChildren = new ArrayList<PQTreeNode>();
 			
-			if (type == PQNodeType.P){
-				circularLink = new DoubleLinkedList<PQTreeNode>();
-			}
-			else if (type == PQNodeType.Q){
-				endmostChildren = new HashSet<PQTreeNode>();
-			}
 		}
 	}
 	
@@ -463,35 +429,11 @@ public class PQTreeNode implements Vertex{
 		this.parent = parent;
 	}
 
-	public DoubleLinkedList<PQTreeNode> getCircularLink() {
-		return circularLink;
-	}
-
-	public Set<PQTreeNode> getEndmostChildren() {
-		return endmostChildren;
-	}
 
 	public List<PQTreeNode> getFullChildren() {
 		return fullChildren;
 	}
 
-	public List<PQTreeNode> getImmediateSimblings() {
-		immediateSimblings.clear();
-		if (parent != null && parent.getType() == PQNodeType.Q){
-			List<PQTreeNode> siblings = parent.getChildren();
-			int index = siblings.indexOf(this);
-			if (index == 0)
-				immediateSimblings.add(siblings.get(index + 1));
-			else if (index == siblings.size() - 1)
-				immediateSimblings.add(siblings.get(index - 1));
-			else{
-				immediateSimblings.add(siblings.get(index - 1));
-				immediateSimblings.add(siblings.get(index + 1));
-			}
-		}
-		
-		return immediateSimblings;
-	}
 
 	public PQNodeLabel getLabel() {
 		return label;
