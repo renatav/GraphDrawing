@@ -5,7 +5,6 @@ import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,8 +17,10 @@ import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.drawing.NotPlanarException;
+import graph.algorithms.planarity.Embedding;
 import graph.algorithms.planarity.PQTreePlanarity;
 import graph.algorithms.planarity.PlanarEmbedding;
+import graph.algorithms.planarity.PlanarFaces;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.drawing.Drawing;
 import graph.elements.Graph;
@@ -484,8 +485,10 @@ public class CommandPanel extends JPanel{
 //			return stNumbering.getOrder() + "";
 			
 			try {
-				Map<GraphVertex, List<GraphEdge>> embedding = PlanarEmbedding.emedGraph(graph);
-				return embedding + "";
+				//Embedding<GraphVertex, GraphEdge> embedding = PlanarEmbedding.emedGraph(graph);
+				//return embedding + "";
+				PlanarFaces<GraphVertex, GraphEdge> planarFaces = new PlanarFaces<GraphVertex, GraphEdge>(graph);
+				planarFaces.formFaces();
 			} catch (NotPlanarException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

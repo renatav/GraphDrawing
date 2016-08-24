@@ -19,7 +19,7 @@ public class PlanarEmbedding {
 	 * @return
 	 * @throws CannotBeAppliedException
 	 */
-	public static <V extends Vertex, E extends Edge<V>> Map<V,List<E>> emedGraph(Graph<V,E> graph) throws NotPlanarException{
+	public static <V extends Vertex, E extends Edge<V>> Embedding<V,E> emedGraph(Graph<V,E> graph) throws NotPlanarException{
 		Map<V,List<E>> embedding = new HashMap<V, List<E>>();
 
 		//get upwards embedding
@@ -40,8 +40,10 @@ public class PlanarEmbedding {
 
 		List<V> stOrder = pqPlanarity.getStOrder();
 		dfs(stOrder.get(stOrder.size() - 1), covered, upwardsEmbedding, embedding);
+		
+		Embedding<V,E> ret = new Embedding<>(embedding, pqPlanarity.getStNumbers());
 
-		return embedding;
+		return ret;
 
 	}
 
@@ -54,7 +56,8 @@ public class PlanarEmbedding {
 
 		if (upwardsEmbedding.containsKey(y))
 
-			for (E e : upwardsEmbedding.get(y)){
+			for (int i = upwardsEmbedding.get(y).size() - 1; i >= 0; i--){
+				E e = upwardsEmbedding.get(y).get(i);
 				V v = e.getOrigin() == y ? e.getDestination() : e.getOrigin();
 				List<E> list = embedding.get(v);
 				if (list == null){

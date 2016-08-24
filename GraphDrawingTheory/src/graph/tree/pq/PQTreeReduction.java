@@ -20,7 +20,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 	private Logger log = Logger.getLogger(PQTreeReduction.class);
 
-	private boolean debug;
+	private boolean debug = false;
 
 	public PQTreeReduction(){
 		queue = new LinkedList<PQTreeNode>();
@@ -394,7 +394,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//add new full children in correct place, next to another full child
 			int partialChildFullIndex = -1;
 			if (partialChild.fullChildrenCount() > 0){
-				partialChildFullIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(partialChild.getFullChildren().size() - 1));
+				partialChildFullIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(partialChild.getFullChildren().size() - 1)) + 1;
 			}
 
 			if (node.fullChildrenCount() == 1){

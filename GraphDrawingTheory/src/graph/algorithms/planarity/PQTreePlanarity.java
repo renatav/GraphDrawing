@@ -23,6 +23,9 @@ import graph.tree.pq.PQTreeReduction;
 public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V, E>{
 
 	private List<V> stOrder;
+	
+	private Map<V,Integer> stNumbers;
+	
 	private Graph<V,E> graph;
 
 	/**
@@ -46,7 +49,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 	private Logger log = Logger.getLogger(PQTreePlanarity.class);
 
-	private boolean debug;
+	private boolean debug = false;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -68,6 +71,8 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
 		stOrder = stNumbering.getOrder();
+		stNumbers = stNumbering.getNumbering();
+		
 		final Map<V, Integer> stMapping = stNumbering.getNumbering();
 
 		if (debug){
@@ -468,6 +473,22 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	 */
 	public List<V> getStOrder() {
 		return stOrder;
+	}
+
+
+	/**
+	 * @return the stNumbers
+	 */
+	public Map<V, Integer> getStNumbers() {
+		return stNumbers;
+	}
+
+
+	/**
+	 * @param stNumbers the stNumbers to set
+	 */
+	public void setStNumbers(Map<V, Integer> stNumbers) {
+		this.stNumbers = stNumbers;
 	}
 
 }
