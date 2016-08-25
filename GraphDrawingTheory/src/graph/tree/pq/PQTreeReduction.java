@@ -3,8 +3,10 @@ package graph.tree.pq;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -20,7 +22,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 	private Logger log = Logger.getLogger(PQTreeReduction.class);
 
-	private boolean debug = false;
+	private boolean debug = true;
+	
+	private Map<V, Integer> reversalNum = new HashMap<V, Integer>();
 
 	public PQTreeReduction(){
 		queue = new LinkedList<PQTreeNode>();
@@ -229,6 +233,17 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			//if there is only one child, just place it on one of the ends
 			//else create a new P-node and group the full children
+			
+			//TODO marking embedding experiments
+			if (!node.getEmptyChildren().contains(node.getChildren().get(0))){
+				if (!reversalNum.containsKey(node.getContent()))
+					reversalNum.put((V) node.getContent(), 1);
+				else{
+					int num = reversalNum.get((V) node.getContent());
+					reversalNum.put((V) node.getContent(), num+1);
+				}
+				
+			}
 
 			if (node.fullChildrenCount() > 1){
 
@@ -287,6 +302,19 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		//and that there are full children
 		if (node.fullChildrenCount() > 0 && node.emptyChildrenCount() > 0
 				&& node.partialChildrenCount() == 0){
+			
+			
+			//TODO marking embedding experiments
+			if (!node.getEmptyChildren().contains(node.getChildren().get(0))){
+				if (!reversalNum.containsKey(node.getContent()))
+					reversalNum.put((V) node.getContent(), 1);
+				else{
+					int num = reversalNum.get((V) node.getContent());
+					reversalNum.put((V) node.getContent(), num+1);
+				}
+				
+			}
+			
 
 			PQTreeNode qNode = new PQTreeNode(PQNodeType.Q);
 			qNode.setLabel(PQNodeLabel.SINGLY_PARTIAL);
@@ -388,6 +416,19 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				log.info("FULL CHILDREN");
 				log.info(node.getFullChildren());
 			}
+			
+			
+			//TODO marking embedding experiments
+			if (node.getFullChildren().contains(node.getChildren().get(0))){
+				if (!reversalNum.containsKey(node.getContent()))
+					reversalNum.put((V) node.getContent(), 1);
+				else{
+					int num = reversalNum.get((V) node.getContent());
+					reversalNum.put((V) node.getContent(), num+1);
+				}
+				
+			}
+			
 
 			PQTreeNode partialChild = node.getPartialChildren().get(0);
 
@@ -484,6 +525,18 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			tree.addVertex(qNode);
 			tree.addEdge(new PQTreeEdge(parent, qNode));
 			qNode.setContent(node.getContent());
+			
+			
+			//TODO marking embedding experiments
+			if (node.getFullChildren().contains(node.getChildren().get(0))){
+				if (!reversalNum.containsKey(node.getContent()))
+					reversalNum.put((V) node.getContent(), 1);
+				else{
+					int num = reversalNum.get((V) node.getContent());
+					reversalNum.put((V) node.getContent(), num+1);
+				}
+				
+			}
 
 
 			//should create a new p-node for the empty children
@@ -579,6 +632,17 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			if (debug)
 				log.info("Labeling node as doubly partial ");
+			
+			//TODO marking embedding experiments
+			if (node.getFullChildren().contains(node.getChildren().get(0))){
+				if (!reversalNum.containsKey(node.getContent()))
+					reversalNum.put((V) node.getContent(), 1);
+				else{
+					int num = reversalNum.get((V) node.getContent());
+					reversalNum.put((V) node.getContent(), num+1);
+				}
+				
+			}
 
 			//leave empty children as they are
 			//join the partial children and full children
@@ -896,6 +960,14 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 		}
 		return true;
+	}
+
+
+	/**
+	 * @return the reversalNum
+	 */
+	public Map<V, Integer> getReversalNum() {
+		return reversalNum;
 	}
 
 

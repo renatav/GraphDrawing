@@ -48,9 +48,11 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	private DijkstraAlgorithm<PQTreeNode, PQTreeEdge> dijkstra = new DijkstraAlgorithm<PQTreeNode, PQTreeEdge>();
 
 	private Logger log = Logger.getLogger(PQTreePlanarity.class);
+	
+	private	STNumbering<V, E> stNumbering;
 
-	private boolean debug = false;
-
+	private boolean debug = true;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isPlannar(Graph<V, E> graph) {
@@ -69,7 +71,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 		PQTreeNode pertRoot = null;
 
-		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
+		stNumbering = new STNumbering<V,E>(graph, s, t);
 		stOrder = stNumbering.getOrder();
 		stNumbers = stNumbering.getNumbering();
 		
@@ -82,7 +84,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		}
 
 		//construct a PQ-tree corresponding to G1'
-		Graph<V,E> g = constructGk(1);
+		Graph<V,E> g = constructG1();
 		PQTree<V, E> T = new PQTree<>(g, gPrimMap.get(g), stMapping);
 
 		//S - the set of edges whose higher-numbered vertex is j
@@ -136,8 +138,27 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				}
 			}
 
+			
+			final V v = stOrder.get(j);
+			
+			Collections.sort(Sprim, new Comparator<E>() {
+
+				@Override
+				public int compare(E o1, E o2) {
+					V v1 = o1.getOrigin() == v ? o1.getDestination() : o1.getOrigin();
+					V v2 = o2.getOrigin() == v ? o2.getDestination() : o2.getOrigin();
+					
+					if  (stNumbering.getNumbering().get(v1) > stNumbering.getNumbering().get(v2))
+						return 1;
+					else if  (stNumbering.getNumbering().get(v1) == stNumbering.getNumbering().get(v2))
+						return 0;
+					else return -1;
+				}
+			});
+			
 			if (debug)
 				log.info("S' " + Sprim);
+			
 
 			//sort S so that lower indexes are processed later
 			//bottom up
@@ -148,23 +169,10 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				public int compare(PQTreeNode node1, PQTreeNode node2) {
 
 
-					PQTreeNode parent1 = node1.getParent();
-					PQTreeNode parent2 = node2.getParent();
+					V v1 = (V) node1.getContent();
+					V v2 = (V) node2.getContent();
 
-					while (parent1.getContent() == null){
-						parent1 = parent1.getParent();
-					}
-
-					while (parent2.getContent() == null){
-						parent2 = parent2.getParent();
-					}
-
-					//parent are now P nodes
-					V v1 = (V) parent1.getContent();
-					V v2 = (V) parent2.getContent();
-
-
-					if  (stMapping.get(v1) < stMapping.get(v2))
+					if  (stMapping.get(v1) > stMapping.get(v2))
 						return 1;
 					else if  (stMapping.get(v1) == stMapping.get(v2))
 						return 0;
@@ -317,6 +325,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		if (debug)
 			log.info("embed vertex = " + v);
 		embedLast(T.getRoot(), currentEmbedding);
+		
 		upwardsEmbedding.put(v, currentEmbedding);
 		if (debug)
 			log.info(currentEmbedding);
@@ -324,21 +333,50 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		upwardsEmbedding.put(v, currentEmbedding);
 		if (debug)
 			log.info("Upwards embedding: " + upwardsEmbedding);
+		
+		//TODO Kada ih obrnuti?????
+		//Gledati kada se obrne parent, onda listu
+		//Ko je parent od neke liste
+		//nije to isti onaj koji se embedovao
+		//I kaze da je to samo za Q-cvorove
+		//sta sa P? Pogotovo onima koji su nastali of Q...
+		//to obrtanje je samo za decu p-cvorova
+		//za testiranje daljeg, uzeti ono kako je slucajno radilo...
+		
+		
+		System.out.println(treeReduction.getReversalNum());
+		
+		if (debug)
+			log.info("Upwards embedding: " + upwardsEmbedding);
 
 		return true;
 	}
 
 
-	private Graph<V,E> constructGk(int k){
+	private Graph<V,E> constructG1(){
 		//vertices in the subgraph
-		List<V> vertices = stOrder.subList(0,k); //the second index is exclusive
-
+		List<V> vertices = stOrder.subList(0,1); //the second index is exclusive
 		Graph<V,E> Gk = graph.subgraph(vertices);
 		List<E> virtualEdges = new ArrayList<E>();
+		final V v = vertices.get(0);
 		for (E e : graph.getEdges())
-			if (vertices.contains(e.getOrigin()) && !vertices.contains(e.getDestination()) || 
-					vertices.contains(e.getDestination()) && !vertices.contains(e.getOrigin()))
+			if (v == e.getOrigin() || v == e.getDestination())
 				virtualEdges.add(e);
+		
+		Collections.sort(virtualEdges, new Comparator<E>() {
+
+			@Override
+			public int compare(E o1, E o2) {
+				V v1 = o1.getOrigin() == v ? o1.getDestination() : o1.getOrigin();
+				V v2 = o2.getOrigin() == v ? o2.getDestination() : o2.getOrigin();
+				
+				if  (stNumbering.getNumbering().get(v1) > stNumbering.getNumbering().get(v2))
+					return 1;
+				else if  (stNumbering.getNumbering().get(v1) == stNumbering.getNumbering().get(v2))
+					return 0;
+				else return -1;
+			}
+		});
 
 		gPrimMap.put(Gk, virtualEdges);
 		return Gk;
