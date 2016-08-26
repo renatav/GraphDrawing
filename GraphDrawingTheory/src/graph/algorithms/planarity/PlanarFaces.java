@@ -30,7 +30,13 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 * The first one being the left one
 	 * and the second being the right one
 	 */
-	private Map<E, List<List<E>>> faces;
+	private Map<E, List<List<E>>> edgeFacesMap;
+	/**
+	 * List of all faces. Nothing new compared
+	 * to the map above, but this makes it more practical
+	 * when, for example, a face containing certain vertex needs to be found
+	 */
+	private List<List<E>> allFaces;
 	private Graph<V,E> graph;
 	
 	private Logger log = Logger.getLogger(PlanarFaces.class);
@@ -47,12 +53,13 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 		//Do this until all edges are traversed twice, once in every direction
 		
 		log.info("Form faces");
-		faces = new HashMap<E, List<List<E>>>();
+		edgeFacesMap = new HashMap<E, List<List<E>>>();
+		allFaces = new ArrayList<List<E>>();
 		
 		Embedding<V,E> embedding = PlanarEmbedding.emedGraph(graph);
 		
 		for (E e : graph.getEdges())
-			faces.put(e, new ArrayList<List<E>>());
+			edgeFacesMap.put(e, new ArrayList<List<E>>());
 		
 		
 		List<E> toDestinationTraversed = new ArrayList<E>();
@@ -134,20 +141,20 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 			log.info("face edges " + faceEdges);
 			log.info("directions " + edgeDirections);
 			
+			allFaces.add(faceEdges);
+			
 			for (int i = 0; i < faceEdges.size(); i++){
 				E currentEdge = faceEdges.get(i);
-				System.out.println("current edge: " + currentEdge);
-				System.out.println(faceEdges);
 				EdgeDirection direction = edgeDirections.get(i);
 				if (direction == EdgeDirection.TO_ORIGIN)
-					faces.get(currentEdge).add(faceEdges);
+					edgeFacesMap.get(currentEdge).add(faceEdges);
 				else
-					faces.get(currentEdge).add(0, faceEdges);
+					edgeFacesMap.get(currentEdge).add(0, faceEdges);
 			}
 			
 		}
 		
-		log.info(faces);
+		log.info(edgeFacesMap);
 	}
 	
 	private void getOrderedEdgeVertices(Map<V,Integer> stNumbering, E edge, List<V> orderedVetices){
@@ -170,7 +177,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 * @return left face
 	 */
 	public List<E> leftFaceOf(E edge){
-		return faces.get(edge).get(0);
+		return edgeFacesMap.get(edge).get(0);
 	}
 
 	/**
@@ -179,7 +186,21 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 * @return right face
 	 */
 	public List<E> rightFaceOf(E edge){
-		return faces.get(edge).get(1);
+		return edgeFacesMap.get(edge).get(1);
+	}
+
+	/**
+	 * @return the allFaces
+	 */
+	public List<List<E>> getAllFaces() {
+		return allFaces;
+	}
+
+	/**
+	 * @param allFaces the allFaces to set
+	 */
+	public void setAllFaces(List<List<E>> allFaces) {
+		this.allFaces = allFaces;
 	}
 	
 	

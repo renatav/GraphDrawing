@@ -68,7 +68,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	//direction, and when in left to right
 	//Does the fact that the full children of a p-node that is/used to be the parent of the q-node
 	//are sometimes on the left and sometimes on the right have anything to do with that?
-	//At the moment, it is noted when those children are on the left and not on the right side of the q-node
+	//Currently, that determines if the node should be placed in the beginning or at the end of existing children of the q-node
 	//Chiba's paper mentions something about determining the position during the vertex addition step
 	//by finding a list of brothers - children of the q-node using dfs and bubble up and then traverse 
 	//the children to see if the list should be reversed
@@ -78,6 +78,9 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	//Also note the fact that when an upward embedding is extended into full
 	//the edges are traversed from the last one to the first one, that seems to do a good job
 	//if the upwards embedding is correct
+	//The last edge is not so strictly embedded because the nodes are not all children of some q-node
+	//so there can be more combinations
+	
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -319,6 +322,11 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				//else replace root(T,S) and its descendants by T(S', S')
 				List<PQTreeNode> descendants = T.allDescendantsOf(pertRoot);
 				descendants.add(pertRoot);
+				PQTreeNode parent = pertRoot.getParent();
+				int index = -1;
+				
+				if (parent != null)
+					index = parent.getChildren().indexOf(pertRoot);
 
 
 				//remove all children of pertinent root
@@ -332,12 +340,12 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				for (PQTreeNode descendant : descendants)
 					T.removeVertex(descendant);		
 
-				PQTreeNode parent = pertRoot.getParent();
+				
 
 				if (parent == null)
 					T.setRoot(newNode);
 				else{
-					parent.addChild(newNode);
+					parent.addChild(newNode, index);
 					T.addEdge(new PQTreeEdge(parent, newNode));
 					parent.removeChild(pertRoot);
 				}

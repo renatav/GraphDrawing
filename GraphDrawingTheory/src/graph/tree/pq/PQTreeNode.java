@@ -362,7 +362,8 @@ public class PQTreeNode implements Vertex{
 		PQNodeLabel oldLabel = this.label;
 		this.label = label;
 		if (parent != null){
-			parent.getPartialChildren().add(this);
+			if (oldLabel != PQNodeLabel.SINGLY_PARTIAL && oldLabel != PQNodeLabel.DOUBLY_PARTIAL)
+				parent.getPartialChildren().add(this);
 			if (oldLabel == PQNodeLabel.EMPTY)
 				parent.getEmptyChildren().remove(this);
 			else if (oldLabel == PQNodeLabel.FULL)

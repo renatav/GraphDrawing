@@ -234,11 +234,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//if there is only one child, just place it on one of the ends
 			//else create a new P-node and group the full children
 
-			//TODO marking embedding experiments
-			if (!node.getEmptyChildren().contains(node.getChildren().get(0))){
-				increaseReversalNum(node);
-			}
-
 			if (node.fullChildrenCount() > 1){
 
 				PQTreeNode newNode = new PQTreeNode(PQNodeType.P);
@@ -298,16 +293,11 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				&& node.partialChildrenCount() == 0){
 
 
-			//TODO marking embedding experiments
-			if (!node.getEmptyChildren().contains(node.getChildren().get(0))){
-				increaseReversalNum(node);
-			}
-
-
 			PQTreeNode qNode = new PQTreeNode(PQNodeType.Q);
 			qNode.setLabel(PQNodeLabel.SINGLY_PARTIAL);
 			PQTreeNode parent = node.getParent();
 			int index = parent.getChildren().indexOf(node);
+			System.out.println("INDEX  " + index);
 			parent.removeChild(node);
 			//add on the same position where the node was
 			parent.addChild(qNode, index);
@@ -403,34 +393,51 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			if (debug){
 				log.info("FULL CHILDREN");
 				log.info(node.getFullChildren());
+				log.info("ALL CHILDREN");
+				log.info(node.getChildren());
 			}
-
-
-			//TODO marking embedding experiments
-			if (node.getFullChildren().contains(node.getChildren().get(0))){
-				increaseReversalNum(node);
-			}
+			
+			
 
 
 			PQTreeNode partialChild = node.getPartialChildren().get(0);
+			int partialChildIndex = node.getChildren().indexOf(partialChild);
 
 			//add new full children in correct place, next to another full child
-			int partialChildFullIndex = -1;
+
+			//very important
+			//determine where to place the full children
+
+			int partialChildEndIndex = -1;
+			int partialChildStartIndex = -1;
 			if (partialChild.fullChildrenCount() > 0){
-				partialChildFullIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(partialChild.getFullChildren().size() - 1)) + 1;
+				partialChildEndIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(partialChild.getFullChildren().size() - 1)) + 1;
+				partialChildStartIndex = partialChild.getChildren().indexOf(partialChild.getFullChildren().get(0));
 			}
 
 			if (node.fullChildrenCount() == 1){
 				if (debug)
 					log.info("Only one full child");
 				PQTreeNode fullChild = node.getFullChildren().get(0);
+				int fullChildIndex = node.getChildren().indexOf(fullChild);
 				node.removeChild(fullChild);
 				tree.removeEdge(tree.edgeBetween(node, fullChild));
-
-				if (partialChildFullIndex != -1)
-					partialChild.addChild(fullChild, partialChildFullIndex);
-				else
-					partialChild.addChild(fullChild);
+				
+				//TODO is this ok - determining if the new node should be placed after or before the full children
+				//if yes, should the same be done for other templates
+				
+				if (fullChildIndex > partialChildIndex){
+					if (partialChildEndIndex != -1)
+						partialChild.addChild(fullChild, partialChildEndIndex);
+					else
+						partialChild.addChild(fullChild);
+				}
+				else{
+					if (partialChildStartIndex != -1)
+						partialChild.addChild(fullChild, partialChildStartIndex);
+					else
+						partialChild.addChild(fullChild);
+				}
 
 				tree.addEdge(new PQTreeEdge(partialChild, fullChild));
 				if (debug){
@@ -443,7 +450,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 					log.info("Two or more full children, creating a new P-node");
 				PQTreeNode newPNode = new PQTreeNode(PQNodeType.P);
 				tree.addVertex(newPNode);
+				int fullChildrenIndex = -1;
 				for (PQTreeNode fullChild : node.getFullChildren()){
+					if (fullChildrenIndex == -1)
+						fullChildrenIndex = node.getChildren().indexOf(fullChild);
 					newPNode.addChild(fullChild);
 					node.removeChild(fullChild);
 					tree.removeEdge(tree.edgeBetween(node, fullChild));
@@ -452,11 +462,18 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				newPNode.setLabel(PQNodeLabel.FULL);
 				node.getFullChildren().clear();
 
-				if (partialChildFullIndex != -1)
-					partialChild.addChild(newPNode, partialChildFullIndex);
-				else
-					partialChild.addChild(newPNode);
-
+				if (fullChildrenIndex > partialChildIndex){
+					if (partialChildEndIndex != -1)
+						partialChild.addChild(newPNode, partialChildEndIndex);
+					else
+						partialChild.addChild(newPNode);
+				}
+				else{
+					if (partialChildStartIndex != -1)
+						partialChild.addChild(newPNode, partialChildStartIndex);
+					else
+						partialChild.addChild(newPNode);
+				}
 				tree.addEdge(new PQTreeEdge(partialChild, newPNode));
 				if (debug){
 					log.info("New p-node: " + newPNode);
@@ -493,6 +510,9 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			log.info("Trying template P5 for node " + node);
 		if (node.getType() != PQNodeType.P)
 			return false;
+		
+		System.out.println(node.getChildren());
+		System.out.println(node.getPartialChildren());
 
 		if (node.partialChildrenCount() == 1){
 
@@ -507,12 +527,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			tree.addVertex(qNode);
 			tree.addEdge(new PQTreeEdge(parent, qNode));
 			qNode.setContent(node.getContent());
-
-
-			//TODO marking embedding experiments
-			if (node.getFullChildren().contains(node.getChildren().get(0))){
-				increaseReversalNum(node);
-			}
 
 
 			//should create a new p-node for the empty children
@@ -602,6 +616,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	private boolean templateP6(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
 			log.info("Trying template P6 for node " + node);
+
+		if (node.getType() != PQNodeType.P)
+			return false;
+
 		//if the node has exactly one partial child
 		if (node.partialChildrenCount() == 2){
 			node.labelAsPartial(PQNodeLabel.DOUBLY_PARTIAL);
@@ -609,10 +627,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			if (debug)
 				log.info("Labeling node as doubly partial ");
 
-			//TODO marking embedding experiments
-			if (node.getFullChildren().contains(node.getChildren().get(0))){
-				increaseReversalNum(node);
-			}
 
 			//leave empty children as they are
 			//join the partial children and full children
@@ -767,6 +781,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		if (node.fullChildrenCount() < node.childrenCount() && 
 				node.emptyChildrenCount() < node.childrenCount() && 
 				node.partialChildrenCount() <= 1){
+			
+			System.out.println(node.getParent().getPartialChildren());
 
 
 			//check the order
@@ -814,7 +830,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				tree.removeVertex(partialChild);
 			}
 
-			node.setLabel(PQNodeLabel.SINGLY_PARTIAL);
+			node.labelAsPartial(PQNodeLabel.SINGLY_PARTIAL);
 			if (debug){
 				log.info("Template matched");
 				log.info("Node: " + node);
@@ -841,10 +857,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		if (node.getType() != PQNodeType.Q)
 			return false;
 
-		//node must be doubly partial
-		if (node.getLabel() != PQNodeLabel.DOUBLY_PARTIAL)
-			return false;
-
 		if (node.fullChildrenCount() < node.childrenCount() && 
 				node.emptyChildrenCount() < node.childrenCount() && 
 				node.partialChildrenCount() <= 2){
@@ -855,7 +867,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			if (validOrder == PQNodeOrderValid.REVERSAL){
 				increaseReversalNum(node);
 			}
-
 
 			List<PQTreeNode> children = node.getChildren();
 
@@ -946,7 +957,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			}
 
-			node.setLabel(PQNodeLabel.DOUBLY_PARTIAL);
+			node.labelAsPartial(PQNodeLabel.DOUBLY_PARTIAL);
 			if (debug){
 				log.info("Template matched");
 				log.info("Node: " + node);
@@ -968,12 +979,12 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	private void increaseReversalNum(PQTreeNode node){
 		if (node.getContent() == null)
 			return;
-			if (!reversalNum.containsKey(node.getContent()))
-				reversalNum.put((V) node.getContent(), 1);
-			else{
-				int num = reversalNum.get((V) node.getContent());
-				reversalNum.put((V) node.getContent(), num+1);
-			}
+		if (!reversalNum.containsKey(node.getContent()))
+			reversalNum.put((V) node.getContent(), 1);
+		else{
+			int num = reversalNum.get((V) node.getContent());
+			reversalNum.put((V) node.getContent(), num+1);
+		}
 	}
 
 
