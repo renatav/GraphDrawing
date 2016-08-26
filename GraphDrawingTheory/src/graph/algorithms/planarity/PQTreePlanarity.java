@@ -53,6 +53,32 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 	private boolean debug = true;
 	
+	
+	//TODO Determine the correct order of Au(v) - should a found list be reversed or not
+	//In Chiba's paper it is proposed to add a direction node after the vertex
+	//addition step if the root of the pertinent tree is a q-node that is not full
+	//Even if all of that is done, for the example pqtreeplanar without the edge (v4,v1)
+	//the found embedding is obviously not OK as is, without any reversal
+	//for vertex v2 - (v4,v2), (v2,v0) doesn't seem to be OK when looking at other embeddings
+	//for other vertices. If it is reversed, everything seems to be OK
+	//and there are no q-nodes there in any case
+	//And this embedding was formed so that when adding children to a q-node during the reduction
+	//they are always added at the end - rightmost position
+	//So, the question is, when do these full children of a q-node need to be added in left to right
+	//direction, and when in left to right
+	//Does the fact that the full children of a p-node that is/used to be the parent of the q-node
+	//are sometimes on the left and sometimes on the right have anything to do with that?
+	//At the moment, it is noted when those children are on the left and not on the right side of the q-node
+	//Chiba's paper mentions something about determining the position during the vertex addition step
+	//by finding a list of brothers - children of the q-node using dfs and bubble up and then traverse 
+	//the children to see if the list should be reversed
+	//It also notes that a possible solution is to note how many time a node is reversed and if the 
+	//number is odd the Au(v) list should be reversed
+	//The current  idea is inspired by that one, but further testing is needed
+	//Also note the fact that when an upward embedding is extended into full
+	//the edges are traversed from the last one to the first one, that seems to do a good job
+	//if the upwards embedding is correct
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isPlannar(Graph<V, E> graph) {
@@ -334,17 +360,16 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		if (debug)
 			log.info("Upwards embedding: " + upwardsEmbedding);
 		
-		//TODO Kada ih obrnuti?????
-		//Gledati kada se obrne parent, onda listu
-		//Ko je parent od neke liste
-		//nije to isti onaj koji se embedovao
-		//I kaze da je to samo za Q-cvorove
-		//sta sa P? Pogotovo onima koji su nastali of Q...
-		//to obrtanje je samo za decu p-cvorova
-		//za testiranje daljeg, uzeti ono kako je slucajno radilo...
 		
+		log.info("Reverse emebdiings if necessary");
+		log.info(treeReduction.getReversalNum());
+		for (V reversed : treeReduction.getReversalNum().keySet()){
+			if (treeReduction.getReversalNum().get(reversed) % 2 == 1)
+				if (upwardsEmbedding.containsKey(reversed))
+					Collections.reverse(upwardsEmbedding.get(reversed));
+		}
+			
 		
-		System.out.println(treeReduction.getReversalNum());
 		
 		if (debug)
 			log.info("Upwards embedding: " + upwardsEmbedding);

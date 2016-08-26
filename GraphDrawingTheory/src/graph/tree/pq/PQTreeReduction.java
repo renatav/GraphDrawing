@@ -23,7 +23,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	private Logger log = Logger.getLogger(PQTreeReduction.class);
 
 	private boolean debug = true;
-	
+
 	private Map<V, Integer> reversalNum = new HashMap<V, Integer>();
 
 	public PQTreeReduction(){
@@ -233,16 +233,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			//if there is only one child, just place it on one of the ends
 			//else create a new P-node and group the full children
-			
+
 			//TODO marking embedding experiments
 			if (!node.getEmptyChildren().contains(node.getChildren().get(0))){
-				if (!reversalNum.containsKey(node.getContent()))
-					reversalNum.put((V) node.getContent(), 1);
-				else{
-					int num = reversalNum.get((V) node.getContent());
-					reversalNum.put((V) node.getContent(), num+1);
-				}
-				
+				increaseReversalNum(node);
 			}
 
 			if (node.fullChildrenCount() > 1){
@@ -302,19 +296,13 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		//and that there are full children
 		if (node.fullChildrenCount() > 0 && node.emptyChildrenCount() > 0
 				&& node.partialChildrenCount() == 0){
-			
-			
+
+
 			//TODO marking embedding experiments
 			if (!node.getEmptyChildren().contains(node.getChildren().get(0))){
-				if (!reversalNum.containsKey(node.getContent()))
-					reversalNum.put((V) node.getContent(), 1);
-				else{
-					int num = reversalNum.get((V) node.getContent());
-					reversalNum.put((V) node.getContent(), num+1);
-				}
-				
+				increaseReversalNum(node);
 			}
-			
+
 
 			PQTreeNode qNode = new PQTreeNode(PQNodeType.Q);
 			qNode.setLabel(PQNodeLabel.SINGLY_PARTIAL);
@@ -416,19 +404,13 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				log.info("FULL CHILDREN");
 				log.info(node.getFullChildren());
 			}
-			
-			
+
+
 			//TODO marking embedding experiments
 			if (node.getFullChildren().contains(node.getChildren().get(0))){
-				if (!reversalNum.containsKey(node.getContent()))
-					reversalNum.put((V) node.getContent(), 1);
-				else{
-					int num = reversalNum.get((V) node.getContent());
-					reversalNum.put((V) node.getContent(), num+1);
-				}
-				
+				increaseReversalNum(node);
 			}
-			
+
 
 			PQTreeNode partialChild = node.getPartialChildren().get(0);
 
@@ -525,17 +507,11 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			tree.addVertex(qNode);
 			tree.addEdge(new PQTreeEdge(parent, qNode));
 			qNode.setContent(node.getContent());
-			
-			
+
+
 			//TODO marking embedding experiments
 			if (node.getFullChildren().contains(node.getChildren().get(0))){
-				if (!reversalNum.containsKey(node.getContent()))
-					reversalNum.put((V) node.getContent(), 1);
-				else{
-					int num = reversalNum.get((V) node.getContent());
-					reversalNum.put((V) node.getContent(), num+1);
-				}
-				
+				increaseReversalNum(node);
 			}
 
 
@@ -632,16 +608,10 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			if (debug)
 				log.info("Labeling node as doubly partial ");
-			
+
 			//TODO marking embedding experiments
 			if (node.getFullChildren().contains(node.getChildren().get(0))){
-				if (!reversalNum.containsKey(node.getContent()))
-					reversalNum.put((V) node.getContent(), 1);
-				else{
-					int num = reversalNum.get((V) node.getContent());
-					reversalNum.put((V) node.getContent(), num+1);
-				}
-				
+				increaseReversalNum(node);
 			}
 
 			//leave empty children as they are
@@ -803,8 +773,14 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			//only looks for singly partial
 			//so if the partial child is doubly partial, that should be
 			//recognized as invalid
-			if (!node.orderValidUpToOnePartial())
+
+			PQNodeOrderValid validOrder = node.orderValidUpToOnePartial();
+			System.out.println(validOrder);
+			if (validOrder == PQNodeOrderValid.INVALID)
 				return false;
+			if (validOrder == PQNodeOrderValid.REVERSAL){
+				increaseReversalNum(node);
+			}
 
 			//if an invalid situation wasn't detected
 			//eliminate the partial child and add its children to the parent
@@ -814,8 +790,12 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				PQTreeNode partialChild = node.getPartialChildren().get(0);
 				//check the partial child
 				//are its children mixed
-				if (!partialChild.orderValidUpToOnePartial())
+				validOrder = partialChild.orderValidUpToTwoPartial();
+				if (validOrder == PQNodeOrderValid.INVALID)
 					return false;
+				if (validOrder == PQNodeOrderValid.REVERSAL){
+					increaseReversalNum(partialChild);
+				}
 
 				int index = node.getChildren().indexOf(partialChild);
 
@@ -869,8 +849,12 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				node.emptyChildrenCount() < node.childrenCount() && 
 				node.partialChildrenCount() <= 2){
 
-			if (!node.orderValidUpToTwoPartial())
+			PQNodeOrderValid validOrder = node.orderValidUpToTwoPartial();
+			if (validOrder == PQNodeOrderValid.INVALID)
 				return false;
+			if (validOrder == PQNodeOrderValid.REVERSAL){
+				increaseReversalNum(node);
+			}
 
 
 			List<PQTreeNode> children = node.getChildren();
@@ -889,8 +873,13 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 			if (children.get(firstEmpty).getLabel() == PQNodeLabel.SINGLY_PARTIAL){
 				PQTreeNode partialChild = children.get(firstEmpty);
-				if (!partialChild.orderValidUpToOnePartial())
+
+				validOrder = partialChild.orderValidUpToOnePartial();
+				if (validOrder == PQNodeOrderValid.INVALID)
 					return false;
+				if (validOrder == PQNodeOrderValid.REVERSAL){
+					increaseReversalNum(partialChild);
+				}
 
 				int index = firstEmpty;
 
@@ -925,8 +914,13 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 				PQTreeNode partialChild = children.get(lastEmpty);
 
-				if (!partialChild.orderValidUpToOnePartial())
+				validOrder = partialChild.orderValidUpToOnePartial();
+				if (validOrder == PQNodeOrderValid.INVALID)
 					return false;
+				if (validOrder == PQNodeOrderValid.REVERSAL){
+					increaseReversalNum(partialChild);
+				}
+
 
 				int index = lastEmpty;
 
@@ -968,6 +962,18 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 */
 	public Map<V, Integer> getReversalNum() {
 		return reversalNum;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void increaseReversalNum(PQTreeNode node){
+		if (node.getContent() == null)
+			return;
+			if (!reversalNum.containsKey(node.getContent()))
+				reversalNum.put((V) node.getContent(), 1);
+			else{
+				int num = reversalNum.get((V) node.getContent());
+				reversalNum.put((V) node.getContent(), num+1);
+			}
 	}
 
 

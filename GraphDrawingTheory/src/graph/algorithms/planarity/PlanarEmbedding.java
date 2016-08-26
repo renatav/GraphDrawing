@@ -57,9 +57,9 @@ public class PlanarEmbedding {
 
 		if (upwardsEmbedding.containsKey(y))
 
-			for (E e : upwardsEmbedding.get(y)){
-			//for (int i = upwardsEmbedding.get(y).size() - 1; i >= 0; i--){
-				//E e = upwardsEmbedding.get(y).get(i);
+			//for (E e : upwardsEmbedding.get(y)){
+			for (int i = upwardsEmbedding.get(y).size() - 1; i >= 0; i--){
+				E e = upwardsEmbedding.get(y).get(i);
 				V v = e.getOrigin() == y ? e.getDestination() : e.getOrigin();
 				List<E> list = embedding.get(v);
 				if (list == null){

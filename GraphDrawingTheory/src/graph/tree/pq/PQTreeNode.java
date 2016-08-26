@@ -158,22 +158,27 @@ public class PQTreeNode implements Vertex{
 	 * Reversal is possible
 	 * @return
 	 */
-	public boolean orderValidUpToOnePartial(){
+	public PQNodeOrderValid orderValidUpToOnePartial(){
 		
 		
 		boolean hasEmpty = emptyChildrenCount() > 0;
 		boolean hasPartial = partialChildrenCount() > 0;
 		boolean hasFull = fullChildrenCount() > 0;
+		boolean reversed = false;
 		
-		if (children.get(0).getLabel() == PQNodeLabel.FULL && (hasEmpty || hasPartial))
+		if (children.get(0).getLabel() == PQNodeLabel.FULL && (hasEmpty || hasPartial)){
+			reversed = true;
 			Collections.reverse(children);
-		else if (children.get(0).getLabel() == PQNodeLabel.SINGLY_PARTIAL && hasEmpty)
+		}
+		else if (children.get(0).getLabel() == PQNodeLabel.SINGLY_PARTIAL && hasEmpty){
+			reversed = true;
 			Collections.reverse(children);
+		}
 		
 		if (hasEmpty && children.get(0).getLabel() != PQNodeLabel.EMPTY)
-			return false;
+			return PQNodeOrderValid.INVALID;
 		else if (!hasEmpty && hasPartial && children.get(0).getLabel() != PQNodeLabel.SINGLY_PARTIAL)
-			return false;
+			return PQNodeOrderValid.INVALID;
 		
 		
 		boolean emptyFinished = false;
@@ -193,45 +198,47 @@ public class PQTreeNode implements Vertex{
 			//if there is such child
 			if (!emptyFinished && hasEmpty && label != PQNodeLabel.EMPTY){
 				if (hasPartial && label != PQNodeLabel.SINGLY_PARTIAL){
-					return false;
+					return PQNodeOrderValid.INVALID;
 				}
 				emptyFinished = true;
 			}
 			//another empty encountered later, not valid
 			else if (emptyFinished && label == PQNodeLabel.EMPTY){
-				return false;
+				return PQNodeOrderValid.INVALID;
 			}
 			//partial after empty, the first time when the child is not partial
 			else if (emptyFinished && !partialFinished && hasPartial && label != PQNodeLabel.SINGLY_PARTIAL){
 				if (hasFull && label != PQNodeLabel.FULL){
-					return false;
+					return PQNodeOrderValid.INVALID;
 				}
 				partialFinished = true;
 			}
 			else if (partialFinished && label == PQNodeLabel.SINGLY_PARTIAL){
-				return false;
+				return PQNodeOrderValid.INVALID;
 			}
 			//the others should be full
 			//the case when one of them is not should be detected by the previous ifs
 		}
 		
-		return true;
+		if (!reversed)
+			return PQNodeOrderValid.VALID;
+		return PQNodeOrderValid.REVERSAL;
 	}
 	
 	 /**Checks if the order of the children is empty, singly partial, full, empty partial, empty
 	 * Some labels could be missing
 	 * Reversal is possible
 	 */
-	public boolean orderValidUpToTwoPartial(){
+	public PQNodeOrderValid orderValidUpToTwoPartial(){
 		
 		boolean hasEmpty = emptyChildrenCount() > 0;
 		
 		if (children.get(0).getLabel() == PQNodeLabel.FULL)
-			return false;
+			return PQNodeOrderValid.INVALID;
 		
 		int childrenNum = childrenCount();
 		if (children.get(childrenNum - 1).getLabel() == PQNodeLabel.FULL)
-			return false;
+			return PQNodeOrderValid.INVALID;
 		
 		//check outer first
 		int firstEmpty = 0;
@@ -264,7 +271,7 @@ public class PQTreeNode implements Vertex{
 			//empty children, there must be some in the middle
 			//not valid
 			if (emptyNum != emptyChildrenCount())
-				return false;
+				return PQNodeOrderValid.INVALID;
 		}
 		
 		//now check the ones after the empty nodes
@@ -272,18 +279,18 @@ public class PQTreeNode implements Vertex{
 			//both ends should have partial nodes
 			if (children.get(firstEmpty).getLabel() != PQNodeLabel.SINGLY_PARTIAL || 
 					children.get(lastEmpty).getLabel() != PQNodeLabel.SINGLY_PARTIAL)
-				return false;
+				return PQNodeOrderValid.INVALID;
 		}
 		
 		else if (partialChildrenCount() == 1){
 			if (children.get(firstEmpty).getLabel() != PQNodeLabel.SINGLY_PARTIAL &&
 					children.get(lastEmpty).getLabel() != PQNodeLabel.SINGLY_PARTIAL)
-				return false;
+				return PQNodeOrderValid.INVALID;
 		}
 		
 		//the others should now be full
 		//no need to check
-		return false;
+		return PQNodeOrderValid.VALID;
 		
 		
 	}
