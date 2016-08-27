@@ -7,11 +7,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import graph.algorithms.drawing.NotPlanarException;
 import graph.elements.Edge;
 import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.exception.NotPlanarException;
 
 /**
  * For each edge, there should be a right and a left face
@@ -45,7 +45,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 	
-	public void formFaces() throws NotPlanarException{
+	public void formFaces(V s, V t) throws NotPlanarException{
 		//Select some edge (v,w)
 		//go from v to w
 		//find the closest edge in A(w) to (v,w) in the clockwise direction
@@ -56,7 +56,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 		edgeFacesMap = new HashMap<E, List<List<E>>>();
 		allFaces = new ArrayList<List<E>>();
 		
-		Embedding<V,E> embedding = PlanarEmbedding.emedGraph(graph);
+		Embedding<V,E> embedding = PlanarEmbedding.emedGraph(graph, s, t);
 		
 		for (E e : graph.getEdges())
 			edgeFacesMap.put(e, new ArrayList<List<E>>());
@@ -201,6 +201,13 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 */
 	public void setAllFaces(List<List<E>> allFaces) {
 		this.allFaces = allFaces;
+	}
+
+	/**
+	 * @return the edgeFacesMap
+	 */
+	public Map<E, List<List<E>>> getEdgeFacesMap() {
+		return edgeFacesMap;
 	}
 	
 	

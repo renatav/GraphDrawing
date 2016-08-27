@@ -16,7 +16,6 @@ import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.drawing.ConvexDrawing;
-import graph.algorithms.drawing.NotPlanarException;
 import graph.algorithms.planarity.Embedding;
 import graph.algorithms.planarity.PQTreePlanarity;
 import graph.algorithms.planarity.PlanarEmbedding;
@@ -26,6 +25,7 @@ import graph.drawing.Drawing;
 import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.DSLException;
+import graph.exception.NotPlanarException;
 import graph.layout.dsl.DSLLayouter;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
@@ -488,7 +488,7 @@ public class CommandPanel extends JPanel{
 				//Embedding<GraphVertex, GraphEdge> embedding = PlanarEmbedding.emedGraph(graph);
 				//return embedding + "";
 				PlanarFaces<GraphVertex, GraphEdge> planarFaces = new PlanarFaces<GraphVertex, GraphEdge>(graph);
-				planarFaces.formFaces();
+				planarFaces.formFaces(null, null);
 			} catch (NotPlanarException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

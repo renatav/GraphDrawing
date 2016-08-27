@@ -1,4 +1,4 @@
-package graph.algorithms.drawing;
+package graph.exception;
 
 public class NotPlanarException extends Exception{
 	

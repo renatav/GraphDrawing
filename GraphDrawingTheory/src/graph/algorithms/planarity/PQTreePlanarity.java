@@ -23,9 +23,9 @@ import graph.tree.pq.PQTreeReduction;
 public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V, E>{
 
 	private List<V> stOrder;
-	
+
 	private Map<V,Integer> stNumbers;
-	
+
 	private Graph<V,E> graph;
 
 	/**
@@ -48,12 +48,23 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	private DijkstraAlgorithm<PQTreeNode, PQTreeEdge> dijkstra = new DijkstraAlgorithm<PQTreeNode, PQTreeEdge>();
 
 	private Logger log = Logger.getLogger(PQTreePlanarity.class);
-	
+
 	private	STNumbering<V, E> stNumbering;
 
 	private boolean debug = true;
+
+	private V s, t;
+
+
+	public PQTreePlanarity(V s, V t){
+		this.s = s;
+		this.t = t;
+	}
 	
-	
+	public PQTreePlanarity(){
+	}
+
+
 	//TODO Determine the correct order of Au(v) - should a found list be reversed or not
 	//In Chiba's paper it is proposed to add a direction node after the vertex
 	//addition step if the root of the pertinent tree is a q-node that is not full
@@ -80,8 +91,8 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	//if the upwards embedding is correct
 	//The last edge is not so strictly embedded because the nodes are not all children of some q-node
 	//so there can be more combinations
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isPlannar(Graph<V, E> graph) {
@@ -90,20 +101,23 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		gPrimMap.clear();
 		upwardsEmbedding.clear();
 
-		//assign st-numbers to all vertices of G
-		//s and t should be connected, but it is not stated
-		//that they should meet any special condition
-		//so, let st be the first edge
-		E st = graph.getEdges().get(0);
-		V s = st.getOrigin();
-		V t = st.getDestination();
+
+		if (s == null && t == null){
+			//assign st-numbers to all vertices of G
+			//s and t should be connected, but it is not stated
+			//that they should meet any special condition
+			//so, let st be the first edge
+			E st = graph.getEdges().get(0);
+			s = st.getOrigin();
+			t = st.getDestination();
+		}
 
 		PQTreeNode pertRoot = null;
 
 		stNumbering = new STNumbering<V,E>(graph, s, t);
 		stOrder = stNumbering.getOrder();
 		stNumbers = stNumbering.getNumbering();
-		
+
 		final Map<V, Integer> stMapping = stNumbering.getNumbering();
 
 		if (debug){
@@ -167,16 +181,16 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				}
 			}
 
-			
+
 			final V v = stOrder.get(j);
-			
+
 			Collections.sort(Sprim, new Comparator<E>() {
 
 				@Override
 				public int compare(E o1, E o2) {
 					V v1 = o1.getOrigin() == v ? o1.getDestination() : o1.getOrigin();
 					V v2 = o2.getOrigin() == v ? o2.getDestination() : o2.getOrigin();
-					
+
 					if  (stNumbering.getNumbering().get(v1) > stNumbering.getNumbering().get(v2))
 						return 1;
 					else if  (stNumbering.getNumbering().get(v1) == stNumbering.getNumbering().get(v2))
@@ -184,10 +198,10 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 					else return -1;
 				}
 			});
-			
+
 			if (debug)
 				log.info("S' " + Sprim);
-			
+
 
 			//sort S so that lower indexes are processed later
 			//bottom up
@@ -324,7 +338,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				descendants.add(pertRoot);
 				PQTreeNode parent = pertRoot.getParent();
 				int index = -1;
-				
+
 				if (parent != null)
 					index = parent.getChildren().indexOf(pertRoot);
 
@@ -340,7 +354,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				for (PQTreeNode descendant : descendants)
 					T.removeVertex(descendant);		
 
-				
+
 
 				if (parent == null)
 					T.setRoot(newNode);
@@ -359,7 +373,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		if (debug)
 			log.info("embed vertex = " + v);
 		embedLast(T.getRoot(), currentEmbedding);
-		
+
 		upwardsEmbedding.put(v, currentEmbedding);
 		if (debug)
 			log.info(currentEmbedding);
@@ -367,8 +381,8 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		upwardsEmbedding.put(v, currentEmbedding);
 		if (debug)
 			log.info("Upwards embedding: " + upwardsEmbedding);
-		
-		
+
+
 		log.info("Reverse emebdiings if necessary");
 		log.info(treeReduction.getReversalNum());
 		for (V reversed : treeReduction.getReversalNum().keySet()){
@@ -376,9 +390,9 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				if (upwardsEmbedding.containsKey(reversed))
 					Collections.reverse(upwardsEmbedding.get(reversed));
 		}
-			
-		
-		
+
+
+
 		if (debug)
 			log.info("Upwards embedding: " + upwardsEmbedding);
 
@@ -395,14 +409,14 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		for (E e : graph.getEdges())
 			if (v == e.getOrigin() || v == e.getDestination())
 				virtualEdges.add(e);
-		
+
 		Collections.sort(virtualEdges, new Comparator<E>() {
 
 			@Override
 			public int compare(E o1, E o2) {
 				V v1 = o1.getOrigin() == v ? o1.getDestination() : o1.getOrigin();
 				V v2 = o2.getOrigin() == v ? o2.getDestination() : o2.getOrigin();
-				
+
 				if  (stNumbering.getNumbering().get(v1) > stNumbering.getNumbering().get(v2))
 					return 1;
 				else if  (stNumbering.getNumbering().get(v1) == stNumbering.getNumbering().get(v2))

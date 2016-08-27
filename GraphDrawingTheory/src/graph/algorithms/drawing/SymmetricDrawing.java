@@ -4,6 +4,7 @@ import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.exception.NotPlanarException;
 import graph.symmetry.PermutationGroup;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 

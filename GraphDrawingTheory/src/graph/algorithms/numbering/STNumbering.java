@@ -1,12 +1,5 @@
 package graph.algorithms.numbering;
 
-import graph.algorithms.planarity.PQTreePlanarity;
-import graph.elements.Edge;
-import graph.elements.Graph;
-import graph.elements.Vertex;
-import graph.traversal.DFSTreeTraversal;
-import graph.trees.DFSTree;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +8,12 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+
+import graph.elements.Edge;
+import graph.elements.Graph;
+import graph.elements.Vertex;
+import graph.traversal.DFSTreeTraversal;
+import graph.trees.DFSTree;
 
 /**
  * Given any edge {s,t} in a biconnected graph G with n vertices, 

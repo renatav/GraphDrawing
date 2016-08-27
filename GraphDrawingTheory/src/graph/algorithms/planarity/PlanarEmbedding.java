@@ -5,28 +5,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import graph.algorithms.drawing.NotPlanarException;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
+import graph.exception.NotPlanarException;
 
 public class PlanarEmbedding {
 
+	
+	
 	/**
 	 * Calculates a planar embedding of a graph based on the work of Chiba, Nishizeki, Abe and Ozava
 	 * @param graph
 	 * @return
 	 * @throws CannotBeAppliedException
 	 */
-	public static <V extends Vertex, E extends Edge<V>> Embedding<V,E> emedGraph(Graph<V,E> graph) throws NotPlanarException{
+	public static <V extends Vertex, E extends Edge<V>> Embedding<V,E> emedGraph(Graph<V,E> graph, V s, V t) throws NotPlanarException{
 		Map<V,List<E>> embedding = new HashMap<V, List<E>>();
 
-		//get upwards embedding
-		PQTreePlanarity<V, E> pqPlanarity = new PQTreePlanarity<V,E>();
+		
+		PQTreePlanarity<V, E> pqPlanarity;
+		if (s != null && t != null)
+			pqPlanarity = new PQTreePlanarity<V,E>(s, t);
+		else
+			pqPlanarity = new PQTreePlanarity<V,E>();
+
+		
 		if (!pqPlanarity.isPlannar(graph))
 			throw new NotPlanarException();
-
+		
 		//copy upwards embedding
 		Map<V, List<E>> upwardsEmbedding = pqPlanarity.getUpwardsEmbedding();
 
