@@ -54,6 +54,12 @@ public class DualGraphEdge<V extends Vertex, E extends Edge<V>> implements Edge<
 		
 	}
 
+	@Override
+	public String toString() {
+		return "DualGraphEdge [origin=" + origin + ", destination="
+				+ destination + "]";
+	}
+
 
 
 }

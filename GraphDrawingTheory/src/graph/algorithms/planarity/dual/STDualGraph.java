@@ -1,15 +1,13 @@
 package graph.algorithms.planarity.dual;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.python.jline.internal.Log;
-
 import graph.algorithms.planarity.PlanarFaces;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.NotPlanarException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Given a planar st-graph G, the dual planar st-graph G = (V ∗, E∗)
@@ -25,50 +23,63 @@ t∗ representing the portion from t to s.
  * @param <E>
  */
 public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<DualGraphVertex<V, E>, DualGraphEdge<V, E>>{
-	
+
 	private Graph<V,E> graph;
 	private List<E> externalFace;
 	private V s, t;
-	
-	
+	private PlanarFaces<V,E> planarFaces;
+
+
 	public STDualGraph(Graph<V,E> graph, List<E> externalFace, V s, V t){
 		this.graph = graph;
 		this.externalFace = externalFace;
 		this.s = s;
 		this.t = t;
+		setDirected(true);
 		constructDualGraph();
 	}
-	
+
+	public STDualGraph(Graph<V,E> graph, List<E> externalFace, V s, V t, PlanarFaces<V,E> planarFaces){
+		this.graph = graph;
+		this.externalFace = externalFace;
+		this.s = s;
+		this.t = t;
+		setDirected(true);
+		constructDualGraph();
+	}
+
 	@SuppressWarnings("unchecked")
 	private void constructDualGraph(){
-		
-		PlanarFaces<V, E> planarFaces = new PlanarFaces<V,E>(graph);
-		try {
-			planarFaces.formFaces(s, t);
-		} catch (NotPlanarException e) {
-			e.printStackTrace();
+
+		if (planarFaces == null){
+			planarFaces = new PlanarFaces<V,E>(graph);
+			try {
+				planarFaces.formFaces(s, t);
+			} catch (NotPlanarException e) {
+				e.printStackTrace();
+			}
 		}
-		
+
 		//The external face s...t...s should be divided into two parts
 		//s* is a part from s to t
 		//and t* from t to s
-		
+
 		List<E> sStar = new ArrayList<E>();
 		List<E> tStar = new ArrayList<E>();
 		int sIndex = -1, tIndex = -1;
-		
+
 		//go from the first edge, when s is encountered, keep adding edges to s* until
 		//t is encountered
 		//if t is encountered first, keep adding edges to t* until s is encountered
 		//then go from the first edge again and completed the uncompleted part
-		
+
 		V first = externalFace.get(0).getOrigin();
 		if (externalFace.get(1).getOrigin() == first || externalFace.get(1).getDestination() == first)
 			first = externalFace.get(0).getDestination();
-		
+
 		V current = first;
 		boolean sCompleted = false, tCompleted = false;
-		
+
 		for (int i = 0; i < externalFace.size(); i++){
 			E e = externalFace.get(i);
 			if (current == s && sIndex == -1){
@@ -87,26 +98,26 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 				tStar.add(e);
 			current = e.getOrigin() == current ? e.getDestination() : e.getOrigin();
 		}
-		
+
 		if (!sCompleted)
 			for (int i = 0; i < tIndex; i++)
 				sStar.add(externalFace.get(i));
-		
+
 		if (!tCompleted)
-			for (int i = 0; i < tIndex; i++)
+			for (int i = 0; i < sIndex; i++)
 				tStar.add(externalFace.get(i));
-		
-		Log.info(sStar);
-		Log.info(tStar);
-		
-		
+
+		System.out.println(sStar);
+		System.out.println(tStar);
+
+
 		List<List<E>> allFaces = planarFaces.getAllFaces();
-		
-		
+
+
 		//won't be the same reference, so find the xternal face in the list of all faces
 		List<E> externalFaceInList = null;
-		
-		
+
+
 		for (List<E> face : allFaces){
 			if (externalFaceInList == null && face.size() == externalFace.size()){
 				//check if this is external face
@@ -124,14 +135,14 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 			DualGraphVertex<V, E> vert = new DualGraphVertex<>(face);
 			addVertex(vert);
 		}
-		
+
 		//create vertices for s* and t*
-		
+
 		DualGraphVertex<V, E> sVert = new DualGraphVertex<>(sStar);
 		addVertex(sVert);
 		DualGraphVertex<V, E> tVert = new DualGraphVertex<>(tStar);
 		addVertex(tVert);
-		
+
 		//now form edges
 		//link left and right faces for each edge of graph
 		//if one of the faces is the external face
@@ -140,28 +151,27 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 			DualGraphEdge<V, E> edge;
 			List<E> leftFace = planarFaces.leftFaceOf(e);
 			List<E> rightFace = planarFaces.rightFaceOf(e);
-			if (leftFace != externalFace && rightFace != externalFace){
+			if (leftFace != externalFaceInList && rightFace != externalFaceInList){
 				edge = new DualGraphEdge<>(getVertexByContent(leftFace), getVertexByContent(rightFace));
-				
 			}
-			else if (leftFace == externalFace){
+			else if (leftFace == externalFaceInList){
 				if (sStar.contains(e))
-					edge = new DualGraphEdge<>(sVert, getVertexByContent(rightFace));
-				else
-					edge = new DualGraphEdge<>(tVert, getVertexByContent(rightFace));
+						edge = new DualGraphEdge<>(sVert, getVertexByContent(rightFace));
+					else
+						edge = new DualGraphEdge<>(tVert, getVertexByContent(rightFace));
 			}
 			else{
 				if (sStar.contains(e))
-					edge = new DualGraphEdge<>(getVertexByContent(leftFace), sVert);
+						edge = new DualGraphEdge<>(getVertexByContent(leftFace), sVert);
 				else
 					edge = new DualGraphEdge<>(getVertexByContent(leftFace), tVert);
 			}
 			addEdge(edge);
 		}
-		
-	
-		
-		
+
+
+
+
 	}
 
 	/* (non-Javadoc)
@@ -171,6 +181,6 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 	public String toString() {
 		return "STDualGraph [vertices=" + vertices + ", edges=" + edges + "]";
 	}
-	
-	
+
+
 }

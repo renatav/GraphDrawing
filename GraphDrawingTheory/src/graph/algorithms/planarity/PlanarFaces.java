@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import graph.algorithms.numbering.STNumbering;
 import graph.elements.Edge;
 import graph.elements.EdgeDirection;
 import graph.elements.Graph;
@@ -37,11 +38,22 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 * when, for example, a face containing certain vertex needs to be found
 	 */
 	private List<List<E>> allFaces;
+	
+	/**
+	 * Complete embedding
+	 */
+	private Map<V,List<E>> planarEmbedding;
+	
 	private Graph<V,E> graph;
+	
 	
 	private Logger log = Logger.getLogger(PlanarFaces.class);
 	
 	public PlanarFaces(Graph<V,E> graph){
+		this.graph = graph;
+	}
+	
+	public PlanarFaces(Graph<V,E> graph, STNumbering<V, E> stNumbering){
 		this.graph = graph;
 	}
 	
@@ -76,7 +88,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 		
 		
 		Map<V,Integer> stNumbering = embedding.getStNumbering();
-		Map<V,List<E>> planarEmbedding = embedding.getEmbedding();
+		planarEmbedding = embedding.getEmbedding();
 		
 		log.info("st numbering " + stNumbering);
 		log.info("Embedding: " + embedding);
@@ -208,6 +220,10 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 */
 	public Map<E, List<List<E>>> getEdgeFacesMap() {
 		return edgeFacesMap;
+	}
+
+	public Map<V, List<E>> getPlanarEmbedding() {
+		return planarEmbedding;
 	}
 	
 	

@@ -46,6 +46,11 @@ public class DualGraphVertex<V extends Vertex, E extends Edge<V>> implements Ver
 	public void setSize(Dimension size) {
 	}
 
+	@Override
+	public String toString() {
+		return "DualGraphVertex [content=" + content + "]";
+	}
+
 
 	
 }

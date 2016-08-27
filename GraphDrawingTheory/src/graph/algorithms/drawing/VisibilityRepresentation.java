@@ -1,5 +1,17 @@
 package graph.algorithms.drawing;
 
+import graph.algorithms.numbering.STNumbering;
+import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
+import graph.algorithms.planarity.PlanarFaces;
+import graph.algorithms.planarity.dual.DualGraphVertex;
+import graph.algorithms.planarity.dual.STDualGraph;
+import graph.elements.Edge;
+import graph.elements.Graph;
+import graph.elements.Vertex;
+import graph.exception.CannotBeAppliedException;
+import graph.exception.NotPlanarException;
+import graph.ordering.TopologicalOrdering;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,36 +19,45 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
-import graph.algorithms.planarity.dual.STDualGraph;
-import graph.elements.Edge;
-import graph.elements.Graph;
-import graph.elements.Vertex;
+/** Given a graph G = (V, E), a visibility representation Γ, for G maps 
+every  vertex  v  in V    to  a  horizontal  vertex  segment  Γ(v)  and  every  edge  (u, v)  ∈ E  to  a 
+vertical  edge segment Γ(u, v) such that each vertical edge segment Γ(u, v) has its endpoints 
+lying on the horizontal vertex segments Γ(u) and Γ(v) and no other segment intersections 
+or overlaps occur. */
 
 public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 
-	private Map<V, Integer> xMinMap;
-	private Map<V, Integer> yMinMap;
-	private Map<V, Integer> xMaxMap;
-	private Map<V, Integer> yMaxMap;
+	private Map<V, Integer> vYMap;
+	private Map<V, Integer> vXMinMap;
+	private Map<V, Integer> vXMaxMap;
+	private Map<E, Integer> eXMap;
+	private Map<E, Integer> eYMaxMap;
+	private Map<E, Integer> eYMinMap;
 	private Graph<V,E> graph;
 	private BoyerMyrvoldPlanarity<V, E> boyerMyrvold;
 	private Logger log = Logger.getLogger(VisibilityRepresentation.class);
 	
+	private List<E> switchedEdges;
+	
 	public VisibilityRepresentation(Graph<V,E> graph){
 		this.graph = graph;
-		xMinMap = new HashMap<V, Integer>();
-		yMinMap = new HashMap<V, Integer>();
-		xMaxMap = new HashMap<V, Integer>();
-		yMaxMap = new HashMap<V, Integer>();
-		constructVisibilityRepresentation();
+		vYMap = new HashMap<V, Integer>();
+		vXMinMap = new HashMap<V, Integer>();
+		vXMaxMap = new HashMap<V, Integer>();
+		eXMap = new HashMap<E, Integer>();
+		eYMaxMap = new HashMap<E, Integer>();
+		eYMinMap = new HashMap<E, Integer>();
 		boyerMyrvold = new BoyerMyrvoldPlanarity<V,E>();
+		switchedEdges = new ArrayList<E>();
+		constructVisibilityRepresentation();
+		
 	}
 	
 	private void constructVisibilityRepresentation(){
 		//make graph biconnected by adding dummy edges - do this later when everything else seems to be fine
 		//select edge (s,t) on the external face
 		//find external face
+		boolean directed = graph.isDirected();
 		boyerMyrvold.isPlannar(graph);
 		List<V> externalFaceVertices = boyerMyrvold.getOutsideFace();
 		log.info("External face vertices: " + externalFaceVertices);
@@ -60,34 +81,118 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 		
 		//compute plnar st-graph
 		//this is like the original graph, but the edges should be in st-orientation
-		Graph<V,E> stGraph = constructSTGraph();
+		//shallow copy doesn't do anything here
+		//st graph variable is just to make the code easier to understant
+		Graph<V,E> stGraph = graph; 
+		constructSTGraph(s, t);
+		log.info("ST graph: " + stGraph);
+		PlanarFaces<V, E> planarFaces = new PlanarFaces<>(stGraph);
+		try {
+			planarFaces.formFaces(s, t);
+		} catch (NotPlanarException e1) {
+			e1.printStackTrace();
+		}
+		
 		//create the dual planar st-graph G*
 		STDualGraph<V, E> stDualGraph = new STDualGraph<V,E>(stGraph, externalFace, s, t);
-		//Compute the optimal topological ordering Tx = T (G∗) 
+		log.info("Dual graph: " + stDualGraph);
+		
+		//Compute the optimal topological ordering Tx = T (G∗)
 		//Compute the optimal topological ordering Ty = T (G)
-		/*
-		 * for all v ∈ V do {Assigning positions to the horizontal vertex segments}
-			Let fl be the face to the left of the leftmost outgoing edge of v
-			Let fr be the face to the right of the rightmost outgoing edge of v
-			10: {fl and fr are vertices in the dual graph G∗}
-			Γ(v).y ← Ty(v)
-			Γ(v).xmin ← Tx(fl)
-			Γ(v).xmax ← Tx(fr) − 1
-			end for
-			15: for all e = (u, v) ∈ E do {Assigning positions to the vertical edge segments}
-			Let fl be the face to the left of e {fl is a vertex in G∗}
-			Γ(e).x ← Tx(fl)
-			Γ(e).ymin ← Ty(u)
-			Γ(e).ymax ← Ty(v)
-			20: end for
-			Remove any added “dummy” edges
-		 */
+		Map<DualGraphVertex<V, E>, Integer> Tx = null;
+		Map<V,Integer> Ty = null;
+		try {
+			Tx = TopologicalOrdering.calculateOrdering(stDualGraph);
+			stGraph.setDirected(true);
+			Ty = TopologicalOrdering.calculateOrdering(stGraph);
+		} catch (CannotBeAppliedException e) {
+			e.printStackTrace();
+		}
 		
+		log.info("Tx " + Tx);
+		log.info("Ty " + Ty);
 		
+		Map<V, List<E>> embedding = planarFaces.getPlanarEmbedding();
+		
+		// for all v ∈ V do {Assigning positions to the horizontal vertex segments}
+		for (V v : embedding.keySet()){
+			//Let fl be the face to the left of the leftmost outgoing edge of v
+			//Let fr be the face to the right of the rightmost outgoing edge of v
+			
+			E leftmostOutgoingEdge = null, rightmostOutgoingEdge;
+			//the embedding contains a list of edges in the clockwise order for every edge
+			//the leftmost would appear first in the embedding, rightmost the last
+			//outgoing edges are those whose origin is the vertex in question
+			for (E e : embedding.get(v)){
+				if (e.getOrigin() == v){
+					leftmostOutgoingEdge = e;
+					break;
+				}
+			}
+			
+			if(leftmostOutgoingEdge == null)
+				continue; //TODO t vertex has no outgoing edges
+			
+			rightmostOutgoingEdge = embedding.get(v).get(embedding.get(v).size() - 1);
+			List<E> fl = planarFaces.leftFaceOf(leftmostOutgoingEdge);
+			List<E> fr = planarFaces.rightFaceOf(rightmostOutgoingEdge);
+			
+			DualGraphVertex<V, E> flVertex = stDualGraph.getVertexByContent(fl);
+			DualGraphVertex<V, E> frVertex = stDualGraph.getVertexByContent(fr);
+			
+			//{fl and fr are vertices in the dual graph G*}
+			//Γ(v).y ← Ty(v)
+			//Γ(v).xmin ← Tx(fl)
+			//Γ(v).xmax ← Tx(fr) − 1
+			vYMap.put(v, Ty.get(v));
+			vXMinMap.put(v, Tx.get(flVertex));
+			vXMaxMap.put(v, Tx.get(frVertex));
+		}
+		
+		//for all e = (u, v) ∈ E do {Assigning positions to the vertical edge segments}
+		for (E e : stGraph.getEdges()){
+			//Let fl be the face to the left of e {fl is a vertex in G∗}
+			List<E> fl = planarFaces.leftFaceOf(e);
+			DualGraphVertex<V, E> flVertex = stDualGraph.getVertexByContent(fl);
+			//Γ(e).x ← Tx(fl)
+			//Γ(e).ymin ← Ty(u)
+			//Γ(e).ymax ← Ty(v)
+			eXMap.put(e, Tx.get(flVertex));
+			eYMinMap.put(e, Ty.get(e.getOrigin()));
+			eYMaxMap.put(e, Ty.get(e.getDestination()));
+			
+		}
+		
+		//Remove any added “dummy” edges
+		//also get switched edges to previous state
+		for (E e : switchedEdges){
+			V origin = e.getOrigin();
+			V destination = e.getDestination();
+			e.setOrigin(destination);
+			e.setDestination(origin);
+		}
+		graph.setDirected(directed);
+		
+		log.info("E x map " + eXMap);
+		log.info("E y min map " + eYMinMap);
+		log.info("E y max map " + eYMaxMap);
+		log.info("V y map " + vYMap);
+		log.info("V x min map " + vXMinMap);
+		log.info("V x max map " + vXMaxMap);
 	}
 	
-	private Graph<V,E> constructSTGraph(){
-		//TODO
-		return graph;
+	private void constructSTGraph(V s, V t){
+		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
+		switchedEdges.clear();
+		for (E e : graph.getEdges()){
+			V origin = e.getOrigin();
+			V destination = e.getDestination();
+			if (stNumbering.getNumbering().get(origin) > stNumbering.getNumbering().get(destination)){
+				e.setOrigin(destination);
+				e.setDestination(origin);
+				switchedEdges.add(e);
+			}
+		}
 	}
+	
 }
