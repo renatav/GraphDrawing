@@ -36,6 +36,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	private Graph<V,E> graph;
 	private BoyerMyrvoldPlanarity<V, E> boyerMyrvold;
 	private Logger log = Logger.getLogger(VisibilityRepresentation.class);
+	private List<V> stOrder;
 	
 	private List<E> switchedEdges;
 	
@@ -113,12 +114,15 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 		log.info("Ty " + Ty);
 		
 		Map<V, List<E>> embedding = planarFaces.getPlanarEmbedding();
+		log.info(embedding);
 		
+		int yMax = 0;
 		// for all v ∈ V do {Assigning positions to the horizontal vertex segments}
 		for (V v : embedding.keySet()){
 			//Let fl be the face to the left of the leftmost outgoing edge of v
 			//Let fr be the face to the right of the rightmost outgoing edge of v
 			
+			log.info("current v " + v );
 			E leftmostOutgoingEdge = null, rightmostOutgoingEdge;
 			//the embedding contains a list of edges in the clockwise order for every edge
 			//the leftmost would appear first in the embedding, rightmost the last
@@ -130,12 +134,32 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 			
-			if(leftmostOutgoingEdge == null)
+			log.info("leftmost outgoing edge: " + leftmostOutgoingEdge);
+			if(leftmostOutgoingEdge == null){
 				continue; //TODO t vertex has no outgoing edges
+			}
 			
 			rightmostOutgoingEdge = embedding.get(v).get(embedding.get(v).size() - 1);
+			
+			log.info("rightmost outgoing edge: " + rightmostOutgoingEdge);
+			
 			List<E> fl = planarFaces.leftFaceOf(leftmostOutgoingEdge);
 			List<E> fr = planarFaces.rightFaceOf(rightmostOutgoingEdge);
+			
+			//TODO further check dividing the external face
+			if (fl.equals(stDualGraph.getExternalFace())){
+				if (stDualGraph.getsStar().contains(leftmostOutgoingEdge))
+					fl =  stDualGraph.getsStar();
+				else
+					fl = stDualGraph.gettStar();
+			}
+			
+			if (fr.equals(stDualGraph.getExternalFace())){
+				if (stDualGraph.getsStar().contains(rightmostOutgoingEdge))
+					fr =  stDualGraph.getsStar();
+				else
+					fr = stDualGraph.gettStar();
+			}
 			
 			DualGraphVertex<V, E> flVertex = stDualGraph.getVertexByContent(fl);
 			DualGraphVertex<V, E> frVertex = stDualGraph.getVertexByContent(fr);
@@ -145,14 +169,33 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 			//Γ(v).xmin ← Tx(fl)
 			//Γ(v).xmax ← Tx(fr) − 1
 			vYMap.put(v, Ty.get(v));
+			if (Ty.get(v) > yMax)
+				yMax = Ty.get(v);
 			vXMinMap.put(v, Tx.get(flVertex));
-			vXMaxMap.put(v, Tx.get(frVertex));
+			vXMaxMap.put(v, Tx.get(frVertex) - 1);
 		}
+		
+		//the vertex with the highest st-number is not added
+		//since it has no outgoing edges
+		//based on the example, it will now be added so that
+		//it has the same x min and max as the first vertex (with the lowest st-number)
+		//and y by one higher than the currently highest
+		//TODO check this
+		V v = stOrder.get(stOrder.size() - 1);
+		vYMap.put(v, yMax + 1);
+		vXMinMap.put(v,vXMinMap.get(stOrder.get(0)));
+		vXMaxMap.put(v, vXMaxMap.get(stOrder.get(0)));
 		
 		//for all e = (u, v) ∈ E do {Assigning positions to the vertical edge segments}
 		for (E e : stGraph.getEdges()){
 			//Let fl be the face to the left of e {fl is a vertex in G∗}
 			List<E> fl = planarFaces.leftFaceOf(e);
+			if (fl.equals(stDualGraph.getExternalFace())){
+				if (stDualGraph.getsStar().contains(e))
+					fl =  stDualGraph.getsStar();
+				else
+					fl = stDualGraph.gettStar();
+			}
 			DualGraphVertex<V, E> flVertex = stDualGraph.getVertexByContent(fl);
 			//Γ(e).x ← Tx(fl)
 			//Γ(e).ymin ← Ty(u)
@@ -183,7 +226,8 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	
 	private void constructSTGraph(V s, V t){
 		STNumbering<V, E> stNumbering = new STNumbering<V,E>(graph, s, t);
-		switchedEdges.clear();
+		stOrder = stNumbering.getOrder();
+		log.info("St order " + stNumbering.getOrder());
 		for (E e : graph.getEdges()){
 			V origin = e.getOrigin();
 			V destination = e.getDestination();

@@ -1,28 +1,26 @@
 package graph.test.layout;
 
-import java.awt.Dimension;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections15.map.HashedMap;
-
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.elements.Graph;
-import graph.exception.CannotBeAppliedException;
 import graph.layout.DefaultGraphLayoutProperties;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
 import graph.layout.Layouter;
 import graph.layout.PropertyEnums.CircleProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
-import graph.layout.PropertyEnums.TutteProperties;
 import graph.symmetry.Permutation;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
 import graph.traversal.DFSTreeTraversal;
 import graph.trees.DFSTree;
 import graph.util.Util;
+
+import java.awt.Dimension;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections15.map.HashedMap;
 
 public class LayoutsSpeedTest {
 
@@ -69,15 +67,11 @@ public class LayoutsSpeedTest {
 				layoutProperties.setProperty(CircleProperties.OPTIMIZE_CROSSINGS, false);
 			}
 			else if (algorithm == LayoutAlgorithms.TUTTE){
-				String face = "";
 				Map<Integer, Integer> permutation = new HashedMap<Integer, Integer>();
 				for (int j = 0; j < 100; j++){
-					face += j + ",";
 					permutation.put(j, j +1);
 				}
-				face += 100;
 				layoutProperties = new GraphLayoutProperties();
-				layoutProperties.setProperty(TutteProperties.FACE, face);
 				
 				Permutation p = new Permutation(permutation);
 				layoutProperties.setProperty(SymmetricProperties.PERMUTATION, p);
@@ -122,15 +116,11 @@ public class LayoutsSpeedTest {
 				layoutProperties.setProperty(CircleProperties.OPTIMIZE_CROSSINGS, false);
 			}
 			else if (algorithm == LayoutAlgorithms.TUTTE){
-				String face = "";
 				Map<Integer, Integer> permutation = new HashedMap<Integer, Integer>();
 				for (int j = 0; j < 100; j++){
-					face += j + ",";
 					permutation.put(j, j +1);
 				}
-				face += 100;
 				layoutProperties = new GraphLayoutProperties();
-				layoutProperties.setProperty(TutteProperties.FACE, face);
 				
 				Permutation p = new Permutation(permutation);
 				layoutProperties.setProperty(SymmetricProperties.PERMUTATION, p);

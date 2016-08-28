@@ -58,8 +58,8 @@ public interface PropertyEnums {
 	}
 
 	public enum TutteProperties implements PropertyEnums{
-		DISTANCE("Distance", false, Double.class), FACE("Face", false, String.class),
-		PERMUTATION("Permutation", false, String.class), CENTER("Center", true, String.class);
+		DISTANCE("Distance", false, Double.class),
+		CENTER("Center", true, String.class);
 
 		private String name;
 		private boolean hidden;

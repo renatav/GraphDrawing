@@ -26,12 +26,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
 
-		//		BoyerMyrvoldPlanarity<V, E> planarity = new BoyerMyrvoldPlanarity<V,E>();
-		//		if (!planarity.isPlannar(graph))
-		//			throw new NotPlanarException();
-		//		
-		//		List<V> J = planarity.getOutsideFace();
-
 		//calculate positions of the outside face
 
 		CircleLayoutCalc<V> circleCalc = new CircleLayoutCalc<V>();

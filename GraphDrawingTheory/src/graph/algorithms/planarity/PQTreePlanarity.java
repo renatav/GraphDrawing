@@ -51,7 +51,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 	private	STNumbering<V, E> stNumbering;
 
-	private boolean debug = true;
+	private boolean debug = false	;
 
 	private V s, t;
 
@@ -382,9 +382,10 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		if (debug)
 			log.info("Upwards embedding: " + upwardsEmbedding);
 
-
-		log.info("Reverse emebdiings if necessary");
-		log.info(treeReduction.getReversalNum());
+		if (debug){
+			log.info("Reverse emebdiings if necessary");
+			log.info(treeReduction.getReversalNum());
+		}
 		for (V reversed : treeReduction.getReversalNum().keySet()){
 			if (treeReduction.getReversalNum().get(reversed) % 2 == 1)
 				if (upwardsEmbedding.containsKey(reversed))

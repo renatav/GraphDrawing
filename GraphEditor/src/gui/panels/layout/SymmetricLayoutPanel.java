@@ -2,7 +2,6 @@ package gui.panels.layout;
 
 import graph.elements.Graph;
 import graph.layout.PropertyEnums.SymmetricProperties;
-import graph.layout.PropertyEnums.TutteProperties;
 import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import gui.main.frame.MainFrame;
@@ -43,10 +42,6 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 		if (enumClass == SymmetricProperties.class){
 			 tf = componentsMap.remove(SymmetricProperties.PERMUTATION);
 			 componentsMap.put(SymmetricProperties.PERMUTATION, cbPermutations);
-		}
-		else if (enumClass == TutteProperties.class){
-			tf = componentsMap.remove(TutteProperties.PERMUTATION);
-			componentsMap.put(TutteProperties.PERMUTATION, cbPermutations);
 		}
 		if (tf != null)
 			remove(tf);

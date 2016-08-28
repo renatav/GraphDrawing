@@ -196,6 +196,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 	}
 
 
+	@SuppressWarnings("unused")
 	private Pair<LayoutAlgorithms, GraphLayoutProperties> selectLayout(List<V> vertices, List<E> edges, LayoutGraph layoutInstructions){
 
 		Graph<V,E> graph = formOneGraph(vertices, edges);

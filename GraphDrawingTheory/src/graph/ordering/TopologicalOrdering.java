@@ -29,31 +29,33 @@ public class TopologicalOrdering {
 		 Map<V, Integer> T = new HashMap<V, Integer>();
 		 
 		 Graph<V,E> copy = Util.copyGraph(graph);
-		 List<V> sinkVertices = copy.getAllSinks();
-		 List<V> nextSinKVertices = new ArrayList<V>();
-		 List<E> inEdges;
+		 List<V> sourceVertices = copy.getAllSources();
+		 List<V> nextSourceVertices = new ArrayList<V>();
+		 List<E> outEdges;
 		 int n = 0;
 		 do{
 			 
-			nextSinKVertices.clear();
-			 for (V v : sinkVertices){
+			 System.out.println("Current sources: " + sourceVertices );
+			 
+			 nextSourceVertices.clear();
+			 for (V v : sourceVertices){
 				 T.put(v, n);
-				 inEdges = copy.inEdges(v);
+				 outEdges = copy.outEdges(v);
 				 
-				 if (inEdges != null){
-					 for (E e : inEdges){
-						 V u = e.getOrigin();
-						 if (copy.outDegree(u) - 1 == 0)
-							 nextSinKVertices.add(u);
+				 if (outEdges != null){
+					 for (E e : outEdges){
+						 V u = e.getDestination();
+						 if (copy.inDegree(u) - 1 == 0)
+							 nextSourceVertices.add(u);
 					 }
 				 }
 				 copy.removeVertex(v);
 				 n++;
 			 }
-			 sinkVertices.clear();
-			 sinkVertices.addAll(nextSinKVertices);
+			 sourceVertices.clear();
+			 sourceVertices.addAll(nextSourceVertices);
 		 }
-		 while (sinkVertices.size() > 0);
+		 while (sourceVertices.size() > 0);
 			 
 		 return T;
 	}

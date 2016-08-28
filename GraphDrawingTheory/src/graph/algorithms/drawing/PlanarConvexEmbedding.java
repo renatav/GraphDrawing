@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Edge;
@@ -115,14 +116,19 @@ public class PlanarConvexEmbedding<V extends Vertex, E extends Edge<V>>  {
 		List<E> pathEdges = new ArrayList<E>();
 
 		if (criticalSeparationPairs.size() == 0){
-
+			
+			log.info("All facial cycles are extendable");
 			//all cycles are extendable
 			//take one
 			//for example, the one found during Hopcroft-Tarjan path finding phase
 			//the first of those paths is a cycle
-
-			log.info("All facial cycles are extendable");
-			pathEdges = hopcroftTarjanSplitting.getPaths().get(0);
+			//Didn't seem to work, not a good result for graphs with no critical separation pairs
+			//Use Boyer-Myrvold
+			BoyerMyrvoldPlanarity<V, E> boyerMyrvoldPlanarity = new BoyerMyrvoldPlanarity<V,E>();
+			boyerMyrvoldPlanarity.isPlannar(graph);
+			pathEdges = boyerMyrvoldPlanarity.getExternalFaceEdges();
+			
+			//pathEdges = hopcroftTarjanSplitting.getPaths().get(0);
 		}
 
 		else if (criticalSeparationPairs.size() == 1){

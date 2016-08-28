@@ -22,7 +22,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 
 	private Logger log = Logger.getLogger(PQTreeReduction.class);
 
-	private boolean debug = true;
+	private boolean debug = false;
 
 	private Map<V, Integer> reversalNum = new HashMap<V, Integer>();
 

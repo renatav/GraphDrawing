@@ -63,6 +63,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	private List<V> externallyActive;
 	
 	private boolean debug = false;
+	
+	private Graph<V,E> graph;
 
 	private Logger log = Logger.getLogger(BoyerMyrvoldPlanarity.class);
 
@@ -70,6 +72,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	@Override
 	public boolean isPlannar(Graph<V, E> graph) {
 
+		this.graph = graph;
+		
 		//************************
 		//preprocessing
 		//************************
@@ -799,6 +803,21 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		for (Block b : blocks)
 			ret.addAll(b.getBoundaryVertices());
 		return ret;
+	}
+	
+	public List<E> getExternalFaceEdges(){
+		List<V> externalFaceVertices = getOutsideFace();
+		List<E> externalFace = new ArrayList<E>();
+		for (int i = 0; i < externalFaceVertices.size(); i++){
+			V v1 = externalFaceVertices.get(i);
+			V v2;
+			if (i == externalFaceVertices.size() - 1)
+				v2 = externalFaceVertices.get(0);
+			else
+				v2 = externalFaceVertices.get(i + 1);
+			externalFace.add(graph.edgeBetween(v1, v2));
+		}
+		return externalFace;
 	}
 
 

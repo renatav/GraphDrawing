@@ -28,6 +28,7 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 	private List<E> externalFace;
 	private V s, t;
 	private PlanarFaces<V,E> planarFaces;
+	private List<E> sStar, tStar;
 
 
 	public STDualGraph(Graph<V,E> graph, List<E> externalFace, V s, V t){
@@ -64,8 +65,8 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 		//s* is a part from s to t
 		//and t* from t to s
 
-		List<E> sStar = new ArrayList<E>();
-		List<E> tStar = new ArrayList<E>();
+		sStar = new ArrayList<E>();
+		tStar = new ArrayList<E>();
 		int sIndex = -1, tIndex = -1;
 
 		//go from the first edge, when s is encountered, keep adding edges to s* until
@@ -162,7 +163,7 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 			}
 			else{
 				if (sStar.contains(e))
-						edge = new DualGraphEdge<>(getVertexByContent(leftFace), sVert);
+					edge = new DualGraphEdge<>(getVertexByContent(leftFace), sVert);
 				else
 					edge = new DualGraphEdge<>(getVertexByContent(leftFace), tVert);
 			}
@@ -179,7 +180,34 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 	 */
 	@Override
 	public String toString() {
-		return "STDualGraph [vertices=" + vertices + ", edges=" + edges + "]";
+		String ret = "STDualGraph vertices: \n";
+		for (DualGraphVertex<V, E> vert : vertices)
+			ret += vert.toString() + " \n";
+		ret += " edges: \n";
+		for (DualGraphEdge<V, E> e : edges)
+			ret += e.toString() + " \n";
+		
+		return ret;
+	}
+
+	public List<E> getExternalFace() {
+		return externalFace;
+	}
+
+	public V getS() {
+		return s;
+	}
+
+	public V getT() {
+		return t;
+	}
+
+	public List<E> getsStar() {
+		return sStar;
+	}
+
+	public List<E> gettStar() {
+		return tStar;
 	}
 
 

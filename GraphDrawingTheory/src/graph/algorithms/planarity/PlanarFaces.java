@@ -24,7 +24,7 @@ import graph.exception.NotPlanarException;
  * @param <E>
  */
 public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
-	
+
 	/**
 	 * Map contains an edge and a list of faces
 	 * The list will only contain two faces
@@ -38,91 +38,98 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 * when, for example, a face containing certain vertex needs to be found
 	 */
 	private List<List<E>> allFaces;
-	
+
 	/**
 	 * Complete embedding
 	 */
 	private Map<V,List<E>> planarEmbedding;
-	
+
 	private Graph<V,E> graph;
-	
-	
+
+	private boolean debug = false;
+
+
 	private Logger log = Logger.getLogger(PlanarFaces.class);
-	
+
 	public PlanarFaces(Graph<V,E> graph){
 		this.graph = graph;
 	}
-	
+
 	public PlanarFaces(Graph<V,E> graph, STNumbering<V, E> stNumbering){
 		this.graph = graph;
 	}
-	
+
 	public void formFaces(V s, V t) throws NotPlanarException{
 		//Select some edge (v,w)
 		//go from v to w
 		//find the closest edge in A(w) to (v,w) in the clockwise direction
 		//and keep going until we return to v
 		//Do this until all edges are traversed twice, once in every direction
-		
-		log.info("Form faces");
+
+		if (debug)
+			log.info("Form faces");
 		edgeFacesMap = new HashMap<E, List<List<E>>>();
 		allFaces = new ArrayList<List<E>>();
-		
+
 		Embedding<V,E> embedding = PlanarEmbedding.emedGraph(graph, s, t);
-		
+
 		for (E e : graph.getEdges())
 			edgeFacesMap.put(e, new ArrayList<List<E>>());
-		
-		
+
+
 		List<E> toDestinationTraversed = new ArrayList<E>();
 		List<E> toOriginTraversed = new ArrayList<E>();
-		
+
 		List<E> allEdges = new ArrayList<E>();
 		//initially add all edges, and as an edge is traversed
 		//from origin to destination, remove it
 		allEdges.addAll(graph.getEdges());
-		
+
 		//to destination is from a vertex with lower st-number to 
 		//a vertex with higher st-number
 		//to origin is the other way around
-		
-		
+
+
 		Map<V,Integer> stNumbering = embedding.getStNumbering();
 		planarEmbedding = embedding.getEmbedding();
-		
-		log.info("st numbering " + stNumbering);
-		log.info("Embedding: " + embedding);
-		
+
+		if (debug){
+			log.info("st numbering " + stNumbering);
+			log.info("Embedding: " + embedding);
+		}
+
 		int numOfEdges = allEdges.size();
-		
-		
+
+
 		List<EdgeDirection> edgeDirections = new ArrayList<EdgeDirection>();
 		List<V> orderedVertices = new ArrayList<V>(2);
-		
+
 		while (toDestinationTraversed.size() < numOfEdges && toOriginTraversed.size() < numOfEdges){
-			
+
 			//creating a new list every time because
 			//different references are needed
 			List<E> faceEdges = new ArrayList<E>();
 			edgeDirections.clear();
-			
+
 			E edge = allEdges.get(0);
 			toDestinationTraversed.add(edge);
 			allEdges.remove(0);
-			
-			
+
+
 			getOrderedEdgeVertices(stNumbering, edge, orderedVertices);
 			V v = orderedVertices.get(0);
 			V w = orderedVertices.get(1);
 			V first = v;
-			
-			log.info("staring edge " + edge);
-			log.info("v " + v);
-			log.info("w " + w);
-			
+
+			if (debug){
+				log.info("staring edge " + edge);
+				log.info("v " + v);
+				log.info("w " + w);
+			}
+
 			faceEdges.add(edge);
 			edgeDirections.add(EdgeDirection.TO_DESTINATION);
-			
+
 			while (w != first){
 				List<E> wEdges = planarEmbedding.get(w);
 				//find the next edge to take in vertex w
@@ -130,9 +137,10 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 				edgeIndex = wEdges.size() - 1 == edgeIndex ? 0 : edgeIndex + 1;
 				edge = wEdges.get(edgeIndex);
 				faceEdges.add(edge);
-				
-				log.info("Edge " + edge);
-				
+
+				if (debug)
+					log.info("Edge " + edge);
+
 				getOrderedEdgeVertices(stNumbering, edge, orderedVertices);
 				V v1 = orderedVertices.get(0);
 				V v2 = orderedVertices.get(1);
@@ -147,14 +155,18 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 					edgeDirections.add(EdgeDirection.TO_ORIGIN);
 					w = v1;
 				}
-				log.info("next w " + w);
+
+				if (debug)
+					log.info("next w " + w);
 			}
-			
-			log.info("face edges " + faceEdges);
-			log.info("directions " + edgeDirections);
-			
+
+			if (debug){
+				log.info("face edges " + faceEdges);
+				log.info("directions " + edgeDirections);
+			}
+
 			allFaces.add(faceEdges);
-			
+
 			for (int i = 0; i < faceEdges.size(); i++){
 				E currentEdge = faceEdges.get(i);
 				EdgeDirection direction = edgeDirections.get(i);
@@ -163,12 +175,13 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 				else
 					edgeFacesMap.get(currentEdge).add(0, faceEdges);
 			}
-			
+
 		}
-		
-		log.info(edgeFacesMap);
+
+		if (debug)
+			log.info(edgeFacesMap);
 	}
-	
+
 	private void getOrderedEdgeVertices(Map<V,Integer> stNumbering, E edge, List<V> orderedVetices){
 		V v1 = edge.getOrigin();
 		V v2 = edge.getDestination();
@@ -182,7 +195,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 			orderedVetices.add(1, v1);
 		}
 	}
-	
+
 	/**
 	 * Left face of the given edge
 	 * @param edge
@@ -225,7 +238,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	public Map<V, List<E>> getPlanarEmbedding() {
 		return planarEmbedding;
 	}
-	
-	
+
+
 
 }
