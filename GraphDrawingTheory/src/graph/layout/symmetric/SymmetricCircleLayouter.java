@@ -1,12 +1,12 @@
 package graph.layout.symmetric;
 
+import graph.algorithms.drawing.CyclicSymmetricGraphDrawing;
 import graph.drawing.Drawing;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
-import graph.symmetry.CyclicSymmetricGraphDrawing;
 import graph.symmetry.Permutation;
 
 import java.awt.geom.Point2D;

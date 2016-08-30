@@ -13,6 +13,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+/**
+ * An algorithm for checking the planarity of a graph based on Fraysseix and Mendez's algorithm
+ * @author xxx
+ *
+ * @param <V>
+ * @param <E>
+ */
 public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V,E> {
 
 	private Logger log = Logger.getLogger(FraysseixMendezPlanarity.class);

@@ -12,6 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementation of McKay's canonical graph labeling algorithm
+ * @author xx
+ *
+ * @param <V>
+ * @param <E>
+ */
 public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 
 

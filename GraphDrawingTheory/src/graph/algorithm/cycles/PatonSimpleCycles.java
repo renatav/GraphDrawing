@@ -36,7 +36,7 @@ import java.util.Stack;
  * See:<br/>
  * K. Paton, An algorithm for finding a fundamental set of cycles
  * for an undirected linear graph, Comm. ACM 12 (1969), pp. 514-518.
- * 
+ *  Ports the implementation of the following author:
  * @author Nikolay Ognyanov
  *
  * @param <V> - the vertex type.

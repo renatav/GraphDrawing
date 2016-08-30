@@ -33,11 +33,9 @@ import java.util.Stack;
 /**
  * Find all simple cycles of a directed graph using the Johnson's
  * algorithm.
- * <p/>
- * See:<br/>
  * D.B.Johnson, Finding all the elementary circuits of 
  * a directed graph, SIAM J. Comput., 4 (1975), pp. 77-84.
- * 
+ * Ports the implementation of the following author:
  * @author Nikolay Ognyanov
  *
  * @param <V> - the vertex type.

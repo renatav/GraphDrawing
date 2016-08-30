@@ -20,6 +20,13 @@ import graph.tree.pq.PQTreeEdge;
 import graph.tree.pq.PQTreeNode;
 import graph.tree.pq.PQTreeReduction;
 
+/**
+ * PQ tree planarity testing based on Booth and Lueker's algorithm
+ * @author xxx
+ *
+ * @param <V>
+ * @param <E>
+ */
 public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V, E>{
 
 	private List<V> stOrder;

@@ -15,6 +15,14 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Implementation based on Hopcroft and Tarjan's algorithm:
+ *  J. E. Hopcroft and R. E. Tarjan, Dividing a graph into triconnected components,
+ * SIAM J. Comput. 2 (1973), no. 3, 135–158.
+ * @author xx
+ * @param <V>
+ * @param <E>
+ */
 public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 

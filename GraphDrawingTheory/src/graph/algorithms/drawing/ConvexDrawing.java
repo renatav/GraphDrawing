@@ -25,6 +25,13 @@ import graph.traversal.DijkstraAlgorithm;
 import graph.traversal.TraversalUtil;
 import graph.util.Util;
 
+/**
+ * Convex drawing algorithms based on Chiba's work 
+ * @author xx
+ *
+ * @param <V>
+ * @param <E>
+ */
 public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 	private Graph<V,E> graph;

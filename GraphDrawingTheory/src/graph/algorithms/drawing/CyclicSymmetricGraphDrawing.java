@@ -1,8 +1,11 @@
-package graph.symmetry;
+package graph.algorithms.drawing;
 
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
+import graph.symmetry.CyclicPermutation;
+import graph.symmetry.Permutation;
+import graph.symmetry.PermutationCycle;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.util.Pair;
 
@@ -11,6 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Concentric symmrtic drawing algorithms based on Car and Kocay's algorithm
+ * @author xx
+ *
+ * @param <V>
+ * @param <E>
+ */
 public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 
