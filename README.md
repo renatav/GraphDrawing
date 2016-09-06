@@ -60,6 +60,7 @@ form other open-soucce libraries. It strives to provide a very easy way of calli
 - Tree balloon layout
 - Node link tree layout
 - Radial tree layout
+- Hierarchical layout
 - Spring, Kamada-Kawai and force-dircted layout
 - Organic and fast-organic layouts
 - ISOM layout
