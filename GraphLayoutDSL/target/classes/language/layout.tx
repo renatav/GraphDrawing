@@ -3,11 +3,11 @@ Layout:
 ;
 
 LayoutGraph:
-	'layout' 'graph' layoutType = LayoutEnum
+	'lay out' 'graph' layoutType = LayoutEnum
 ;
 
 LayoutSubgraphs:
-	'layout' layoutSubgraphs += LayoutSubraph[';']
+	'lay out' layoutSubgraphs += LayoutSubraph[';']
 ;
 
 LayoutSubraph:

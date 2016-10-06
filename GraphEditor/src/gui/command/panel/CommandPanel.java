@@ -436,8 +436,12 @@ public class CommandPanel extends JPanel{
 
 		else if (command.startsWith(commands[25])){
 			//Layout DSL input
-			DSLLayouter<GraphVertex, GraphEdge> dslLayout = new DSLLayouter<GraphVertex, GraphEdge>(graph.getVertices(), 
-					graph.getEdges(), command);
+			List<GraphVertex> vertices = graph.getVertices();
+			List<GraphEdge> edges = graph.getEdges();
+			
+			DSLLayouter<GraphVertex, GraphEdge> dslLayout =
+					new DSLLayouter<GraphVertex, GraphEdge>(vertices, edges, command);	
+					
 			try{
 				Drawing<GraphVertex, GraphEdge> drawing = dslLayout.layout();
 				GraphView view = MainFrame.getInstance().getCurrentView();
@@ -548,7 +552,7 @@ public class CommandPanel extends JPanel{
 		commands[22] = "separation pairs";
 		commands[23] = "clear";
 		commands[24] = "splitting";
-		commands[25] = "layout";
+		commands[25] = "lay out";
 		commands[26] = "binary tree";
 		commands[27] = "is ring";
 		commands[28] = "test";

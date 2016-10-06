@@ -1,34 +1,36 @@
 # Graph Analysis and Drawing Library - Grad
 
+http://www.gradlibrary.net
+
 Grad is a library for the Java programming language whose main goals are to provide a large number of graph drawing and analysis algorithms
 and a very simple integration with existing tools. It consists of three projects:
-- GraphDrawingTheory - the core of the library defining containing numerous algorithms
+- GraphDrawingTheory - the core of the library, containing numerous algorithms
 - GraphEditor - a simple graph editor that can be used to test the layout and anaylisis features
 - GraphLayoutDSL - defines a domain-specific language (DSL) for specifying how a graph should be laid out
 
 ##Implemented analysis algorithms
-Grad offers implementations of several noteable graph analysis.
+Grad offers implementations of several noteable graph analysis algorithms.
 
 ###Graph traversal
 - Dijkstra's shortest path
 - Depth-first search and construction of DFS trees
 
 ###Graph connectivity
-- Checking connectivity, biconnectivity and triconnectivity of the graphs
+- Checking connectivity, biconnectivity and triconnectivity of graphs
 - Finding graph cut vertices and blocks (biconnected components) of a graph
-- Hopcroft-Tarjan division of graph into triconnected components
+- Hopcroft-Tarjan division of a graph into triconnected components
 - Construction of BC (block-cut vertex) trees
 - Construction of SPQR trees (not thoroughly teseted yet)
 - Planar augmentation - an algorithm for turning a connected graph into a biconnected one. Based on Fialko and Mutzel's 5/3 approximation algorithm
 
 ###Cyclic properties
 - Johnson's algorithms for finding simple cycles of a directed graph
-- Paton's algorithm for finding cycles of a undirected graph
+- Paton's algorithm for finding cycles of an undirected graph
 
 ###Planarity testing
 - Fraysseix-Mendez planarity testing
 - Boyer-Myrvold planarity testing which finds the outside face
-- PQ tree planarity testing Booth and Lueker's algorithm, which finds the upwards embedding
+- PQ tree planarity testing with Booth and Lueker's algorithm, which finds the upwards embedding
 - Finding an embedding and planar faces given an upwards embedding
 
 ###Graph symmetry
@@ -45,7 +47,7 @@ Grad offers implementations of several noteable graph analysis.
 
 ##Layout algorithms
 Grad has several original implementaions of different graph drawing (layout) algorithms and ports some excellet implementations
-form other open-soucce libraries. It strives to provide a very easy way of calling any desired algorithm a very easy task.
+form other open-soucce libraries. It strives to provide a very easy way of calling any desired algorithm.
 
 ###Original implementations
 - Box layout (simple positioning of graph vertices into a table-like structure)
