@@ -1,6 +1,7 @@
 # Graph Analysis and Drawing Library - Grad
 
-http://www.gradlibrary.net
+Site: http://www.gradlibrary.net
+Javadoc: https://renatav.github.io
 
 Grad is a library for the Java programming language whose main goals are to provide a large number of graph drawing and analysis algorithms
 and a very simple integration with existing tools. It consists of three projects:

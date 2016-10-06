@@ -165,9 +165,9 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 			DualGraphVertex<V, E> frVertex = stDualGraph.getVertexByContent(fr);
 			
 			//{fl and fr are vertices in the dual graph G*}
-			//Γ(v).y ← Ty(v)
-			//Γ(v).xmin ← Tx(fl)
-			//Γ(v).xmax ← Tx(fr) − 1
+			//Γ(v).y = Ty(v)
+			//Γ(v).xmin = Tx(fl)
+			//Γ(v).xmax = Tx(fr) − 1
 			vYMap.put(v, Ty.get(v));
 			if (Ty.get(v) > yMax)
 				yMax = Ty.get(v);
@@ -197,16 +197,16 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 					fl = stDualGraph.gettStar();
 			}
 			DualGraphVertex<V, E> flVertex = stDualGraph.getVertexByContent(fl);
-			//Γ(e).x ← Tx(fl)
-			//Γ(e).ymin ← Ty(u)
-			//Γ(e).ymax ← Ty(v)
+			//Γ(e).x = Tx(fl)
+			//Γ(e).ymin = Ty(u)
+			//Γ(e).ymax = Ty(v)
 			eXMap.put(e, Tx.get(flVertex));
 			eYMinMap.put(e, Ty.get(e.getOrigin()));
 			eYMaxMap.put(e, Ty.get(e.getDestination()));
 			
 		}
 		
-		//Remove any added “dummy” edges
+		//Remove any added "dummy" edges
 		//also get switched edges to previous state
 		for (E e : switchedEdges){
 			V origin = e.getOrigin();

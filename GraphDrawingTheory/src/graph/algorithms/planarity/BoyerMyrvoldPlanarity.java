@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 /**
  * The Boyer-Myrvold algorithm is a planarity testing algorithm which uses reverse DFS order as numbering
  *  of the vertices of G. The general strategy is that of explicitly maintaining a 
- *  “flexible” planar embedding of each connected component of Gi with the outer vertices on the outer face.
+ *  "flexible" planar embedding of each connected component of Gi with the outer vertices on the outer face.
  *  This embedding is “flexible” in the sense that each block can be flipped in constant time,
  *  whatever its size, while the permutation of the blocks around cutvertices is left undecided. 
  */
