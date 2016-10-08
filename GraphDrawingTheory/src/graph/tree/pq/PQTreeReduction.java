@@ -403,7 +403,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 			PQTreeNode partialChild = node.getPartialChildren().get(0);
 			int partialChildIndex = node.getChildren().indexOf(partialChild);
 
-			//add new full children in correct place, next to another full child
+			//add new full children in the correct place, next to another full child
 
 			//very important
 			//determine where to place the full children
@@ -419,25 +419,27 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 				if (debug)
 					log.info("Only one full child");
 				PQTreeNode fullChild = node.getFullChildren().get(0);
-				int fullChildIndex = node.getChildren().indexOf(fullChild);
+				//int fullChildIndex = node.getChildren().indexOf(fullChild);
 				node.removeChild(fullChild);
 				tree.removeEdge(tree.edgeBetween(node, fullChild));
 				
 				//TODO is this ok - determining if the new node should be placed after or before the full children
 				//if yes, should the same be done for other templates
 				
-				if (fullChildIndex > partialChildIndex){
-					if (partialChildEndIndex != -1)
-						partialChild.addChild(fullChild, partialChildEndIndex);
-					else
-						partialChild.addChild(fullChild);
-				}
-				else{
-					if (partialChildStartIndex != -1)
-						partialChild.addChild(fullChild, partialChildStartIndex);
-					else
-						partialChild.addChild(fullChild);
-				}
+//				if (fullChildIndex > partialChildIndex){
+//					if (partialChildEndIndex != -1)
+//						partialChild.addChild(fullChild, partialChildEndIndex);
+//					else
+//						partialChild.addChild(fullChild);
+//				}
+//				else{
+//					if (partialChildStartIndex != -1)
+//						partialChild.addChild(fullChild, partialChildStartIndex);
+//					else
+//						partialChild.addChild(fullChild);
+//				}
+				
+				partialChild.addChild(fullChild);
 
 				tree.addEdge(new PQTreeEdge(partialChild, fullChild));
 				if (debug){

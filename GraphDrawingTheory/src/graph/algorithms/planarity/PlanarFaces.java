@@ -178,7 +178,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 
 		}
 
-		if (debug)
+		//if (debug)
 			log.info(edgeFacesMap);
 	}
 

@@ -73,6 +73,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	public boolean isPlannar(Graph<V, E> graph) {
 
 		this.graph = graph;
+		boolean directed = graph.isDirected();
+		graph.setDirected(false);
 		
 		//************************
 		//preprocessing
@@ -148,8 +150,10 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				formBlock(e);
 			}
 
-			if (!processVertex(v))
+			if (!processVertex(v)){
+				graph.setDirected(directed);
 				return false;
+			}
 
 
 		}
@@ -162,7 +166,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		if (debug)
 			log.info(blocks);
 		
-		
+		graph.setDirected(directed);
 		return true;
 	}
 

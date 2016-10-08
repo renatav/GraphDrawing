@@ -115,7 +115,7 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 		List<List<E>> allFaces = planarFaces.getAllFaces();
 
 
-		//won't be the same reference, so find the xternal face in the list of all faces
+		//won't be the same reference, so find the external face in the list of all faces
 		List<E> externalFaceInList = null;
 
 

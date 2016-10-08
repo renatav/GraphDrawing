@@ -58,7 +58,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 	private	STNumbering<V, E> stNumbering;
 
-	private boolean debug = false	;
+	private boolean debug = false;
 
 	private V s, t;
 

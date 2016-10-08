@@ -65,6 +65,8 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 
 		DFSTreeTraversal<V, E> traversal = new  DFSTreeTraversal<V,E>(graph);
 		DFSTree<V,E> dfsTree = traversal.formDFSTree(t);
+		
+		log.info(dfsTree);
 
 		//initial numbering can be the dfs numbering
 		numbering = dfsTree.getVerticesWithIndexes();
