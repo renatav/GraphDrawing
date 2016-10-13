@@ -15,7 +15,7 @@ import graph.layout.organic.JGraphFastorganicLayouter;
 import graph.layout.organic.JGraphHierarchicalLayouter;
 import graph.layout.organic.JGraphOrganicLayouter;
 import graph.layout.organic.JungISOMLayouter;
-import graph.layout.orthgonal.VisibilityRepresentationLayout;
+import graph.layout.orthogonal.VisibilityRepresentationLayout;
 import graph.layout.straight.line.ConvexLayouter;
 import graph.layout.straight.line.TutteLayouter;
 import graph.layout.symmetric.SymmetricCircleLayouter;

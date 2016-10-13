@@ -30,7 +30,6 @@ public class EdgePainter implements IElementPainter{
 		g.setStroke(stroke);
 
 		path.reset();
-
 		path.moveTo(edge.getLinkNodes().get(0).getX(), edge.getLinkNodes().get(0).getY());
 		for (int i = 1; i < edge.getLinkNodes().size() - 1; i++){
 			path.lineTo(edge.getLinkNodes().get(i).getX(), edge.getLinkNodes().get(i).getY());
