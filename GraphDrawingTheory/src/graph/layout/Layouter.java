@@ -173,7 +173,6 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 			return drawing;
 		}
 
-		System.out.println("forming graphs");
 		for (Graph<V,E> graph : formGraphs(vertices, edges)){
 			try{
 				drawing = layouter.layout(graph, layoutProperties);
