@@ -59,6 +59,7 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 		}
 
 		//now route the edges
+		//TODO maybe place this in a separate class to enable further usage
 
 		Map<E, List<Point2D>> edgesMappings = drawing.getEdgeMappings();
 		for (E edge : graph.getEdges()){
@@ -128,7 +129,7 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 						conn = createOrFindConnector(origin, EntryDirection.DOWN, connectorsMap);
 					conn.incNumber();
 					conn.addEdge(nodePositions);
-					
+
 					nodePositions.add(node);
 				}
 				if (x > destinationMax  || x < desitnationMin){
@@ -136,7 +137,7 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 					Point2D node2 = new Point2D.Double(x, y2);
 					nodePositions.add(node2);
 					nodePositions.add(node1);
-					
+
 					OrthogonalConnector<V> conn;
 					if (x > destinationMax)
 						conn = createOrFindConnector(destination, EntryDirection.RIGHT, connectorsMap);
@@ -144,12 +145,12 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 						conn = createOrFindConnector(destination, EntryDirection.LEFT, connectorsMap);
 					conn.incNumber();
 					conn.addEdge(nodePositions);
-					
+
 				}
 				else{
 					Point2D node = new Point2D.Double(x, y2);
 					nodePositions.add(node);
-					
+
 					OrthogonalConnector<V> conn;
 					if (y2 > y1)
 						conn = createOrFindConnector(destination, EntryDirection.UP, connectorsMap);
@@ -157,10 +158,10 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 						conn = createOrFindConnector(destination, EntryDirection.DOWN, connectorsMap);
 					conn.incNumber();
 					conn.addEdge(nodePositions);
-					
+
 				}
 			}
-			
+
 			edgesMappings.put(edge, nodePositions);
 
 		}
@@ -174,67 +175,85 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 					Point2D position = vertexMappings.get(v);
 					int ySize = (int) v.getSize().getHeight();
 					int xSize = (int) v.getSize().getWidth();
+					
 					//TODO
 					//see where the edge later goes and position the edges accordingly
 					//to avoid intersections
-					//some code refactoring needed
 					//also take care of edges overlapping on other segments, not just here
 					//but this is the most important aspect
-					
+
+					int yDist, yStart, xDist, xStart;
+					int parts;
+					//if there the number of the edges is even, divide the element into num + 2 components
+					//otherwise into num + 1
+					if (number % 2 == 0)
+						parts = number + 2;
+					else
+						parts = number + 1;
+
 					if (conn.getEntryDirection() == EntryDirection.LEFT || conn.getEntryDirection() == EntryDirection.RIGHT){
-						int yStart = (int)position.getY() + ySize/(number + 1);
-						int yDist = ySize / (number + 1);
-						for (List<Point2D> nodes : edgesWithNodePositions){
-							
-							Point2D node1, node2;
-							
-							if (nodes.get(0).getX() == position.getX() && nodes.get(0).getY() == position.getY()){
-								node1 = nodes.get(0);
-								node2 = nodes.get(1);
-							}
-							else{
-								node1 = nodes.get(nodes.size() - 1);
-								node2 = nodes.get(nodes.size() - 2);
-							}
-							node1.setLocation(node1.getX(), yStart - yDist);
-							yDist += ySize / (number + 1);
-							node2.setLocation(node2.getX(), node1.getY());
-						}
+
+						yDist = ySize / parts;
+						yStart = (int) position.getY() - ySize/2;
+						xDist = 0;
+						xStart = (int) position.getX();
 					}
 					else{
-						int xStart = (int)position.getX() + xSize/(number + 1);
-						int xDist = xSize / (number + 1);
-						for (List<Point2D> nodes : edgesWithNodePositions){
-							
-							Point2D node1, node2;
-							
-							if (nodes.get(0).getX() == position.getX() && nodes.get(0).getY() == position.getY()){
-								node1 = nodes.get(0);
-								node2 = nodes.get(1);
-							}
-							else{
-								node1 = nodes.get(nodes.size() - 1);
-								node2 = nodes.get(nodes.size() - 2);
-							}
-							node1.setLocation(xStart - xDist, node1.getY());
-							xDist += ySize / (number + 1);
-							node2.setLocation(node1.getX(), node2.getY());
+						xDist = xSize / parts;
+						xStart = (int)position.getY() - xSize/2;
+						yDist = 0;
+						yStart = (int) position.getY();
+					}
+					
+					int counter = 0;
+					int half = 0;
+					int numOfEdges = edgesWithNodePositions.size();
+					if (numOfEdges % 2 == 0)
+						half = numOfEdges /2;
+					int yDistTotal = yDist;
+					int xDistTotal = xDist;
+					for (List<Point2D> nodes : edgesWithNodePositions){
+
+						counter ++;
+						Point2D node1, node2;
+						
+
+						if (nodes.get(0).getX() == position.getX() && nodes.get(0).getY() == position.getY()){
+							node1 = nodes.get(0);
+							node2 = nodes.get(1);
 						}
+						else{
+							node1 = nodes.get(nodes.size() - 1);
+							node2 = nodes.get(nodes.size() - 2);
+						}
+						
+						node1.setLocation(xStart + xDistTotal, yStart + yDistTotal);
+						yDistTotal += yDist;
+						xDistTotal += xDist;
+						if (counter == half){
+							yDistTotal += yDist;
+							xDistTotal += xDist;
+						}
+						if (xDist == 0)
+							node2.setLocation(node2.getX(), node1.getY());
+						else
+							node2.setLocation(node1.getY(), node2.getX());
+						
 					}
 				}
 			}
 		}
 
-		return drawing;
-	}
+	return drawing;
+}
 
-	private OrthogonalConnector<V> createOrFindConnector(V v, EntryDirection dir, Map<V, List<OrthogonalConnector<V>>> connectorsMap){
-		for (OrthogonalConnector<V> conn : connectorsMap.get(v))
-			if (conn.getEntryDirection() == dir)
-				return conn;
-		OrthogonalConnector<V> conn =  new OrthogonalConnector<V>(v, dir, 0);
-		connectorsMap.get(v).add(conn);
-		return conn;
-	}
+private OrthogonalConnector<V> createOrFindConnector(V v, EntryDirection dir, Map<V, List<OrthogonalConnector<V>>> connectorsMap){
+	for (OrthogonalConnector<V> conn : connectorsMap.get(v))
+		if (conn.getEntryDirection() == dir)
+			return conn;
+	OrthogonalConnector<V> conn =  new OrthogonalConnector<V>(v, dir, 0);
+	connectorsMap.get(v).add(conn);
+	return conn;
+}
 
 }
