@@ -1,9 +1,10 @@
 package graph.layout.orthogonal;
 
-import java.awt.geom.Point2D;
-import java.util.List;
-
 import graph.elements.Vertex;
+
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrthogonalConnector<V extends Vertex> {
 
@@ -17,7 +18,7 @@ public class OrthogonalConnector<V extends Vertex> {
 	 * Also, it is important to know where the edge then goes
 	 * in order to avoid intersections of edges
 	 */
-	private List<Point2D> nodePositions;
+	private List<List<Point2D>> edgesWithNodePositions;
 	
 	
 	public OrthogonalConnector(V vertex, EntryDirection entryDirection, int number) {
@@ -25,6 +26,7 @@ public class OrthogonalConnector<V extends Vertex> {
 		this.vertex = vertex;
 		this.entryDirection = entryDirection;
 		this.number = number;
+		edgesWithNodePositions = new ArrayList<List<Point2D>>();
 	}
 	
 	public void incNumber(){
@@ -82,15 +84,15 @@ public class OrthogonalConnector<V extends Vertex> {
 	/**
 	 * @return the nodePositions
 	 */
-	public List<Point2D> getNodePositions() {
-		return nodePositions;
+	public List<List<Point2D>> getEdgesWithNodePositions() {
+		return edgesWithNodePositions;
 	}
 
 	/**
 	 * @param nodePositions the nodePositions to set
 	 */
-	public void setNodePositions(List<Point2D> nodePositions) {
-		this.nodePositions = nodePositions;
+	public void addEdge(List<Point2D> nodePositions) {
+		edgesWithNodePositions.add(nodePositions);
 	}
 
 	/* (non-Javadoc)
@@ -98,8 +100,7 @@ public class OrthogonalConnector<V extends Vertex> {
 	 */
 	@Override
 	public String toString() {
-		return "OrthogonalConnector [vertex=" + vertex + ", entryDirection=" + entryDirection + ", number=" + number
-				+ ", nodePositions=" + nodePositions + "]";
+		return "OrthogonalConnector [vertex=" + vertex + ", entryDirection=" + entryDirection + ", number=" + number + "]";
 	}
 	
 	

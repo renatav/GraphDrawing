@@ -101,8 +101,8 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 				}
 				connector1.incNumber();
 				connector2.incNumber();
-				connector1.setNodePositions(nodePositions);
-				connector2.setNodePositions(nodePositions);
+				connector1.addEdge(nodePositions);
+				connector2.addEdge(nodePositions);
 			}
 			else{
 
@@ -117,7 +117,7 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 					else
 						conn = createOrFindConnector(origin, EntryDirection.LEFT, connectorsMap);
 					conn.incNumber();
-					conn.setNodePositions(nodePositions);
+					conn.addEdge(nodePositions);
 				}
 				else{
 					Point2D node = new Point2D.Double(x, y1);
@@ -127,7 +127,7 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 					else
 						conn = createOrFindConnector(origin, EntryDirection.DOWN, connectorsMap);
 					conn.incNumber();
-					conn.setNodePositions(nodePositions);
+					conn.addEdge(nodePositions);
 					
 					nodePositions.add(node);
 				}
@@ -143,7 +143,7 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 					else
 						conn = createOrFindConnector(destination, EntryDirection.LEFT, connectorsMap);
 					conn.incNumber();
-					conn.setNodePositions(nodePositions);
+					conn.addEdge(nodePositions);
 					
 				}
 				else{
@@ -156,7 +156,7 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 					else
 						conn = createOrFindConnector(destination, EntryDirection.DOWN, connectorsMap);
 					conn.incNumber();
-					conn.setNodePositions(nodePositions);
+					conn.addEdge(nodePositions);
 					
 				}
 			}
@@ -167,10 +167,62 @@ public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>>
 
 		//now move the last segments if necessary to prevent overlapping of edges
 		for (V  v : graph.getVertices()){
-			for (OrthogonalConnector<V> conn : connectorsMap.get(v))
-				if (conn.getNumber() > 1){
-					System.out.println("overlapping: " + conn.getEntryDirection() + " " + v + " " + conn.getNumber());
+			for (OrthogonalConnector<V> conn : connectorsMap.get(v)){
+				int number = conn.getNumber();
+				if (number > 1){
+					List<List<Point2D>> edgesWithNodePositions = conn.getEdgesWithNodePositions();
+					Point2D position = vertexMappings.get(v);
+					int ySize = (int) v.getSize().getHeight();
+					int xSize = (int) v.getSize().getWidth();
+					//TODO
+					//see where the edge later goes and position the edges accordingly
+					//to avoid intersections
+					//some code refactoring needed
+					//also take care of edges overlapping on other segments, not just here
+					//but this is the most important aspect
+					
+					if (conn.getEntryDirection() == EntryDirection.LEFT || conn.getEntryDirection() == EntryDirection.RIGHT){
+						int yStart = (int)position.getY() + ySize/(number + 1);
+						int yDist = ySize / (number + 1);
+						for (List<Point2D> nodes : edgesWithNodePositions){
+							
+							Point2D node1, node2;
+							
+							if (nodes.get(0).getX() == position.getX() && nodes.get(0).getY() == position.getY()){
+								node1 = nodes.get(0);
+								node2 = nodes.get(1);
+							}
+							else{
+								node1 = nodes.get(nodes.size() - 1);
+								node2 = nodes.get(nodes.size() - 2);
+							}
+							node1.setLocation(node1.getX(), yStart - yDist);
+							yDist += ySize / (number + 1);
+							node2.setLocation(node2.getX(), node1.getY());
+						}
+					}
+					else{
+						int xStart = (int)position.getX() + xSize/(number + 1);
+						int xDist = xSize / (number + 1);
+						for (List<Point2D> nodes : edgesWithNodePositions){
+							
+							Point2D node1, node2;
+							
+							if (nodes.get(0).getX() == position.getX() && nodes.get(0).getY() == position.getY()){
+								node1 = nodes.get(0);
+								node2 = nodes.get(1);
+							}
+							else{
+								node1 = nodes.get(nodes.size() - 1);
+								node2 = nodes.get(nodes.size() - 2);
+							}
+							node1.setLocation(xStart - xDist, node1.getY());
+							xDist += ySize / (number + 1);
+							node2.setLocation(node1.getX(), node2.getY());
+						}
+					}
 				}
+			}
 		}
 
 		return drawing;
