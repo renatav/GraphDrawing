@@ -839,8 +839,11 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 	public List<V> getOutsideFace(){
 		List<V> ret = new ArrayList<V>();
-		for (Block b : blocks)
-			ret.addAll(b.getBoundaryVertices());
+		for (Block b : blocks){
+			for (V vb : b.getBoundaryVertices())
+				if (!ret.contains(vb))
+					ret.add(vb);
+		}
 		return ret;
 	}
 
