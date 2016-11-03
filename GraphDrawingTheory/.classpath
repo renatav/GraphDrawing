@@ -24,5 +24,17 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="target/dependency/collections-generic-4.01.jar"/>
+	<classpathentry kind="lib" path="target/dependency/colt-1.2.0.jar"/>
+	<classpathentry kind="lib" path="target/dependency/concurrent-1.3.4.jar"/>
+	<classpathentry kind="lib" path="target/dependency/jama-1.0.3.jar"/>
+	<classpathentry kind="lib" path="target/dependency/jgraphx-3.4.1.3.jar"/>
+	<classpathentry kind="lib" path="target/dependency/jung-algorithms-2.0.1.jar"/>
+	<classpathentry kind="lib" path="target/dependency/jung-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="target/dependency/jung-graph-impl-2.0.1.jar"/>
+	<classpathentry kind="lib" path="target/dependency/jung-visualization-2.0.1.jar"/>
+	<classpathentry kind="lib" path="target/dependency/jython-standalone-2.7.1b2.jar"/>
+	<classpathentry kind="lib" path="target/dependency/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="target/dependency/prefuse-beta-20071021.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

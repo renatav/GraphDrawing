@@ -61,9 +61,9 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 	/**List of externally active vertices used during the walkdown phase*/
 	private List<V> externallyActive;
-	
+
 	private boolean debug = false;
-	
+
 	private Graph<V,E> graph;
 
 	private Logger log = Logger.getLogger(BoyerMyrvoldPlanarity.class);
@@ -75,7 +75,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		this.graph = graph;
 		boolean directed = graph.isDirected();
 		graph.setDirected(false);
-		
+
 		//************************
 		//preprocessing
 		//************************
@@ -141,7 +141,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		for (V v : numbering.getOrder()){
 
 
-			//System.out.println("PROCESSING VERTEX + " + v);
+			if (debug)
+				log.info("PROCESSING VERTEX + " + v);
 
 
 			//for each DFS child c of v in G
@@ -162,10 +163,10 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		//to embed all back edges which can be embedded and to isolate
 		//Kuratowski subgraph
 		//don't return false, just keep going
-		
+
 		if (debug)
 			log.info(blocks);
-		
+
 		graph.setDirected(directed);
 		return true;
 	}
@@ -207,14 +208,14 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					for (E backEdge : edgesToEmbed)
 						walkup(v, backEdge);
 
-					
+
 					while (edgesToEmbed.size() > 0){
-						
+
 						//perform walkup for every edge
 						//since blocks are changed when merging and 
 						//some kind of processing would have to be performed in any case
 						sortEdgesToEmbed(edgesToEmbed);
-						
+
 						E backEdge = edgesToEmbed.get(0);
 						//now perform walkdown and embed the edge
 						//if that is not possible, return false
@@ -240,7 +241,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		//basically, traversing the external face of the relevant block and searching for 
 		//ednpoints and pertinent vertices
 
-		//System.out.println(edgesToEmbed);
 		Collections.sort(edgesToEmbed, new Comparator<E>() {
 
 			@Override
@@ -254,12 +254,13 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				Map<V,Block> pertinent1 = pertinentBlocksForEdge.get(o1);
 				Map<V,Block> pertinent2 = pertinentBlocksForEdge.get(o2);
 
-				//System.out.println("pertinent1 " + pertinent1);
-				//System.out.println("pertinent2 " + pertinent2);
+				if (debug){
+					log.info("pertinent1 " + pertinent1);
+					log.info("pertinent2 " + pertinent2);
+				}
 
 				List<Block> overlappingBlocks = new ArrayList<Block>(pertinent1.values());
 				overlappingBlocks.retainAll(pertinent2.values());
-				//System.out.println("overlapping blocks: " + overlappingBlocks);
 
 
 				if (overlappingBlocks.size() > 0){
@@ -270,7 +271,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 						if (dfsTree.getIndex(overlapping.getRoot()) > dfsTree.getIndex(block.getRoot()))
 							block = overlapping;
 
-					//	System.out.println("RELEVANT BLOCK " + block);
 
 					int index1 = -1, index2 = -1;
 					int stopIndex = -1;
@@ -363,13 +363,16 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 		//find dfs tree path between vertices connected with the back edge
 		List<V> dfsTreePath = dfsTree.treePathBetween(v, w);
-		//System.out.println("DFS path " + dfsTreePath);
+		if (debug)
+			log.info("DFS path " + dfsTreePath);
 
 
 		for (V pathVertex : dfsTreePath){
 
 			//check for blocks on the path which contain the vertex
-			//System.out.println("Checking for vertex " + pathVertex);
+			
+			if (debug)
+				log.info("Checking for vertex " + pathVertex);
 
 			//check for blocks with path vertex as root
 			List<Block> rootsBlocks = allBlocksWithRoot.get(pathVertex);
@@ -450,28 +453,27 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 			while (true){ //simulating for loop in order to avoid writing the same code twice 
 
 				V currentBoundary = current.getBoundaryVertices().get(index);
+
 				traversedVerticesList.add(currentBoundary);
-
-				//System.out.println("Current boundary: " + currentBoundary);
-
 
 				if (!blocksWhichContainEndpoint.contains(current)) //don't move to next block if this contains the endpoint
 					if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null && 
 					pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != current){
-						//System.out.println("FOUND PERTINENT " + currentBoundary);
+						if (debug)
+							log.info("FOUND PERTINENT " + currentBoundary);
 						nextBlock = pertinentBlocksForEdge.get(backEdge).get(currentBoundary);
 						break;
 					}
 
 				if (currentBoundary == endpoint){
-					//System.out.println("endpoint");
 					foundEnding = true;
 					break;
 				}
 
 				if (externallyActive.contains(currentBoundary)){
 					changeDirection = true;
-					//System.out.println("found extremely active vertex " + currentBoundary + " changing direction");
+					if (debug)
+						log.info("found extremely active vertex " + currentBoundary + " changing direction");
 					break;
 				}
 
@@ -490,7 +492,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 			}
 
 
-
 			if (changeDirection){
 
 				currentDirection = currentDirection == Direction.CLOCKWISE ? Direction.COUNTERCLOCKWISE : Direction.CLOCKWISE;
@@ -505,10 +506,17 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 					V currentBoundary = current.getBoundaryVertices().get(index);
 
-					//System.out.println("Current boundary: " + currentBoundary);
+
+					
+					if (debug){
+						log.info(pertinentBlocksForEdge);
+						log.info("Current boundary: " + currentBoundary);
+					}
+					
 
 					traversedVerticesList.add(currentBoundary);
 
+					//check if a 
 
 					if (!blocksWhichContainEndpoint.contains(current)) //don't move to next block if this contains the endpoint
 						if (pertinentBlocksForEdge.get(backEdge).get(currentBoundary) != null && 
@@ -522,7 +530,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					}
 
 					if (externallyActive.contains(currentBoundary)){
-						System.out.println("found another externally active " + currentBoundary + " - not planar!");
+						if (debug)
+							log.info("found another externally active " + currentBoundary + " - not planar!");
 						return false;
 					}
 
@@ -549,12 +558,22 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 
 			V last = traversedVerticesList.get(traversedVerticesList.size() - 1);
+			
+			if (debug){
+				log.info(current.getBoundaryVertices());
+				log.info("Externally active: " + externallyActive);
+				log.info("Endpoints " + endpoins);
+			}
+
 
 			if (changeDirection){
 				if (currentDirection == Direction.COUNTERCLOCKWISE)
 					current.setExternalFace(last, Direction.CLOCKWISE);
 				else
 					current.setExternalFace(last, Direction.COUNTERCLOCKWISE);
+				
+				if (debug)
+					log.info(current.getBoundaryVertices());
 
 			}
 			else{
@@ -567,6 +586,8 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				boolean hasExternallyActive = false;
 				boolean hasOtherToBeEmbedded = false;
 				boolean hasPertiment = false;
+				
+		
 
 				if (currentDirection == Direction.CLOCKWISE){
 
@@ -615,7 +636,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 							break;
 						if (allBlocksWithRoot.get(vert) != null && allBlocksWithRoot.get(vert).size() > 0){
 							traversedPertinent = true;
-							//System.out.println(vert  + " je pertinent");
 							break;
 						}
 					}
@@ -624,7 +644,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				}
 
 
-				//System.out.println("FLIP " + flip);
 
 				Direction toSet = currentDirection;
 				if (flip){
@@ -635,14 +654,17 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				}
 
 				current.setExternalFace(last, toSet);
+				
+				if (debug)
+					log.info(current.getBoundaryVertices());
 			}
 
 
-			//System.out.println("Blok posle: " + current);
 
 			current = nextBlock;
 			if (first)
 				first = false;
+
 
 		}
 
@@ -656,11 +678,11 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 			Block newBlock = mergeBlocks(blocksToBeJoined);
 
 			newBlock.addEdge(backEdge);
-			
+
 			if (debug)
 				log.info(newBlock);
 			endpoins.remove(endpoint);
-			
+
 			//update pertinent map
 			for (E edge : backEdges){
 				Map<V, Block> pertinentForEdge = pertinentBlocksForEdge.get(edge);
@@ -669,17 +691,17 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				while (entries.hasNext()){
 					Entry<V, Block> entry = entries.next();
 					if (blocksToBeJoined.contains(entry.getValue())){
-							entries.remove();
-							replaced = true;
+						entries.remove();
+						replaced = true;
 					}
 				}
 				if (replaced)
 					pertinentForEdge.put(newBlock.getRoot(), newBlock);
 			}
-			
+
 
 		}
-		
+
 		pertinentBlocksForEdge.remove(backEdge);
 		backEdges.remove(backEdge);
 
@@ -749,6 +771,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	private Block mergeBlocks(List<Block> blocksToBeJoined){
 
 		Block result = new Block();
+		
 
 		for (Block block : blocksToBeJoined){
 
@@ -761,14 +784,23 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					result.addVertex(v, false);
 			}
 			for (V v : block.getBoundaryVertices()){
-				if (!result.getBoundaryVertices().contains(v))
+				boolean addBoundary = true;
+				for (Block otherBlock : blocksToBeJoined)
+					if (otherBlock.getVertices().contains(v) && !otherBlock.getBoundaryVertices().contains(v)){
+						addBoundary = false;
+						break;
+					}
+				if (addBoundary)
 					result.getBoundaryVertices().add(v);
+					
 			}
 
 			result.getEdges().addAll(block.getEdges());
 
 			blocks.remove(block);
 			allBlocksWithRoot.get(block.getRoot()).remove(block);
+			
+			
 		}
 
 		blocks.add(result);
@@ -786,7 +818,10 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					separatedListIterator.remove();
 			}
 		}
-		
+
+		if (debug){
+			log.info("resutl boundary " + result.getBoundaryVertices());
+		}
 		return result;
 
 	}
@@ -801,14 +836,14 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 		return ret;
 	}
-	
+
 	public List<V> getOutsideFace(){
 		List<V> ret = new ArrayList<V>();
 		for (Block b : blocks)
 			ret.addAll(b.getBoundaryVertices());
 		return ret;
 	}
-	
+
 	public List<E> getExternalFaceEdges(){
 		List<V> externalFaceVertices = getOutsideFace();
 		List<E> externalFace = new ArrayList<E>();
@@ -842,6 +877,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 
 		public void addVertex(V v, boolean boundary){
+			
 			vertices.add(v);
 			if (boundary)
 				boundaryVertices.add(v);
@@ -855,6 +891,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 
 		public void setExternalFace(V endpoint, Direction direction){
+		
 			List<V> boundaryCopy = new ArrayList<V>(boundaryVertices);
 			int indexOF = boundaryVertices.indexOf(endpoint);
 			boundaryVertices.clear();
@@ -869,7 +906,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 					boundaryVertices.add(boundaryCopy.get(i));
 			}
 		}
-		
+
 		public List<V> getVertices() {
 			return vertices;
 		}

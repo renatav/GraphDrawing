@@ -17,7 +17,7 @@ public class EdgePainter implements IElementPainter{
 	private Graph<GraphVertex, GraphEdge> graph;
 	private GeneralPath path = new GeneralPath();
 	private double selectionMaxDistance=8;
-	private BasicStroke stroke = new BasicStroke(1);
+	private BasicStroke stroke = new BasicStroke(2);
 
 	public EdgePainter(GraphEdge edge, Graph<GraphVertex, GraphEdge> graph){
 		this.edge = edge;
