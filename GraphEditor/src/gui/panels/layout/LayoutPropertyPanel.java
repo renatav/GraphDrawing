@@ -78,10 +78,12 @@ public class LayoutPropertyPanel extends JPanel	{
 			return;
 		for (Object key : componentsMap.keySet()){
 			if (properties.getProperty((PropertyEnums) key) != null)
-				if (componentsMap.get(key) instanceof JTextField)
+				if (componentsMap.get(key) instanceof JTextField){
 					((JTextField)componentsMap.get(key)).setText(properties.getProperty((PropertyEnums) key).toString());
+				}
 				else if (componentsMap.get(key) instanceof JCheckBox)
 					((JCheckBox)componentsMap.get(key)).setSelected((Boolean)properties.getProperty((PropertyEnums) key));
+				
 		}
 	}
 

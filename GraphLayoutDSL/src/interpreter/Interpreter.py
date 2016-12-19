@@ -18,13 +18,16 @@ class Interpreter():
         try:
             model = self.metamodel.model_from_str(model_str)
         except TextXSyntaxError as e:
+            print(e.message)
             return MLayoutGraph(exception = e.message)
             
         
         if model.__class__.__name__ == 'LayoutGraph':
                 layoutGraph = Interpreter.execute_one(model.layoutType, 'graph')
+                print('graph')
                 return layoutGraph
         else:
+            print('subgraphs')
             subgraphs = []
             for layoutSubgraph in model.layoutSubgraphs:
                    

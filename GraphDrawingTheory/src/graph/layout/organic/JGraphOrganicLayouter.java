@@ -10,6 +10,10 @@ import graph.layout.PropertyEnums.OrganicProperties;
 
 public class JGraphOrganicLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJGraphXLayouter<V, E>{
 
+	
+	public JGraphOrganicLayouter(){
+		this.oneGraph = false;
+	}
 	@Override
 	protected void initLayouter(GraphLayoutProperties layoutProperties) {
 		mxOrganicLayout organicLayouter = new mxOrganicLayout(jGraphXGraph);

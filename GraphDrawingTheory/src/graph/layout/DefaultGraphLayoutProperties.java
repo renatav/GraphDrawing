@@ -20,19 +20,19 @@ public class DefaultGraphLayoutProperties {
 		if (algorithm == LayoutAlgorithms.KAMADA_KAWAI){
 
 			if (graph.getVertices().size() < 4){
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 0.9);
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 0.4);
 				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 0.8);
 			}
 			else if (graph.getVertices().size() < 10){
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 1.5);
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 0.6);
 				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 3);
 			}
 			else if (graph.getVertices().size() < 20){
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 2);
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 1);
 				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 5);
 			}
 			else {
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 3);
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 1.2);
 				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 10);
 			}
 		}

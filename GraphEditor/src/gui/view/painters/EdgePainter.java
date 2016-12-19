@@ -40,9 +40,16 @@ public class EdgePainter implements IElementPainter{
 		Point2D p1 = edge.getLinkNodes().get(edge.getLinkNodes().size() - 2);
 		Point2D p2 = edge.getLinkNodes().get(edge.getLinkNodes().size() - 1);
 
-		Point2D intersection = PaintingUtil.getCircleLineIntersectionPoint(p1, p2, destination.getPosition(),
+		Point2D intersection;
+		try{
+		 intersection = PaintingUtil.getCircleLineIntersectionPoint(p1, p2, destination.getPosition(),
 				(double) destination.getSize().getWidth()/2).get(0);
 		path.lineTo(intersection.getX(), intersection.getY());
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+			intersection = new Point2D.Double(0,0);
+		}
 
 		g.setColor(edge.getColor());
 		g.draw(path);

@@ -12,6 +12,7 @@ public class JDoubleTextField extends JTextField{
 
 	public JDoubleTextField(){
 
+		super();
 		PlainDocument doc = new PlainDocument();
 		doc.setDocumentFilter(new NumberFilter());
 		setDocument(doc);
