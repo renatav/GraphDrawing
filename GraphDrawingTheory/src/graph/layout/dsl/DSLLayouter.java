@@ -8,6 +8,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.DSLException;
+import graph.layout.AestheticCriteria;
 import graph.layout.DefaultGraphLayoutProperties;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
@@ -168,7 +169,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 
 	private void positionDrawing(Drawing<V,E> drawing){
 
-		
+
 		int currentLeftmost = drawing.findLeftmostPosition();
 		int currentTop = drawing.findTop();
 
@@ -403,6 +404,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 			LayoutAlgorithms layoutAlgorithm;
 			GraphLayoutProperties layoutProperties = new GraphLayoutProperties();
 
+
 			//node distribution, node lengths, node variation
 			//minimization of edge crossings etc.
 			//can be handled by using a force-directed layout and
@@ -470,30 +472,33 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 			}
 
 
+			//check if graph is a tree
 			boolean tree = graph.isTree();
 
-			if (planar != -1){
+			boolean isPlanar = tree;
+
+			if (planar != -1 || edgeCrossings != -1){
 				//check if the graph is planar
-				//if it is, check if it is a tree
-				boolean isPlanar;
-				if (!tree){
+				if (!tree)
 					isPlanar = planarityTest.isPlannar(graph);
-					if (isPlanar)
-						edgeCrossings = 0;
-				}
 			}
 
 
-			if (planar != -1 && criteriaMaps.size() == 1 && !tree){
+			if ((planar != -1 || edgeCrossings != -1) && criteriaMaps.size() == 1){
 				try{
 					//see if a convex drawing exists
 					//TODO
 					//za sada, posto ovo nije skroz stabilno
 					//kada se on zavrsi, samo proveriti da li ima konveksni 
 					//izvrsiti samo convex test
-					ConvexDrawing<V,E> convex = new ConvexDrawing<V,E>(graph);
-					convex.execute();
-					layoutAlgorithm = LayoutAlgorithms.CONVEX;
+
+					if (!tree){
+						ConvexDrawing<V,E> convex = new ConvexDrawing<V,E>(graph);
+						convex.execute();
+						layoutAlgorithm = LayoutAlgorithms.CONVEX;
+					}
+					else
+						layoutAlgorithm = LayoutAlgorithms.COMPACT_TREE;
 
 				}
 				catch(Exception ex){
@@ -515,24 +520,26 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 				//should be used
 
 				layoutAlgorithm = LayoutAlgorithms.NODE_LINK_TREE;
-				if (uniformFlow != -1){
-					layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.NODE_LINK_TREE, graph);
-					//check if a specific direction was specified
-					//in that case an algorithm that allows this
-					//property to be set should be used
-					String orientation = (String) criteriaMaps.get(uniformFlow).get("direction");
-					if (orientation != null){
-						if (orientation.equals("right"))
-							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 0);
-						else if (orientation.equals("left"))
-							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 1);
-						else if (orientation.equals("down"))
-							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 2);
-						else if (orientation.equals("up"))
-							layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 3);
+				if (uniformFlow != -1 || symmetric != -1){
+					if (uniformFlow > symmetric){
+						layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.NODE_LINK_TREE, graph);
+						//check if a specific direction was specified
+						//in that case an algorithm that allows this
+						//property to be set should be used
+						String orientation = (String) criteriaMaps.get(uniformFlow).get("direction");
+						if (orientation != null){
+							if (orientation.equals("right"))
+								layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 0);
+							else if (orientation.equals("left"))
+								layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 1);
+							else if (orientation.equals("down"))
+								layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 2);
+							else if (orientation.equals("up"))
+								layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, 3);
+						}
 					}
 				}
-				else if (symmetric != -1){
+				else{ //symmetric > uniform flow
 					layoutAlgorithm = LayoutAlgorithms.COMPACT_TREE;
 					layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(layoutAlgorithm, graph);
 				}
@@ -542,7 +549,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 				//better algorithm when it is implemented
 				layoutAlgorithm = LayoutAlgorithms.CONCENTRIC;
 			}
-			else if (uniformFlow != -1){
+			else if (uniformFlow > nodeDistribution && uniformFlow > edgeLengths && uniformFlow > edgeVariation){
 				//hierarchical
 				layoutAlgorithm = LayoutAlgorithms.HIERARCHICAL;
 				String orientation = (String) criteriaMaps.get(uniformFlow).get("direction"); 
