@@ -48,6 +48,8 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 	private Layouter<V,E> layouter;
 	private FraysseixMendezPlanarity<V, E> planarityTest = 
 			new FraysseixMendezPlanarity<V,E>();
+	private final int bigGraphVertices = 1000;
+	private final int bigGraphEdges = 2000;
 
 	int startX = 200;
 	int startY = 200;
@@ -201,6 +203,9 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 	private Pair<LayoutAlgorithms, GraphLayoutProperties> selectLayout(List<V> vertices, List<E> edges, LayoutGraph layoutInstructions){
 
 		Graph<V,E> graph = formOneGraph(vertices, edges);
+		
+		boolean big = graph.getVertices().size() >= bigGraphVertices &&
+				graph.getEdges().size() >= bigGraphEdges;
 
 		if (layoutInstructions.getType().equals("algorithm")){
 			LayoutAlgorithms layoutAlgorithm = null;
@@ -395,8 +400,12 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 						DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.CONCENTRIC, graph)); //TODO replace with better algorithm when implemented
 			}
 			else if (style.equals("general")){
-				return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.KAMADA_KAWAI,
+				if (!big)
+					return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.KAMADA_KAWAI,
 						DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.KAMADA_KAWAI, graph));
+				else
+					return new Pair<LayoutAlgorithms, GraphLayoutProperties>(LayoutAlgorithms.ISOM,
+							DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.ISOM, graph));
 			}
 		}
 		else if (layoutInstructions.getType().equals("criteria")){
@@ -471,7 +480,6 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 				}
 			}
 
-
 			//check if graph is a tree
 			boolean tree = graph.isTree();
 
@@ -506,7 +514,10 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 					//apply Kamada-Kawai for now
 					//until other specialized planar drawing algorithms
 					//are implemented
-					layoutAlgorithm = LayoutAlgorithms.KAMADA_KAWAI;
+					if (!big)
+						layoutAlgorithm = LayoutAlgorithms.KAMADA_KAWAI;
+					else
+						layoutAlgorithm = LayoutAlgorithms.ISOM;
 				}
 			}
 			else if (tree && (nodeDistribution == -1 || uniformFlow != -1)){

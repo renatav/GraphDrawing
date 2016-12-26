@@ -45,7 +45,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 		
 		if (graph.getEdges().size() == 0) //if there are no edges, just vertices
 			ret = LayoutAlgorithms.BOX;   //for example, packages in a class diagram
-		else if (graph.getVertices().size() > 1000) //big graph, use efficient algorithm; ISOM seems to be the fastest one
+		else if (graph.getVertices().size() >= 1000) //big graph, use efficient algorithm; ISOM seems to be the fastest one
 			ret = LayoutAlgorithms.ISOM;
 		else if (graph.isRing())
 			ret = LayoutAlgorithms.CIRCLE;
