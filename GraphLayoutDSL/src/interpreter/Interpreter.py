@@ -60,9 +60,15 @@ class Interpreter():
     
     @staticmethod
     def execute_one(layout, graph):
-            layoutType = layout.howToLayout
+        
+            if layout.__class__.__name__ == "LayoutStyle":
+                layoutType = "style"
+            elif layout.__class__.__name__ == "LayoutAlgorithm":
+                layoutType = "algorithm"
+            else:
+                layoutType = "criteria"
             
-            if layoutType== 'algorithm':
+            if layoutType == 'algorithm':
                 #a map that will contain all information about the algorithm
                 algorithmProperties = {}
                 algorithm = layout.algorithm

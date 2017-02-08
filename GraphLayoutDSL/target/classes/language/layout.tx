@@ -24,7 +24,7 @@ LayoutEnum:
 ;
 
 LayoutStyle:
-	howToLayout = 'style' style = LayoutStyleEnum
+	'style' style = LayoutStyleEnum
 ;
 
 LayoutStyleEnum:
@@ -32,11 +32,11 @@ LayoutStyleEnum:
 ;
 
 AestheticCriteria:
-	howToLayout = 'criteria' aestheticCriteria += AestheticCriteion[',']
+	'criteria' aestheticCriteria += AestheticCriteion[',']
 ;
 
 LayoutAlgorithm:
-	howToLayout = 'algorithm' algorithm = LayoutAlgorithmEnum
+	'algorithm' algorithm = LayoutAlgorithmEnum
 ;
 
 AestheticCriteion:
