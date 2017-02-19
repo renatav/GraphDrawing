@@ -30,6 +30,12 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 		A wave center node is adjacent to some other node that has already been processed.
 		 */
 
+		//TODO Efikasnije ovo implementirati
+		//Mozda izbaciti graph copy i triangulated
+		//samo cuvati listu triangulated grana
+		//a kreirati novu obicnu refleksijom
+		//najnormalnije ubaciti
+		
 		GraphCopy<V,E> copyGraph = new GraphCopy<V,E>(graph.getVertices(), graph.getEdges());
 
 		List<V> waveFrontNodes = new ArrayList<V>();
@@ -41,7 +47,6 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 		List<V> nodes = new ArrayList<V>();
 		nodes.addAll(graph.getVertices());
 		Collections.sort(nodes, new VertexDegreeComparator<V,E>(graph));
-
 
 		//step two set counter to 1
 		int counter = 1;
@@ -97,13 +102,12 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 			
 			//Define a wave front node to be adjacent to the last node processed
 			//A wave center node is adjacent to some other node that has already been processed.
+			
+			//adding processed neighbours of the previous current node
+			waveCenterNodes.addAll(waveFrontNodes);
 			waveFrontNodes.clear();
 			List<V> currentAdjacent = graph.adjacentVertices(currentNode); 
 			waveFrontNodes.addAll(currentAdjacent);
-			waveCenterNodes.addAll(currentAdjacent);
-			
-			
-
 			
 			//step 7 - Visit the adjacent nodes consecutively
 			List<V> adjacentVertices = copyGraph.adjacentVerticesWithTriangulated(currentNode);
@@ -139,13 +143,12 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 			//step 10 - Update the location of currentNode’s neighbors in T
 			nodes.clear();
 			nodes.addAll(copyGraph.getVertices());
-			Collections.sort(nodes, new VertexDegreeComparator<V,E>(copyGraph));
-
-			
 
 			//step 11 - Remove currentNode and incident edges from G
 			nodes.remove(currentNode);
 			copyGraph.removeVertex(currentNode);
+			
+			Collections.sort(nodes, new VertexDegreeComparator<V,E>(copyGraph));
 
 			for (Edge<V> e : copyGraph.allAdjacentEdgesWithTriangulated(currentNode))
 				copyGraph.removeEdgeWithTriangulated(e);
@@ -167,7 +170,7 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 		
 		
 		//step 14 - Perform a DFS (or a longest path heuristic) on G (copy in this case)
-		Path<V,E> longestPath = GraphTraversal.findLongestPath(copyGraph);
+		Path<V,E> longestPath = GraphTraversal.findLongestPath(originalGraphCopy);
 		
 		List<V> embeddingOrder = longestPath.pathVertivesWithoutDuplicates();
 		//System.out.println(embeddingOrder);
