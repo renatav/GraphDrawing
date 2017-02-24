@@ -64,7 +64,7 @@ public class GraphTraversal {
 		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, excluding);
 		return paths;
 	}
-
+	
 
 	private static <V extends Vertex,E extends Edge<V>> void findAllPathsDFS(Graph<V,E> graph,  List<E> visited, List<EdgeDirection> directions, List<Path<V, E>> paths, 
 			V currentVertex, V start, V end, List<V> excluding) {        

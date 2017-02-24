@@ -44,7 +44,7 @@ public class CircleLayoutCalc<V extends Vertex> {
 		return ret;
 	}
 	
-	public List<V> organizeVerticesBySuze(List<V> vertices){
+	public List<V> organizeVerticesBySize(List<V> vertices){
 		
 		List<V> ret = new ArrayList<V>();
 		
@@ -141,15 +141,13 @@ public class CircleLayoutCalc<V extends Vertex> {
 
 			if (Math.abs(Math.cos(currentTheta) - Math.cos(previousTheta)) > 0.01) //not parallel
 				r_x = (currentV.getSize().getWidth() + previousV.getSize().getWidth() + treshold) 
-				/ (2 * (Math.max(Math.cos(currentTheta), Math.cos(previousTheta)) 
-						- Math.min(Math.cos(currentTheta), Math.cos(previousTheta))));
+				/ (2 * (Math.abs(Math.cos(currentTheta) - Math.cos(previousTheta))));
 
 			double r_y = 0;
 
 			if (Math.abs(Math.sin(currentTheta) - Math.sin(previousTheta)) > 0.01) //not parallel
 				r_y = (currentV.getSize().getHeight() + previousV.getSize().getHeight() + treshold) 
-				/ (2 * (Math.max(Math.sin(currentTheta), Math.sin(previousTheta)) 
-						- Math.min(Math.sin(currentTheta), Math.sin(previousTheta))));
+				/ (2 * (Math.abs(Math.sin(currentTheta) -  Math.sin(previousTheta))));
 
 
 			double r_current = Math.min(r_x, r_y);

@@ -19,7 +19,7 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 	private List<ExclusivePair> exclusivePairs;
 	private DFSTree<V,E> tree;
 	private Logger log = Logger.getLogger(LRPartitionSet.class);
-	private boolean debug = false;
+	private boolean debug = true;
 
 
 	public LRPartitionSet(DFSTree<V,E> tree){
@@ -111,6 +111,12 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 		}
 		
 		//System.out.println("Same size: " + same.size());
+		
+		if (debug){
+			log.info("Partitions without remaining edges");
+			printPartitions();
+		}
+		
 		addRemainingEdges();
 		if (debug)
 			log.info("organizing partitions ended");
@@ -181,6 +187,13 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 			}
 		}
 		
+		if (debug){
+			log.info("after adding back edges");
+			printPartitions();
+		}
+		
+		
+		
 		//now add tree edges
 		for (E e : tree.getTreeEdges()){
 			E highestReturningEdge = tree.getHighestReturningEdge(e);
@@ -227,6 +240,7 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 	public void printPartitions(){
 		System.out.println(same.size());
 		for (List<E> list : same){
+			System.out.println("partition");
 			for (E e : list)
 				System.out.print(e);
 		}

@@ -24,7 +24,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	private List<E> right, left;
 	private Graph<V,E> graph;
 	private Logger log = Logger.getLogger(LRPartition.class);
-	private boolean debug = false;
+	private boolean debug = true;
 
 	public LRPartition(Graph<V,E> graph){
 		right = new ArrayList<E>();
@@ -68,6 +68,8 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 		right.clear();
 		left.clear();
 
+		if (debug)
+			log.info(tree);
 
 		LRPartitionSet<V, E> partitionSet = new LRPartitionSet<V,E>(tree);
 
@@ -77,7 +79,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 		if (!partitionSet.organizePartitions())
 			return false;
 		
-		//partitionSet.printPartitions();
+		partitionSet.printPartitions();
 
 		return true;
 

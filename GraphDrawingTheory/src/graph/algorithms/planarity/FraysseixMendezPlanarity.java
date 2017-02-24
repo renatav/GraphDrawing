@@ -57,7 +57,7 @@ public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> exten
 		EdgeDirection lastDirection = cycle.getDirections().get(cycle.getDirections().size() - 1);
 		V lastVertex = lastDirection == EdgeDirection.TO_DESTINATION ? last.getDestination() : last.getOrigin();
 		cycle.getDirections().add(edge.getOrigin() == lastVertex ? EdgeDirection.TO_DESTINATION : EdgeDirection.TO_ORIGIN);
-
+		System.out.println(cycle);
 		return cycle;
 	}
 

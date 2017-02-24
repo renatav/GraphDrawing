@@ -33,7 +33,7 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 			graph.setVertices(ordering);
 		}
 		catch(Exception ex){
-			//not always possible
+			//ex.printStackTrace();
 		}
 		
 		
@@ -42,6 +42,7 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 			distance =  (Integer) layoutProperties.getProperty(CircleProperties.DISTANCE);
 		
 		CircleLayoutCalc<V> calc = new CircleLayoutCalc<V>();
+		
 		
 		double radius = calc.calculateRadius(graph.getVertices(), distance);
 
