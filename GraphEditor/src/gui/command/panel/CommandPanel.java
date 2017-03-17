@@ -508,17 +508,17 @@ public class CommandPanel extends JPanel{
 			builder.append("create graph name [true/false] \n");
 			builder.append("add vertex content graph\n");
 			builder.append("add edge {vertex1, vertex2}\n");
-			builder.append("is connected graph\n");
-			builder.append("is biconnected graph\n");
-			builder.append("is cyclic graph\n");
-			builder.append("is planar graph\n");
-			builder.append("list cut vertices graph\n");
+			builder.append("is connected\n");
+			builder.append("is biconnected\n");
+			builder.append("is cyclic\n");
+			builder.append("is planar\n");
+			builder.append("list cut vertices\n");
 			builder.append("list blocks graph\n");
 			builder.append("list split pairs graph\n");
-			builder.append("list split components {u,v} graph\n");
-			builder.append("split graph {u,v} {e1, e2} graph\n");
-			builder.append("maximal split pairs {e1, e2} graph\n");
-			builder.append("construct spqr tree {e1, e2} graph\n");
+			builder.append("list split components {u,v}\n");
+			builder.append("split graph {u,v} {e1, e2} \n");
+			builder.append("maximal split pairs {e1, e2} \n");
+			builder.append("construct spqr tree {e1, e2} \n");
 			return builder.toString();
 		}
 

@@ -374,6 +374,12 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 				if (algorithm.containsKey("numOfColumns"))
 					layoutProperties.setProperty(BoxProperties.COLUMNS, algorithm.get("numOfColumns"));
 			}
+			else if (algorithm.get("name").equals("concentric")){
+				System.out.println("symmetric");
+				layoutAlgorithm = LayoutAlgorithms.CONCENTRIC;
+			}
+			
+
 
 			//TODO  simetricni i konveksni (kada se srede)
 			return new Pair<LayoutAlgorithms, GraphLayoutProperties>(layoutAlgorithm, layoutProperties);
@@ -515,7 +521,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 					//until other specialized planar drawing algorithms
 					//are implemented
 					if (!big)
-						layoutAlgorithm = LayoutAlgorithms.KAMADA_KAWAI;
+						layoutAlgorithm = LayoutAlgorithms.ORGANIC;
 					else
 						layoutAlgorithm = LayoutAlgorithms.ISOM;
 				}
@@ -531,9 +537,9 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 				//should be used
 
 				layoutAlgorithm = LayoutAlgorithms.NODE_LINK_TREE;
+				layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.NODE_LINK_TREE, graph);
 				if (uniformFlow != -1 || symmetric != -1){
 					if (uniformFlow > symmetric){
-						layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.NODE_LINK_TREE, graph);
 						//check if a specific direction was specified
 						//in that case an algorithm that allows this
 						//property to be set should be used
@@ -550,10 +556,6 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 						}
 					}
 				}
-				else{ //symmetric > uniform flow
-					layoutAlgorithm = LayoutAlgorithms.COMPACT_TREE;
-					layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(layoutAlgorithm, graph);
-				}
 			}
 			else if (symmetric != -1 && criteriaMaps.size() == 1){
 				//TODO permutation check
@@ -563,6 +565,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 			else if (uniformFlow > nodeDistribution && uniformFlow > edgeLengths && uniformFlow > edgeVariation){
 				//hierarchical
 				layoutAlgorithm = LayoutAlgorithms.HIERARCHICAL;
+				layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(LayoutAlgorithms.HIERARCHICAL, graph);
 				String orientation = (String) criteriaMaps.get(uniformFlow).get("direction"); 
 				if (orientation != null){
 					if (orientation.equals("right"))

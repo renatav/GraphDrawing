@@ -27,9 +27,10 @@ public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 		Circular<V,E> circular = new Circular<V,E>(graph);
 		List<V> ordering = graph.getVertices();
 		if ((boolean) layoutProperties.getProperty(CircleProperties.OPTIMIZE_CROSSINGS))
+			
 		try{
 			//optimize crossings
-			ordering = circular.circularOrdering();
+		//	ordering = circular.circularOrdering();
 			graph.setVertices(ordering);
 		}
 		catch(Exception ex){

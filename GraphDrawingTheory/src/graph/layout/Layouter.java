@@ -156,7 +156,6 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		Drawing<V,E> drawing = null;
 
 		AbstractLayouter<V, E> layouter = layouterFactory.createLayouter(algorithm);
-		
 
 		if (layouter.isOneGraph()){
 			try{

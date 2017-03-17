@@ -39,7 +39,6 @@ public abstract class AbstractJungLayouter<V extends Vertex, E extends Edge<V>> 
 
 		Drawing<V, E> drawing = new Drawing<>();
 
-
 		for (V v : graph.getVertices()){
 			Point2D p = layouter.transform(v);
 			drawing.setVertexPosition(v, p);
