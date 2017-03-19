@@ -41,11 +41,15 @@ public class DefaultGraphLayoutProperties {
 		}
 		
 		else if (algorithm == LayoutAlgorithms.ORGANIC){
+			double[] params = maxWidthHeight(graph);
+			double r = Math.max(params[0], params[1]);
+			
 			properties.setProperty(OrganicProperties.IS_FINE_TUNING, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_BORDER_LINE, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_NODE_DISTRIBUTION, true);
+			properties.setProperty(OrganicProperties.EDGE_DISTANCE_FACTOR, r * 200000);
 		}
 		
 		else if (algorithm == LayoutAlgorithms.HIERARCHICAL){
