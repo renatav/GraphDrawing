@@ -1,13 +1,13 @@
 package graph.layout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import graph.drawing.Drawing;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Layouter accepts lists of veritces and edges which might in fact form more than one graph
@@ -166,9 +166,9 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
 
-
 			if (!layouter.isPositionsEdges())
 				drawing.positionEdges(edges);
+			
 			return drawing;
 		}
 
@@ -180,6 +180,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				ex.printStackTrace();
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
+				
 			int currentLeftmost = drawing.findLeftmostPosition();
 			int currentTop = drawing.findTop();
 
@@ -205,9 +206,11 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 			}
 
 			ret.getVertexMappings().putAll(drawing.getVertexMappings());
+			ret.getEdgeMappings().putAll(drawing.getEdgeMappings());
 
 			currentIndex ++;
 		}
+		
 		if (!layouter.isPositionsEdges())
 			ret.positionEdges(edges);
 		return ret;

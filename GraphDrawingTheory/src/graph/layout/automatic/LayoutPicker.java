@@ -1,16 +1,15 @@
 package graph.layout.automatic;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.LayoutAlgorithms;
 import graph.traversal.DFSTreeTraversal;
-import graph.tree.binary.BinaryTree;
 import graph.trees.DFSTree;
-
-import java.util.List;
-
-import org.apache.log4j.Logger;
 
 public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	
@@ -43,7 +42,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 		
 		log.info("Picking layout for graph: " + graph);
 		
-		if (graph.getEdges().size() == 0) //if there are no edges, just vertices
+		if (graph.getEdges().size() == 0 || graph.getVertices().size() < 3) //if there are no edges, just vertices
 			ret = LayoutAlgorithms.BOX;   //for example, packages in a class diagram
 		else if (graph.getVertices().size() >= 1000) //big graph, use efficient algorithm; ISOM seems to be the fastest one
 			ret = LayoutAlgorithms.ISOM;
@@ -64,17 +63,20 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 			List<V> leaves = graph.getTreeLeaves(null);
 			System.out.println(leaves);
 			
+			//TODO the problem with the balloon is that clusters should have different radiuses
+			//implementation of a clustered circle algorithm would fix all
 			if (leaves.size() >= balloonFactor*graph.getVertices().size())
 				ret = LayoutAlgorithms.BALLOON;
-			else{
-				//level-based approaches produce nice layouts, like we would draw the tree ourselves
-				//but they are too wide if the tree is balanced 
-				BinaryTree<V,E> binaryTree = new BinaryTree<V,E>(graph);
-				if (binaryTree.isCanBeConstructed() && binaryTree.isBalanced())
-					ret = LayoutAlgorithms.COMPACT_TREE;
-				else
-					ret = LayoutAlgorithms.NODE_LINK_TREE;
-			}
+//			else{
+//				//level-based approaches produce nice layouts, like we would draw the tree ourselves
+//				//but they are too wide if the tree is balanced 
+//				BinaryTree<V,E> binaryTree = new BinaryTree<V,E>(graph);
+//				if (binaryTree.isCanBeConstructed() && binaryTree.isBalanced())
+//					ret = LayoutAlgorithms.COMPACT_TREE; //this doesn't really help 
+			//node link tree is the best algorithm
+			else
+				ret = LayoutAlgorithms.NODE_LINK_TREE;
+			
 			
 		}
 		else if (checkHierachicalTendency(graph))
@@ -83,7 +85,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 			ret = LayoutAlgorithms.CIRCLE_CENTER;
 		}
 		else //else force-directed
-			ret =  LayoutAlgorithms.KAMADA_KAWAI;
+			ret =  LayoutAlgorithms.ORGANIC;
 		
 		log.info("Chosen algorithm: " + ret);
 		return ret;

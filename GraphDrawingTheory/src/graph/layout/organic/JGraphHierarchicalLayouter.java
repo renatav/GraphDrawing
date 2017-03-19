@@ -43,7 +43,7 @@ public class JGraphHierarchicalLayouter<V extends Vertex, E extends Edge<V>> ext
 
 			Object parentBorder = layoutProperties.getProperty(HierarchicalProperties.INTER_HIERARCHY_SPACING);
 			if (parentBorder != null)
-				hierarchicalLayouter.setParentBorder((int) parentBorder);
+				hierarchicalLayouter.setParentBorder(((Double)parentBorder).intValue());
 
 			Object interHierarchySpacing = layoutProperties.getProperty(HierarchicalProperties.PARALLEL_EDGE_SPACING);
 			if (interHierarchySpacing != null)
@@ -57,7 +57,7 @@ public class JGraphHierarchicalLayouter<V extends Vertex, E extends Edge<V>> ext
 			if (fineTuning != null)
 				hierarchicalLayouter.setFineTuning((boolean)fineTuning);
 		}
-
+		
 		layouter = hierarchicalLayouter;
 
 	}
