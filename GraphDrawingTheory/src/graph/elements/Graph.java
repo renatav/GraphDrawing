@@ -14,10 +14,9 @@ import graph.properties.GraphProperties;
  * /**
  * A graph consisting of a set of vertices of type <code>V</code>
  * and a set of edges of type <code>E</code>. 
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class Graph<V extends Vertex,E extends Edge<V>>{
 
@@ -31,8 +30,14 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 */
 	protected Map<V, List<E>> adjacentLists;
 
+	/**
+	 * Map of all edges leaving vertices
+	 */
 	protected Map<V, List<E>> outgoingEdges;
-
+	
+	/**
+	 * Map of all edges entering vertices
+	 */
 	protected Map<V, List<E>> incomingEdges;
 
 	/**

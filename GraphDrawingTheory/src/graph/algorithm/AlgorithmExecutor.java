@@ -3,9 +3,21 @@ package graph.algorithm;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Class used to generically execute any algorithm and measure how much time
+ * it takes to do so
+ * @author Renata
+ */
 public class AlgorithmExecutor {
-
-
+	
+	/**
+	 * Executes a given algorithm and returns its result and the time the execution took 
+	 * @param algorithm Instance of an algorithm class whose method should be executed
+	 * @param methodName Method that should be called
+	 * @param params Parameters of the algorithms
+	 * @return Object consisting of result of the execution of the algorithm and
+	 * length of the execution in milliseconds 
+	 */
 	public static ExecuteResult execute(Object algorithm, String methodName, Object...params){
 
 		Long duration = 0L;
@@ -50,7 +62,6 @@ public class AlgorithmExecutor {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
-
 
 		ExecuteResult executeResult = new ExecuteResult(duration, result);
 		return executeResult;

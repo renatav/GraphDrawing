@@ -8,7 +8,7 @@ public class App {
 	public static void main(String[] args) {
 
 		
-		String subgraphsExample = "lay out subgraph v 1, v 2 criteria  minimize bands, planar; subgraph v 3, v 4 style symmetric; others algorithm Kamada Kawai";
+		String subgraphsExample = "lay out graph criteria distribute nodes evenly, minimize edge crossings";
 		ILayout result = Interpreter.getInstance().execute(subgraphsExample);
 		System.out.println(result);
 	}

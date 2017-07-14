@@ -26,6 +26,13 @@ import graph.traversal.DijkstraAlgorithm;
 import graph.traversal.TraversalUtil;
 import graph.util.Util;
 
+/**
+ * Part of Chiba's convex drawing algorithm
+ * Determines if a graph has convex drawing and finds the extendable facial cycle 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
+ */
 public class PlanarConvexEmbedding<V extends Vertex, E extends Edge<V>>  {
 	
 
@@ -825,7 +832,7 @@ public class PlanarConvexEmbedding<V extends Vertex, E extends Edge<V>>  {
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	private boolean isIsExtendable(List<E> S){
+	private boolean isExtendable(List<E> S){
 
 		if (forbiddenSeparationPairs.size() > 0){
 			log.info("Has forbidden separation pairs - not extendable");

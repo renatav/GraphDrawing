@@ -14,21 +14,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
- * Concentric symmrtic drawing algorithms based on Car and Kocay's algorithm
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * Implementation of concentric symmetric drawing based on:
+ * An Algorithm for Drawing Graphs Symmetrically
+ * Hamish Carr and William Kocay
+ * Bulletin of the Institute of Combinatorics and its Applications 27, 1999
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
  */
 public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
-
+	/**
+	 * Graph to be drawn
+	 */
 	private Graph<V,E> graph;
+	/**
+	 * Instance of the nauty algorithm which will be used to find permutations
+	 */
 	private McKayGraphLabelingAlgorithm<V, E> nauty;
-
+	/**
+	 * Map of vertices and their permutation cycles
+	 */
 	private Map<V, PermutationCycle<V>> vertexCycle = new HashMap<V, PermutationCycle<V>>();
+	/**
+	 * Map containing maximum lengths for base lengths 
+	 */
 	private Map<Integer, Integer> maxLenghts;
+	
+	private boolean debug = false;
+	
+	private Logger log = Logger.getLogger(CyclicSymmetricGraphDrawing.class);
 
 	public CyclicSymmetricGraphDrawing(Graph<V,E> graph){
 		this.graph = graph;
@@ -65,7 +83,8 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 		for (PermutationCycle<V> cycle: g.getCycles()){
-			System.out.println("current cycle: " + cycle);
+			if (debug)
+				log.info("current cycle: " + cycle);
 
 			Integer baseLength = cycle.size();
 
@@ -135,16 +154,19 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 		}
 		
 		return formVerticeLists(bestFoundPaths);
-
-		
 	}
-
-
-
-
+	
+	/**
+	 * Implementation of the extend path procedure of Carr and Kocay's algorithm
+	 * @param currentCycle
+	 * @param baseCycle
+	 * @param visitedCycles
+	 * @param path
+	 * @param bestPath
+	 * @return true if path can be extended, false otherwise
+	 */
 	private boolean extendPath(PermutationCycle<V> currentCycle, PermutationCycle<V> baseCycle, 
 			List<PermutationCycle<V>> visitedCycles, List<PermutationCycle<V>> path, List<PermutationCycle<V>> bestPath){
-
 
 		path.add(currentCycle);
 
@@ -154,10 +176,11 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 			return true;
 		}
 
-		System.out.println("Current path: " + path);
+		if (debug)
+			log.info("Current path: " + path);
 
-
-		System.out.println("visiting cycle " + currentCycle);
+		if (debug)
+			log.info("visiting cycle " + currentCycle);
 
 		List<PermutationCycle<V>> linkedCycles = new ArrayList<PermutationCycle<V>>();
 
@@ -173,18 +196,17 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 			}
 		}
 
-		System.out.println("Linked cycles: " + linkedCycles);
+		if (debug)
+			log.info("Linked cycles: " + linkedCycles);
 
 		for (PermutationCycle<V> linkedCycle : linkedCycles){
 
 			if (linkedCycle.size() != baseCycle.size())
 				continue;
 
-
-
 			if (linkedCycle == baseCycle){
-				System.out.println("back to base cycle");
-
+				if (debug)
+					log.info("back to base cycle");
 
 				if (path.size() == 2) //ignore cycle of lenght 2
 					continue;
@@ -193,9 +215,9 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 				if (path.size() > bestPath.size()){
 					bestPath.clear();
 					bestPath.addAll(path);
-					System.out.println("Best path: " + bestPath);
+					if (debug)
+						log.info("Best path: " + bestPath);
 				}
-
 
 				//see if the maximal covered path was taken
 				int covered = path.size() * baseCycle.size();
@@ -210,14 +232,14 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 				if (extendPath(linkedCycle, baseCycle, visitedCycles, path, bestPath))
 					return true;
 
-				System.out.println("removing " + linkedCycle);
+				if (debug)
+					log.info("removing " + linkedCycle);
 
 				//else reset for next iteration
 				visitedCycles.remove(linkedCycle);
 				path.remove(linkedCycle);
 			}
 		}
-
 
 		return false;
 	}
@@ -234,16 +256,16 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 		}
 		
 		return ret;
-		
 	}
-
-
-
 
 	//maximize k*m
 	//k = number of cycles
 	//m = length of a cycles
 	@SuppressWarnings("unused")
+	/**
+	 * Finds best permutation if none is provided. Maximizes k*m
+	 * @return
+	 */
 	private Pair<List<List<Integer>>,Integer> findPermutation(){
 
 		List<Permutation> automorphisms = nauty.findAutomorphisms();

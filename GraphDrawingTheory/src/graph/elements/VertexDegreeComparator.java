@@ -2,6 +2,12 @@ package graph.elements;
 
 import java.util.Comparator;
 
+/**
+ * Class used for sorting vertices based on their degree
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class VertexDegreeComparator<V extends Vertex, E extends Edge<V>> implements Comparator<V>{
 
 	private Graph<V, E> graph;

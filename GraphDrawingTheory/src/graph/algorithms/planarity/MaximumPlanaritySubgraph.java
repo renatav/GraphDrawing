@@ -10,24 +10,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Finds maximum planar subgraph
  * A widely used standard heuristic for finding a maximal planar subgraph is to start with
  * a spanning tree of G, and to iteratively try to add the remaining edges one by one
  * In every step, a planarity testing algorithm is called for the obtained graph.
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class MaximumPlanaritySubgraph<V extends Vertex, E extends Edge<V>> {
 	
+	/**
+	 * Graph whose subgraph is being found
+	 */
 	private Graph<V,E> graph;
+	/**
+	 * A planarity testing algorithm
+	 */
 	private PlanarityTestingAlgorithm<V, E> planarityTest;
 	/**
-	 * 
+	 * Found planar subgraph
 	 */
 	private Graph<V,E> planarSubgraph;
 	private List<E> remainingEdges;
-	
 	
 	public MaximumPlanaritySubgraph(Graph<V,E> graph){
 		this.graph = graph;
@@ -52,7 +57,6 @@ public class MaximumPlanaritySubgraph<V extends Vertex, E extends Edge<V>> {
 		
 		return testGraph;
 	}
-
 
 	public Graph<V, E> getPlanarSubgraph() {
 		return planarSubgraph;

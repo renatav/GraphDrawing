@@ -22,11 +22,15 @@ import org.apache.log4j.Logger;
 
 
 /**
+ * Implementation of the Boyer-Myrvold planarity testing algorithm
  * The Boyer-Myrvold algorithm is a planarity testing algorithm which uses reverse DFS order as numbering
- *  of the vertices of G. The general strategy is that of explicitly maintaining a 
- *  "flexible" planar embedding of each connected component of Gi with the outer vertices on the outer face.
- *  This embedding is “flexible” in the sense that each block can be flipped in constant time,
- *  whatever its size, while the permutation of the blocks around cutvertices is left undecided. 
+ * of the vertices of G. The general strategy is that of explicitly maintaining a 
+ * "flexible" planar embedding of each connected component of Gi with the outer vertices on the outer face.
+ * This embedding is "flexible" in the sense that each block can be flipped in constant time,
+ * whatever its size, while the permutation of the blocks around cutvertices is left undecided.
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 
 public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V,E>{
@@ -34,7 +38,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 	/**Map whose key is a vertex and value is a list of all block with that vertex as root*/
 	private Map<V, List<Block>> allBlocksWithRoot = new HashMap<V, List<Block>>();
-
 
 	/**List of all blocks*/
 	private List<Block> blocks = new ArrayList<Block>();
@@ -348,8 +351,13 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 
 
-	//the purpose of the Walkup is to identify vertices and biconnected
-	//components that are pertinent due to the given back edge (v, w).
+	/**
+	 * Implementation of the Walkup procedure
+	 * The purpose of the Walkup is to identify vertices and biconnected
+	 * components that are pertinent due to the given back edge (v, w).
+	 * @param v
+	 * @param backEdge
+	 */
 	private void walkup(V v, E backEdge){
 
 		if (debug)
@@ -401,10 +409,18 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		}
 	}
 
-	/*in this phase it is determined how to embed an edge
-	  and blocks are joined
-	  it is important to keep externally active vertices
-	  on the external face*/
+	/**
+	 * Implementation of the Walkdown procedure
+	 * in this phase it is determined how to embed an edge
+	 * and blocks are joined
+	 * it is important to keep externally active vertices
+	 * on the external face
+	 * @param v
+	 * @param child
+	 * @param backEdge
+	 * @param backEdges
+	 * @return True if the procedure was successfully executed, false otherwise
+	 */
 	private boolean walkdown(V v, V child, E backEdge,  List<E> backEdges){
 
 		if (debug)
@@ -586,8 +602,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				boolean hasExternallyActive = false;
 				boolean hasOtherToBeEmbedded = false;
 				boolean hasPertiment = false;
-				
-		
 
 				if (currentDirection == Direction.CLOCKWISE){
 
@@ -643,8 +657,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 						flip = true;
 				}
 
-
-
 				Direction toSet = currentDirection;
 				if (flip){
 					if (currentDirection == Direction.CLOCKWISE)
@@ -658,18 +670,11 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				if (debug)
 					log.info(current.getBoundaryVertices());
 			}
-
-
-
 			current = nextBlock;
 			if (first)
 				first = false;
-
-
 		}
-
-
-
+		
 		//now merge blocks
 		//and set the external face of the new block properly
 		if (blocksToBeJoined.size() > 1){
@@ -725,9 +730,13 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 
 	/**
-	   A vertex w is externally active during the processing of v if w either has a least ancestor less than
-		v or if the first element in the separatedDFSChildList of w has a lowpoint less than v.
-		Checks if vertex w is externally active during the processing of v
+	 * 
+	 * A vertex w is externally active during the processing of v if w either has a least ancestor less than
+	 * v or if the first element in the separatedDFSChildList of w has a lowpoint less than v.
+	 * Checks if vertex w is externally active during the processing of v
+	 * @param v A vertex being processed
+	 * @param w A vertex whose external activity is being checked
+	 * @return True if the vertex is externally active, false otherwise
 	 */
 	private boolean externallyActive(V w, V v){
 
@@ -864,6 +873,12 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 
 
+	/**
+	 * Represents a block used during the implementation of Boyer-Myrvold algorithm
+	 * @author Renata
+	 * @param <V> The vertex type
+	 * @param <E> The edge type 
+	 */
 	public class Block{
 
 		private List<V> vertices;

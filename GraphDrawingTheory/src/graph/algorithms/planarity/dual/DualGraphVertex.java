@@ -8,15 +8,14 @@ import graph.elements.Vertex;
 
 
 /**
+ * Class represents vertices of dual graphs
  * Vertices of dual graphs are sets of faces of G, where G is a st-graph 
  * (DAG with one source and one sink)
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class DualGraphVertex<V extends Vertex, E extends Edge<V>> implements Vertex{
-	
 	
 	private List<E> content;
 	

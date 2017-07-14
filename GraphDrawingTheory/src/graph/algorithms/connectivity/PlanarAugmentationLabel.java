@@ -14,10 +14,9 @@ import graph.tree.bc.BCNodeType;
  * is called a label. If parent is a c-vertex, the label is also
  * called c-label, otherwise it is calse a b-label
  * The size of a label is the number of pendants contained by the bundle
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
  */
 public class PlanarAugmentationLabel<V extends Vertex, E extends Edge<V>> {
 

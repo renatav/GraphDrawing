@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+/**
+ * Represents DFS numbering of a given graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
+ */
 public class DFSNumbering<V extends Vertex, E extends Edge<V>> extends Numbering<V,E>{
 
 	private DFSTree<V, E> dfsTree;
@@ -46,8 +52,6 @@ public class DFSNumbering<V extends Vertex, E extends Edge<V>> extends Numbering
 				else
 					return 0;
 			}
-
-
 		});
 	}
 

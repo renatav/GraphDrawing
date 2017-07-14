@@ -22,10 +22,9 @@ import graph.trees.DFSTree;
  * This is called the st-numbering
  * This implementation is based on an algoritm by Even and Tarjan from their paper
  * titled  "Computing an st-numbering"
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
  */
 public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numbering<V,E>{
 

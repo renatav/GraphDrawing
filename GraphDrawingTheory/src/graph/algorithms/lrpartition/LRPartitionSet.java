@@ -10,12 +10,22 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Used in LR planar testing algorithm to form L and R partitions
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
+ */
 public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 
 
-	//lists of elements that should be in the same partition
+	/**
+	 *Lists of elements that should be in the same partition
+	 */
 	private List<List<E>> same;
-	//list of elements that should be in different partition
+	/**
+	 *List of elements that should be in different partition
+	 */
 	private List<ExclusivePair> exclusivePairs;
 	private DFSTree<V,E> tree;
 	private Logger log = Logger.getLogger(LRPartitionSet.class);
@@ -49,6 +59,10 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 	}
 
 
+	/**
+	 * Forms partitions
+	 * @return True if partitions can be formed, false otherwise
+	 */
 	public boolean organizePartitions(){
 		
 		if (debug)
@@ -123,7 +137,7 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 		return true;
 	}
 
-	/**join all partitions that aren't in conflict
+	/**Joins all partitions that aren't in conflict
 	 * in order to minimize their number*/
 	private void joinPartitions(){
 

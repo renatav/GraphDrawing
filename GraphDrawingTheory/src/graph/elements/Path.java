@@ -5,10 +5,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Represents a path (list of edges)
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class Path<V extends Vertex, E extends Edge<V>> {
 	
+	/**
+	 * Path, consisting of a list of edges
+	 */
 	private List<E> path = new ArrayList<E>();
+	/**
+	 * A list of edge directions. i-th member of this list determines the direction
+	 * of the i-th edge of the path
+	 */
 	private List<EdgeDirection> directions = new ArrayList<EdgeDirection>();
+	/**
+	 * Unique vertices on the path
+	 */
 	private List<V> uniqueVertices = new ArrayList<V>();
 
 	public Path(){
@@ -103,6 +119,11 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 	
+	/**
+	 * List all vertices on the path, only including one vertex once, even if
+	 * it is contained multiple times
+	 * @return A list of unique vertices
+	 */
 	public List<V> pathVertivesWithoutDuplicates(){
 		List<V> ret = new ArrayList<V>();
 		

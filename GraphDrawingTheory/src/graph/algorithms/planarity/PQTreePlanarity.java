@@ -21,18 +21,26 @@ import graph.tree.pq.PQTreeNode;
 import graph.tree.pq.PQTreeReduction;
 
 /**
- * PQ tree planarity testing based on Booth and Lueker's algorithm
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * Implementation of the PQ tree planarity testing based on Booth and Lueker's algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V, E>{
 
+	/**
+	 * A list containing vertices in st order
+	 */
 	private List<V> stOrder;
 
+	/**
+	 * Map of vertices and their st-numbers
+	 */
 	private Map<V,Integer> stNumbers;
 
+	/**
+	 * Graph whose planarity is being tested
+	 */
 	private Graph<V,E> graph;
 
 	/**
@@ -52,14 +60,24 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	 */
 	private Map<Graph<V,E>, List<E>> gPrimMap = new HashMap<Graph<V,E>, List<E>>();; 
 
+	/**
+	 * An instance of Dijskra's algorithm for finding paths between vertices of a graph
+	 * In this case, between PQ tree nodes
+	 */
 	private DijkstraAlgorithm<PQTreeNode, PQTreeEdge> dijkstra = new DijkstraAlgorithm<PQTreeNode, PQTreeEdge>();
 
 	private Logger log = Logger.getLogger(PQTreePlanarity.class);
 
+	/**
+	 * An instance of the st-numbering algorithm
+	 */
 	private	STNumbering<V, E> stNumbering;
 
 	private boolean debug = false;
 
+	/**
+	 * First and last vertices of st-numbering
+	 */
 	private V s, t;
 
 
@@ -361,8 +379,6 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				for (PQTreeNode descendant : descendants)
 					T.removeVertex(descendant);		
 
-
-
 				if (parent == null)
 					T.setRoot(newNode);
 				else{
@@ -371,7 +387,6 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 					parent.removeChild(pertRoot);
 				}
 			}
-
 		}
 
 		//embed the last node
@@ -398,8 +413,6 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 				if (upwardsEmbedding.containsKey(reversed))
 					Collections.reverse(upwardsEmbedding.get(reversed));
 		}
-
-
 
 		if (debug)
 			log.info("Upwards embedding: " + upwardsEmbedding);
@@ -457,9 +470,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 			newNode = new PQTreeNode(PQNodeType.LEAF, other);
 			newNode.setVirtualEdge(edge);
 		}
-
 		return newNode;
-
 	}
 
 	/**
@@ -476,7 +487,6 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		//trivial case
 		if (S.size() == 1)
 			return S.get(0);
-
 
 		//find path from each of the nodes of the set to the root of the tree and
 		//see where they come together
@@ -538,7 +548,6 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 			}
 	}
 
-
 	@SuppressWarnings("unchecked")
 	private void embedLast(PQTreeNode currentNode, List<E> embedding){
 		//just like regular embedding, but no need to construct S
@@ -578,7 +587,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 
 
 	/**
-	 * @param stNumbers the stNumbers to set
+	 * @param stNumbers stNumbers to set
 	 */
 	public void setStNumbers(Map<V, Integer> stNumbers) {
 		this.stNumbers = stNumbers;

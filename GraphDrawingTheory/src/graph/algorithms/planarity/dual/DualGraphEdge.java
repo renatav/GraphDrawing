@@ -4,14 +4,16 @@ import graph.elements.Edge;
 import graph.elements.Vertex;
 
 /**
- * Each edge  of dual graphs connects a face to the left of a graph's edge and the face to the right 
- * @author xx
- *
+ * Class represents edge of a dual graph
+ * Each edge  of dual graphs connects a face to the left of a graph's edge
+ * and the face to the right 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class DualGraphEdge<V extends Vertex, E extends Edge<V>> implements Edge<DualGraphVertex<V,E>>{
 
 	private DualGraphVertex<V,E> origin, destination;
-	
 	
 	public DualGraphEdge(DualGraphVertex<V, E> origin, DualGraphVertex<V, E> destination) {
 		super();
@@ -26,7 +28,6 @@ public class DualGraphEdge<V extends Vertex, E extends Edge<V>> implements Edge<
 
 	@Override
 	public DualGraphVertex<V, E> getDestination() {
-		// TODO Auto-generated method stub
 		return destination;
 	}
 
@@ -44,13 +45,11 @@ public class DualGraphEdge<V extends Vertex, E extends Edge<V>> implements Edge<
 
 	@Override
 	public int getWeight() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void setWeight(int weight) {
-		// TODO Auto-generated method stub
 		
 	}
 

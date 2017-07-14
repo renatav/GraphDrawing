@@ -8,12 +8,31 @@ import java.util.List;
 import java.util.Set;
 
 
-
+/**
+ * Used to implement LR planar testing algorithms
+ * Saves lists of edges which should be in the same and in different partitions
+ * than the given edge
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
+ */
 public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 	
+	/**
+	 * Edge for which the division is calculated
+	 */
 	private E edge;
+	/**
+	 * A list of edges that should be in the same partition as the given edge
+	 */
 	private List<E> same;
+	/**
+	A list of edges that should be in a different partition than the given edge
+	*/
 	private List<E> different;
+	/**
+	 * Detects contradiction - if an edge is in both lists
+	 */
 	private boolean valid;
 	
 	
@@ -30,7 +49,6 @@ public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 			if (e == edge)
 				continue;
 			if (different.contains(e)){
-				//System.out.println("Ne moze same " + toBeAdded);
 				valid = false;
 				return false;
 			}

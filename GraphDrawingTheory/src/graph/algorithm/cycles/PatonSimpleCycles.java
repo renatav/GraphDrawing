@@ -39,8 +39,8 @@ import java.util.Stack;
  *  Ports the implementation of the following author:
  * @author Nikolay Ognyanov
  *
- * @param <V> - the vertex type.
- * @param <E> - the edge type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
  */
 public class PatonSimpleCycles<V extends Vertex, E extends Edge<V>>{
 	

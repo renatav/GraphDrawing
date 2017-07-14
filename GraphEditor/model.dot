@@ -1,0 +1,52 @@
+
+    digraph xtext {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+65 -> 66 [label="layoutSubgraphs:0" arrowtail=diamond dir=both]
+66 -> 67 [label="subgraph" arrowtail=diamond dir=both]
+67 -> 68 [label="vertices:0" arrowtail=diamond dir=both]
+68[label="{:Vertex|+index:int=0\l+content:unicode=''\l}"]
+67 -> 69 [label="vertices:1" arrowtail=diamond dir=both]
+69[label="{:Vertex|+index:int=1\l+content:unicode=''\l}"]
+67 -> 70 [label="vertices:2" arrowtail=diamond dir=both]
+70[label="{:Vertex|+index:int=2\l+content:unicode=''\l}"]
+67 -> 71 [label="vertices:3" arrowtail=diamond dir=both]
+71[label="{:Vertex|+index:int=3\l+content:unicode=''\l}"]
+67 -> 72 [label="vertices:4" arrowtail=diamond dir=both]
+72[label="{:Vertex|+index:int=4\l+content:unicode=''\l}"]
+67 -> 73 [label="vertices:5" arrowtail=diamond dir=both]
+73[label="{:Vertex|+index:int=6\l+content:unicode=''\l}"]
+67 -> 74 [label="vertices:6" arrowtail=diamond dir=both]
+74[label="{:Vertex|+index:int=7\l+content:unicode=''\l}"]
+67 -> 75 [label="vertices:7" arrowtail=diamond dir=both]
+75[label="{:Vertex|+index:int=8\l+content:unicode=''\l}"]
+67 -> 76 [label="vertices:8" arrowtail=diamond dir=both]
+76[label="{:Vertex|+index:int=21\l+content:unicode=''\l}"]
+67 -> 77 [label="vertices:9" arrowtail=diamond dir=both]
+77[label="{:Vertex|+index:int=22\l+content:unicode=''\l}"]
+67 -> 78 [label="vertices:10" arrowtail=diamond dir=both]
+78[label="{:Vertex|+index:int=23\l+content:unicode=''\l}"]
+67 -> 79 [label="vertices:11" arrowtail=diamond dir=both]
+79[label="{:Vertex|+index:int=24\l+content:unicode=''\l}"]
+67[label="{:Subgraph|}"]
+66 -> 80 [label="layoutType" arrowtail=diamond dir=both]
+80[label="{:LayoutStyle|+style:unicode='tree'\l}"]
+66[label="{:LayoutSubraph|}"]
+65 -> 81 [label="layoutSubgraphs:1" arrowtail=diamond dir=both]
+81 -> 82 [label="layoutType" arrowtail=diamond dir=both]
+82 -> 83 [label="aestheticCriteria:0" arrowtail=diamond dir=both]
+83[label="{:MinimizeCrossings|+criterion:unicode='crossings'\l}"]
+82[label="{:AestheticCriteria|}"]
+81[label="{:LayoutSubraph|}"]
+65[label="{:LayoutSubgraphs|}"]
+
+}

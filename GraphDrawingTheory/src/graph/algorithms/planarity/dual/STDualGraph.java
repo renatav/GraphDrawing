@@ -10,24 +10,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Given a planar st-graph G, the dual planar st-graph G = (V ∗, E∗)
-is a digraph with the following properties:
-• V* is the set of faces in G with the addition that the external face (s, . . . , t, . . . , s)
-is broken into two parts s∗ representing the portion of the face from s to t and
-t∗ representing the portion from t to s.
-• For every edge e in E, we have an edge e* = (f, g) ∈ E∗
- where f is the face the left of e and g is the face to the right of e.
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * Constructs a st-dual graph
+ * Given a planar st-graph G, the dual planar st-graph G = (V, E)
+ * is a digraph with the following properties:
+ * - V* is the set of faces in G with the addition that the external face (s, . . . , t, . . . , s)
+ * is broken into two parts S* representing the portion of the face from s to t and
+ * T* representing the portion rom t to s.
+ * - For every edge e in E, we have an edge e* = (f, g)
+ * where f is the face the left of e and g is the face to the right of e.
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<DualGraphVertex<V, E>, DualGraphEdge<V, E>>{
 
+	/**
+	 * Graph whose dual graph is being constructed
+	 */
 	private Graph<V,E> graph;
+	/**
+	 * An external face
+	 */
 	private List<E> externalFace;
+	/**
+	 * Fist and last vertex of st-numbering
+	 */
 	private V s, t;
+	/**
+	 * Graph's planar faces
+	 */
 	private PlanarFaces<V,E> planarFaces;
+	/**
+	 * List representing S* and T* portions of the external face
+	 */
 	private List<E> sStar, tStar;
 
 

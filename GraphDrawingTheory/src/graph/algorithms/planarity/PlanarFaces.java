@@ -15,13 +15,13 @@ import graph.elements.Vertex;
 import graph.exception.NotPlanarException;
 
 /**
- * For each edge, there should be a right and a left face
+ * Finds planar faces of a graph. Crucial step of many graph drawing algorithms.
+ * For eac1h edge, there should be a right and a left face
  * If (v,w) is an edge, the left face is the one that contains (v,w) and
  * the right face is the one that contains (w,v)
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 
@@ -47,7 +47,6 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	private Graph<V,E> graph;
 
 	private boolean debug = false;
-
 
 	private Logger log = Logger.getLogger(PlanarFaces.class);
 
@@ -88,7 +87,6 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 		//to destination is from a vertex with lower st-number to 
 		//a vertex with higher st-number
 		//to origin is the other way around
-
 
 		Map<V,Integer> stNumbering = embedding.getStNumbering();
 		planarEmbedding = embedding.getEmbedding();

@@ -11,21 +11,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Represents a drawing of a graph.
  * A drawing Γ of a graph G = (V, E) is  a mapping of each vertex v in V to a
-distinct point Γ(v) and of each edge e = (u, v) in E to a simple open Jordan curve Γ(e),
-represented here with a list of its nodes' positions,
-which has Γ(u) and Γ(v) as its endpoints. 
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * distinct point Γ(v) and of each edge e = (u, v) in E to a simple open Jordan curve Γ(e),
+ * represented here with a list of its nodes' positions,
+ * which has Γ(u) and Γ(v) as its endpoints. 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class Drawing<V extends Vertex, E extends Edge<V>> {
 
+	/**
+	 * Maps vertices to their positions
+	 */
 	private Map<V, Point2D> vertexMappings;
+	/**
+	 * Maps edges to a list of positions of their nodes
+	 */
 	private Map<E, List<Point2D>> edgeMappings;
+	/**
+	 * How long should segments of recursive links be
+	 */
 	private int reursiveLinkDistance = 20;
-
 
 	public Drawing(){
 		vertexMappings = new HashMap<V, Point2D>();
@@ -40,6 +48,12 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 	
+	/**
+	 * Once positions of vertices are calculated, this method
+	 * set positions of edges (their nodes).
+	 * Multiple and recursive edges are handled.
+	 * @param edges
+	 */
 	public void positionEdges(List<E> edges){
 		
 		//initialize mappings
@@ -200,20 +214,33 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 	}
 
+	/**
+	 * @return Position of the topmost vertex
+	 */
 	public int findTop(){
 		V top =  findTopExcluding(null);
 		return (int) (vertexMappings.get(top).getY() - top.getSize().getHeight()/2);
 	}
-
+	/**
+	 * @return Position of the bottommost vertex
+	 */
 	public int findBottom(){
 		V bottom =  findBottomExcluding(null);
 		return (int) (vertexMappings.get(bottom).getY() + bottom.getSize().getHeight()/2);
 	}
 
+	/**
+	 * @return Finds the middle vertical point of the vertex
+	 */
 	public int findMiddle(){
 		return (findBottom() - findTop())/2;
 	}
 
+	/**
+	 * Finds the highest vertex not counting those in the excluding list
+	 * @param excluding Vertices which should be skipped
+	 * @return Position of the topmost vertex not counting those in the excluding list
+	 */
 	private V findTopExcluding(List<V> excluding){
 		V top = null;
 		for (V v : vertexMappings.keySet()){
@@ -225,7 +252,11 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		}
 		return top;
 	}
-
+	/**
+	 * Finds the lowest vertex not counting those in the excluding list
+	 * @param excluding Vertices which should be skipped
+	 * @return Position of the bottommost vertex not counting those in the excluding list
+	 */
 	private V findBottomExcluding(List<V> excluding){
 		V bottom = null;
 		for (V v : vertexMappings.keySet()){
@@ -238,11 +269,19 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		return bottom;
 	}
 
+	/**
+	 * @return Position of the leftmost vertex
+	 */
 	public int findLeftmostPosition(){
 		V leftmost = findLeftmostExcluding(null);
 		return (int) (vertexMappings.get(leftmost).getX() - leftmost.getSize().getWidth()/2);
 	}
 
+	/**
+	 * Finds the leftmost vertex not counting those in the excluding list
+	 * @param excluding Vertices which should be skipped
+	 * @return Position of the leftmost vertex not counting those in the excluding list
+	 */
 	private V findLeftmostExcluding(List<V> excluding){
 		V leftmost = null;
 		for (V v : vertexMappings.keySet()){
@@ -267,6 +306,9 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 	}
 
+	/**
+	 * @return Bounds of the drawing
+	 */
 	public int[] getBounds(){
 
 		int bounds[] = new int[2];
@@ -297,13 +339,22 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		return bounds;
 	}
 
+	/**
+	 * Moves all vertices horizontally and vertically
+	 * @param x Horizontal move length
+	 * @param y Vertical move length
+	 */
 	public void moveBy(int x, int y){
 		for (V v : vertexMappings.keySet()){
 			Point2D pos = vertexMappings.get(v);
 			pos.setLocation(pos.getX() + x, pos.getY() + y);
 		}
 	}
-	
+	/**
+	 * Moves the whole drawing horizontally and vertically
+	 * @param x Horizontal move length
+	 * @param y Vertical move length
+	 */
 	public void moveByIncludingEdges(int x, int y){
 		for (V v : vertexMappings.keySet()){
 			Point2D pos = vertexMappings.get(v);

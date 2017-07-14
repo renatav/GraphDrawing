@@ -1,5 +1,12 @@
 package graph.algorithms.drawing;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import graph.algorithms.numbering.STNumbering;
 import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.PlanarFaces;
@@ -11,20 +18,17 @@ import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.NotPlanarException;
 import graph.ordering.TopologicalOrdering;
-import jnr.ffi.Struct.ssize_t;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-/** Given a graph G = (V, E), a visibility representation Γ, for G maps 
-every  vertex  v  in V    to  a  horizontal  vertex  segment  Γ(v)  and  every  edge  (u, v)  ∈ E  to  a 
-vertical  edge segment Γ(u, v) such that each vertical edge segment Γ(u, v) has its endpoints 
-lying on the horizontal vertex segments Γ(u) and Γ(v) and no other segment intersections 
-or overlaps occur. */
+/**Finds a graph's visibility representation.
+ * Given a graph G = (V, E), a visibility representation Î“, for G maps 
+ * every  vertex  v  in V    to  a  horizontal  vertex  segment  Î“(v)  and  every  edge  (u, v)  â�� E  to  a 
+ * vertical  edge segment Î“(u, v) such that each vertical edge segment Î“(u, v) has its endpoints 
+ * lying on the horizontal vertex segments Î“(u) and Î“(v) and no other segment intersections 
+ *o r overlaps occur. 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
+ **/
 
 public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 
@@ -102,7 +106,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 		STDualGraph<V, E> stDualGraph = new STDualGraph<V,E>(stGraph, externalFace, s, t);
 		log.info("Dual graph: " + stDualGraph);
 		
-		//Compute the optimal topological ordering Tx = T (G∗)
+		//Compute the optimal topological ordering Tx = T (Gâ�—)
 		//Compute the optimal topological ordering Ty = T (G)
 		Map<DualGraphVertex<V, E>, Integer> Tx = null;
 		Map<V,Integer> Ty = null;
@@ -174,9 +178,9 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 			
 			
 			//{fl and fr are vertices in the dual graph G*}
-			//Γ(v).y = Ty(v)
-			//Γ(v).xmin = Tx(fl)
-			//Γ(v).xmax = Tx(fr) − 1
+			//Î“(v).y = Ty(v)
+			//Î“(v).xmin = Tx(fl)
+			//Î“(v).xmax = Tx(fr) â�’ 1
 			vYMap.put(v, Ty.get(v));
 			if (Ty.get(v) > yMax)
 				yMax = Ty.get(v);
@@ -205,9 +209,9 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 		vXMinMap.put(v,vXMinMap.get(stOrder.get(0)));
 		vXMaxMap.put(v, vXMaxMap.get(stOrder.get(0)));
 		
-		//for all e = (u, v) ∈ E do {Assigning positions to the vertical edge segments}
+		//for all e = (u, v) â�� E do {Assigning positions to the vertical edge segments}
 		for (E e : stGraph.getEdges()){
-			//Let fl be the face to the left of e {fl is a vertex in G∗}
+			//Let fl be the face to the left of e {fl is a vertex in Gâ�—}
 			List<E> fl = planarFaces.leftFaceOf(e);
 			if (fl.equals(stDualGraph.getExternalFace())){
 				if (stDualGraph.getsStar().contains(e))
@@ -230,9 +234,9 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 				flVertex = stDualGraph.getVertexByContent(fl);
 			
 			
-			//Γ(e).x = Tx(fl)
-			//Γ(e).ymin = Ty(u)
-			//Γ(e).ymax = Ty(v)
+			//Î“(e).x = Tx(fl)
+			//Î“(e).ymin = Ty(u)
+			//Î“(e).ymax = Ty(v)
 			eXMap.put(e, Tx.get(flVertex));
 			eYMinMap.put(e, Ty.get(e.getOrigin()));
 			eYMaxMap.put(e, Ty.get(e.getDestination()));

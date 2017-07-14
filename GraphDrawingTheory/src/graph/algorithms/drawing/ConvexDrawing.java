@@ -26,11 +26,13 @@ import graph.traversal.TraversalUtil;
 import graph.util.Util;
 
 /**
- * Convex drawing algorithms based on Chiba's work 
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * Implementation of Chiba's convex drawing algorithm
+ * Linear Algorithm for Convex Drawong of Planar Graphs
+ * Norishige Chiba, Tadashi Yamanouchi, Takao Nishizeki
+ * In Progress In Graph Theory, 1984. 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
  */
 public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
@@ -58,6 +60,10 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 
+	/**
+	 * Executes the algorithms
+	 * @return A map of vertices and their calculated positions
+	 */
 	public Map<V, Point2D> execute(){
 
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
@@ -80,6 +86,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Executes the algorithms give an outside facial cycle
+	 * @param S Outside facial cycle
+	 * @return A map of vertices and their calculated positions
+	 */
 	public Map<V, Point2D> execute(Path<V,E> S){
 
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
@@ -582,7 +593,15 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 
-
+	/**
+	 * Places given vertices as apices of a polygon inside the triangle vi,vi_1,v
+	 * @param vi
+	 * @param vi_1
+	 * @param v
+	 * @param positions
+	 * @param Si
+	 * @param vertices
+	 */
 	private void positionVerticesAsApices(V vi, V vi_1, V v, Map<V,Point2D> positions, List<E> Si, List<V> vertices){
 		//vertices should be apices of a polygon and should be placed inside the triangle whose
 		//apices are vi, vi_1 and v
@@ -778,6 +797,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
+	/**
+	 * Positions vertices belonging to Si on straight line segments
+	 * @param Si
+	 * @param positions
+	 */
 	private void positionVerticesOnStraightLineSegments(List<E> Si, Map<V,Point2D> positions){
 		//position vertices on straight line segments
 		log.info("Positioning vertices on straight line segments");
@@ -853,7 +877,11 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
-
+	/**
+	 * Randomlu selects a vertex of S*
+	 * @param Sstar
+	 * @return
+	 */
 	private V arbitraryApex(List<V> Sstar){
 		int i = rand.nextInt(Sstar.size());
 		return Sstar.get(i);

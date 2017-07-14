@@ -15,10 +15,9 @@ import org.apache.log4j.Logger;
 
 /**
  * An algorithm for checking the planarity of a graph based on Fraysseix and Mendez's algorithm
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> extends PlanarityTestingAlgorithm<V,E> {
 
@@ -41,7 +40,12 @@ public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> exten
 		return partition.createLRPartition();
 	}
 
-
+	/**
+	 * Implementation of the procedure for finding a fundamental cycle
+	 * @param tree
+	 * @param edge
+	 * @return Fundamental cycle if it exists, null otherwise
+	 */
 	public Path<V,E> findFundamentalCycle(DFSTree<V, E> tree, E edge){
 
 		if (!tree.getBackEdges().contains(edge))
@@ -57,7 +61,8 @@ public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> exten
 		EdgeDirection lastDirection = cycle.getDirections().get(cycle.getDirections().size() - 1);
 		V lastVertex = lastDirection == EdgeDirection.TO_DESTINATION ? last.getDestination() : last.getOrigin();
 		cycle.getDirections().add(edge.getOrigin() == lastVertex ? EdgeDirection.TO_DESTINATION : EdgeDirection.TO_ORIGIN);
-		System.out.println(cycle);
+		if (debug)
+			log.info("Fundamental cycle " + cycle);
 		return cycle;
 	}
 

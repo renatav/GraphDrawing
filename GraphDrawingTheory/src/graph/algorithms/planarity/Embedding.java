@@ -7,9 +7,21 @@ import java.util.Map;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
+/**
+ * Represents embedding of a graph - clockwise order of edges around each vertex
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class Embedding<V extends Vertex, E extends Edge<V>> {
 	
+	/**
+	 * Embedding - clockwise order of edges around each vertex
+	 */
 	private Map<V,List<E>> embedding = new HashMap<V, List<E>>();
+	/**
+	 * s-t numbering of a given graph
+	 */
 	private Map<V, Integer> stNumbering;
 	
 	public Embedding(Map<V, List<E>> embedding, Map<V, Integer> stNumbering) {

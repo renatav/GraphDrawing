@@ -11,6 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Finds all cycles of a graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
+ */
 public class SimpleUndirectedCyclesFinder<V extends Vertex, E extends Edge<V>> {
 
 
@@ -22,6 +28,11 @@ public class SimpleUndirectedCyclesFinder<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;	
 	}
 
+	/**
+	 * Finds all cycles of a graph. A graph can have a very large number of cycles,
+	 * and the algorithm is only effective if that is not the case. 
+	 * @return
+	 */
 	public List<List<V>> findAllCycles(){
 
 		List<List<V>> baseCycles = new PatonSimpleCycles<V,E>(graph).findSimpleCycles();

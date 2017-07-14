@@ -11,26 +11,27 @@ import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.NotPlanarException;
 
+/**
+ * Class containing methods for calculating planar embedding
+ * @author Renata
+ */
 public class PlanarEmbedding {
-
-	
 	
 	/**
 	 * Calculates a planar embedding of a graph based on the work of Chiba, Nishizeki, Abe and Ozava
-	 * @param graph
-	 * @return
+	 * A linear algorithm for embedding planar graphs using PQ-trees, Journal of Computer and System Sciences 30, 1985
+	 * @param graph Graph whose embedding should be found
+	 * @return Planar embedding if it exists
 	 * @throws CannotBeAppliedException
 	 */
 	public static <V extends Vertex, E extends Edge<V>> Embedding<V,E> emedGraph(Graph<V,E> graph, V s, V t) throws NotPlanarException{
 		Map<V,List<E>> embedding = new HashMap<V, List<E>>();
-
 		
 		PQTreePlanarity<V, E> pqPlanarity;
 		if (s != null && t != null)
 			pqPlanarity = new PQTreePlanarity<V,E>(s, t);
 		else
 			pqPlanarity = new PQTreePlanarity<V,E>();
-
 		
 		if (!pqPlanarity.isPlannar(graph))
 			throw new NotPlanarException();
@@ -79,8 +80,5 @@ public class PlanarEmbedding {
 				if (!covered.contains(v))
 					dfs(v, covered, upwardsEmbedding, embedding);
 			}
-
 	}
-
-
 }

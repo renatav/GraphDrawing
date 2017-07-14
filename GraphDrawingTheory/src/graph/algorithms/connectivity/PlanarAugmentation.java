@@ -28,6 +28,9 @@ import graph.util.Util;
  * adds a minimum number of edges to turn it into a biconnected graph
  * while not ruining the planarity
  * This implementation is based on Fialko and Mutzel's 5/3 approximation
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
  */
 public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 

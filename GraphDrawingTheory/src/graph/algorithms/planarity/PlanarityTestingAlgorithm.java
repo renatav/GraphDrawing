@@ -4,13 +4,16 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
+/**
+ * A class which should be extented by all planarity testing implementations
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public abstract class PlanarityTestingAlgorithm<V extends Vertex, E extends Edge<V>>  {
 
-
 	/**
-	 * planar graph is a graph that can be embedded in the plane, i.e., 
-	 * it can be drawn on the plane in such a way that its edges intersect only at their endpoints. 
-	 * In other words, it can be drawn in such a way that no edges cross each other.
+	 * @param graph Graph whose planarity is being checked
 	 * @return true if graph is planar, otherwise false
 	 */
 	public abstract boolean isPlannar(Graph<V,E> graph);

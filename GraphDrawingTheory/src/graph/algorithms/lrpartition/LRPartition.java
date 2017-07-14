@@ -15,8 +15,10 @@ import org.apache.log4j.Logger;
 /**
  * A partition B = L U R of DFS oriented graph's 
  * back edges into two classes, referred to as left and right, is called left-right
- * partition , or LR partition for short
- * @author xx
+ * partition, or LR partition for short
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
  */
 public class LRPartition<V extends Vertex, E extends Edge<V>> {
 

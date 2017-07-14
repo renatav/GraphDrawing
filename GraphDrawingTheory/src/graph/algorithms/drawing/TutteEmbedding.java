@@ -13,8 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementations of Tutte's (or barycentric) embedding of a simple 3-vertex-connected planar graph.
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type
+ */
 public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
-
 
 	private Graph<V,E> graph;
 
