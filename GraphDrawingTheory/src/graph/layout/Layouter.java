@@ -12,18 +12,32 @@ import graph.exception.CannotBeAppliedException;
 /**
  * Layouter accepts lists of veritces and edges which might in fact form more than one graph
  * It then forms the graphs which can later be layouted using the desired method
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 
+	/**
+	 * Edges of the graph (diagram) that is to be laid out
+	 */
 	private List<E> edges;
+	/**
+	* Vertices of the graph (diagram) that is to be laid out
+	*/
 	private List<V> vertices;
+	/**
+	 * Names the layout algorithm to be applied
+	 */
 	private LayoutAlgorithms algorithm;
+	/**
+	 * Properties of the algorithm that should be set
+	 */
 	private GraphLayoutProperties layoutProperties;
+	/**
+	 * Factory used to create an instance of the appropriate algorithm
+	 */
 	private LayouterFactory<V,E> layouterFactory;
 
 	public Layouter(){
@@ -43,6 +57,13 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Create just one graph from all vertices and edges
+	 * Even if it consists of multiple 1-connected components
+	 * @param vertices
+	 * @param edges
+	 * @return Constructed graph
+	 */
 	private Graph<V,E> formOneGraph(List<V> vertices, List<E> edges){
 		Graph<V,E> graph = new Graph<V,E>();
 
@@ -55,6 +76,12 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		return graph;
 	}
 
+	/**
+	 * Forms one graph for each 1-connected component
+	 * @param vertices
+	 * @param edges
+	 * @return A list of formed graphs
+	 */
 	private List<Graph<V,E>> formGraphs(List<V> vertices, List<E> edges){
 
 		List<Graph<V,E>> graphs = new ArrayList<Graph<V,E>>();
@@ -136,6 +163,11 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 
+	/**
+	 * Lays out the graph and returns an instance of the drawing object
+	 * @return Laid out drawing (mapping of vertices and edges to their calculated positions)
+	 * @throws CannotBeAppliedException
+	 */
 	public Drawing<V,E> layout() throws CannotBeAppliedException{
 
 		int startX = 200;

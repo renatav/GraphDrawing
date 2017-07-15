@@ -4,6 +4,10 @@ import java.awt.Dimension;
 
 import graph.elements.Vertex;
 
+/**
+ * A class which implements the Vertex interface
+ * @author Renata
+ */
 public class GraphVertex implements Vertex{
 	
 	private Dimension size;

@@ -8,9 +8,14 @@ import graph.layout.AbstractJGraphXLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
 
+/**
+ * Layouter using JGraphX's organic layout
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class JGraphOrganicLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJGraphXLayouter<V, E>{
 
-	
 	public JGraphOrganicLayouter(){
 		this.oneGraph = false;
 	}

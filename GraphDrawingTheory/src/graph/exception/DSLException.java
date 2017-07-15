@@ -1,5 +1,10 @@
 package graph.exception;
 
+/**
+ * Exception which is thrown if the supplied string is not
+ * in accordance with the dsl
+ * @author Renata
+ */
 public class DSLException extends Exception{
 
 	private static final long serialVersionUID = 1L;

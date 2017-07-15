@@ -9,7 +9,6 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
-import graph.exception.NotPlanarException;
 
 /**
  * Class containing methods for calculating planar embedding
@@ -24,7 +23,7 @@ public class PlanarEmbedding {
 	 * @return Planar embedding if it exists
 	 * @throws CannotBeAppliedException
 	 */
-	public static <V extends Vertex, E extends Edge<V>> Embedding<V,E> emedGraph(Graph<V,E> graph, V s, V t) throws NotPlanarException{
+	public static <V extends Vertex, E extends Edge<V>> Embedding<V,E> emedGraph(Graph<V,E> graph, V s, V t) throws CannotBeAppliedException{
 		Map<V,List<E>> embedding = new HashMap<V, List<E>>();
 		
 		PQTreePlanarity<V, E> pqPlanarity;
@@ -34,7 +33,7 @@ public class PlanarEmbedding {
 			pqPlanarity = new PQTreePlanarity<V,E>();
 		
 		if (!pqPlanarity.isPlannar(graph))
-			throw new NotPlanarException();
+			throw new CannotBeAppliedException("Graph is not planar.");
 		
 		//copy upwards embedding
 		Map<V, List<E>> upwardsEmbedding = pqPlanarity.getUpwardsEmbedding();

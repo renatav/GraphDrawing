@@ -12,6 +12,12 @@ import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.router.OrthogonalEdgeRouter;
 
+/**
+ * Layouter using visibility representation or orthogonally lay out a graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class VisibilityRepresentationLayout<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
 
 

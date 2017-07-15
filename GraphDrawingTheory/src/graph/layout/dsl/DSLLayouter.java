@@ -1,5 +1,11 @@
 package graph.layout.dsl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.SwingConstants;
+
 import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.drawing.Drawing;
@@ -8,7 +14,6 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.DSLException;
-import graph.layout.AestheticCriteria;
 import graph.layout.DefaultGraphLayoutProperties;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
@@ -30,25 +35,43 @@ import graph.util.Pair;
 import interfaces.ILayout;
 import interfaces.ILayoutGraph;
 import interpreter.java.Interpreter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.SwingConstants;
-
 import models.java.LayoutGraph;
 import models.java.LayoutSubgraphs;
 
+/**
+ * A layouter which lays out a given graph in accordance to the user's description
+ * which needs to conform to the defined dsl.
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 
+	/**
+	 * List of vertices to be laid out
+	 */
 	private List<V> vertices;
+	/**
+	 * List of edges to be laid out
+	 */
 	private List<E> edges;
+	/**
+	 * User's description which should conform to the dsl
+	 */
 	private String userDescription;
+	
 	private Layouter<V,E> layouter;
+	
 	private FraysseixMendezPlanarity<V, E> planarityTest = 
 			new FraysseixMendezPlanarity<V,E>();
+	
+	/**
+	 * Determines how many vertices should a graph have in order to be considered big
+	 */
 	private final int bigGraphVertices = 1000;
+	/**
+	 * Determines how many edges should a graph have in order to be considered big
+	 */
 	private final int bigGraphEdges = 2000;
 
 	int startX = 200;

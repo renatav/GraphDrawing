@@ -11,10 +11,26 @@ import graph.layout.LayoutAlgorithms;
 import graph.traversal.DFSTreeTraversal;
 import graph.trees.DFSTree;
 
+/**
+ * Class used to select an algorithm automatically based on properties
+ * of the graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	
+	/**
+	 * Used to determine if balloon layouter should be used
+	 */
 	private double balloonFactor = 0.8;
+	/**
+	 * Used to determine if hierarchical layouter should be used 
+	 */
 	private double hierarchicalFactor = 0.34;
+	/**
+	 * Used to determine if circle layouter with a vertex in center should be used
+	 */
 	private double circleCenterFactor = 0.9;
 	private Logger log = Logger.getLogger(LayoutPicker.class);
 
@@ -92,6 +108,12 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	
 	}
 	
+	/**
+	 * Methods determines if the circle layout with a vertex in center
+	 * would be suitable for the graph
+	 * @param graph
+	 * @return true if hierarchical layout is recommended, false otherwise
+	 */
 	private boolean checkCircularWithCenter(Graph<V, E> graph) {
 		//is there a vertex connected to most of the other vertices
 		//if there is, place it in the center, the others around it in a circle

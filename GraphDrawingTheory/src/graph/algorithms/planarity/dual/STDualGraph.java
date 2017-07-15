@@ -1,13 +1,13 @@
 package graph.algorithms.planarity.dual;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import graph.algorithms.planarity.PlanarFaces;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.exception.NotPlanarException;
-
-import java.util.ArrayList;
-import java.util.List;
+import graph.exception.CannotBeAppliedException;
 
 /**
  * Constructs a st-dual graph
@@ -71,7 +71,7 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 			planarFaces = new PlanarFaces<V,E>(graph);
 			try {
 				planarFaces.formFaces(s, t);
-			} catch (NotPlanarException e) {
+			} catch (CannotBeAppliedException e) {
 				e.printStackTrace();
 			}
 		}

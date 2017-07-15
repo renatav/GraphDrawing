@@ -9,6 +9,12 @@ import graph.elements.Vertex;
 import graph.layout.AbstractJungLayouter;
 import graph.layout.GraphLayoutProperties;
 
+/**
+ * Layouter using JGraphX's fast organic layout
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class JungISOMLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V,E>{
 
 	@Override

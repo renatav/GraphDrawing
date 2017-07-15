@@ -13,10 +13,20 @@ import graph.layout.PropertyEnums.PartitionProperties;
 import graph.layout.PropertyEnums.RadialTree2Properties;
 import graph.layout.PropertyEnums.StackProperties;
 
+/**
+ * Sets default properties of layout algorithms. 
+ * @author Renata
+ */
 public class DefaultGraphLayoutProperties {
 	
 	private static double spacing = 50;
 
+	/**
+	 * Sets default layout properties of the algorithm given a graph
+	 * @param algorithm
+	 * @param graph
+	 * @return Default properties of the algorithm
+	 */
 	public static GraphLayoutProperties getDefaultLayoutProperties(LayoutAlgorithms algorithm, Graph<?,?> graph){
 		GraphLayoutProperties properties = new GraphLayoutProperties();
 

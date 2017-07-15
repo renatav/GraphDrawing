@@ -8,6 +8,12 @@ import graph.layout.PropertyEnums.HierarchicalProperties;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 
+/**
+ * Layouter using JGraphX's hierarchical layout
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class JGraphHierarchicalLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJGraphXLayouter<V, E> {
 
 	public JGraphHierarchicalLayouter(){

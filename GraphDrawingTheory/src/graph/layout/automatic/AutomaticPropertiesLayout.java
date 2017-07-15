@@ -10,6 +10,13 @@ import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
 import graph.layout.LayouterFactory;
 
+/**
+ * Layouter which automatically picks and executes an algorithm
+ * based on the properties of the given graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class AutomaticPropertiesLayout<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V,E> {
 
 	protected LayoutPicker<V,E> layoutPicker;

@@ -16,7 +16,6 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.exception.CannotBeAppliedException;
-import graph.exception.NotPlanarException;
 import graph.ordering.TopologicalOrdering;
 
 /**Finds a graph's visibility representation.
@@ -98,7 +97,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 		PlanarFaces<V, E> planarFaces = new PlanarFaces<>(stGraph);
 		try {
 			planarFaces.formFaces(s, t);
-		} catch (NotPlanarException e1) {
+		} catch (CannotBeAppliedException e1) {
 			e1.printStackTrace();
 		}
 		

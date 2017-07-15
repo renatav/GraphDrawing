@@ -2,6 +2,10 @@ package graph.elements.impl;
 
 import graph.elements.Edge;
 
+/**
+ * A class which implements the Edge interface. 
+ * @author Renata
+ */
 public class GraphEdge implements Edge<GraphVertex>{
 	
 	private GraphVertex origin;

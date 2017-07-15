@@ -5,8 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class used to map aethetic criteria and algoritithms which were designed
+ * in accordance with them
+ * @author Renata
+ */
 public class LayoutAestheticMap {
 
+	/**
+	 * Map of aeshtetic criteria and a list of algorithms which were designed in
+	 * accordance to them
+	 */
 	private static Map<AestheticCriteria, List<LayoutAlgorithms>> aestheticCriteriaAlgorithms;
 	
 	static {

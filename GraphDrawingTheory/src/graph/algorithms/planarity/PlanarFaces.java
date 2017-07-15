@@ -12,7 +12,7 @@ import graph.elements.Edge;
 import graph.elements.EdgeDirection;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.exception.NotPlanarException;
+import graph.exception.CannotBeAppliedException;
 
 /**
  * Finds planar faces of a graph. Crucial step of many graph drawing algorithms.
@@ -58,7 +58,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 
-	public void formFaces(V s, V t) throws NotPlanarException{
+	public void formFaces(V s, V t) throws CannotBeAppliedException{
 		//Select some edge (v,w)
 		//go from v to w
 		//find the closest edge in A(w) to (v,w) in the clockwise direction

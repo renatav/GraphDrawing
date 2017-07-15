@@ -17,17 +17,51 @@ import prefuse.action.layout.Layout;
 import prefuse.data.Node;
 import prefuse.data.Table;
 
+/**
+ * Contains common code used for calling prefuse layout algorithms
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public abstract class AbstractPrefuseLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E> {
 
+	/**
+	 * Prefuse layouter
+	 */
 	protected Layout layouter;
+	/**
+	 * Prefuse graph
+	 */
 	protected prefuse.data.Graph prefuseGraph;
+	/**
+	 * Maps vertices of the given graph to nodes of the prefuse graph
+	 */
 	protected Map<V, Node> verticesMap = new HashMap<V, Node>();
+	/**
+	 * Maps prefuse graph nodes to their keys
+	 */
 	protected Map<Node, Integer> nodeKeyMap = new HashMap<Node, Integer>();
+	/**
+	 * Maps edges of the given graph to edges of the prefuse graph
+	 */
 	protected Map<E, prefuse.data.Edge> edgesMap = new HashMap<E, prefuse.data.Edge>();
+	/**
+	 * prefuse visualization
+	 */
 	protected Visualization vis = new Visualization();
+	/**
+	 * prefuse tables, used to create prefuse graphs
+	 */
 	protected Table nodeData, edgeData;
+	/**
+	 * Original graph
+	 */
 	protected Graph<V,E> graph;
 
+	/**
+	 * Converts the given graph into a prefuse graph
+	 * @param graph
+	 */
 	protected void createPrefuseGraph(Graph<V,E> graph){
 		// Create tables for node and edge data, and configure their columns.
 		this.graph = graph;

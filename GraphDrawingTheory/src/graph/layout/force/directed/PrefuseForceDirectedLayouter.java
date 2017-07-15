@@ -6,6 +6,12 @@ import graph.layout.AbstractPrefuseLayouter;
 import graph.layout.GraphLayoutProperties;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 
+/**
+ * Layouter using prefuse framework's force-directed layout
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class PrefuseForceDirectedLayouter<V extends Vertex, E extends Edge<V>> extends AbstractPrefuseLayouter<V, E> {
 
 	@Override

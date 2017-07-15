@@ -1,5 +1,9 @@
 package graph.layout;
 
+/**
+ * List of all implemented layout algorithms
+ * @author Renata
+ */
 public enum LayoutAlgorithms {
 
 	AUTOMATIC, ORTHOGONAL1, CONCENTRIC, CONVEX, TUTTE, KAMADA_KAWAI, FRUCHTERMAN_REINGOLD, SPRING, DAG, CIRCLE, CIRCLE_CENTER, BOX,

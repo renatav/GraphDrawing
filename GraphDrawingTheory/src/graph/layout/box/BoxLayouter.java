@@ -15,15 +15,25 @@ import java.util.List;
 /**
  * A simple layout algorithm which places elements in a table like structure
  * Suitable if the elements are not linked
- * @author xxx
- *
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class BoxLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V,E>{
 	
+	/**
+	 * Number of vertices to be placed in one row
+	 */
 	private int numberInRow = 5;
+	/**
+	 * Determine where should the drawing start, horizontally and vertically
+	 * as well as the distance between neighboring vertices
+	 */
 	private int xStart = 200, yStart = 200, xOffset = 100, yOffset = 50;
+	/**
+	 * List of vertices that are to be laid out
+	 */
 	private List<V> elementsToLayout;
-	
 
 	@Override
 	public Drawing<V,E> layout(Graph<V,E> graph, GraphLayoutProperties layoutProperties) {

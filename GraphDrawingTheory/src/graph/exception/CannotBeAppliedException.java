@@ -1,5 +1,10 @@
 package graph.exception;
 
+/**
+ * Exception which is thrown when an algorithm cannot be applied (if the algorithm
+ * wasn't designed for the graph in question) 
+ * @author Renata
+ */
 public class CannotBeAppliedException extends Exception{
 	  /**
 		 * 

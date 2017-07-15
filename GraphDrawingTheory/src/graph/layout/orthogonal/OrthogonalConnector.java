@@ -6,6 +6,11 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class represents a point where an edge begins or ends inside a vertex
+ * @author Renata
+ * @param <V> The vertex type
+ */
 public class OrthogonalConnector<V extends Vertex> {
 
 	private V vertex;
@@ -32,7 +37,6 @@ public class OrthogonalConnector<V extends Vertex> {
 	public void incNumber(){
 		number++;
 	}
-
 
 	/**
 	 * @return the vertex

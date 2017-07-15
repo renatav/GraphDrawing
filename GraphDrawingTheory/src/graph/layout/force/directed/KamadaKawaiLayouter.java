@@ -6,8 +6,13 @@ import graph.elements.Vertex;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 
+/**
+ * Layouter using JUNG framework's Kamada-Kawai layout
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class KamadaKawaiLayouter<V extends Vertex, E extends Edge<V>> extends AbstractForceDirectedLayouter<V,E> {
-
 
 	@Override
 	protected void initLayouter(GraphLayoutProperties layoutProperties) {

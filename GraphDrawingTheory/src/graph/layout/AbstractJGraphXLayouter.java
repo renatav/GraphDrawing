@@ -17,14 +17,36 @@ import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.view.mxGraph;
 
+/**
+ * Contains common code used for calling JGraphX layout algorithms
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
 
 
+	/**
+	 * JGraphX layout algorithm
+	 */
 	protected mxGraphLayout layouter;
+	/**
+	 * JGraphX graph which has to be instantiated
+	 */
 	protected mxGraph jGraphXGraph;
+	/**
+	 * Maps vertices of the supplied graph to vertices of the JGraphX graph
+	 */
 	protected Map<V, Object> verticesMap = new HashMap<V, Object>();
+	/**
+	 * Maps edges of the supplied graph to edges of the JGraphX graph
+	 */
 	protected Map<E, Object> edgesMap = new HashMap<E, Object>();
 
+	/**
+	 * Converts the given graph into a JGraphX graph
+	 * @param graph
+	 */
 	protected void createJGraphXGraph(Graph<V,E> graph){
 		jGraphXGraph = new mxGraph();
 		jGraphXGraph.getModel().beginUpdate();
@@ -56,14 +78,18 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 		}
 	}
 
-
 	public Drawing<V,E> layout(Graph<V,E> graph, GraphLayoutProperties layoutProperties){
 		createJGraphXGraph(graph);
 		initLayouter(layoutProperties);
 		return createDrawing(graph);
-
 	}
 
+	/**
+	 * Executes the layout algorithm and creates the drawing of the graph
+	 * (mappings of its vertices and edges to their positions)
+	 * @param graph
+	 * @return Drawing of the graph
+	 */
 	protected Drawing<V,E> createDrawing(Graph<V,E> graph){
 
 		Object parent = jGraphXGraph.getDefaultParent();
@@ -94,6 +120,11 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 
 		return drawing;
 	}
+	
+	/**
+	 * Initializes the appropriate algorithm (layouter)
+	 * @param layoutProperties
+	 */
 	protected abstract void initLayouter(GraphLayoutProperties layoutProperties);
 
 }

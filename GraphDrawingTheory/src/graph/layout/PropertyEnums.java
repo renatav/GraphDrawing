@@ -1,5 +1,11 @@
 package graph.layout;
 
+/**
+ * List of all properties for each implemented layout algorithm
+ * Each enum contains values used for generis implementation
+ * of the user interface
+ * @author Renata
+ */
 public interface PropertyEnums {
 
 

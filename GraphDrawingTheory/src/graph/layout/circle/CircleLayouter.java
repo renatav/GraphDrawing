@@ -14,6 +14,13 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Layotuer which embeds the vertices on a circle, with or without optimizing
+ * edge crossings (depending on the optimize crossings parameter value).
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class CircleLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
 	
 	public CircleLayouter() {
