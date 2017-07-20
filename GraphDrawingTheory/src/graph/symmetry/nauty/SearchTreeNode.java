@@ -5,11 +5,28 @@ import graph.elements.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class represents a search tree node
+ * @author Renata
+ * @param <V> The vertex type
+ */
 public class SearchTreeNode<V extends Vertex>{
 	
+	/**
+	 * Ordered partition associated with the node 
+	 */
 	private OrderedPartition<V> nodePartition;
+	/**
+	 * A list of vertices that split the node
+	 */
 	private List<V> splittingList;
+	/**
+	 * Node's parent
+	 */
 	private SearchTreeNode<V> parent;
+	/**
+	 * Node's children
+	 */
 	private List<SearchTreeNode<V>> children;
 	
 	public SearchTreeNode(OrderedPartition<V> nodePartition, V split, SearchTreeNode<V> parent){

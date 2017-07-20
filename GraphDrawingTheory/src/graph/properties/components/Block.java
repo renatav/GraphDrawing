@@ -5,11 +5,9 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 
 /**
+ * Class represent a block of a graph
  * A block is a maximal biconnected subgraph of a given graph 
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @return {@code true} if graph is connected, @{code false} otherwise
  */
 public class Block<V extends Vertex, E extends Edge<V>> extends Graph<V,E>{
 
@@ -18,6 +16,9 @@ public class Block<V extends Vertex, E extends Edge<V>> extends Graph<V,E>{
 	 */
 	private Graph<V,E> graph;
 	
+	/**
+	 * Block's cut vertex
+	 */
 	private V cutVertex;
 
 	public Block(Graph<V, E> graph) {

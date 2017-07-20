@@ -2,8 +2,19 @@ package graph.math;
 
 import java.awt.geom.Point2D;
 
+/**
+ * Class containing basic math calculations needed for implementation
+ * of various drawing algorithms
+ * @author Renata
+ */
 public class Calc {
 
+	/**
+	 * Finds a line which goes through provided two points
+	 * @param p1 The first point
+	 * @param p2 The second Point
+	 * @return Line going to {@code p1} and {@code p2}
+	 */
 	public static Line lineThroughTwoPoints(Point2D p1, Point2D p2){
 		
 		double x1 = p1.getX();
@@ -26,7 +37,13 @@ public class Calc {
 		return new Line(k,n);
 	}
 	
-	public static Line perperndicularLineIntersectingOnPoint(Line l1, Point2D p){
+	/**
+	 * Finds a line which is perpendicular to the the given line and contains it point p
+	 * @param l1 Line
+	 * @param p Point where the lines intersect
+	 * @return Perpendicular line to {@code l1} containing {@code p}
+	 */
+	public static Line perpendicularLineIntersectingOnPoint(Line l1, Point2D p){
 		
 		//k1*k2 = -1
 		
@@ -40,6 +57,12 @@ public class Calc {
 		
 	}
 	
+	/**
+	 * Finds a point where the two given lines intersect
+	 * @param l1 The first line
+	 * @param l2 The second line
+	 * @return Point where {@code l1} and {@code l2} intersect
+	 */
 	public static Point2D intersectionOfLines(Line l1, Line l2){
 		
 		double x, y;
@@ -53,8 +76,6 @@ public class Calc {
 		Double k2 = l2.getK();
 		Double n1 = l1.getN();
 		Double n2 = l2.getN();
-		
-		System.out.println("Intersection of lines: " + l1 + " " + l2);
 		
 		if (k1 != null && k2 != null){
 			x = (n2-n1)/(k1-k2);
@@ -75,6 +96,12 @@ public class Calc {
 		
 	}
 	
+	/**
+	 * Finds angle between the two given lines
+	 * @param l1 The first line
+	 * @param l2 The second line
+	 * @return Angle between {@code l1} and {@code l2}
+	 */
 	public static double[] angleBetweenTwoLines(Line l1, Line l2){
 		double[] ret = new double[2];
 		
@@ -92,6 +119,12 @@ public class Calc {
 		return ret;
 	}
 	
+	/**
+	 * Finds distance between the two provided points
+	 * @param p1 The first point
+	 * @param p2 The second point
+	 * @return Distance between {@code p1} and {@code p2}
+	 */
 	public static double distanceBetweenTwoPoints(Point2D p1, Point2D p2){
 		//d = sqrt((x2-x1)^2 + (y2-y1)^2)
 		
@@ -103,6 +136,13 @@ public class Calc {
 		return Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
 	}
 	
+	/**
+	 * Finds an angle of the triangle in its apex c, given lengths of its sides
+	 * @param a Length of triangle's side a
+	 * @param b Length of triangle's side b
+	 * @param c Length of triangle's side v
+	 * @return Angle of the triangle in its apex c
+	 */
 	public static double triangleAngle(double a, double b, double c){
 		
 		//c^2 = a^2 + b^2 -2a*b*cosC
@@ -110,6 +150,13 @@ public class Calc {
 	}
 	
 	
+	/**
+	 * Finds centroid of the given triangle, given positions of its apices
+	 * @param a The first triangle apex
+	 * @param b The second triangle apex
+	 * @param c Third triangle apex
+	 * @return Centroid of the triangle
+	 */
 	public static Point2D triangleCentroid(Point2D a, Point2D b, Point2D c){
 		
 		double x = (a.getX() + b.getX() + c.getX())/3;
@@ -117,10 +164,21 @@ public class Calc {
 		return new Point2D.Double(x,y);
 	}
 	
+	/**
+	 * Finds centroid of the triangle, given the whole triangle object
+	 * @param t Triangle
+	 * @return Centroid of {@code t}
+	 */
 	public static Point2D triangleCentroid(Triangle t){
 		return triangleCentroid(t.getA(), t.getB(), t.getC());
 	}
 	
+	/**
+	 * Finds a line parallel to the given line containing the given point
+	 * @param line1 Line to which the new line should be paralle
+	 * @param point Point the parallel line should contain
+	 * @return Line parallel to {@code line1} containing {@cod point}
+	 */
 	public static Line parallelLineThroughPoint(Line line1, Point2D point){
 		Double k = line1.getK();
 		if (k == null) //parallel to y axis
@@ -131,6 +189,12 @@ public class Calc {
 		return new Line(k,n);
 	}
 	
+	/**
+	 * Finds a point symmetric to the given point with the axis being the provided line 
+	 * @param p1 Point to which the resulting one should be symmetric
+	 * @param line Line serving as an axis of the symmetry
+	 * @return Point symmetric to {@code p1} with the axis being {@code line}
+	 */
 	public static Point2D symmetricPoint(Point2D p1, Line line){
 		
 		//(x,y)-> 1/(a^2 + b^2)(((b^2 - a^2)-4a^2b^2)(x,y)-(2ac, 2bc)
@@ -150,8 +214,6 @@ public class Calc {
 		double y = divider*(determinant * p1.getY() - 2*b*c);
 		
 		return new Point2D.Double(x,y);
-		
-		
 		
 	}
 

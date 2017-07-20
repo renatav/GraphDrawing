@@ -14,10 +14,9 @@ import java.util.Map;
 
 /**
  * Implementation of McKay's canonical graph labeling algorithm
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 
@@ -43,12 +42,15 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 
 	}
 	
+	/**
+	 * Finds automorphisms of the graph
+	 * @return A list of graph's automorphisms
+	 */
 	public List<Permutation> findAutomorphisms(){
 
 		OrderedPartition<V> pi = new OrderedPartition<V>(graph.getVertices());
 		binaryRepresenatation = new BinaryRepresentation<V,E>(graph);
 		OrderedPartition<V> refined = refinementProcedure(pi);
-		System.out.println("create search tree");
 		SearchTree<V> tree = createSearchTree(refined);
 		List<SearchTreeNode<V>> terminalNodes = tree.getTerminalNodes();
 
@@ -56,7 +58,6 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		return findAutomorphisms(terminalNodes);
 		
 	}
-
 
 	private OrderedPartition<V> refinementProcedure(OrderedPartition<V> pi){
 

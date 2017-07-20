@@ -3,9 +3,21 @@ package graph.properties.components;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
+/**
+ * Class represent a split pair of a graph.
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class SplitPair<V extends Vertex, E extends Edge<V>> {
 	
+	/**
+	 * Split pair vertices
+	 */
 	private V v, u;
+	/**
+	 * Splut pair type
+	 */
 	private int type;
 	
 

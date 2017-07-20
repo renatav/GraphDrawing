@@ -5,11 +5,17 @@ import graph.elements.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class represents a permutation in the cyclic representation
+ * @author Renata
+ * @param <V> The vertex type
+ */
 public class CyclicPermutation<V extends Vertex> {
 	
-	
+	/**
+	 * Cycles forming the permutation
+	 */
 	private List<PermutationCycle<V>> cycles;	
-	
 	
 	public CyclicPermutation(List<V> vertices, Permutation permutation){
 		

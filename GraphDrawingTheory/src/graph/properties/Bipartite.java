@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A class for checking the bipartite property of a graph
  * Bipartite graph (or bigraph) is a graph whose vertices can be divided into two disjoint sets U and V 
  *(that is, U and V are each independent sets) such that every edge connects a vertex in U to one in V.
  * Vertex set U and V are often denoted as partite sets.
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class Bipartite<V extends Vertex,E extends Edge<V>> {
 
@@ -25,11 +25,6 @@ public class Bipartite<V extends Vertex,E extends Edge<V>> {
 	private List<V> marked;
 	private boolean isBipartite;
 
-	/**
-	 * Determines whether an undirected graph is bipartite and finds either a
-	 * bipartition or an odd-length cycle.
-	 * @param Graph graph
-	 */
 	public Bipartite(Graph<V,E> graph) {
 
 		this.graph = graph;
@@ -37,6 +32,11 @@ public class Bipartite<V extends Vertex,E extends Edge<V>> {
 		marked = new ArrayList<V>();
 	}
 
+	/**
+	 * Determines whether an undirected graph is bipartite and finds either a
+	 * bipartition or an odd-length cycle.
+	 * @return {@code true} if the graph is bipartite, {@code false} otherwise
+	 */
 	public boolean isBipartite(){
 		
 		isBipartite = true;

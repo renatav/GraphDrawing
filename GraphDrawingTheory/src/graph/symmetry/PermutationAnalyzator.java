@@ -10,6 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class containing methods for analyzing permutations of a graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 
 	private List<Permutation> permutations;
@@ -20,7 +26,9 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 		permutations = nauty.findAutomorphisms();
 	}
 
-
+	/**
+	 * @return List of all reflection permutation groups
+	 */
 	public List<PermutationGroup> findReflectionGroups(){
 		List<PermutationGroup> ret = new ArrayList<PermutationGroup>();
 		for (Permutation p : permutations){
@@ -28,17 +36,23 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 			if (group != null)
 				ret.add(group);
 		}
-
 		return ret;
 
 	}
 
+	/**
+	 * @param p Permutation
+	 * @return A reflection group if {@code p} is its generator, {@code null} otherwise
+	 */
 	public PermutationGroup isReflectionGroupGenerator(Permutation p){
 		if (p.order() == 2)
 			return new PermutationGroup(p, null);
 		return null;
 	}
 
+	/**
+	 * @return List of all rotation permutation groups
+	 */
 	public List<PermutationGroup> findRotationGroups(){
 		List<PermutationGroup> ret = new ArrayList<PermutationGroup>();
 		for (Permutation p : permutations){
@@ -50,7 +64,10 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 
-
+	/**
+	 * @param p Permutation
+	 * @return A rotation group if {@code p} is its generator, {@code null} otherwise
+	 */
 	public PermutationGroup isRotationalGroupGenerator(Permutation p){
 		List<Integer> fixedPoints = p.fix();
 		//rotational permutation has one fixed point at most
@@ -78,6 +95,9 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	}
 
 
+	/**
+	 * @return List of all dihedral permutation groups
+	 */
 	public List<PermutationGroup> findDihedralGroups(){
 
 		List<PermutationGroup> ret = new ArrayList<PermutationGroup>();
@@ -92,9 +112,12 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 
 	}
 
+	/**
+	 * @param p Permutation
+	 * @return A dihedral group if {@code p} is its generator, {@code null} otherwise
+	 */
 	public PermutationGroup isDehidralGroupGenerator(Permutation p1, Permutation p2){
 		Permutation rotation, axial;
-
 
 		//one of the permutations must be a rotational permutation
 		//the other one must be axial, of order 2
@@ -130,8 +153,5 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 		return new PermutationGroup(axial, rotation);
 
 	}
-
-
-
 
 }

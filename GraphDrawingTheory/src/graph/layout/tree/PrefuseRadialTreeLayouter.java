@@ -7,6 +7,12 @@ import graph.layout.AbstractPrefuseLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.RadialTree2Properties;
 
+/**
+ * A layouter which creates a drawing of a graph using prefuse's radial tree drawing algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class PrefuseRadialTreeLayouter<V extends Vertex, E extends Edge<V>> extends AbstractPrefuseLayouter<V, E>{
 
 	@Override

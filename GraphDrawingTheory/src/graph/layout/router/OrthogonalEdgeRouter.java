@@ -11,8 +11,15 @@ import graph.elements.Vertex;
 import graph.layout.orthogonal.EntryDirection;
 import graph.layout.orthogonal.OrthogonalConnector;
 
+/**
+ * Part of the orthogonal graph drawing algorithm. Routes edges
+ * so that the number of edge breaks is minimized and there is no
+ * edge overlapping. Work in progress.
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class OrthogonalEdgeRouter<V extends Vertex, E extends Edge<V>>{
-
 	
 	private List<E> edges;
 	private Map<V, Point2D> vertexMappings;
@@ -27,6 +34,9 @@ public class OrthogonalEdgeRouter<V extends Vertex, E extends Edge<V>>{
 		this.xDistance = xDistance;
 	}
 
+	/**
+	 * @return Map of edges and positions of their nodes
+	 */
 	public Map<E, List<Point2D>> routeEdges(){
 
 		//there is also a possibility of having overlapping edges

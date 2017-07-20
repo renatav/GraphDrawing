@@ -1,5 +1,9 @@
 package graph.math;
 
+/**
+ * A line defined with k and n parameters, where y=k*x +n
+ * @author Renata
+ */
 public class Line {
 
 	private Double k;

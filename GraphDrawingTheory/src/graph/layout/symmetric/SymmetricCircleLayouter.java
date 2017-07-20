@@ -15,6 +15,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Layouter which creates a drawing of a graph using Carr and Kocay's symmetric
+ * circular algorithms 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class SymmetricCircleLayouter <V extends Vertex, E extends Edge<V>> extends SymmetricLayouter<V, E>{
 
 

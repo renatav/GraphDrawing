@@ -4,10 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Represent a permutation group and contains methods for its analysis
+ * @author Renata
+ */
 public class PermutationGroup {
 
+	/**
+	 * Permutations forming the group
+	 */
 	private List<Permutation> permutations;
 	
+	/**
+	 * Reflection and rotation permutations
+	 */
 	private Permutation reflection, rotation;
 	
 	public PermutationGroup(Permutation reflection, Permutation rotation){
@@ -40,13 +50,9 @@ public class PermutationGroup {
 		}
 	}
 	
-	
 	/**
-	 * The stabilizer of u ∈ V , denoted by stabA(u),
-	 * is the set of automorphisms in A that fix u, that is,
-	 * stabA(u) = {β ∈ A | β(u) = u}. (3.1)
-	 * @param u
-	 * @return
+	 * @param u Vertex
+	 * @return A list of all stabilizers with respect to some given {@code u}
 	 */
 	public List<Permutation> stabilizers(Integer u){
 		List<Permutation> ret = new ArrayList<Permutation>();
@@ -57,14 +63,11 @@ public class PermutationGroup {
 		}
 		
 		return ret;
-		
 	}
 	
 	/**
-	 * f Y subset of V , then
-	 * stabA(Y ) = {β ∈ A | ∀y ∈ Y, β(y) ∈ Y }.
-	 * @param Y
-	 * @return
+	 * @param Y Subset
+	 * @return A list of stabilizers with respect to a subset {@code Y}
 	 */
 	public List<Permutation> subsetStabilizers(List<Integer> Y){
 		
@@ -87,10 +90,7 @@ public class PermutationGroup {
 	
 
 	/**
-	 * The set of vertices
-	 * that are fixed elementwise by every element of A is denoted by fixA, that is,
-     * fixA = {v ∈ V | ∀ β ∈ A, β(v) = v }. (3.3
-	 * @return
+	 * @return A list of vertices fixed by the permutations
 	 */
 	public List<Integer> fix(){
 		List<Integer> ret = new ArrayList<Integer>();
@@ -111,8 +111,10 @@ public class PermutationGroup {
 		return ret;
 	}
 	
-	/**the orbit of u under A is
-	 *orbitA(u) = {β(u) | β ∈ A} */
+	/**
+	 * @param u Vertex
+	 * @return An orbit (list of vertices) of the group with respect to u
+	 */
    	public List<Integer> orbit(Integer u){
    		
    		List<Integer> ret = new ArrayList<Integer>();
@@ -122,9 +124,10 @@ public class PermutationGroup {
 	}
    	
    	/**
-   	 * Group is semiregular if no permutation which is not an identity
+   	 * Checks if the group is semi-regular
+   	 * Group is semi-regular if no permutation which is not an identity
    	 * has fixed points
-   	 * @return
+   	 * @return {@code true} if the group is semi-regular {@code false} otherwise
    	 */
    	public boolean isSemiRegular(){
    		for (Permutation p : permutations)
@@ -134,6 +137,9 @@ public class PermutationGroup {
    		return true;
    	}
    	
+   	/**
+   	 * @return Size of the permutation group
+   	 */
    	public int size(){
    		return permutations.size();
    	}

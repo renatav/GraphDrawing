@@ -1,10 +1,17 @@
 package graph.math;
 
-
-
+/**
+ * @author Renata
+ */
 public class Matrix {
 
+	/**
+	 * Contents of the matrix
+	 */
 	private double[][] content;
+	/**
+	 * Number of rows and columns
+	 */
 	private int rows, columns;
 	
 	public Matrix(int rows, int columns){

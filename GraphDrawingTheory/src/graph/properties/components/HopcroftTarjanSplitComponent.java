@@ -8,11 +8,29 @@ import java.util.Map;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
+/**
+ * A xomponent of a graph used in Hopcroft-Tarjan splitting algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> extends Component<V,E>{
 
+	/**
+	 * Type of the component
+	 */
 	private SplitTriconnectedComponentType type;
+	/**
+	 * Separation pair that lead to the creation of the component
+	 */
 	private SplitPair<V,E> spearaionPair;
+	/**
+	 * Virtual edges belonging to the component
+	 */
 	private List<E> virtualEdges;
+	/**
+	 * Vertices belonging to the component
+	 */
 	private List<V> vertices;
 	
 	public SplitTriconnectedComponentType getType() {
@@ -51,6 +69,10 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 		this.type = type;
 	}
 	
+	/**
+	 * Finds adjacency map of the component. Skips virtual edges.
+	 * @return Mapping of component's vertices to a list of edges they're adjacent to
+	 */
 	public Map<V,List<E>> adjacencyMap(){
 		Map<V,List<E>> ret = new HashMap<V,List<E>>();
 		for (E e : edges){

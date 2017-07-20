@@ -9,7 +9,12 @@ import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 
 import java.awt.geom.Point2D;
-
+/**
+ * Abstract layouter, meant to be extended by all symmetric layouters.
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public abstract class SymmetricLayouter <V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{
 
 	protected Permutation p;

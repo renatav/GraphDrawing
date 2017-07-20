@@ -5,8 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class represent a permutation in the mapping notation
+ * @author Renata
+ */
 public class Permutation {
 	
+	/**
+	 * A map representing a permutation
+	 */
 	private Map<Integer, Integer> permutation;
 	
 	public Permutation(){
@@ -17,6 +24,10 @@ public class Permutation {
 		this.permutation = permutation;
 	}
 	
+	/**
+	 * Calculates inverse permutation
+	 * @return Incerse permutation
+	 */
 	public Permutation inverse(){
 	
 		//basically, switch keys and values
@@ -26,9 +37,13 @@ public class Permutation {
 			inversePermutation.put(permutation.get(key), key);
 		
 		return new Permutation(inversePermutation);
-		
 	}
 	
+	/**
+	 * Multiplies this permutation with the provided one
+	 * @param other Permutation to multiply with
+	 * @return Calculated permutation
+	 */
 	public Permutation mul(Permutation other){
 		
 		Map<Integer, Integer> product = new HashMap<Integer, Integer>();
@@ -41,6 +56,9 @@ public class Permutation {
 		
 	}
 	
+	/**
+	 * @return Permutation's order
+	 */
 	public int order(){
 		int order = 1;
 		Permutation result = new Permutation(new HashMap<Integer,Integer>(this.getPermutation()));
@@ -53,6 +71,10 @@ public class Permutation {
 	
 	}
 	
+	/**
+	 * @return {@code true} if the permutation is an identity permutation {@code false}
+	 * otherwise
+	 */
 	public boolean isIdentityPermutation(){
 		for (Integer key : permutation.keySet())
 			if (permutation.get(key) != key)
@@ -60,6 +82,9 @@ public class Permutation {
 		return true;
 	}
 	
+	/**
+	 * @return Cyclic representation of the permutation
+	 */
 	public List<List<Integer>> cyclicRepresenatation(){
 		List<List<Integer>> ret = new ArrayList<List<Integer>>();
 		List<Integer> covered = new ArrayList<Integer>();
@@ -82,7 +107,9 @@ public class Permutation {
 		return ret;
 	}
 	
-	/**For each automorphism β we denote {u ∈ V | β(u) = u} by fixβ*/
+	/**
+	 * @return Fix of the permutation
+	 */
 	public List<Integer> fix(){
 		List<Integer> ret = new ArrayList<Integer>();
 		
@@ -94,10 +121,8 @@ public class Permutation {
 	}
 	
 	/**
-	 * If β ∈ A and u ∈ V , then the orbit of u under β, denoted by orbitβ(u), is the set of
-	 * images of u under <β>, that is, orbit β(u) = {βi(u) | 0 ≤ i < k}
 	 * @param u
-	 * @return
+	 * @return Permutation's orbit
 	 */
 	public List<Integer> orbit(Integer u){
 		List<Integer> ret = new ArrayList<Integer>();
@@ -130,7 +155,6 @@ public class Permutation {
 		return cyclicRepresenatation() + "";
 		
 	}
-	
 	
 	@Override
 	public boolean equals(Object obj) {

@@ -10,26 +10,34 @@ import graph.operations.GraphOperations;
 import graph.properties.components.SplitComponent;
 import graph.properties.components.SplitPair;
 
+/**
+ * A class containing methods regarding graph splitting, such as finding cut vertices
+ * Some methods need to be rewritten due to being slow
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 	/**
+	 * Finds a list of graph's cut vertices
 	 * A cut vertex is a vertex whose removal would disconnect the remaining graph
 	 * @param graph
-	 * @return
+	 * @return A list of cut vertices
 	 */
 	public List<V> findAllCutVertices(Graph<V,E> graph){
 		return graph.listCutVertices();
 	}
 
 
-
-
 	/**
+	 * Finds graph's split pairs
 	 * A pair {u,v} of vertices is a split pair if it is an edge in the graph
 	 * or if it is a separation pair (it increases the number of connected components)
 	 * in the graph (graph is no longer connected if it is removed)
+	 * @deprecated
 	 * @param graph
-	 * @return
+	 * @return A list of split pairs
 	 */
 	public List<SplitPair<V,E>> findAllSplitPairs(Graph<V,E> graph){
 
@@ -59,6 +67,12 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Finds all split components of a split pair
+	 * @param graph Graph
+	 * @param splitPair Split pair
+	 * @return List of all split components of a pair
+	 */
 	public List<SplitComponent<V, E>> findAllSplitComponents(Graph<V,E> graph, SplitPair<V, E> splitPair){
 
 		
@@ -70,7 +84,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 		List<E> edges =  graph.edgeesBetween(u, v);
 		
-		for (E e : edges){ //TODO sta ako stvarno ima vise izmedju, da li ovako, ili ne moze...?
+		for (E e : edges){ 
 			SplitComponent<V, E> component = new SplitComponent<>(splitPair, graph);
 			component.addVertex(v);
 			component.addVertex(u);
@@ -155,9 +169,9 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * A split graph of a split pair with respect of some edge 
 	 * is the union of all split components which don't contain that edge
-	 * @param splitComponents
-	 * @param edge
-	 * @return
+	 * @param splitComponents All split components
+	 * @param edge Edge
+	 * @return Split graph
 	 */
 	public Graph<V,E> splitGraph(List<SplitComponent<V, E>> splitComponents, E edge){
 
@@ -172,17 +186,24 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 
 	}
 
+	/** 
+	 * Finds a split graph with respect to the given split pair and edge
+	 * @param splitPair Split pair
+	 * @param edge Edge
+	 * @param graph Graph
+	 * @return Split graph
+	 */
 	public Graph<V,E> splitGraph(SplitPair<V,E> splitPair, E edge, Graph<V,E> graph){
 		return splitGraph(findAllSplitComponents(graph, splitPair), edge);
 	}
 
 	/**
+	 * Checks if one split pair is dominated by another given an edge
 	 * A split pair {u,v} is dominated by another split pair {x,y} if
-	 * 
-	 * @param dominant
-	 * @param other
-	 * @param edge
-	 * @return
+	 * @param dominanted Potentially dominated split pair
+	 * @param other Potentially dominant split pair
+	 * @param edge Edge
+	 * @return {@code true} if {@code dominated} is dominated by @{code other}  
 	 */
 	public boolean splitPairIsDominantedBy(Graph<V,E> graph, SplitPair<V,E> dominanted, SplitPair<V, E> dominant, E edge){
 		GraphOperations<V, E> operations = new GraphOperations<>();
@@ -195,11 +216,12 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
+	 * Fins a list of maximal split pair with respect to some edge
 	 * A maximal split pair with respect to some edge 
 	 * is a split pair not dominated by any other split pair with respect to that edge
 	 * There may several such pairs
 	 * @param graph
-	 * @param edge
+	 * @param edge A list of maximal split pairs
 	 * @return
 	 */
 	public List<SplitPair<V, E>> maximalSplitPairs(Graph<V,E> graph, E edge){
@@ -227,24 +249,5 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 		}
 		return ret;
 	}
-	
-	/**
-	 * A pair of vertices {x,y} of a 2-connected graph is a separation pair
-	 * if there exists two subgraphs G1' = (v1, E1') and G2' = (V2, E2')
-	 * which satisfy the following conditions
-	 * V = V1 U v2 V1 ∩ V2 = {x,y}
-	 * E = E1' U E2' E1' ∩ E2' = O |E1'| >= 2 |E2'| >= 2
-	 * @param graph
-	 * @return
-	 */
-	public List<SplitPair<V,E>> findAllSeparationPairs(Graph<V,E> graph){
-		List<SplitPair<V,E>> ret = new ArrayList<SplitPair<V,E>>();
-		
-		
-		
-		return ret;
-	}
-
-
 
 }

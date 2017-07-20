@@ -11,9 +11,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class containing methods for calculating certain values needed by
+ * the circular drawing algorithms
+ * @author Renata
+ * @param <V> The vertex type
+ */
 public class CircleLayoutCalc<V extends Vertex> {
 
 
+	/**
+	 * Calculates positions of the provided vertices so that they are apices of
+	 * of regular polygon and belonging to a circle with the provided center and radius
+	 * @param vertices Vertices whose positions need to be set
+	 * @param radius Radius of the circle
+	 * @param center Center of the circle
+	 * @return Map of vertices to their calculated positions
+	 */
 	public Map<V,Point2D> calculatePosition(List<V> vertices, double radius, Point2D center){
 
 		Map<V,Point2D> ret = new HashMap<V,Point2D>();
@@ -39,11 +53,14 @@ public class CircleLayoutCalc<V extends Vertex> {
 			ret.put(vertices.get(i), p);
 		}
 		
-		
-		
 		return ret;
 	}
 	
+	/**
+	 * Sorts the given vertices by size
+	 * @param vertices Vertices to be sorted
+	 * @return A sorted list of vertices
+	 */
 	public List<V> organizeVerticesBySize(List<V> vertices){
 		
 		List<V> ret = new ArrayList<V>();
@@ -108,6 +125,14 @@ public class CircleLayoutCalc<V extends Vertex> {
 		return ret;
 	}
 
+	/**
+	 * Calculates optimum radius of a circle on which centers of the provided vertices
+	 * should lay and where the distances between neighbouring vertices should not be
+	 * smaller than the provided value
+	 * @param vertices Vertices whose centers belong to the circle
+	 * @param treshold Distance between neighbouring vertices
+	 * @return Calculated radius
+	 */
 	public double calculateRadius(List<V> vertices,  double treshold){
 
 		double radius = 0D;
@@ -115,7 +140,6 @@ public class CircleLayoutCalc<V extends Vertex> {
 		if (vertices.size() == 2){
 			return vertices.get(0).getSize().getWidth() + vertices.get(1).getSize().getWidth() + treshold;
 		}
-		
 
 		double slice = 2 * Math.PI / vertices.size();
 		V currentV = null;
@@ -154,8 +178,6 @@ public class CircleLayoutCalc<V extends Vertex> {
 			
 			if (radius < r_current)
 				radius = r_current;
-
-
 		}
 
 		return radius;

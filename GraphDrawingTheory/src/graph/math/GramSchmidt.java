@@ -7,13 +7,13 @@ import Jama.Matrix;
  * Implementation of the GramSchmidt process
  * Given a matrix A, representing a set of base vectors
  * calculates the orthonormal basis
- * @author xx
+ * @author Renata
  *
  */
 public class GramSchmidt {
-	
 
 	/**
+	 * Calculates orthonormal basis giben a matrix
 	 * @param A Basis
 	 * @return Orthonormal basis
 	 */
@@ -46,7 +46,6 @@ public class GramSchmidt {
 			for (int i = 0; i < n; i++){
 				Q[i][j] = v[i]/R[j][j];
 			}
-			
 		}
 		
 		return new Matrix(Q);

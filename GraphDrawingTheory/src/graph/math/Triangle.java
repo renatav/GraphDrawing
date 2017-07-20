@@ -2,13 +2,36 @@ package graph.math;
 
 import java.awt.geom.Point2D;
 
+/**
+ * A triangle suited for the use inside convex drawing algorithm
+ * @author Renata
+ */
 public class Triangle {
 
+	/**
+	 * Position of the first apex
+	 */
 	private Point2D a;
+	/**
+	 * Position of the second apex
+	 */
 	private Point2D b;
+	/**
+	 * Position of the third apex
+	 */
 	private Point2D c;
+	/**
+	 * Position of the ceontroid of the triangle
+	 */
 	private Point2D centroid;
+	/**
+	 * A triangle containing this triangle (used in convex drawing)
+	 */
 	private Triangle parentTriangle;
+	/**
+	 * Indicator if the triangle should be placed before its parent
+	 * (used in convex drawing)
+	 */
 	private boolean beforeParent;
 	
 	public Triangle(Point2D a, Point2D b, Point2D c) {

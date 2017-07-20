@@ -13,6 +13,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+/**
+ * An implementation of the algorithm CIRCULAR
+ * which optimizes the number of edge crossings in circular drawings
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class Circular<V extends Vertex, E extends Edge<V>> {
 
 	private Graph<V,E> graph;
@@ -22,6 +29,11 @@ public class Circular<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 
+	/**
+	 * Finds the ordering which minimizes the number of edge crossings in a circular
+	 * drawing
+	 * @return A list of vertices in the calculated order
+	 */
 	public List<V> circularOrdering(){
 
 		log.info("Executing circular ordering");

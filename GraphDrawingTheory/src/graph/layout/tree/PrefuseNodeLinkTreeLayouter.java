@@ -7,6 +7,12 @@ import graph.layout.AbstractPrefuseLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.NodeLinkTreeProperties;
 
+/**
+ * A layouter which creates a drawing of a graph using prefuse's node link tree drawing algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class PrefuseNodeLinkTreeLayouter<V extends Vertex, E extends Edge<V>> extends AbstractPrefuseLayouter<V, E>{
 
 	@Override

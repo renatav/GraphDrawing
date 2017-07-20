@@ -1,7 +1,11 @@
 package graph.math;
 
+/**
+ * A class which provides an implementation of Cramer's rule for solving
+ * a system of equations
+ * @author Renata
+ */
 public class CramersRule {
-
 
 	private static double determinant(double A[][], int N) {
 		
@@ -33,6 +37,13 @@ public class CramersRule {
 		return res;
 	}
 
+	/**
+	 * Given left-hand side equation matrix and right-hand side vector, solves
+	 * the system of equations
+	 * @param A Right-hand side matrix
+	 * @param B Left-hand side vector
+	 * @return Array containing the solution of the system of equations
+	 */
 	public static double[] cramers(double A[][],double B[]) {
 		
 		int N = A.length;

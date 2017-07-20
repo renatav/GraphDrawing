@@ -4,7 +4,9 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.HopcroftTarjanSplitComponent;
+import graph.properties.components.SeparationPair;
 import graph.properties.components.SplitTriconnectedComponentType;
+import graph.properties.components.Triple;
 import graph.util.Util;
 
 import java.util.ArrayList;
@@ -19,9 +21,9 @@ import org.apache.log4j.Logger;
  * Implementation based on Hopcroft and Tarjan's algorithm:
  *  J. E. Hopcroft and R. E. Tarjan, Dividing a graph into triconnected components,
  * SIAM J. Comput. 2 (1973), no. 3, 135–158.
- * @author xx
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
@@ -103,28 +105,61 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	private int n;
 	private int j;
 
+	/**
+	 * Adjacency map
+	 */
 	private Map<V, List<E>> adjacency;
 
 	private Logger log = Logger.getLogger(HopcroftTarjanSplitting.class);
 
+	/**
+	 * A list of found separation pairs
+	 */
 	private List<SeparationPair<V>> separationPairs;
 
+	/**
+	 * A list of found split components
+	 */
 	private List<HopcroftTarjanSplitComponent<V, E>> splitComponents;
 
+	/**
+	 * E stack
+	 */
 	private Stack<E> estack;
 
+	/**
+	 * Triples (T) stack
+	 */
 	private Stack<Triple> tstack;
 
+	/**
+	 * A triple denoting the end of the stack
+	 */
 	private Triple endOfStackMarker;
 
+	/**
+	 * Class of the graph's edges
+	 */
 	private Class<?> edgeClass;
 
+	/**
+	 * A list of paths, populated in the paths finding phase
+	 */
 	private List<List<E>> paths = new ArrayList<List<E>>();
 
+	/**
+	 * A flag used in the paths finding phase
+	 */
 	private boolean fflag = false;
 
+	/**
+	 * A list of virtual edges
+	 */
 	private List<E> virtualEdges = new ArrayList<E>();
 
+	/**
+	 * A map of separation pairs and virtual edges created as a result of their existence
+	 */
 	private Map<SeparationPair<V>, E> separationPairVirtuelEdgeMap = new HashMap<SeparationPair<V>, E>();
 
 	private boolean debug = true;

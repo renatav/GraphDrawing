@@ -1,11 +1,26 @@
-package graph.properties.splitting;
+package graph.properties.components;
 
 import graph.elements.Vertex;
 
+/**
+ * A separation pair, used in Hopcroft-Tarjan splitting
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class SeparationPair<V extends Vertex> {
 	
+	/**
+	 * The first vertex of the par
+	 */
 	private V a;
+	/**
+	 * The second vertex of the pair
+	 */
 	private V b;
+	/**
+	 * Separation pair type (1 or 2)
+	 */
 	private int type;
 	
 	

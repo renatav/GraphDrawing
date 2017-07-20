@@ -9,6 +9,12 @@ import graph.layout.LayoutAlgorithms;
 import graph.layout.PropertyEnums.BalloonProperties;
 import prefuse.action.layout.graph.BalloonTreeLayout;
 
+/**
+ * A layouter which creates a drawing of a graph using prefuse's balloon tree drawing algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class PrefuseBalloonLayouter<V extends Vertex, E extends Edge<V>> extends AbstractPrefuseLayouter<V, E>{
 
 	@Override

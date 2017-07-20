@@ -12,9 +12,9 @@ import prefuse.visual.VisualItem;
 
 	/**
 	 * Class needed to get the positions of graph elements after a layout algorithm is performed
-	 * Prefuse uses schedulers, so this class is supposed to be instantiated in order to be scheduled
+	 * prefuse uses schedulers, so this class is supposed to be instantiated in order to be scheduled
 	 * after the layout action
-	 * @author xxx
+	 * @author Renata
 	 */
 	public class PositionAction extends Action{
 

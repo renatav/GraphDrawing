@@ -3,6 +3,11 @@ package graph.ordering.circular;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 
+/**
+ * Triangulated edge as defined in algorithm CIRCULAR
+ * @author Renata
+ * @param <V> The vertex type
+ */
 public class TriangulatedEdge<V extends Vertex> implements Edge<V> {
 
 	private V origin, destination;

@@ -4,6 +4,12 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
+/**
+ * Class represents a split component of a graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class SplitComponent<V extends Vertex, E extends Edge<V>> extends Graph<V,E>{
 	
 	/**

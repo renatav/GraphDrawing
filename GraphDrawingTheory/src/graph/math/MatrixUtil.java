@@ -2,9 +2,20 @@ package graph.math;
 
 import Jama.Matrix;
 
+/**
+ * A class containing certain methods for working with matrices
+ * @author Renata
+ *
+ */
 public class MatrixUtil {
 	
 	
+	/**
+	 * Extracts a column from a matrix
+	 * @param A Matrix
+	 * @param column Column index
+	 * @return An array represented the extracted column
+	 */
 	public static double[] getColumn(double[][] A, int column){
 		int n = A.length;
 		double[] ret = new double[n]; 
@@ -13,6 +24,10 @@ public class MatrixUtil {
 		return ret;
 	}
 	
+	/**
+	 * Prints the given matrix
+	 * @param m Matrix
+	 */
 	public static void printMatrix(Matrix m){
 		double[][] values = m.getArray();
 		for (int i = 0; i < m.getRowDimension(); i++){

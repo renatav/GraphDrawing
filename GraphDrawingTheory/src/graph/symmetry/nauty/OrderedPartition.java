@@ -5,8 +5,16 @@ import graph.elements.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Ordered partition, used in graph labeling algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ */
 public class OrderedPartition<V extends Vertex> {
 	
+	/**
+	 * The ordered partition, composed of a list of parts, which are lists of vertices
+	 */
 	private List<List<V>> partition;
 	
 	
@@ -21,7 +29,16 @@ public class OrderedPartition<V extends Vertex> {
 			partition.add(verticeList);
 	}
 	
+	public OrderedPartition(List<List<V>> partition){
+		this.partition = new ArrayList<List<V>>();
+		this.partition.addAll(partition);
+	}
 	
+	/**
+	 * Replaces one part of the partition with the given list of components
+	 * @param Vi To be replaced
+	 * @param replacements Replacements of {@code Vi}
+	 */
 	public void replace(List<V> Vi, List<List<V>> replacements){
 		int i = partition.indexOf(Vi);
 		partition.remove(i);
@@ -30,11 +47,10 @@ public class OrderedPartition<V extends Vertex> {
 		
 	}
 	
-	public OrderedPartition(List<List<V>> partition){
-		this.partition = new ArrayList<List<V>>();
-		this.partition.addAll(partition);
-	}
-	
+	/**
+	 * @param u Vertex
+	 * @return A part which contains {@code u}
+	 */
 	public List<V> partContainingVertex(V u){
 		for (List<V> part : partition)
 			if (part.contains(u))
@@ -42,6 +58,9 @@ public class OrderedPartition<V extends Vertex> {
 		return null;
 	}
 	
+	/**
+	 * @return The first nontrivial part of the ordered partition
+	 */
 	public List<V> getFirstNontrivialPart(){
 		for (List<V> part : partition)
 			if (part.size() > 1)

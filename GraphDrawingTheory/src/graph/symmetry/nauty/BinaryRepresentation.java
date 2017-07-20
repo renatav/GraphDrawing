@@ -6,6 +6,12 @@ import graph.elements.Vertex;
 
 import java.util.List;
 
+/**
+ * Binary representation of a graph, used in graph labeling algorithm 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class BinaryRepresentation<V extends Vertex, E extends Edge<V>> {
 
 	private Graph<V,E> graph;
@@ -13,7 +19,6 @@ public class BinaryRepresentation<V extends Vertex, E extends Edge<V>> {
 	public BinaryRepresentation(Graph<V,E> graph){
 		this.graph = graph;
 	}
-	
 	
 	public String binaryRepresenatation(List<V> verticeList){
 		String representation = "";

@@ -14,13 +14,18 @@ import graph.util.Util;
 /**
  * A topological ordering T(G) is an assignment of integer values T(v) to each
  * vertex v in V such that for every directed edge (u,v) in E T(u)<T(v) 
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class TopologicalOrdering {
 
-
+	/**
+	 * Finds topological ordering
+	 * @param graph Graph
+	 * @return A map of vertex to integer values - topological ordering of graph {@code graph}
+	 * @throws CannotBeAppliedException if graph doesn't have a topological ordering
+	 */
 	public static <V extends Vertex,E extends Edge<V>>  Map<V,Integer> calculateOrdering(Graph<V,E> graph) throws CannotBeAppliedException{
 		
 		if (!graph.isDirected() || graph.isCyclic())
@@ -34,8 +39,6 @@ public class TopologicalOrdering {
 		 List<E> outEdges;
 		 int n = 0;
 		 do{
-			 
-			 System.out.println("Current sources: " + sourceVertices );
 			 
 			 nextSourceVertices.clear();
 			 for (V v : sourceVertices){

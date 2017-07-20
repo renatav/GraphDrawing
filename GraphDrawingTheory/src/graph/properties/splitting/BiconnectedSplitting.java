@@ -14,8 +14,9 @@ import java.util.Stack;
  * Since the components should have the same features as block
  * Like removal of vertex which also removed the edge, being able to find its cut vertices etc. 
  * There is no specific class to represent the component, it is also a graph
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 
@@ -31,6 +32,9 @@ public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 	
+	/**
+	 * @return A list of all biconnected components
+	 */
 	public List<Graph<V,E>> findBiconnectedComponents(){
 
 		//initialization

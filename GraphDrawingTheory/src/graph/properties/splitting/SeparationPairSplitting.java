@@ -13,6 +13,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+/**
+ * An implementation of Hopcroft-Tarjan's algorithm for finding separation pairs
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 	/**
@@ -90,19 +96,40 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	private int m;
 
 	private int n;
+	
 	private DFSTree<V,E> tree;
 
+	/**
+	 * A map of lowpt1 values and lists of vertices having that value
+	 */
 	private Map<Integer, List<V>> lowpt1sMap = new HashMap<Integer, List<V>>();
 
+	/**
+	 * A list of separation pairs
+	 */
 	private List<SplitPair<V,E>> separationPairs;
 
+	/**
+	 * A map of vertices and all split pairs containing it 
+	 */
 	private Map<V, List<SplitPair<V,E>>> separationPairStartVertices, separationPairEndVertices;
 
+	/**
+	 * Adjacency map
+	 */
 	private Map<V, List<E>> adjacency;
 
 	private Logger log = Logger.getLogger(SeparationPairSplitting.class);
+	
+	boolean debug = false;
 
 
+	/**
+	 * Finds all separation pairs of the given graph
+	 * @param graph Graph
+	 * @return A list of separation pairs of graph {@code graph}
+	 * @throws AlgorithmErrorException
+	 */
 	public List<SplitPair<V, E>> findSeaparationPairs(Graph<V,E> graph) throws AlgorithmErrorException{
 
 		//step one: perform a depth-first search on the multigraph converting in
@@ -137,18 +164,17 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			adjacency.put(v, new ArrayList<E>(graph.adjacentEdges(v)));
 		}
 
-
-
 		//the search starts at vertex s
 		V root = graph.getVertices().get(0);
 		dfs(root,null);
 
-		log.info("first dfs traversal finished");
+		if (debug)
+			log.info("first dfs traversal finished");
 		tree = new DFSTree<V,E>(root, number, treeEdges, fronds, vertices);
+		
 		//System.out.println(tree);
 
 		constructAdjacencyLists(adjacency);
-
 
 		s = null;
 		m = size;
@@ -158,18 +184,19 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		List<List<E>> paths = new ArrayList<List<E>>();
 		pathfiner(root,paths, null);
 
-		log.info("second dfs completed");
-
-		System.out.println("CHECKING ADJACENCY: " + checkAdjacencyValidity(adjacency, newnum, treeEdges));
+		if (debug){
+			log.info("second dfs completed");
+			log.info("CHECKING ADJACENCY: " + checkAdjacencyValidity(adjacency, newnum, treeEdges));
+		}
 
 		if (!checkAdjacencyValidity(adjacency, newnum, treeEdges))
 			throw new AlgorithmErrorException("Error: adjacency structure not valid");
 
 		tree = new DFSTree<V,E>(root, newnum, treeEdges, fronds, vertices);
-		System.out.println(tree.toString());
-
-		log.info("setting lowpts, inverse numbering etc.");
-
+		if (debug){
+			log.info(tree.toString());
+			log.info("setting lowpts, inverse numbering etc.");
+		}
 
 
 		for (V v : vertices){
@@ -350,7 +377,8 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 
 					}
 					if (satisfiedAll){
-						log.info("type 2 separation pair "+ aVert + " " + bVert);
+						if (debug)
+							log.info("type 2 separation pair "+ aVert + " " + bVert);
 						addSeparationPair(aVert, bVert, 2);
 					}
 
@@ -426,8 +454,6 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 				flag[vIndex] = false;
 		}
 	}
-
-
 
 
 	/**

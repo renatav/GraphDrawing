@@ -1,5 +1,11 @@
-package graph.properties.splitting;
+package graph.properties.components;
 
+/**
+ * A triple as defined by Hopcroft and Tarjan and used in their triconnected splitting algorithms
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class Triple {
 	
 	private int h;

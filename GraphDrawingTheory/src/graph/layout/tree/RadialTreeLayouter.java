@@ -10,6 +10,12 @@ import graph.layout.AbstractJungLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
 
+/**
+ * A layouter which creates a drawing of a graph using JUNG framework's radial tree drawing algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class RadialTreeLayouter<V extends Vertex, E extends Edge<V>> extends AbstractJungLayouter<V, E>{
 	
 	@Override

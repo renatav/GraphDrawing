@@ -11,6 +11,12 @@ import graph.layout.GraphLayoutProperties;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
+/**
+ * A layouter which creates a drawing of a graph using Chiba's convex drawing algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class ConvexLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E> {
 
 	@Override
@@ -23,7 +29,6 @@ public class ConvexLayouter<V extends Vertex, E extends Edge<V>> extends Abstrac
 
 		Map<V, Point2D> vertexPositions;
 		vertexPositions = convexDrawing.execute();
-		System.out.println(vertexPositions);
 		drawing.getVertexMappings().putAll(vertexPositions);
 
 		return drawing;

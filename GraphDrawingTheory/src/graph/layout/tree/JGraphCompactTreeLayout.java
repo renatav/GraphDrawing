@@ -8,6 +8,12 @@ import graph.layout.AbstractJGraphXLayouter;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.CompactTreeProperties;
 
+/**
+ * A layouter which creates a drawing of a graph using JGraphX's compact tree algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class JGraphCompactTreeLayout<V extends Vertex, E extends Edge<V>> extends AbstractJGraphXLayouter<V, E> {
 
 	public JGraphCompactTreeLayout(){

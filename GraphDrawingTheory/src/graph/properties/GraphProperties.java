@@ -14,18 +14,27 @@ import graph.traversal.DFSTreeTraversal;
 import graph.traversal.DijkstraAlgorithm;
 import graph.trees.DFSTree;
 
+/**
+ * A class containing methods for checking various properties
+ * of the given graph 
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 
+	/**
+	 * Graph which is being analyzed
+	 */
 	private Graph<V,E> graph;
 
 	public GraphProperties(Graph<V,E> graph){
 		this.graph = graph;
 	}
-
 	
 	/**
 	 * Checks is graph is connected
-	 * @return
+	 * @return @{code true} if the graph is connected @{false}
 	 */
 	public boolean isConnected(){
 		
@@ -42,8 +51,10 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		
 	}
 
-	
-
+	/**
+	 * Finds all cut vertices of a graph
+	 * @return A list containing all cut vertices
+	 */
 	public List<V> getCutVertices(){
 		List<V> ret = new ArrayList<V>();
 		int size = graph.getVertices().size();
@@ -64,6 +75,9 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 
+	/**
+	 * @return {@code true} if graph is biconnected, @{code false} otherwisse
+	 */
 	public boolean isBiconnected(){
 		return getCutVertices().size() == 0;
 	}
@@ -97,6 +111,9 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 
 	}
 	
+	/**
+	 * @return A list of graph's eigen values
+	 */
 	public List<Double> getEigenValues(){
 		int[][] adjacencyMatrix = graph.adjacencyMatrix();
 		double[][] values = new double[graph.getVertices().size()][graph.getVertices().size()];
@@ -116,7 +133,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	
 	/**
 	 * Checks is graph is connected
-	 * @return
+	 * @return {@code true} if graph is connected, @{code false} otherwise
 	 */
 	public boolean isConnected(List<V> excluding){
 		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>(graph);
@@ -135,6 +152,9 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return true;
 	}
 
+	/**
+	 * @return {@code true} if graph is cyclic, @{code false} otherwise
+	 */
 	public boolean isCyclic(){
 
 		//if graph is not directed
@@ -155,7 +175,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	
 	/**
 	 * Checks if the graph is a tree
-	 * @return true, if it is a tree, false otherwise
+	 * @return {@code true} if graph is a tree, @{code false} otherwise
 	 */
 	public boolean isTree(){
 		return !isCyclic() && isConnected();
@@ -174,8 +194,11 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 	
-
-	
+	/**
+	 * Finds all multiedges in a graph
+	 * @return A list containing list of edges between two vertices (in case when there is more
+	 * than one edge between them)
+	 */
 	public List<List<E>> listMultiEdges(){
 		
 		List<List<E>> ret = new ArrayList<List<E>>();
@@ -191,11 +214,18 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 	
+	/**
+	 * Finds all biconnected components of a graph
+	 * @return A list of grap's biconnected components
+	 */
 	public List<Graph<V, E>> listBiconnectedComponents(){
 		BiconnectedSplitting<V,E> biconnected = new BiconnectedSplitting<V,E>(graph);
 		return biconnected.findBiconnectedComponents();
 	}
 	
+	/**
+	 * @return {@code true} if graph is a ring, @{code false} otherwise
+	 */
 	public boolean isRing(){
 		//a graph is a ring if it is basically one cycle
 		

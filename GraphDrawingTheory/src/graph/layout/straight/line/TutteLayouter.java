@@ -14,8 +14,13 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A layouter which creates a drawing of the graph using  Tutte's embedding
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class TutteLayouter <V extends Vertex, E extends Edge<V>> extends SymmetricLayouter<V, E>{
-
 
 	@Override
 	public Drawing<V, E> layout(Graph<V, E> graph,
