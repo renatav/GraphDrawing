@@ -2,12 +2,14 @@ package graph.tree.bc;
 
 import graph.elements.Edge;
 
+/**
+ * Edge of the block-cut vertex tree
+ * @author Renata
+ */
 public class BCTreeEdge implements Edge<BCTreeNode>{
 
-	
 	private BCTreeNode origin;
 	private BCTreeNode destination;
-	
 	
 	public BCTreeEdge(BCTreeNode origin, BCTreeNode destination) {
 		super();

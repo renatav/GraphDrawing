@@ -163,7 +163,7 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	 * @param visitedCycles
 	 * @param path
 	 * @param bestPath
-	 * @return true if path can be extended, false otherwise
+	 * @return {@code true} if path can be extended, {@code false} otherwise
 	 */
 	private boolean extendPath(PermutationCycle<V> currentCycle, PermutationCycle<V> baseCycle, 
 			List<PermutationCycle<V>> visitedCycles, List<PermutationCycle<V>> path, List<PermutationCycle<V>> bestPath){

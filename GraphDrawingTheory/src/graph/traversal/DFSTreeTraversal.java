@@ -8,11 +8,19 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.trees.DFSTree;
 
+/**
+ * Class for forming a DFS tree given a graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class DFSTreeTraversal<V extends Vertex, E extends Edge<V>> {
 
+	/**
+	 * Graph for which a tree is being formed
+	 */
 	private Graph<V,E> graph;
 	private int index;
-
 
 	public DFSTreeTraversal(Graph<V,E> graph){
 		this.graph = graph;
@@ -22,6 +30,11 @@ public class DFSTreeTraversal<V extends Vertex, E extends Edge<V>> {
 		return formDFSTree(graph.getVertices().get(0));
 	}
 
+	/**
+	 * Forms a DFS tree
+	 * @param root Vertex which should be the root of the DFS tree
+	 * @return DFS tree
+	 */
 	public DFSTree<V,E> formDFSTree(V root){
 		DFSTree<V, E> tree = new DFSTree<V,E>(root);
 		index = 1;
@@ -29,7 +42,6 @@ public class DFSTreeTraversal<V extends Vertex, E extends Edge<V>> {
 		tree.formBackEdges(graph.getEdges());
 		return tree;
 	}
-
 
 	private void formDFSTree(V current, E currentEdge, DFSTree<V,E> tree, List<V> covered, List<E> visited){
 

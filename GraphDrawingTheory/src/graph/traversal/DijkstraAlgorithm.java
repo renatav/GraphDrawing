@@ -16,13 +16,12 @@ import java.util.Set;
 
 
 /**
- * Algorithm for finding a path between two graph vertices in a graph
- * @author xx
- *
- * @param <V>
- * @param <E>
+ * An implementation of Dijkstra's algorithm for finding a path between
+ * two graph vertices in a graph
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
-
 public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 
 	private List<E> edges;
@@ -51,14 +50,25 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 	}
 	
 
+	/**
+	 * Finds a path in the given graph between two vertices if it exists.
+	 * @param source Source vertex
+	 * @param target Target (destination) vertex
+	 * @return A path from {@code source} to {@code target} if it exists, otherwise null
+	 */
 	public Path<V,E> getPath(V source, V target){
 		return getPath(source, target, null);
 	}
 	
+
 	/**
-	 * Returns path from source to target if one exists, otherwise null
-	 * @param target
-	 * @return shortest path if one exists, otherwise null
+	 * Finds a path in the given graph between two vertices which doesn't contain
+	 * certain specified vertices, if one exists.
+	 * @param source Source vertex
+	 * @param target Target (destination) vertex
+	 * @param excluding Vertices that cannot be on the path
+	 * @return A path from {@code source} to {@code target} not containing {@code excluding}
+	 * if it exists, otherwise null
 	 */
 	public Path<V,E> getPath(V source, V target, List<V> excluding) {
 		execute(source, excluding);

@@ -15,12 +15,13 @@ import graph.properties.components.SplitPair;
 import graph.properties.splitting.Splitting;
 
 /**
- * Used in the construction of spqr trees
- * @author xxx
+ * Used in the construction of SPQR trees
+ * Not a very efficient implementation, needs to be rewritten
+ * Can be used for smaller graphs
  * @assume Graph is planar and biconnected
- * 
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V,E>{
 
@@ -28,7 +29,6 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 	 * Original graph - reference edge
 	 */
 	private Graph<V,E> gPrim;
-
 
 
 	private Logger log = Logger.getLogger(ProtoSPQRTree.class);

@@ -92,8 +92,8 @@ public class GraphOperations<V extends Vertex, E extends Edge<V>> {
 	 * H is a proper subgraph of G, if V(H)!=V(G) || E(H)!=E(G)
 	 * @param supergraph Potential supergraph
 	 * @param subgraph Potential subgraph
-	 * @return True if {@code subgraph} is a proper subgraph of {@code supergraph}
-	 * false otherwise
+	 * @return {@code true} if {@code subgraph} is a proper subgraph of {@code supergraph}
+	 * {@code false} otherwise
 	 */
 	public boolean isProperSubgraph(Graph<V,E> supergraph, Graph<V,E> subgraph){
 		

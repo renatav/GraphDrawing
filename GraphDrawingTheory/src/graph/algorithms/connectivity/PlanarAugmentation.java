@@ -715,7 +715,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	 * Tests whether two bundles represented by labels l1 and l2 can be matched planar
 	 * @param l1
 	 * @param l2
-	 * @return true if a planar match can be made, false otherwise
+	 * @return {@code true} if a planar match can be made, {@code false} otherwise
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean planar(PlanarAugmentationLabel<V, E> l1, PlanarAugmentationLabel<V, E> l2, BCTree<V,E> bcTree,  Graph<V,E> graph){
@@ -812,7 +812,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	 * @param graph
 	 * @param v1
 	 * @param v2
-	 * @return true if the graph is planar, false otherwise
+	 * @return {@code true} if the graph is planar, {@code false} otherwise
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean checkPlanarity(Graph<V,E> graph, V v1, V v2){
@@ -836,7 +836,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	 * @param graph
 	 * @param v1
 	 * @param v2
-	 * @return true if the graph is planar, false otherwise
+	 * @return {@code true} if the graph is planar, {@code false} otherwise
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean checkPlanarity(Graph<V,E> graph, V...vertices){
@@ -870,7 +870,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	 * by labels l1 and l2
 	 * @param l1
 	 * @param l2
-	 * @return true is condition is met, false otherwise
+	 * @return {@code true} is condition is met, {@code false} otherwise
 	 */
 	private boolean conCond(PlanarAugmentationLabel<V,E> l1, PlanarAugmentationLabel<V,E> l2){
 
@@ -923,10 +923,9 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Given a label l1, find a label, l2,  with which it can be matched
 	 * so that planarity is not ruined
-	 * l1 and l2 need to satisfy con cond
 	 * @param l1
 	 * @param labels
-	 * @return
+	 * @return A label with which {@code l1} can be matched
 	 */
 	private PlanarAugmentationLabel<V, E> matchLabels(PlanarAugmentationLabel<V, E> l1,
 			List<PlanarAugmentationLabel<V, E>> labels){

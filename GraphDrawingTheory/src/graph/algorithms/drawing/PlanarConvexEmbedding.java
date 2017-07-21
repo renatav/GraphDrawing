@@ -827,9 +827,8 @@ public class PlanarConvexEmbedding<V extends Vertex, E extends Edge<V>>  {
 	 * G has no forbidden separation pairs
 	 * For each critical separation pair {x,y} of G there exists at most one {x,y} split component having no edge of S
 	 * Moreover, such {x,y} split component is either a bond if (x,y) in E or a ring otherwise
-	 * 
 	 * @param S
-	 * @return
+	 * @return {@code true} is {@code S} is extendible, {@code false} otherwise 
 	 */
 	@SuppressWarnings("unused")
 	private boolean isExtendable(List<E> S){

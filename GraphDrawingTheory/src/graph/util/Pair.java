@@ -1,5 +1,11 @@
 package graph.util;
 
+/**
+ * An util class representing a key-value pair
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class Pair<K,V> {
 
 	private K key;

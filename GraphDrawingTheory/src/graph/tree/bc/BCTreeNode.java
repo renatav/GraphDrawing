@@ -4,6 +4,10 @@ import java.awt.Dimension;
 
 import graph.elements.Vertex;
 
+/**
+ * Node of the block-cut vertex tree
+ * @author Renata
+ */
 public class BCTreeNode implements Vertex {
 
 	private Object content;

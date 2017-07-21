@@ -1,6 +1,7 @@
 package graph.tree.pq;
 
 import graph.elements.Edge;
+
 import graph.elements.Vertex;
 
 import java.util.HashMap;
@@ -11,8 +12,14 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Implementation of the PQ-tree reduction procedure, as described by Booth and Lueker.
+ * Used in their planarity testing and embedding algorithm
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
-
 
 	/**
 	 * A first-in first-out list which is used during both passes for
@@ -30,13 +37,8 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		queue = new LinkedList<PQTreeNode>();
 	}
 
-
 	/**
-	 * @param pqTree
-	 * @param S A subset of all nodes
-	 */
-	/**
-	 * @param pqTree
+	 * @param pqTree PQ-tree
 	 * @param S A subset of all nodes
 	 */
 	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
@@ -71,6 +73,13 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
+	/**
+	 * Implementation of the reduction procedure
+	 * @param pqTree PQ-tree to be reduced
+	 * @param S Subset of all nodes
+	 * @param pertRoot Pertinent root
+	 * @return {@code true} if the tree can be reduced, {@code false} otherwise
+	 */
 	public boolean reduce(PQTree<V,E> pqTree, List<PQTreeNode> S, PQTreeNode pertRoot){
 
 		if (debug)
@@ -143,7 +152,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * Template matching for leaves. The simplest case, the node is simply
 	 * marked as empty or full depending on if it belongs to S or not 
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateL1(PQTreeNode node, List<PQTreeNode> S){
 		if (debug)
@@ -167,7 +176,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * The simplest case for a P-node. If all children of the node
 	 * are labeled empty, then the node can be labeled empty.
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	@SuppressWarnings("unused")
 	private boolean templateP0(PQTreeNode node){
@@ -191,7 +200,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * The simplest case for a P-node. If all children of the node
 	 * are labeled full, then the node can be labeled full.
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateP1(PQTreeNode node){
 		if (debug)
@@ -215,7 +224,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * The full children are grouped under a new P-node
 	 * which is made a child of the root node, which is left unlabeled
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateP2(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
@@ -280,7 +289,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * If there is only one empty or full child
 	 * the additional p-node is not created
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateP3(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
@@ -369,7 +378,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * labeled singly partial. Template P4 is tried if
 	 * the node is the root of the pertinent subtree
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateP4(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
@@ -505,7 +514,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * empty and full nodes of the child partial node as its children
 	 * That original partial node is removed from the list of children
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateP5(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
@@ -613,7 +622,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * is created for the full nodes of the root
 	 * and added as the child of the newly created partial child
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateP6(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
@@ -721,7 +730,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * Simplest case for Q-nodes. If all of its children are empty
 	 * it is also labeled as empty
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	@SuppressWarnings("unused")
 	private boolean templateQ0(PQTreeNode node){
@@ -771,7 +780,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * and then the full ones
 	 * Some may be missing and the order of the children can be reversed 
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateQ2(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
@@ -850,7 +859,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * Doubly partial case
 	 * The order should be empty, partial, full, partial, empty
 	 * @param node
-	 * @return
+	 * @return {@code true} if the template can be applied, {@code false} otherwise
 	 */
 	private boolean templateQ3(PQTreeNode node, PQTree<V,E> tree){
 		if (debug)
@@ -968,7 +977,6 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 		}
 		return true;
 	}
-
 
 	/**
 	 * @return the reversalNum

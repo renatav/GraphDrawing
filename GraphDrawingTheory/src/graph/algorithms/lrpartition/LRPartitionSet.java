@@ -61,7 +61,7 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 
 	/**
 	 * Forms partitions
-	 * @return True if partitions can be formed, false otherwise
+	 * @return {@code true} if partitions can be formed, {@code false} otherwise
 	 */
 	public boolean organizePartitions(){
 		

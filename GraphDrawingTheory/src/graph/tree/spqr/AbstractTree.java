@@ -4,8 +4,13 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
+/**
+ * Abstract class, extended by SPQR tree and proto SPQR tree
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class AbstractTree<V extends Vertex, E extends Edge<V>> extends Graph<SPQRTreeNode<V,TreeEdgeWithContent<V,E>>, Edge<SPQRTreeNode<V,TreeEdgeWithContent<V,E>>>> {
-
 
 	/**
 	 * Root of the tree

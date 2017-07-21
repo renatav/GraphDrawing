@@ -4,11 +4,17 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 
+/**
+ * Class which implements the {@code Edge} interface and adds the content attribute
+ * Used for constructing SPQR-trees
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class TreeEdgeWithContent<V extends Vertex, E extends Edge<V>> implements Edge<V> {
 
 	private V origin, destination;
 	private Graph<V,E> content;
-	
 	
 	public TreeEdgeWithContent() {
 		super();

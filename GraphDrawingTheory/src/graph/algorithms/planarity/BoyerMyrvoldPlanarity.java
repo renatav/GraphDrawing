@@ -419,7 +419,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	 * @param child
 	 * @param backEdge
 	 * @param backEdges
-	 * @return True if the procedure was successfully executed, false otherwise
+	 * @return {@code true} if the procedure was successfully executed, {@code false} otherwise
 	 */
 	private boolean walkdown(V v, V child, E backEdge,  List<E> backEdges){
 
@@ -736,7 +736,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	 * Checks if vertex w is externally active during the processing of v
 	 * @param v A vertex being processed
 	 * @param w A vertex whose external activity is being checked
-	 * @return True if the vertex is externally active, false otherwise
+	 * @return {@code true} if the vertex is externally active, {@code false} otherwise
 	 */
 	private boolean externallyActive(V w, V v){
 

@@ -9,20 +9,38 @@ import graph.elements.Vertex;
 
 
 /**
- * Block-Cut vertex tree
+ * Class represents a block-cut vertex tree and contains methods for its construction given
+ * a separable graph
  * Let B be the set of blocks and C be the set of cut vertices of a separable graph G. Construct a
  * graph H with vertex set B U C in which adjacencies are defined as follows: 
  * ci in C is adjacent to bj in B if and only if the block bj of G contains the cut vertex ci of G 
  * @assume graph is separable
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNode, BCTreeEdge>{
 
+	/**
+	 * Graph for which the BC-tree is constructed
+	 */
 	private Graph<V,E> graph;
+	/**
+	 * A list of C-typed nodes
+	 */
 	private List<BCTreeNode> cVertices;
+	/**
+	 * A list of B-typed nodes
+	 */
 	private List<BCTreeNode> bVertices;
+	/**
+	 * Root of the tree
+	 */
 	private BCTreeNode root;
 	
-	//pendant is a block which contains only one cut vertex
+	/**
+	 * A list of pendants - block which contain only one cut vertex
+	 */
 	private List<Graph<V,E>> pendants = new ArrayList<Graph<V,E>>();
 
 	public BCTree(Graph<V,E> graph){
@@ -82,6 +100,10 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 	
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Updates the list of pendants after certain tree nodes were added or removed,
+	 * thus changing degrees of other nodes
+	 */
 	public void updatePendants(){
 		pendants.clear();
 		for (BCTreeNode blockNode : bVertices){

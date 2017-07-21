@@ -149,7 +149,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * Checks if vertices v1 and v2 are connected i.e. if there is an edge between them
 	 * @param v1 Source vertex
 	 * @param v2 Destination vertex
-	 * @return true if there is and edge between v1 and v2, otherwise false
+	 * @return {@code true} if there is and edge between v1 and v2, otherwise {@code false}
 	 */
 	public boolean hasEdge(V v1, V v2){
 
@@ -396,7 +396,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Checks is graph is connected
-	 * @return true if the graph is connected, false otherwise
+	 * @return {@code true} if the graph is connected, {@code false} otherwise
 	 */
 	public boolean isConnected(){
 		return properties.isConnected();
@@ -404,7 +404,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Check if the graph is a tree
-	 * @return true if the graph is a tree, false otherwise
+	 * @return {@code true} if the graph is a tree, {@code false} otherwise
 	 */
 	public boolean isTree(){
 		return properties.isTree();
@@ -459,7 +459,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	/**
 	 * Checks if a graph is biconnected. 
 	 * A graph is biconnected if and only if any vertex is deleted, the graph remains connected.
-	 * @return true if graph is biconnected, otherwise false
+	 * @return {@code true} if graph is biconnected, otherwise {@code false}
 	 */
 	public boolean isBiconnected(){
 		return properties.isBiconnected();

@@ -40,7 +40,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	 * higher than lowpt(e2) belong to one partition, and all return edges of e2 ending strictly
 	 * higher than lowpt(e1) belong to the other.
 	 * @param graph Graph that should be partitioned
-	 * @return true if it can be partitioned, false otherwise
+	 * @return {@code true} if it can be partitioned, {@code false} otherwise
 	 */
 	public boolean createLRPartition(){
 		if (debug)
@@ -63,7 +63,7 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * 
 	 * @param tree Tree whose back edges are being partitioned
-	 * @return true if it can be partitioned, false otherwise
+	 * @return {@code true} if it can be partitioned, {@code false} otherwise
 	 */
 	public boolean createLRPartition(DFSTree<V, E> tree){
 		canBeCreated = true;

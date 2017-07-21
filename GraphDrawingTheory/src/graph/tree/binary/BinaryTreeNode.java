@@ -2,12 +2,32 @@ package graph.tree.binary;
 
 import graph.elements.Vertex;
 
+/**
+ * Node of the binary tree
+ * @author Renata
+ * @param <V> The vertex type
+ */
 public class BinaryTreeNode<V extends Vertex> {
 	
+	/**
+	 * Vertex of the original graph corresponding to the node
+	 */
 	private V vertex;
+	/**
+	 * Node left of the current node
+	 */
 	private BinaryTreeNode<V> left;
+	/**
+	 * Node right of the current node
+	 */
 	private BinaryTreeNode<V> right;
+	/**
+	 * Node's parent
+	 */
 	private BinaryTreeNode<V> parent;
+	/**
+	 * Node's height
+	 */
 	private int height = 1;
 	
 	

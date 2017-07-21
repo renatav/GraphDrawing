@@ -1202,7 +1202,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	 * with v occurring before w in A(u). Then u<w<v.
 	 * @param adjacency
 	 * @param numbering
-	 * @return true if adjacency structure is valid, false otherwise 
+	 * @return {@code true} if adjacency structure is valid, {@code false} otherwise 
 	 */
 	private boolean checkAdjacencyValidity(Map<V,List<E>> adjacency, int[] numbering, List<E> treeEdges){
 

@@ -8,9 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * A class with some util methods
+ * @author Renata
+ */
 public class Util {
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Creates a copy of a graph
+	 * @param graph Graph to be copied
+	 * @return Copy of {@code graph}
+	 */
 	public static <V extends Vertex, E extends Edge<V>> Graph<V,E> copyGraph(Graph<V,E> graph){
 		Graph<V,E> copy = new Graph<V,E>();
 		for (V v : graph.getVertices())
@@ -20,6 +29,10 @@ public class Util {
 		return copy;
 	}
 
+	/**
+	 * Reverses the given list
+	 * @param list List to be reversed
+	 */
 	public static <T> void reverseList(List<T> list){
 		List<T> reverse = new ArrayList<T>();
 		for (int i = list.size() - 1; i >= 0; i--)
@@ -29,6 +42,13 @@ public class Util {
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Creates a graph edge between two vertices of the given class
+	 * @param origin The first vertex
+	 * @param destination The second vertex
+	 * @param edgeClass Class of the edge
+	 * @return Edge between {@code origin} and {@code destination}
+	 */
 	public static <V extends Vertex, E extends Edge<V>> E createEdge(V origin, V destination, Class<?> edgeClass){
 		try {
 			E e = (E) edgeClass.newInstance();
@@ -44,6 +64,11 @@ public class Util {
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Creates a vertex of the given class
+	 * @param vertexClass Vertex class
+	 * @return New vertex
+	 */
 	public static <V extends Vertex> V createVertex(Class<?> vertexClass){
 		try{
 			V v = (V) vertexClass.newInstance();
@@ -58,10 +83,10 @@ public class Util {
 	
 	/**
 	 * Generates a random graph
-	 * @param numberOfVertices
-	 * @param vertexClass C
-	 * @param numberOfEdges
-	 * @param edgesClass
+	 * @param numberOfVertices Number of vertices the graph will have
+	 * @param vertexClass Vertex class
+	 * @param numberOfEdges Number of edges the graph will have
+	 * @param edgesClass Edge class
 	 * @return Created graph
 	 */
 	public static <V extends Vertex, E extends Edge<V>> List<?>[] generateRandomGraph(int numberOfVertices, 

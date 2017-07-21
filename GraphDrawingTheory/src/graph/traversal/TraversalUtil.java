@@ -11,20 +11,24 @@ import graph.elements.Edge;
 import graph.elements.Vertex;
 
 /**
- * Contains methods for finding path between vertices with certain characteristics 
- * needed in certain algorithms
+ * Contains methods for finding path between vertices which meet certain
+ * special conditions. Used as part of more complex algorithms.
  */
 public class TraversalUtil{
 
 
 	/**
 	 * Finds a path from one vertex to another such that the there are no back edges
-	 * and no edge crossings
+	 * and no edge crossings. In other words, the path can be a part of the outer
+	 * facial cycle of a planar embedding of a graph.
 	 * @param v1 Start vertex
 	 * @param v2 Destination vertex
 	 * @param adj Adjacency map
 	 * @param debug Indicator if debug information should be shown
-	 * @return Path from v1 to v2
+	 * @param excluding Vertices that cannot be of the path
+	 * @param excludingEdges Edges that cannot be of the path
+	 * @return Path from v1 to v2 with such that it is a part of the outer facial cycle
+	 * of a planar embedding of a graph.
 	 */
 	public static <V extends Vertex,E extends Edge<V>> List<E> circularNoCrossingsPath(V v1, V v2, Map<V,List<E>> adj, boolean debug, List<V> excluding, List<E> excludingEdges){
 		//The basic idea is to follow a path, keeping a record of which edges joining one vertex of the path to some other ones
@@ -324,10 +328,20 @@ public class TraversalUtil{
 	}
 
 
-
+   /**
+    * Initializes needed objects in order to initialize the recursive method of the same name
+    *  * @param v Current vertex
+	 * @param startVertex Start vertex
+	 * @param pathVertices Vertices for which it is checked if there is a path from the start vertex to them
+	 * @param pathEdges Edges of the cyclic path - should not be traversed
+	 * @param adjacency Adjacency lists
+	 * @param debug
+	 * @param excludingEdges Edges that should not be traversed
+	 * @param excludingVertices Vertices that should be skipped
+    * @return
+    */
 	private static<V extends Vertex, E extends Edge<V>> List<List<V>> connectedWith (V v, Set<V> pathVertices, List<E> pathEdges, 
 			Map<V,List<E>> adjacency,List<E> excludingEdges, List<V> excludingVertices, boolean debug){
-
 
 		List<V> visited = new ArrayList<V>();
 		visited.add(v);
@@ -338,21 +352,20 @@ public class TraversalUtil{
 			System.out.println("Paths with other path vertices: " + paths);
 		}
 		return paths;
-
-
 	}
 
 	/**
-	 * The method returns paths with other vertices specified as parameters
-	 * i.e. other vertices of the current cyclic planar path
-	 * @param v Start vertex
+	 * Finds paths from the given start vertex to those belonging to a specified path.
+	 * Uses DFS. The result is stored in parameter {@code part} 
+	 * @param v Current vertex
+	 * @param startVertex Start vertex
 	 * @param pathVertices Vertices for which it is checked if there is a path from the start vertex to them
 	 * @param pathEdges Edges of the cyclic path - should not be traversed
 	 * @param adjacency Adjacency lists
 	 * @param debug
 	 * @param excludingEdges Edges that should not be traversed
 	 * @param excludingVertices Vertices that should be skipped
-	 * @param paths List of path with the supplied vertices
+	 * @param paths List of path containing the given vertices
 	 */
 	private static<V extends Vertex, E extends Edge<V>> void connectedWith (V v, V startVertex, Set<V> pathVertices, List<E> pathEdges, 
 			Map<V,List<E>> adjacency, List<E> excludingEdges, List<V> excludingVertices, List<V> visited, List<E> visitedEdges, List<List<V>> paths,

@@ -14,7 +14,7 @@ public abstract class PlanarityTestingAlgorithm<V extends Vertex, E extends Edge
 
 	/**
 	 * @param graph Graph whose planarity is being checked
-	 * @return true if graph is planar, otherwise false
+	 * @return {@code true} if graph is planar, otherwise {@code false}
 	 */
 	public abstract boolean isPlannar(Graph<V,E> graph);
 

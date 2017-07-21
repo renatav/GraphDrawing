@@ -112,7 +112,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	 * Methods determines if the circle layout with a vertex in center
 	 * would be suitable for the graph
 	 * @param graph
-	 * @return true if hierarchical layout is recommended, false otherwise
+	 * @return {@code true} if hierarchical layout is recommended, {@code false} otherwise
 	 */
 	private boolean checkCircularWithCenter(Graph<V, E> graph) {
 		//is there a vertex connected to most of the other vertices
@@ -128,7 +128,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Methods determines if the hierarchical layout would be suitable for the graph
 	 * @param graph
-	 * @return true if hierarchical layout is recommended, false otherwise
+	 * @return {@code true} if hierarchical layout is recommended, {@code false} otherwise
 	 */
 	private boolean checkHierachicalTendency(Graph<V, E> graph) {
 		

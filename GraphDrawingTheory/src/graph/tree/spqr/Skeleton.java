@@ -10,11 +10,9 @@ import graph.elements.Vertex;
 /**
  * Each node is associated with a special graph which is called a skeleton of the node
  * It is a simplified version of the original graph where some subgraphs were replaces
- * by single edges 
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class Skeleton<V extends Vertex,E extends Edge<V>> extends Graph<V,E>{
 	

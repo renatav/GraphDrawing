@@ -13,39 +13,36 @@ import graph.elements.Vertex;
 
 /**
  * Contains methods which implement certain graph traversal algorithms
- * @author xxx
- *
- * @param <V>
- * @param <E>
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class GraphTraversal {
 
-
 	/**
-	 * Depth-First Search
-	 * The depth-first-search algorithm is similar to the standard algorithm for traversing binary trees; 
-	 * it first fully explores one subtree before returning to the current node and then exploring the other subtree.
-	 * Another way to think of depth-first-search is by saying that it is similar to breadth-first search except that it uses a stack instead of a queue.
-	 * @param first
-	 * @param target
-	 * @return
+	 * Finds all paths in the given graph between two provided vertices using depth-first search
+	 * @param graph Graph
+	 * @param source Source vertex
+	 * @param target Target (destination) vertex
+	 * @return All paths in the {@code graph} between {@code source} and {@code target} vertices
 	 */
-	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V first, V target){
+	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V source, V target){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
-		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
+		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, source, source, target, null);
 		return paths;
 	}
 
 	/**
-	 * Finds all paths between first and target which contains all specified vertices
-	 * @param first
-	 * @param target
-	 * @param containing
-	 * @return
+	 * Finds all paths in the given graph between two provided vertices containing a list of vertices using depth-first search
+	 * @param graph Graph
+	 * @param source Source vertex
+	 * @param target Target (destination) vertex
+	 * @param containing A list of vertices the path must contain
+	 * @return All paths in the {@code graph} between {@code source} and {@code target} vertices containing all of the {@code containing} vertices.
 	 */
-	public static <V extends Vertex,E extends Edge<V>>List<Path<V,E>> findAllPathsDFSContaining(Graph<V,E> graph, V first, V target, List<V> containing){
+	public static <V extends Vertex,E extends Edge<V>>List<Path<V,E>> findAllPathsDFSContaining(Graph<V,E> graph, V source, V target, List<V> containing){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
-		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, null);
+		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, source, source, target, null);
 		Iterator<Path<V,E>> pathsIter = paths.iterator();
 		while (pathsIter.hasNext()){
 			Path<V,E> path = pathsIter.next();
@@ -58,10 +55,17 @@ public class GraphTraversal {
 	}
 
 
-
-	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V first, V target, List<V> excluding){
+	/**
+	 * Finds all paths in the given graph between two provided vertices not containing any of vertices in the given list using depth-first search
+	 * @param graph Graph
+	 * @param source Source vertex
+	 * @param target Target (destination) vertex
+	 * @param excluding A list of vertices the path shouldn't contain
+	 * @return All paths in the {@code graph} between {@code source} and {@code target} vertices not containing any of the {@code excluding} vertices.
+	 */
+	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V source, V target, List<V> excluding){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
-		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target, excluding);
+		findAllPathsDFS(graph, new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, source, source, target, excluding);
 		return paths;
 	}
 	
@@ -108,7 +112,15 @@ public class GraphTraversal {
 		}
 	}
 
-	public static <V extends Vertex,E extends Edge<V>> Path<V,E> nonrecursiveDFSPath(Graph<V,E> graph, V start, V end){
+	/**
+	 * A non-recursive implementation of the depth-first search for finding a path between two vertices
+	 * More efficient than the recursive implementation
+	 * @param graph Graph
+	 * @param source Source vertex
+	 * @param target Target (destination) vertex
+	 * @return A path in {@code graph} between {@code source} and {@code target} vertices
+	 */
+	public static <V extends Vertex,E extends Edge<V>> Path<V,E> nonrecursiveDFSPath(Graph<V,E> graph, V source, V target){
 
 		List<V> visited = new ArrayList<V>();
 		List<E> visitedEdges = new ArrayList<E>();
@@ -119,7 +131,7 @@ public class GraphTraversal {
 		List<E> pathEdges = new ArrayList<E>();
 		List<E> edges;
 
-		stack.push(start);
+		stack.push(source);
 
 		V current;
 		E currentEdge = null;
@@ -162,7 +174,7 @@ public class GraphTraversal {
 
 			visited.add(current);
 			
-			if (current == end){
+			if (current == target){
 				//make path
 				Path<V,E> path = new Path<V,E>(pathEdges, directions);
 				return path;
@@ -191,7 +203,8 @@ public class GraphTraversal {
 
 	/**
 	 * Finds the longest path in a graph
-	 * @return
+	 * Method should be rewritten to increase its effectiveness
+	 * @return The longest path between any two vertices in a graph
 	 */
 	//TODO efikasnije napraviti ovo
 	public static <V extends Vertex,E extends Edge<V>> Path<V,E> findLongestPath(Graph<V,E> graph){
@@ -209,9 +222,7 @@ public class GraphTraversal {
 				for (Path<V,E> path : paths)
 					if (longestPath == null || path.size() > longestPath.size())
 						longestPath = path;
-
 			}
-
 		return longestPath;
 	}
 

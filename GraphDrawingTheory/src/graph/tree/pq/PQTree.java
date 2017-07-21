@@ -9,16 +9,19 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 
 /**
- * Tree used in some algorithms for planarity testing
+ * Class represents a PQ-tree, which is used in some algorithms for planarity testing
  * P nodes are cut vertices
  * Q nodes are nonseparable components
  * Leaves are virtual vertices (vertices on the other side of edges where one vertex is on subgraph Gk and the
  * other one is in V-Vk)
- * @author xx
+ * @author Renata
  *
  */
 public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNode, PQTreeEdge> {
 
+	/**
+	 * Lists of P-typed, Q-typed nodes and tree leaves
+	 */
 	private List<PQTreeNode> pNodes, qNodes, leaves;
 	private Graph<V,E> graph;
 	/**
@@ -127,6 +130,13 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 
 	}
 
+	/**
+	 * Finds all leaves which are destination or source of the edge
+	 * belonging to the provided list 
+	 * @param virtualEdges A list of virtual edges
+	 * @return A list of leaves which are either source or destination nodes of edges
+	 * belonging to {@code virtualEdges} list
+	 */
 	public List<PQTreeNode> findLeavesOf(List<E> virtualEdges){
 		List<PQTreeNode> ret = new ArrayList<PQTreeNode>();
 		for (E e : virtualEdges){
@@ -142,7 +152,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	/**
 	 * Finds all descendants of a tree node
 	 * @param node Node
-	 * @return A list of descendants
+	 * @return A list of descendants of {@code node}
 	 */
 	public List<PQTreeNode> allDescendantsOf(PQTreeNode node){
 		List<PQTreeNode> ret = new ArrayList<PQTreeNode>();

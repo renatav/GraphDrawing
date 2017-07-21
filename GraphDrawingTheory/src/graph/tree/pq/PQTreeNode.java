@@ -7,6 +7,10 @@ import java.util.List;
 
 import graph.elements.Vertex;
 
+/**
+ * Node of the PQ-tree
+ * @author Renata
+ */
 public class PQTreeNode implements Vertex{
 
 	/**
@@ -113,25 +117,36 @@ public class PQTreeNode implements Vertex{
 	}
 	
 	/**
-	 * The number of children currently possessed by the nodes.
 	 * Only used for P-nodes
+	 * @return The number of children currently possessed by the node
 	 */
 	public int childrenCount(){
 		return children.size();
 	}
 	
+	/**
+	 * Only used for P-nodes
+	 * @return The number of full children currently possessed by the node
+	 */
 	public int fullChildrenCount(){
 		return fullChildren.size();
 	}
 	
+	/**
+	 * Only used for P-nodes
+	 * @return The number of partial children currently possessed by the node
+	 */
 	public int partialChildrenCount(){
 		return partialChildren.size();
 	}
 	
+	/**
+	 * Only used for P-nodes
+	 * @return The number of empty children currently possessed by the node
+	 */
 	public int emptyChildrenCount(){
 		return emptyChildren.size();
 	}
-	
 	
 	public void incrementPertinentChildCount(){
 		pertinendChildCount++;
@@ -141,6 +156,10 @@ public class PQTreeNode implements Vertex{
 		pertinendChildCount--;
 	}
 
+	/**
+	 * Adds a child node to the current node 
+	 * @param node Child node
+	 */
 	public void addChild(PQTreeNode node){
 		children.add(node);
 		if (node.getLabel() == PQNodeLabel.FULL)
@@ -156,7 +175,7 @@ public class PQTreeNode implements Vertex{
 	 * Checks if the order of the children is empty, singly partial, full
 	 * Some labels could be missing
 	 * Reversal is possible
-	 * @return
+	 * @return Indicator if the order is valid
 	 */
 	public PQNodeOrderValid orderValidUpToOnePartial(){
 		
@@ -228,6 +247,7 @@ public class PQTreeNode implements Vertex{
 	 /**Checks if the order of the children is empty, singly partial, full, empty partial, empty
 	 * Some labels could be missing
 	 * Reversal is possible
+	 * @return Indicator if the order is valid
 	 */
 	public PQNodeOrderValid orderValidUpToTwoPartial(){
 		
@@ -295,7 +315,11 @@ public class PQTreeNode implements Vertex{
 		
 	}
 	
-
+	/**
+	 * Adds child node to the current node at the specified index
+	 * @param node Child node
+	 * @param index Index where the node should be added
+	 */
 	public void addChild(PQTreeNode node, int index){
 		children.add(index, node);
 		if (node.getLabel() == PQNodeLabel.FULL)
@@ -307,6 +331,10 @@ public class PQTreeNode implements Vertex{
 		node.setParent(this);
 	}
 
+	/**
+	 * Removes a child node from the current one
+	 * @param node Child node
+	 */
 	public void removeChild(PQTreeNode node){
 		children.remove(node);
 		if (node.getLabel() == PQNodeLabel.FULL)
@@ -356,7 +384,7 @@ public class PQTreeNode implements Vertex{
 	 * Changes the label to partial
 	 * while updating the lists of the 
 	 * empty, partial and full children
-	 * @param label - Singly partial or doubly partial
+	 * @param label Singly partial or doubly partial
 	 */
 	public void labelAsPartial(PQNodeLabel label){
 		PQNodeLabel oldLabel = this.label;
@@ -401,14 +429,11 @@ public class PQTreeNode implements Vertex{
 
 	@Override
 	public Dimension getSize() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setSize(Dimension size) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

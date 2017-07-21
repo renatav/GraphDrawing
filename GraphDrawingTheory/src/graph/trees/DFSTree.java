@@ -14,11 +14,30 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DFS tree, with methods for its creation and relevant method
+ * regarding its edges and nodes
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
+	/**
+	 * Root of the tree
+	 */
 	private V root;
+	/**
+	 * Map of vertices (tree nodes) and their dfs indexes
+	 */
 	private Map<V, Integer> verticesWithIndexes;
+	/**
+	 * Tree edges of the dfs tree
+	 */
 	private List<E> treeEdges;
+	/**
+	 * Back edges of the dfs tree
+	 */
 	private List<E> backEdges;
 
 	public DFSTree(V root){
@@ -28,7 +47,6 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		this.treeEdges = new ArrayList<E>();
 		this.backEdges = new ArrayList<E>();
 		this.directed = false;
-
 	}
 	
 	public DFSTree(V root, int[] numbering, List<E> treeEdges, List<E> backEdges, List<V> vertices){
@@ -38,11 +56,12 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 			verticesWithIndexes.put(v, numbering[vertices.indexOf(v)]);
 		this.treeEdges = treeEdges;
 		this.backEdges = backEdges;
-		
 	}
 
-
-
+	/**
+	 * Separates back edges
+	 * @param allEdges All edges of the tree
+	 */
 	public void formBackEdges(List<E> allEdges){
 		for (E e : allEdges)
 			if (!treeEdges.contains(e)){
@@ -52,24 +71,37 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 			}
 	}
 
+	/**
+	 * @param v Vertex
+	 * @return DFS index of the vertex
+	 */
 	public int getIndex(V  v){
 		return verticesWithIndexes.get(v);
 	}
 
 
+	/**
+	 * Adds vertex with the provided index to the tree
+	 * @param v Vertex
+	 * @param index Index
+	 */
 	public void addVertex(V v, int index){
 		super.addVertex(v);
 		verticesWithIndexes.put(v, index);
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Adds a new tree edge to the tree
+	 * @param e Tree edge
+	 */
 	public void addTreeEdge(E e){
 		treeEdges.add(e);
 		super.addEdge(e);
 	}
 
 
-	@Override	
+	@Override
 	public LinkedList<E> allEdges(V v){
 		LinkedList<E> ret = new LinkedList<E>();
 		List<E> all = new ArrayList<>(treeEdges);
@@ -81,8 +113,8 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 	/**
 	 * Finds the incoming edge (starting from an ancestor of v (edge with lower index) and ending in v)
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return Edge entering vertex {@code v}
 	 */
 	public E incomingEdge(V v){
 
@@ -97,6 +129,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return null;
 	}
 
+	/**
+	 * Finds all back edges entering the given vertex
+	 * @param v Vertex
+	 * @return A list of all back edges entering {@code v}
+	 */
 	public List<E> allIncomingBackEdges(V v){
 
 		List<E> ret = new ArrayList<E>();
@@ -114,8 +151,8 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	/**
 	 * Finds all edges starting from v and ending in a descendant of v (index of v is lower)
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return A list of all tree edges leaving {@code v}
 	 */
 	public List<E> allOutgoingTreeEdges(V v){
 
@@ -132,6 +169,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return ret;
 	}
 
+	/**
+	 * Finds all edges (tree and back) leaving the given vertex
+	 * @param v Vertex
+	 * @return A list of all edges leaving {@code v}
+	 */
 	public List<E> allOutgoingEdges(V v){
 		List<E> ret = new ArrayList<E>();
 		V other;
@@ -155,20 +197,18 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 
 	/**
-	 * Returns all vertexes that are descendants of vertex v in the tree
-	 * @param v
-	 * @return
+	 * Returns all vertices that are descendants of vertex v in the tree
+	 * @param v Vertex
+	 * @param includeVertex Specifies if the vertex itself should be in the list of descendants
+	 * @return A list of all descendants of {@code v}
 	 */
 	public List<V> allDescendantsOf(V v, boolean includeVertex){
-
-
 		List<V> ret = new ArrayList<V>();
 		allDescendantsOf(v, ret);
 		if (includeVertex)
 			ret.add(0, v);
 
 		return ret;
-
 	}
 
 
@@ -184,6 +224,12 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		}
 	}
 
+	/**
+	 * Finds all direct descendants of a given vertex. That is, those vertices
+	 * directly connected with it through a tree edge, with a higher DFS index
+	 * @param v Vertex
+	 * @return List of all direct descendants of {@code v}
+	 */
 	public List<V> directDescendantsOf(V v){
 		List<V> ret = new ArrayList<V>();
 		V other;
@@ -198,11 +244,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	/**
 	 * Compares indexes of vertices v1 and v2
-	 * @param v1
-	 * @param v2
-	 * @return 1 if v1 has higher index
+	 * @param v1 The first vertex
+	 * @param v2 The second vertex
+	 * @return 1 if {@code v1} has higher index
 	 * 		    0 if indexes are the same
-	 * 			-1 if v2 has higher index
+	 * 			-1 if {@code v2} has higher index
 	 */
 	private int compareVertices(V v1, V v2){
 		int index1 = verticesWithIndexes.get(v1);
@@ -217,10 +263,12 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 	
 	
-	/**The lowpoint of a vertex v, denoted by lowpt(v), is the lowest DFS index of
+	/**
+	 * Finds the lowpoint of a vertex
+	 * The lowpoint of a vertex v, denoted by lowpt(v), is the lowest DFS index of
 	 *an ancestor of v reachable through a back edge from a descendant of v
-	 * @param v
-	 * @return lowpt of v if there are back edges leading form descendant to ancestor of v, -1 otherwise
+	 * @param v Vertex
+	 * @return lowpt of {@code v} if there are back edges leading form descendant to ancestor of {@code v}, -1 otherwise
 	 */
 	public int lowpt(V v){
 		List<V> descendants = allDescendantsOf(v, true); 
@@ -246,11 +294,12 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 	
 	/**
+	 * Finds both lowpt1 and lowpt2 of a vertex
 	 * The lowpoint of a vertex v, denoted by lowpt(v), is the lowest DFS index of
 	 * an ancestor of v reachable through a back edge from a descendant of v
 	 * lowpt1 is the lowest index, lowpt2 is the second lowest 
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return An array whose first element is lowpt1 and the second one is lowpt2
 	 */
 	public int[] lowpts(V v){
 		Integer lowpt1 = null;
@@ -297,10 +346,12 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 
 
-	/**Hhighpoint of a vertex is the highest DFS index of an ancestor of v
+	/**
+	 * Finds the highpoint of a vertex
+	 * Highpoint of a vertex is the highest DFS index of an ancestor of v
 	 * reachable through a back edge from a descendant of v
-	 * @param v
-	 * @return highpt of v if there are back edges leading form descendant to ancestor of v, -1 otherwise
+	 * @param v Vertex
+	 * @return highpt of {@code v} if there are back edges leading form descendant to ancestor of {@code v}, -1 otherwise
 	 */
 	public int highpt(V v){
 		List<V> descendants = allDescendantsOf(v, false);
@@ -327,10 +378,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	
 	
 	/**
+	 * Finds the lowpoint of the given edge
 	 * The lowpt of an edge (v, w) is its lowest
 	 * return point (or w if none exists).
-	 * @param v
-	 * @return
+	 * @param e Edge
+	 * @return Lowpoint of {@code e}
 	 */
 	public int lowpt(E e){
 
@@ -359,6 +411,14 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 
 
+	
+	/**
+	 * Finds the highpoint of the given edge
+	 * The highpt of an edge (v, w) is its highest
+	 * return point (or v if none exists).
+	 * @param e Edge
+	 * @return Highpoint of {@code e}
+	 */
 	public int highpt(E e){
 
 		V origin, destination;
@@ -386,14 +446,14 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	}
 
 	/**
+	 * Finds all returning edges of a given edge
 	 * Given a tree edge e = (u, v), its returning edges are those back
 	 * edges that from a descendant of v (included v itself ) go to an ancestor of u different from u
 	 * itself.
-	 * @param e
-	 * @return
+	 * @param e Edge
+	 * @return A list of returning edges of {@code e}
 	 */
 	public List<E> returningEdges(E e){
-
 
 		List<E> ret = new ArrayList<E>();
 
@@ -437,6 +497,11 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	}
 
+	/**
+	 * Finds the highest returning edge of a given edge
+	 * @param e Edge
+	 * @return The highest returning edge of {@code e}
+	 */
 	public E getHighestReturningEdge(E e){
 		E highestEdge = null;
 		int highestPoint = -1;
@@ -458,7 +523,7 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	 * Vertex directly adjacent to v by a back edge that has the lowest index of all
 	 * such vertices
 	 * @param v Vertex
-	 * @return least ancestor if one exists, null otherwise
+	 * @return Least ancestor of {@code v} if one exists, {@code null} otherwise
 	 */
 	public V leastAncestor(V v){
 		
@@ -484,15 +549,26 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		return leastAncestor;
 	}
 
-	
+	/**
+	 * Finds all tree edges between the given two vertices
+	 * @param first The source vertex
+	 * @param target The target (destination) vertex
+	 * @return A list of all tree edges between {@code first} and {@code target}
+	 */
 	public List<E> treeEdgesBetween(V first, V target){
-		System.out.println("path between: " + first  + ", " + target);
 		List<Path<V,E>> allPaths = findAllPathsDFS(first, target);
 		if (allPaths.size() == 0)
 			return null;
 		return allPaths.get(0).getPath();
 	}
 
+	/**
+	 * Finds a tree path (presented as a list of vertices belonging to it)
+	 * between the two given vertices
+	 * @param first The source vertex
+	 * @param target The target (destination) vertex
+	 * @return A tree path between {@code first} and {@code target}
+	 */
 	public List<V> treePathBetween(V first, V target){
 		Path<V,E> path = findAllPathsDFS(first, target).get(0);
 		List<V> ret = path.pathVertices();
@@ -516,7 +592,13 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 
 	}
 
-	public List<Path<V, E>> findAllPathsDFS(V first, V target){
+	/**
+	 * Finds all paths between the given two vertices using DFS
+	 * @param first The source vertex
+	 * @param target The target (destination) vertex
+	 * @return A list of all paths between {@code first} and {@code target}
+	 */
+	public List<Path<V,E>> findAllPathsDFS(V first, V target){
 		List<Path<V,E>> paths = new ArrayList<Path<V,E>>();
 		findAllPathsDFS(new ArrayList<E>(), new ArrayList<EdgeDirection>(),  paths, first, first, target);
 		return paths;
@@ -564,8 +646,6 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 	public void setRoot(V root) {
 		this.root = root;
 	}
-
-
 
 	public Map<V, Integer> getVerticesWithIndexes() {
 		return verticesWithIndexes;

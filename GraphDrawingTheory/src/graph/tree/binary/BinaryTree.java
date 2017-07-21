@@ -13,16 +13,34 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * A binary tree constructed from a given undirected graph
+ * A binary tree and methods for its construction
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 
-
+	/**
+	 * Root of the binary tree
+	 */
 	private BinaryTreeNode<V> root;
+	/**
+	 * Nodes of the tree
+	 */
 	private List<BinaryTreeNode<V>> nodes = new ArrayList<BinaryTreeNode<V>>();
+	/**
+	 * A mapping of vertices of the original graph and corresponding binary tree nodes 
+	 */
 	private Map<V, BinaryTreeNode<V>> vertexNodesMap = new HashMap<V, BinaryTreeNode<V>>();
+	/**
+	 * Original graph, based on which the tree is constructed
+	 */
 	private Graph<V,E> graph;
+	
 	private Logger log = Logger.getLogger(BinaryTree.class);
+	/**
+	 * Indicates if binary tree can be constructed
+	 */
 	private boolean canBeConstructed;
 
 	public BinaryTree(Graph<V,E> graph){
@@ -79,7 +97,6 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 		}
 
 	}
-
 
 	private void formTree(List<BinaryTreeNode<V>> currentLevel, boolean debug) throws CannotBeAppliedException{
 		if (debug)
@@ -267,10 +284,11 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	/**
+	 * Checks if the binary tree is balanced
 	 * A height-balanced binary tree is defined as a binary tree in
 	 *  which the depth of the two subtrees of every node
 	 *  never differ by more than 1.
-	 * @return
+	 * @return {@code true} if tree is balanced, {@code false} otherwise
 	 */
 	public boolean isBalanced(){
 		if (root == null)

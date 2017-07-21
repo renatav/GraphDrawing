@@ -8,11 +8,17 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Node of the SPQR tree
+ * @author Renata
+ * @param <V> The vertex type
+ * @param <E> The edge type 
+ */
 public class SPQRTreeNode<V extends Vertex, E extends Edge<V>> implements Vertex{
 
 
 	/**
-	 * Node type -S,P,Q,R
+	 * Node type - S,P,Q,R
 	 */
 	private NodeType nodeType;
 
@@ -93,36 +99,25 @@ public class SPQRTreeNode<V extends Vertex, E extends Edge<V>> implements Vertex
 		this.skeleton = skeleton;
 	}
 
-
-
 	public List<SPQRTreeNode<V, E>> getChildren() {
 		return children;
 	}
 
-
-
 	public void setChildren(List<SPQRTreeNode<V, E>> children) {
 		this.children = children;
 	}
-
 
 	@Override
 	public String toString() {
 		return "TreeNode [Node type =" + nodeType + ",\n skeleton=" + skeleton +"]";
 	}
 
-
 	@Override
 	public void setSize(Dimension size) {
-		// TODO Auto-generated method stub
-		
 	}
-
 
 	@Override
 	public void setContent(Object content) {
-		// TODO Auto-generated method stub
-		
 	}
 
 
