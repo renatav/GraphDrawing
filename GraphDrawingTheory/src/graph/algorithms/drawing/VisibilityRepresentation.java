@@ -19,11 +19,11 @@ import graph.exception.CannotBeAppliedException;
 import graph.ordering.TopologicalOrdering;
 
 /**Finds a graph's visibility representation.
- * Given a graph G = (V, E), a visibility representation Î“, for G maps 
- * every  vertex  v  in V    to  a  horizontal  vertex  segment  Î“(v)  and  every  edge  (u, v)  â�� E  to  a 
- * vertical  edge segment Î“(u, v) such that each vertical edge segment Î“(u, v) has its endpoints 
- * lying on the horizontal vertex segments Î“(u) and Î“(v) and no other segment intersections 
- *o r overlaps occur. 
+ * Given a graph G = (V, E), a visibility representation I'', for G maps 
+ * every  vertex  v  in V    to  a  horizontal  vertex  segment  I''(v)  and  every  edge  (u, v)  in E 
+ * vertical  edge segment I''(u, v) such that each vertical edge segment Î“(u, v) has its endpoints 
+ * lying on the horizontal vertex segments I''(u) and I''(v) and no other segment intersections 
+ * or overlaps occur. 
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type
@@ -275,6 +275,12 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 	
+	/**
+	 * Checks if a list of edges (some cycle) is the external face
+	 * @param test A list of edges that could be the external face
+	 * @param externalFace External face
+	 * @return {@code true} if {@code test} is the external face, {@false} otherwise
+	 */
 	public boolean isExternalFace(List<E> test, List<E> externalFace){
 		if (test.size() != externalFace.size())
 			return false;
@@ -285,7 +291,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the vYMap
+	 * @return the vYMap - y coordinates of vertices
 	 */
 	public Map<V, Integer> getvYMap() {
 		return vYMap;
@@ -299,7 +305,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the vXMinMap
+	 * @return the vXMinMap - minimum x coordinates of vertices
 	 */
 	public Map<V, Integer> getvXMinMap() {
 		return vXMinMap;
@@ -313,7 +319,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the vXMaxMap
+	 * @return the vXMaxMap - maximum x coordinates of vertices
 	 */
 	public Map<V, Integer> getvXMaxMap() {
 		return vXMaxMap;
@@ -327,7 +333,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the eXMap
+	 * @return the eXMap - x coordinates of edges
 	 */
 	public Map<E, Integer> geteXMap() {
 		return eXMap;
@@ -341,7 +347,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the eYMaxMap
+	 * @return the eYMaxMap - maximum y coordinates of edges
 	 */
 	public Map<E, Integer> geteYMaxMap() {
 		return eYMaxMap;
@@ -355,7 +361,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the eYMinMap
+	 * @return the eYMinMap - minimum coordinates of edges
 	 */
 	public Map<E, Integer> geteYMinMap() {
 		return eYMinMap;

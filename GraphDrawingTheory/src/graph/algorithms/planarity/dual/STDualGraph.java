@@ -44,18 +44,18 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 	 * List representing S* and T* portions of the external face
 	 */
 	private List<E> sStar, tStar;
+	
+	private boolean debug = false;
 
 
+	/**
+	 * Construct the st-dual graph given a graph, external face and s and t vertices
+	 * @param graph Graph
+	 * @param externalFace Edges of the external face
+	 * @param s The first vertex of the st-numbering
+	 * @param t The last vertex of the st-numbering
+	 */
 	public STDualGraph(Graph<V,E> graph, List<E> externalFace, V s, V t){
-		this.graph = graph;
-		this.externalFace = externalFace;
-		this.s = s;
-		this.t = t;
-		setDirected(true);
-		constructDualGraph();
-	}
-
-	public STDualGraph(Graph<V,E> graph, List<E> externalFace, V s, V t, PlanarFaces<V,E> planarFaces){
 		this.graph = graph;
 		this.externalFace = externalFace;
 		this.s = s;
@@ -123,16 +123,15 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 			for (int i = 0; i < sIndex; i++)
 				tStar.add(externalFace.get(i));
 
-		System.out.println(sStar);
-		System.out.println(tStar);
-
+		if (debug){
+			System.out.println(sStar);
+			System.out.println(tStar);
+		}
 
 		List<List<E>> allFaces = planarFaces.getAllFaces();
 
-
 		//won't be the same reference, so find the external face in the list of all faces
 		List<E> externalFaceInList = null;
-
 
 		for (List<E> face : allFaces){
 			if (externalFaceInList == null && face.size() == externalFace.size()){
@@ -205,22 +204,37 @@ public class STDualGraph<V extends Vertex, E extends Edge<V>> extends Graph<Dual
 		return ret;
 	}
 
+	/**
+	 * @return Edges on the external face
+	 */
 	public List<E> getExternalFace() {
 		return externalFace;
 	}
 
+	/**
+	 * @return S vertex
+	 */
 	public V getS() {
 		return s;
 	}
 
+	/**
+	 * @return T vertex
+	 */
 	public V getT() {
 		return t;
 	}
 
+	/**
+	 * @return S* edges
+	 */
 	public List<E> getsStar() {
 		return sStar;
 	}
 
+	/**
+	 * @return T* edges
+	 */
 	public List<E> gettStar() {
 		return tStar;
 	}

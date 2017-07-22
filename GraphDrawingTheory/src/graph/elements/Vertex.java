@@ -18,8 +18,14 @@ public interface Vertex {
 	 */
 	Object getContent();
 	
+	/**
+	 * @param size Size to set
+	 */
 	void setSize(Dimension size);
 	
+	/**
+	 * @param content Content to set
+	 */
 	void setContent(Object content);
 	
 

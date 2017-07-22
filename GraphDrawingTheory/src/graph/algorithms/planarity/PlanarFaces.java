@@ -58,6 +58,12 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 
+	/**
+	 * Runs the algorithm for forming planar faces
+	 * @param s The first vertex of the st-numbering
+	 * @param t The last vertex of the st-numbering
+	 * @throws CannotBeAppliedException
+	 */
 	public void formFaces(V s, V t) throws CannotBeAppliedException{
 		//Select some edge (v,w)
 		//go from v to w
@@ -213,7 +219,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the allFaces
+	 * @return All planar faces
 	 */
 	public List<List<E>> getAllFaces() {
 		return allFaces;

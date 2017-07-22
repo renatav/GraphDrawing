@@ -45,6 +45,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 */
 	protected Map<Object, V> vertexByContentMap;
 
+	/**
+	 * Creates a graph by creating empty lists of edges, vertices and other properties
+	 * By default, the graph is undirected
+	 */
 	public Graph(){
 		vertices = new ArrayList<V>();
 		edges = new ArrayList<E>();
@@ -57,6 +61,12 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Creates a graph and sets vertices and edges
+	 * By default, the graph is undirected
+	 * @param vertices A list of vertices
+	 * @param edges A list of edges
+	 */
 	public Graph(List<V> vertices, List<E> edges){
 		this();
 		for (V v : vertices)
@@ -66,17 +76,31 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	}
 
+	/**
+	 * Creates a directed or undirected graph, depending on the provided parameter value
+	 * @param directed {@code true} if the graph should be directed, {@code false} otherwise
+	 */
 	public Graph(boolean directed){
 		this();
 		this.directed = directed;
 	}
 
+	/**
+	 * Checks if the graph contains a certain vertex
+	 * @param v Vertex
+	 * @return {@code true} if the graph contains {@code v}, {@code false} otherwise
+	 */
 	public boolean hasVertex(V v){
 		return vertices.contains(v);
 	}
 
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Adds a desired number of vertices to the graph and updates
+	 * all relevant structures
+	 * @param vert One or more vertices to add
+	 */
 	public void addVertex(V...vert){
 		for (V v : vert){
 			if (!vertices.contains(v)){
@@ -87,6 +111,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 	}
 
+	/**
+	 * Add one vertex to the graph
+	 * @param v Vertex to add
+	 */
 	public void addVertex(V v){
 		if (vertices.contains(v))
 			return;
@@ -95,11 +123,20 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		vertexByContentMap.put(v.getContent(), v);
 	}
 
+	/**
+	 * Adds vertex as to the graph before any other vertex
+	 * @param v Vertex to add
+	 */
 	public void addVertexBeginning(V v){
 		vertices.add(0, v);
 		adjacentLists.put(v, new ArrayList<E>());
 	}
 
+	/**
+	 * Removes a vertex from the graph, thus updating all relevant structures
+	 * and also removing the edges it was a part of
+	 * @param v Vertex to remove
+	 */
 	public void removeVertex(V v){
 		vertices.remove(v);
 		List<E> adjacent = new ArrayList<E>();
@@ -115,6 +152,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Adds a desired number of edges to the graph and updates
+	 * all relevant structures
+	 * @param edge One or more edges to add
+	 */
 	public void addEdge(E...edge){
 
 		for (E e : edge){
@@ -201,6 +243,13 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 
+	/**
+	 * Checks if there is an edge between the two given graph vertices and return is
+	 * it if exists
+	 * @param v1 The first vertex
+	 * @param v2 The second vertex
+	 * @return Edge between {@code v1} and {@code v2} if it exists, @{code null} otherwise
+	 */
 	public E edgeBetween(V v1, V v2){
 		List<E> edges = edgeesBetween(v1, v2);
 		if (edges.size() == 0)
@@ -209,6 +258,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 			return edges.get(0);
 	}
 
+	/**
+	 * Removes an edge from the graph and updates all relevants structures
+	 * @param e Edge to be removed
+	 */
 	public void removeEdge(E e){
 		edges.remove(e);
 		if (adjacentLists.get(e.getOrigin()) != null)
@@ -227,8 +280,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * All edges leaving v
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return A list of all edges leaving graph vertex {@code v}
 	 */
 	public List<E> outEdges(V v){
 		return outgoingEdges.get(v);
@@ -236,8 +289,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * All vertices adjacent to the given one
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return A list of all vertices adjacent to graph vertex {@code v}
 	 */
 	public List<V> adjacentVertices(V v){
 		List<V> ret = new ArrayList<V>();
@@ -252,9 +305,9 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 
 	/**
-	 * Number of edges leaving vertex v
-	 * @param v
-	 * @return
+	 * Out degree of the given node
+	 * @param v Vertex
+	 * @return Out degree of {@code v}
 	 */
 	public int outDegree (V v){
 		if (!outgoingEdges.containsKey(v))
@@ -264,17 +317,17 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * All edges entering v
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return A list of all edges entering vertex {@code v}
 	 */
 	public List<E> inEdges(V v){
 		return incomingEdges.get(v);
 	}
 
 	/**
-	 * Number of edges entering v
-	 * @param v
-	 * @return
+	 * In degree of the given vertex
+	 * @param v Vertex
+	 * @return In degree of vertex {@code v}
 	 */
 	public int inDegree(V v){
 		if (!incomingEdges.containsKey(v))
@@ -285,8 +338,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Checks if vertex is a source (vertex with no incoming edges)
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return {@code true} if vertex {@code v} is a source, {@code false} otherwise
 	 */
 	public boolean isSource(V v){
 		return inDegree(v) == 0;
@@ -294,17 +347,17 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Checks if vertex is a sink (vertex with no outgoing edges)
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return {@code true} if vertex {@code v} is a sink, {@code false} otherwise
 	 */
 	public boolean isSink(V v){
 		return outDegree(v) == 0;
 	}
 
 	/**
-	 * All edges leaving or entering v
-	 * @param v
-	 * @return
+	 * All edges leaving or entering the given vertex
+	 * @param v Vertex
+	 * @return A list of all edges leaving or entering {@code v}
 	 */
 	public LinkedList<E> allEdges(V v){
 		LinkedList<E> ret = new LinkedList<E>();
@@ -314,6 +367,11 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 
+	/**
+	 * Finds all edges between certain vertices
+	 * @param vertices A list of vertices
+	 * @return A list of edges between vertices belonging to the {@code vertices} list
+	 */
 	public List<E> edgesBetween(List<V> vertices){
 		List<E> ret = new ArrayList<E>();
 		for (V v : vertices)
@@ -329,8 +387,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	}
 
 	/**
-	 * All edges which connect one vertix to itself
-	 * @return
+	 * All edges which connect one vertex to itself - loops
+	 * @return A list of loops
 	 */
 	public List<E> getAllSelfLoopEdges(){
 		List<E> ret = new ArrayList<E>();
@@ -342,8 +400,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	}
 
 	/**
-	 * Checks if graph has self loop edges 
-	 * @return
+	 * Checks if graph has loops
+	 * @return {@code true} if the graph has loops, {@code false} otherwise
 	 */
 	public boolean hasSelfLoopEdges(){
 		for (E e : edges){
@@ -356,7 +414,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Checks if graph is simple
-	 * @return
+	 * @return {@code true} if the graph is simple, {@code false} otherwise
 	 */
 	public boolean isSimple(){
 		if (hasSelfLoopEdges())
@@ -372,8 +430,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Number of edges entering or leaving v
-	 * @param v
-	 * @return
+	 * @param v Vertex
+	 * @return Vertex degree of {@code v}
 	 */
 	public int vertexDegree(V v){
 		return adjacentLists.get(v).size();
@@ -381,7 +439,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Max vertex degree
-	 * @return
+	 * @return Maximum degree of any of the graph vertices
 	 */
 	public int graphMaxDegree(){
 		int degree = 0;
@@ -421,16 +479,26 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Checks is graph is connected presumed that certain vertices are removed
-	 * @return
+	 * @param excluded Vertices without whom the graph should still be connected 
+	 * @return {@code true} if the graph without vertices belonging to {@code excluded}
+	 * is connected, {@code false} otherwise
 	 */
 	public boolean isConnected(List<V> excluding){
 		return properties.isConnected(excluding);
 	}
-
+	
+	/**
+	 * Check if the graph is cyclic
+	 * @return {@code true} if the graph is a tree, {@code false} otherwise
+	 */
 	public boolean isCyclic(){
 		return properties.isCyclic();
 	}
 
+	/**
+	 * Finds all sinks in the graph
+	 * @return A list of sinks
+	 */
 	public List<V> getAllSinks(){
 		List<V> ret = new ArrayList<V>();
 		for (V v : vertices)
@@ -439,6 +507,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 
+	/**
+	 * Finds all sources in the graph
+	 * @return A list of sources
+	 */
 	public List<V> getAllSources(){
 		List<V> ret = new ArrayList<V>();
 		for (V v : vertices)
@@ -447,14 +519,22 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 
+	/**
+	 * Finds all multiedges of the graph
+	 * @return All multiedges. Group so that all edges between the same two vertices
+	 * are in a separate list, which is then added to the another list which is returned 
+	 */
 	public List<List<E>> listMultiEdges(){
 		return properties.listMultiEdges();
 	}
 
+	/**
+	 * Check if the graph is a ring
+	 * @return {@code true} if the graph is a tree, {@code false} otherwise
+	 */
 	public boolean isRing(){
 		return properties.isRing();
 	}
-
 
 	/**
 	 * Checks if a graph is biconnected. 
@@ -465,10 +545,18 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return properties.isBiconnected();
 	}
 
+	/**
+	 * Finds all cut vertices of a graph
+	 * @return A list of graph's cut vertices
+	 */
 	public List<V> listCutVertices(){
 		return properties.getCutVertices();
 	}
 
+	/**
+	 * Finds all biconnected components of the graph
+	 * @return A list of graph's biconnected components
+	 */
 	public List<Graph<V,E>>listBiconnectedComponents(){
 		return properties.listBiconnectedComponents();
 	}
@@ -477,7 +565,7 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	 * Creates a subgraph of the graph containing the
 	 * given vertices
 	 * @param subgraphVertices Vertices that should be in the subgraph
-	 * @return
+	 * @return Subgraph containing vertices @{code subgraphVertices}
 	 */
 	@SuppressWarnings("unchecked")
 	public Graph<V,E> subgraph(List<V> subgraphVertices){
@@ -493,6 +581,10 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return subgraph;
 	}
 
+	/**
+	 * Calculates the adjacency matrix of the graph
+	 * @return Adjacency matrix
+	 */
 	public int[][] adjacencyMatrix(){
 		int[][] ret = new int[vertices.size()][vertices.size()];
 		for (int i = 0; i < vertices.size(); i++)
@@ -506,6 +598,9 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		return ret;
 	}
 
+	/**
+	 * Prints adjacency matrix
+	 */
 	public void printAdjacencyMatrix(){
 		int[][] adjMatrix = adjacencyMatrix();
 		for (int[] row : adjMatrix){
@@ -521,32 +616,53 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		System.out.println("");
 	}
 
+	/**
+	 * Return a vertex with the provided content
+	 * @param content Searched content
+	 * @return A vertex whose content is @{code content}
+	 */
 	public V getVertexByContent(Object content){
 		return vertexByContentMap.get(content);
 	}
 
-
+	/**
+	 * @return Graph's vertices
+	 */
 	public List<V> getVertices() {
 		return vertices;
 	}
 
+	/**
+	 * @param vertices Vertices to set
+	 */
 	public void setVertices(List<V> vertices) {
 		this.vertices = vertices;
 	}
 
+	/**
+	 * @return Graph's edges
+	 */
 	public List<E> getEdges() {
 		return edges;
 	}
 
+	/**
+	 * @param edges Edges to set
+	 */
 	public void setEdges(List<E> edges) {
 		this.edges = edges;
 	}
 
-
+	/**
+	 * @return {@code true} if graph is directed, {@code false} otherwise
+	 */
 	public boolean isDirected() {
 		return directed;
 	}
 
+	/**
+	 * @param directed Value of directed property to set
+	 */
 	public void setDirected(boolean directed) {
 		this.directed = directed;
 	}
@@ -619,7 +735,6 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 		}
 		return true;
 	}
-
 
 	/**
 	 * @return the adjacentLists

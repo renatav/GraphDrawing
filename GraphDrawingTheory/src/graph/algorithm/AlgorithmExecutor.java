@@ -15,7 +15,7 @@ public class AlgorithmExecutor {
 	 * @param algorithm Instance of an algorithm class whose method should be executed
 	 * @param methodName Method that should be called
 	 * @param params Parameters of the algorithms
-	 * @return Object consisting of result of the execution of the algorithm and
+	 * @return Object consisting of the result of the execution of the algorithm and
 	 * length of the execution in milliseconds 
 	 */
 	public static ExecuteResult execute(Object algorithm, String methodName, Object...params){

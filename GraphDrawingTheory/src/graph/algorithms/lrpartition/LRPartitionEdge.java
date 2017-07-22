@@ -35,7 +35,12 @@ public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 	 */
 	private boolean valid;
 	
-	
+	/**
+	 * Mark the given edge as a LR partition edge and initializes
+	 * lists of the edges which should be in the same and in different
+	 * partition as it
+	 * @param edge Edge
+	 */
 	public LRPartitionEdge(E edge){
 		same = new ArrayList<E>();
 		different = new ArrayList<E>();
@@ -44,6 +49,12 @@ public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 	}
 	
 	
+	/**
+	 * Marks the given edges as those that should be in the same partition
+	 * as the current edge
+	 * @param toBeAdded Edges that should be in the same partition as the current edges  
+	 * @return {@code true} if there was no contradiction, {@code false} otherwise 
+	 */
 	public boolean addToSame(Set<E> toBeAdded){
 		for (E e : toBeAdded){
 			if (e == edge)
@@ -57,7 +68,12 @@ public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 		return true;
 	}
 	
-	
+	/**
+	 * Marks the given edges as those that should be in the different partition
+	 * than the current edge
+	 * @param toBeAdded Edges that should be in the different partition than the current edge's  
+	 * @return {@code true} if there was no contradiction, {@code false} otherwise 
+	 */
 	public boolean addToDifferent(Set<E> toBeAdded){
 		for (E e : toBeAdded){
 			if (e == edge)
@@ -72,42 +88,59 @@ public class LRPartitionEdge <V extends Vertex, E extends Edge<V>>{
 		return true;
 	}
 
-
+	/**
+	 * @return Edge
+	 */
 	public E getEdge() {
 		return edge;
 	}
 
-
+	/**
+	 * @param edge Edge to set
+	 */
 	public void setEdge(E edge) {
 		this.edge = edge;
 	}
 
-
+	/**
+	 * @return Edges that should be in the same partition as this one
+	 */
 	public List<E> getSame() {
 		return same;
 	}
 
-
+	/**
+	 * @param same Edges that should be in the same partition as this one
+	 */
 	public void setSame(List<E> same) {
 		this.same = same;
 	}
 
-
+	/**
+	 * @return Edges that should be in the different partition than this one's
+	 */
 	public List<E> getDifferent() {
 		return different;
 	}
 
-
+	/**
+	 * @param different Edges that should be in the different partition than this one's
+	 */
 	public void setDifferent(List<E> different) {
 		this.different = different;
 	}
 
-
+	/**
+	 * @return Indicator if there was a contradiction
+	 */
 	public boolean isValid() {
 		return valid;
 	}
 
 
+	/**
+	 * @param valid Valid value to set
+	 */
 	public void setValid(boolean valid) {
 		this.valid = valid;
 	}

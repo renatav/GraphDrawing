@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class represent a permutation in the mapping notation
+ * Class represents a permutation in the mapping notation
  * @author Renata
  */
 public class Permutation {

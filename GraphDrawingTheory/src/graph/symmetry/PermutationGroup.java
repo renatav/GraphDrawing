@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represent a permutation group and contains methods for its analysis
+ * Represents a permutation group and contains methods for its analysis
  * @author Renata
  */
 public class PermutationGroup {

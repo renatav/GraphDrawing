@@ -39,8 +39,8 @@ import java.util.Stack;
  *  Ports the implementation of the following author:
  * @author Nikolay Ognyanov
  *
- * @param <V>  The vertex type.
- * @param <E>  The edge type.
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
  */
 public class PatonSimpleCycles<V extends Vertex, E extends Edge<V>>{
 	
@@ -50,7 +50,7 @@ public class PatonSimpleCycles<V extends Vertex, E extends Edge<V>>{
     /**
      * Create a cycle basis finder for the specified graph.
      * 
-     * @param graph - the DirectedGraph in which to find cycles.
+     * @param graph An undirected graph in which to find cycles.
      * @throws IllegalArgumentException if the graph argument is
      *         <code>null</code>.
      */
@@ -60,7 +60,10 @@ public class PatonSimpleCycles<V extends Vertex, E extends Edge<V>>{
     }
 
 
-   
+    /**
+	 * @return A list simple cycles, where each cycle is represented as
+	 * a list of vertices it contains
+	 */
     public List<List<V>> findSimpleCycles()
     {
         if (graph == null) {

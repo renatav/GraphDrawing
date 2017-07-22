@@ -15,7 +15,12 @@ public class GraphEdge implements Edge<GraphVertex>{
 	public GraphEdge() {
 	}
 
-
+	/**
+	 * Creates an edge with the specified origin vertex, destination vertex and weight
+	 * @param origin Origin vertex
+	 * @param destination Destination vertex
+	 * @param weight Weight
+	 */
 	public GraphEdge(GraphVertex origin, GraphVertex destination, int weight) {
 		super();
 		this.origin = origin;
@@ -24,6 +29,11 @@ public class GraphEdge implements Edge<GraphVertex>{
 	}
 
 	
+	/**
+	 * Creates an edge with the specified origin and destination vertices
+	 * @param origin Origin vertex
+	 * @param destination Destination vertex
+	 */
 	public GraphEdge(GraphVertex origin, GraphVertex destination) {
 		super();
 		this.origin = origin;
@@ -52,10 +62,16 @@ public class GraphEdge implements Edge<GraphVertex>{
 		this.destination = destination;
 	}
 
+	/**
+	 * @return Origin vertex
+	 */
 	public GraphVertex getOrigin() {
 		return origin;
 	}
 
+	/**
+	 * @return Destination vertexx
+	 */
 	public GraphVertex getDestination() {
 		return destination;
 	}

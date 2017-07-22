@@ -16,12 +16,21 @@ public interface Edge<V extends Vertex> {
 	 * @return Destination of the edge
 	 */
 	V getDestination();
+	/**
+	 * @param origin Origin vertex to set
+	 */
 	void setOrigin(V origin);
+	/**
+	 * @param destination Destination vertex to set
+	 */
 	void setDestination(V destination);
 	/**
 	 * @return Weight of the edge
 	 */
 	int getWeight();
+	/**
+	 * @param weight Weight to set
+	 */
 	void setWeight(int weight);
 
 }

@@ -35,11 +35,19 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	 */
 	private int reursiveLinkDistance = 20;
 
+	/**
+	 * Creates a drawing with empty vertex and edge mappings
+	 */
 	public Drawing(){
 		vertexMappings = new HashMap<V, Point2D>();
 		edgeMappings = new HashMap<E, List<Point2D>>();
 	}
 
+	/**
+	 * Creates a drawing with the provided edge and vertex mappings
+	 * @param vertexMappings Map consisting of vertices and their positions
+	 * @param edgeMappings Map consisting of edges and their positions
+	 */
 	public Drawing(Map<V, Point2D> vertexMappings,
 			Map<E, List<Point2D>> edgeMappings) {
 		super();
@@ -50,9 +58,9 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	
 	/**
 	 * Once positions of vertices are calculated, this method
-	 * set positions of edges (their nodes).
+	 * sets positions of edges (their nodes).
 	 * Multiple and recursive edges are handled.
-	 * @param edges
+	 * @param edges Edges to be positioned
 	 */
 	public void positionEdges(List<E> edges){
 		
@@ -164,6 +172,11 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 
+	/**
+	 * Moves vertices of the drawing in order to increase the distances between them
+	 * @param minXDistance Minimum horizontal distance between two vertices
+	 * @param minYDistance Minimum vertical distance between two vertices
+	 */
 	public void separate(int minXDistance, int minYDistance){
 		
 		List<V> covered = new ArrayList<V>();
@@ -211,10 +224,10 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 
 			}
 		}
-
 	}
 
 	/**
+	 * Finds the position of the topmost vertex
 	 * @return Position of the topmost vertex
 	 */
 	public int findTop(){
@@ -222,7 +235,8 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		return (int) (vertexMappings.get(top).getY() - top.getSize().getHeight()/2);
 	}
 	/**
-	 * @return Position of the bottommost vertex
+	 * Finds the position of the bottom-most vertex
+	 * @return Position of the bottom-most vertex
 	 */
 	public int findBottom(){
 		V bottom =  findBottomExcluding(null);
@@ -230,7 +244,8 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return Finds the middle vertical point of the vertex
+	 * Calculates the y value of the center of the drawing
+	 * @return Finds the middle vertical point of the drawing
 	 */
 	public int findMiddle(){
 		return (findBottom() - findTop())/2;
@@ -255,7 +270,7 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Finds the lowest vertex not counting those in the excluding list
 	 * @param excluding Vertices which should be skipped
-	 * @return Position of the bottommost vertex not counting those in the excluding list
+	 * @return Position of the bottom-most vertex not counting those in the excluding list
 	 */
 	private V findBottomExcluding(List<V> excluding){
 		V bottom = null;
@@ -270,7 +285,8 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return Position of the leftmost vertex
+	 * Finds the position of the left-most vertex
+	 * @return Position of the left-most vertex
 	 */
 	public int findLeftmostPosition(){
 		V leftmost = findLeftmostExcluding(null);
@@ -280,7 +296,7 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Finds the leftmost vertex not counting those in the excluding list
 	 * @param excluding Vertices which should be skipped
-	 * @return Position of the leftmost vertex not counting those in the excluding list
+	 * @return Position of the left-most vertex not counting those in the excluding list
 	 */
 	private V findLeftmostExcluding(List<V> excluding){
 		V leftmost = null;
@@ -307,7 +323,8 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return Bounds of the drawing
+	 * Calculates bounds of the drawing
+	 * @return Bounds of the drawing - ret[0] = width, ret[1] = height
 	 */
 	public int[] getBounds(){
 
@@ -367,34 +384,62 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 
+	/**
+	 * Add a vertex with its position to the mapping
+	 * @param v Vertex
+	 * @param pos Position
+	 */
 	public void setVertexPosition(V v, Point2D pos){
 		vertexMappings.put(v, pos);
 	}
-
+	
+	/**
+	 * Add an edge with positions of its nodes to the mapping
+	 * @param e Edge
+	 * @param nodes Positions of nodes
+	 */
 	public void setEdgePosition(E e, List<Point2D> nodes){ 
 		edgeMappings.put(e, nodes);
 	}
 
+	/**
+	 * @return Vertices-positions mapping
+	 */
 	public Map<V, Point2D> getVertexMappings() {
 		return vertexMappings;
 	}
 
+	/**
+	 * @param vertexMappings  Vertices-positions mapping to set
+	 */
 	public void setVertexMappings(Map<V, Point2D> vertexMappings) {
 		this.vertexMappings = vertexMappings;
 	}
 
+	/**
+	 * @return Edges-positions of their nodes mapping
+	 */
 	public Map<E, List<Point2D>> getEdgeMappings() {
 		return edgeMappings;
 	}
 
+	/**
+	 * @param edgeMappings Edges-positions of their nodes mapping to set
+	 */
 	public void setEdgeMappings(Map<E, List<Point2D>> edgeMappings) {
 		this.edgeMappings = edgeMappings;
 	}
 
+	/**
+	 * @param reursiveLinkDistance Distance between recursive links to set
+	 */
 	public void setReursiveLinkDistance(int reursiveLinkDistance) {
 		this.reursiveLinkDistance = reursiveLinkDistance;
 	}
 
+	/**
+	 * @return Distance between recursive links
+	 */
 	public int getReursiveLinkDistance() {
 		return reursiveLinkDistance;
 	}
@@ -404,8 +449,5 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 		return "Drawing [vertexMappings=" + vertexMappings + ", edgeMappings="
 				+ edgeMappings + "]";
 	}
-
-
-
 
 }

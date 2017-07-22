@@ -24,6 +24,10 @@ public class Embedding<V extends Vertex, E extends Edge<V>> {
 	 */
 	private Map<V, Integer> stNumbering;
 	
+	/**
+	 * @param embedding Clockwise order of edges around each vertex
+	 * @param stNumbering s-t numbering of a given graph
+	 */
 	public Embedding(Map<V, List<E>> embedding, Map<V, Integer> stNumbering) {
 		super();
 		this.embedding = embedding;

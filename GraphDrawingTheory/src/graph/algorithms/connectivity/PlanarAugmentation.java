@@ -63,7 +63,8 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 
 
 	/**
-	 * 
+	 * Finds edges which need to be added in order to transform the graph into a planar
+	 * biconnected one.
 	 * @param graph Graph that should be connected and planar that is to be turned into a biconnected graph
 	 * @return Edges to be added
 	 * @throws CannotBeAppliedException

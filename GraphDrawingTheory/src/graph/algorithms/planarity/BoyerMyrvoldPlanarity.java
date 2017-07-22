@@ -846,6 +846,10 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		return ret;
 	}
 
+	/**
+	 * Return vertices of the outside face
+	 * @return A list of vertices forming the outside face
+	 */
 	public List<V> getOutsideFace(){
 		List<V> ret = new ArrayList<V>();
 		for (Block b : blocks){
@@ -856,6 +860,10 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		return ret;
 	}
 
+	/**
+	 * Return edges of the outside face
+	 * @return A list of edges forming the outside face
+	 */
 	public List<E> getExternalFaceEdges(){
 		List<V> externalFaceVertices = getOutsideFace();
 		List<E> externalFace = new ArrayList<E>();
@@ -881,9 +889,21 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	 */
 	public class Block{
 
+		/**
+		 * Vertices belonging to the block
+		 */
 		private List<V> vertices;
+		/**
+		 * Edges belonging to the block
+		 */
 		private List<E> edges;
+		/**
+		 * A subset of all vertices containing those which are boundary
+		 */
 		private List<V> boundaryVertices;
+		/**
+		 * Root of the block
+		 */
 		private V root;
 
 
@@ -894,6 +914,11 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 		}
 
 
+		/**
+		 * Adds a new vertex to the block
+		 * @param v Vertex to add
+		 * @param boundary Indicator if it's a boundary vertex
+		 */
 		public void addVertex(V v, boolean boundary){
 			
 			vertices.add(v);
@@ -903,11 +928,20 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 				root = v;
 		}
 
+		/**
+		 * Adds a new edge to the block
+		 * @param edge
+		 */
 		public void addEdge(E edge){
 			edges.add(edge);
 		}
 
 
+		/**
+		 * Sets a new external face based on the old one
+		 * @param endpoint Last boundary vertex
+		 * @param direction Clockwise or counterclockwise traversal
+		 */
 		public void setExternalFace(V endpoint, Direction direction){
 		
 			List<V> boundaryCopy = new ArrayList<V>(boundaryVertices);
@@ -925,35 +959,58 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 			}
 		}
 
+		/**
+		 * @return Block's vertices
+		 */
 		public List<V> getVertices() {
 			return vertices;
 		}
 
+		/**
+		 * @param vertices Vertices to set
+		 */
 		public void setVertices(List<V> vertices) {
 			this.vertices = vertices;
 		}
 
+		/**
+		 * @return Block's edges
+		 */
 		public List<E> getEdges() {
 			return edges;
 		}
 
+		/**
+		 * @param edges Edges to set
+		 */
 		public void setEdges(List<E> edges) {
 			this.edges = edges;
 		}
 
+		/**
+		 * @return Boundary (external face) vertices
+		 */
 		public List<V> getBoundaryVertices() {
 			return boundaryVertices;
 		}
 
+		/**
+		 * @param boundaryVertices Boundary vertices to set
+		 */
 		public void setBoundaryVertices(List<V> boundaryVertices) {
 			this.boundaryVertices = boundaryVertices;
 		}
 
-
+		/**
+		 * @return Block's root
+		 */
 		public V getRoot() {
 			return root;
 		}
 
+		/**
+		 * @param root Root to set
+		 */
 		public void setRoot(V root) {
 			this.root = root;
 		}

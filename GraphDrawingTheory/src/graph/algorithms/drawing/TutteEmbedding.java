@@ -27,6 +27,13 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 
+	/**
+	 * Executes the algorithm, calculates each vertex's position
+	 * @param J Vertices belonging to the outside face
+	 * @param center Center of the drawing
+	 * @param treshold Parameter which determines the distance between vertices
+	 * @return A mapping of each vertex to its position
+	 */
 	public Map<V, Point2D> execute (List<V> J, Point2D center, double treshold) {
 
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();
@@ -119,14 +126,6 @@ public class TutteEmbedding<V extends Vertex, E extends Edge<V>> {
 			
 			eqesionIndex ++;
 		}
-		
-		
-//		System.out.println("Coefficient x");
-//		aX.printMatrix();
-//		bX.printMatrix();
-//		System.out.println("Coefficient y");
-//		aY.printMatrix();
-//		bY.printMatrix();
 		
 		//now solve using Cramer's rule
 		double[] xCoords = CramersRule.cramers(aX.values(), bX.values()[0]);

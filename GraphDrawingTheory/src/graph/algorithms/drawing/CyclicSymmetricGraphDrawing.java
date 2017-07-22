@@ -48,12 +48,21 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	
 	private Logger log = Logger.getLogger(CyclicSymmetricGraphDrawing.class);
 
+	/**
+	 * @param graph Graph whose drawing is being constructed
+	 */
 	public CyclicSymmetricGraphDrawing(Graph<V,E> graph){
 		this.graph = graph;
 		this.nauty = new McKayGraphLabelingAlgorithm<V, E>(graph);
 	}
 	
 	
+	/**
+	 * Executes the algorithm for one permutation, which means that the drawing
+	 * show show that particular transformation
+	 * @param p Permutation
+	 * @return Best paths for each length of the path
+	 */
 	private Map<Integer, List<PermutationCycle<V>>> executeForPermutation(Permutation p){
 		
 		
@@ -126,11 +135,22 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 
 	}
 	
+	/**
+	 * Executes the algorithm using the provided permutation
+	 * @param p Permutation
+	 * @return A list of cycles, where each one is represented as
+	 * a list of vertices it contains
+	 */
 	public List<List<V>> execute(Permutation p){
 		return formVerticeLists(executeForPermutation(p));
 	}
 	
 
+	/**
+	 * Executes the algorithm and automatically selects a suitable permutation
+	 * @return A list of cycles, where each one is represented as a list of vertices
+	 * it contains
+	 */
 	public List<List<V>> execute(){
 
 

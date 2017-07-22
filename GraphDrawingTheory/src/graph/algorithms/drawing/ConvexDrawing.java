@@ -85,12 +85,13 @@ public class ConvexDrawing<V extends Vertex, E extends Edge<V>> {
 	}
 
 
-	@SuppressWarnings("unchecked")
+	
 	/**
 	 * Executes the algorithms give an outside facial cycle
 	 * @param S Outside facial cycle
 	 * @return A map of vertices and their calculated positions
 	 */
+	@SuppressWarnings("unchecked")
 	public Map<V, Point2D> execute(Path<V,E> S){
 
 		Map<V, Point2D> ret = new HashMap<V, Point2D>();

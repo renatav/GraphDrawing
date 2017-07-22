@@ -19,6 +19,9 @@ public class DualGraphVertex<V extends Vertex, E extends Edge<V>> implements Ver
 	
 	private List<E> content;
 	
+	/**
+	 * @param content Content associated with the vertex
+	 */
 	public DualGraphVertex(List<E> content) {
 		super();
 		this.content = content;

@@ -29,15 +29,24 @@ public class PlanarAugmentationLabel<V extends Vertex, E extends Edge<V>> {
 		children = new ArrayList<Graph<V,E>>();
 	}
 	
-	
+	/**
+	 * @return Size of the label (number of its children)
+	 */
 	public int size(){
 		return children.size();
 	}
 	
+	/**
+	 * Adds child pendant to the label
+	 * @param pendant Pendant to be added
+	 */
 	public void addChild(Graph<V,E> pendant){
 		children.add(pendant);
 	}
 	
+	/**
+	 * @return Type of the label (type of it's parent)
+	 */
 	public BCNodeType getType(){
 		return parent.getType();
 	}

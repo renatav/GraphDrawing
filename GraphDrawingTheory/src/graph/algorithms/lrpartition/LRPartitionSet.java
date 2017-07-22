@@ -38,6 +38,14 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 		this.tree = tree;
 	}
 
+	/**
+	 * Marks that all edges belonging to the first list should be in the same partition.
+	 * Same for edges of the second one. Also marks that edges belonging to different lists
+	 * should be in different partitions
+	 * @param class1 The first list of edges
+	 * @param class2 The second list of edges
+	 * @return {@code true} if there was no contradiction, {@code false} otherwise 
+	 */
 	public boolean add(List<E> class1, List<E> class2){
 
 		//make sure that there are no same edges in the two lists
@@ -251,6 +259,9 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 
 
 
+	/**
+	 * Prints partitions
+	 */
 	public void printPartitions(){
 		System.out.println(same.size());
 		for (List<E> list : same){
@@ -260,8 +271,6 @@ public class LRPartitionSet<V extends Vertex, E extends Edge<V>> {
 		}
 
 	}
-
-
 
 	class ExclusivePair {
 		List<E> class1 = new ArrayList<E>();

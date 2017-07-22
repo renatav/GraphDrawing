@@ -17,6 +17,14 @@ public class VertexDegreeComparator<V extends Vertex, E extends Edge<V>> impleme
 	}
 	
 	@Override
+	/**
+	 * Compares two vertices based on their degree
+	 * @param o1 The first vertex
+	 * @param o2 The second vertex
+	 * @return 1 if degree(o1) > degree(o2), 0 if the degrees are the same,
+	 * -1 if degree(o1) < degree(o2)
+	 * 
+	 */
 	public int compare(V o1, V o2) {
 		int degree1 = graph.vertexDegree(o1);
 		int degree2 = graph.vertexDegree(o2);

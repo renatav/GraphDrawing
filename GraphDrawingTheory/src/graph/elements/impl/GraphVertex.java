@@ -17,11 +17,20 @@ public class GraphVertex implements Vertex{
 		
 	}
 	
+	/**
+	 * Creates a vertex with the provided size and content
+	 * @param size Size of the vertex
+	 * @param content Content of the vertex
+	 */
 	public GraphVertex(Dimension size, Object content){
 		this.size = size;
 		this.content = content;
 	}
 	
+	/**
+	 * Creates a vertex with the provided size
+	 * @param size Size of the vertex
+	 */
 	public GraphVertex(Dimension size){
 		this.size = size;
 		content = "";
@@ -36,11 +45,13 @@ public class GraphVertex implements Vertex{
 	public Object getContent() {
 		return content;
 	}
-
+	
+	@Override
 	public void setSize(Dimension size) {
 		this.size = size;
 	}
 
+	@Override
 	public void setContent(Object content) {
 		this.content = content;
 	}

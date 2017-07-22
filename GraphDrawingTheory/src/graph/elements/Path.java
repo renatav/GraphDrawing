@@ -27,10 +27,18 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 	 */
 	private List<V> uniqueVertices = new ArrayList<V>();
 
+	/**
+	 * Creates an empty path
+	 */
 	public Path(){
 		
 	}
 	
+	/**
+	 * Creates a path given edges and the direction in which they are traversed
+	 * @param path Edges forming the paths
+	 * @param directions Directions in which the edges should be traversed
+	 */
 	public Path(List<E> path, List<EdgeDirection> directions) {
 		super();
 		for (int i = 0; i < path.size(); i++)
@@ -38,12 +46,22 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 		this.directions = directions;
 	}
 	
+	/**
+	 * Creates a path given the edges it contains. Directions are left
+	 * empty.
+	 * @param path Edges forming the path
+	 */
 	public Path(List<E> path) {
 		super();
 		this.path = path;
 	}
 	
 	
+	/**
+	 * Adds an edge to the path
+	 * @param e Edge
+	 * @param direction Direction in which the edge should be traversed
+	 */
 	public void addEdge(E e, EdgeDirection direction){
 		path.add(e);
 		directions.add(direction);
@@ -55,22 +73,41 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 			uniqueVertices.add(v2);
 	}
 	
+	/**
+	 * Checks if the path contains a certain edge
+	 * @param e Edge
+	 * @return {@code true} if the path contains {@code e}, {@code false} otherwise
+	 */
 	public boolean containsEdge(E e){
 		return path.contains(e);
 	}
 	
+	/**
+	 * @return Edges belonging to the path
+	 */
 	public List<E> getPath() {
 		return path;
 	}
 
+	/**
+	 * @param path Edges of the path to set
+	 */
 	public void setPath(List<E> path) {
 		this.path = path;
 	}
 	
+	/**
+	 * Size of the path - number of edges belonging to it
+	 * @return Size of the path
+	 */
 	public int size(){
 		return path.size();
 	}
 	
+	/**
+	 * 
+	 * @return {@code true} if the path is cyclic, {@code false} otherwise
+	 */
 	public boolean isCyclic(){
 		V first;
 		V last;
@@ -87,19 +124,34 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 		return first == last;
 	}
 
+	/**
+	 * @return Directions in which the edges should be traverse
+	 */
 	public List<EdgeDirection> getDirections() {
 		return directions;
 	}
 
+	/**
+	 * @param directions Directions to set
+	 */
 	public void setDirections(List<EdgeDirection> directions) {
 		this.directions = directions;
 	}
 	
+	/**
+	 * Checks if there is at least one edge which occurs multiple times in
+	 * the path's list of edges 
+	 * @return {@code true} if the path contains duplicates, {@code false} otherwise
+	 */
 	public boolean containsDuplicates(){
 		Set<E> set = new HashSet<E>(path);
 		return set.size() == path.size();
 	}
 	
+	/**
+	 * Finds all vertices belonging to the path
+	 * @return All vertices on the path
+	 */
 	public List<V> pathVertices(){
 		List<V> ret = new ArrayList<V>();
 		
@@ -169,6 +221,9 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 		return path.toString();
 	}
 
+	/**
+	 * @return A list of unique vertices (no duplicates)
+	 */
 	public List<V> getUniqueVertices() {
 		return uniqueVertices;
 	}

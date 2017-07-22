@@ -45,6 +45,12 @@ public class STNumbering <V extends Vertex,  E extends Edge<V>> extends Numberin
 		formOrder(graph, s, t);
 	}
 
+	/**
+	 * Forms the st-order
+	 * @param graph Graph
+	 * @param s The first (S) vertex
+	 * @param t The last (T) vertex
+	 */
 	public void formOrder(Graph<V,E> graph, V s, V t){
 
 		//find the edge

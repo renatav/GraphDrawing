@@ -43,6 +43,10 @@ public class MaximumPlanaritySubgraph<V extends Vertex, E extends Edge<V>> {
 	
 	
 	@SuppressWarnings("unchecked")
+	/**
+	 * Finds the maximum planarity subgraph
+	 * @return Maximum planarity subgraph
+	 */
 	public Graph<V,E> calculateMaximumPlanarityGraph(){
 		DFSTree<V, E> tree = new DFSTreeTraversal<V,E>(graph).formDFSTree();
 		Graph<V,E> testGraph = new Graph<>(tree.getVertices(), tree.getTreeEdges());
@@ -58,6 +62,9 @@ public class MaximumPlanaritySubgraph<V extends Vertex, E extends Edge<V>> {
 		return testGraph;
 	}
 
+	/**
+	 * @return Maximum planarity subgraph
+	 */
 	public Graph<V, E> getPlanarSubgraph() {
 		return planarSubgraph;
 	}

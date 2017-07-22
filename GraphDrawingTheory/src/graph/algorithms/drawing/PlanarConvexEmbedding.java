@@ -105,7 +105,8 @@ public class PlanarConvexEmbedding<V extends Vertex, E extends Edge<V>>  {
 	
 	/**
 	 * Determines if a 2-connected graph has a convex drawing
-	 * and finds all the extendable facial cycles
+	 * and finds an extendable facial cycle
+	 * @return Extendable facial cycle
 	 * @throws CannotBeAppliedException 
 	 */
 	@SuppressWarnings("unchecked")

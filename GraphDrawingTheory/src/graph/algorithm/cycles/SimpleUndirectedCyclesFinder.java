@@ -31,7 +31,8 @@ public class SimpleUndirectedCyclesFinder<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Finds all cycles of a graph. A graph can have a very large number of cycles,
 	 * and the algorithm is only effective if that is not the case. 
-	 * @return
+	 * @return All cycles of a graph, where each cycles is represented as a list of
+	 * vertices it contains
 	 */
 	public List<List<V>> findAllCycles(){
 

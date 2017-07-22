@@ -141,21 +141,34 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	}
 
 
+	/**
+	 * Returns the right partition
+	 * @return A list of edges in the right partition
+	 */
 	public List<E> getRight() {
 		return right;
 	}
 
 
+	/**
+	 * @param right Edges in the right partition
+	 */
 	public void setRight(List<E> right) {
 		this.right = right;
 	}
 
 
+	/**
+	 * Returns the left partition
+	 * @return A list of edges in the left partition
+	 */
 	public List<E> getLeft() {
 		return left;
 	}
 
-
+	/**
+	 * @param left Edges in the left partition
+	 */
 	public void setLeft(List<E> left) {
 		this.left = left;
 	}
