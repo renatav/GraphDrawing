@@ -13,8 +13,8 @@ import Jama.Matrix;
 public class GramSchmidt {
 
 	/**
-	 * Calculates orthonormal basis giben a matrix
-	 * @param A Basis
+	 * Calculates orthonormal basis gibev a matrix
+	 * @param A Matrix
 	 * @return Orthonormal basis
 	 */
 	public static Matrix execute(Matrix A){

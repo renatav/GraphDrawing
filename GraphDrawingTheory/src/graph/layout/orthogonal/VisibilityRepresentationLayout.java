@@ -10,7 +10,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.AbstractLayouter;
 import graph.layout.GraphLayoutProperties;
-import graph.layout.router.OrthogonalEdgeRouter;
+import graph.layout.router.orthogonal.OrthogonalEdgeRouter;
 
 /**
  * Layouter using visibility representation or orthogonally lay out a graph

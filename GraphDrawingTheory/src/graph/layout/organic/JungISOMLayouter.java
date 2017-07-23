@@ -10,7 +10,7 @@ import graph.layout.AbstractJungLayouter;
 import graph.layout.GraphLayoutProperties;
 
 /**
- * Layouter using JGraphX's fast organic layout
+ * Layouter which uses JUNG grapmework's ISOM layout
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

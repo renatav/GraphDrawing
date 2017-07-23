@@ -1,7 +1,7 @@
 package graph.layout;
 
 /**
- * List of all implemented layout algorithms
+ * Lists all implemented layout algorithms
  * @author Renata
  */
 public enum LayoutAlgorithms {

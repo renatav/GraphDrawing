@@ -9,6 +9,7 @@ import graph.exception.CannotBeAppliedException;
 
 /**
  * Canonical ordering is a technique for embedding a planar graph on a grid
+ * To be implemented
  * @author Renata
  */
 public class CanonicalOrdering {

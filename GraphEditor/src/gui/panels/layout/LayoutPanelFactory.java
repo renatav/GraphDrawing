@@ -1,5 +1,8 @@
 package gui.panels.layout;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import graph.layout.LayoutAlgorithms;
 import graph.layout.PropertyEnums.BalloonProperties;
 import graph.layout.PropertyEnums.BoxProperties;
@@ -11,16 +14,12 @@ import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.NodeLinkTreeProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
-import graph.layout.PropertyEnums.PartitionProperties;
 import graph.layout.PropertyEnums.RadialTree2Properties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
 import graph.layout.PropertyEnums.SpringProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
 import graph.layout.PropertyEnums.TreeProperties;
 import graph.layout.PropertyEnums.TutteProperties;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LayoutPanelFactory {
 	
@@ -50,7 +49,7 @@ public class LayoutPanelFactory {
 		else if (al == LayoutAlgorithms.TREE)
 			panel = new LayoutPropertyPanel(TreeProperties.class);
 		else if (al == LayoutAlgorithms.RADIAL_TREE)
-			panel = new LayoutPropertyPanel(RadialTreeProperties.class);
+			panel = new LayoutPropertyPanel(RadialTreeProperties.class)	;
 		else if (al == LayoutAlgorithms.COMPACT_TREE)
 			panel = new LayoutPropertyPanel(CompactTreeProperties.class);
 		else if (al == LayoutAlgorithms.FAST_ORGANIC)
@@ -59,8 +58,6 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(OrganicProperties.class);
 		else if (al == LayoutAlgorithms.HIERARCHICAL)
 			panel = new HierarchicalLayoutPanel(HierarchicalProperties.class);
-		else if (al == LayoutAlgorithms.PARTITION)
-			panel = new LayoutPropertyPanel(PartitionProperties.class);
 		else if (al == LayoutAlgorithms.BALLOON)
 			panel = new LayoutPropertyPanel(BalloonProperties.class);
 		else if (al == LayoutAlgorithms.NODE_LINK_TREE)

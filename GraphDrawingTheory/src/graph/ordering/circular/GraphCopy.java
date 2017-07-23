@@ -8,14 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A class which extends graph containing triangulated edges. Used
+ * A graph containing triangulated edges. Used
  * to implement algorithm CIRCULAR
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 
  */
 public class GraphCopy<V extends Vertex, E extends Edge<V>> extends Graph<V, E> {
-
 
 	/**
 	 * Triangulated edges, defined in CIRCULAR
@@ -82,12 +81,12 @@ public class GraphCopy<V extends Vertex, E extends Edge<V>> extends Graph<V, E> 
 	}
 
 
-	@SuppressWarnings("unchecked")
 	/**
 	 * Removes an edge from the graph, checking if it is 
 	 * a triangulated edge or a regular one
 	 * @param e
 	 */
+	@SuppressWarnings("unchecked")
 	public void removeEdgeWithTriangulated(Edge<V> e){
 		if (e instanceof TriangulatedEdge<?>)
 			triangulatedEdges.remove(e);

@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A class for calculating Czekanovski-Dice distances
+ * A class for calculating Czekanovski-Dice distances.
  * With respect to Czekanovski-Dice distance,
  * two vertices are close to each other if they
- * have many common vertices
+ * have many common vertices.
  * @author Renata
  * */
 
@@ -93,6 +93,12 @@ public class CzekanovskiDiceDistance<V extends Vertex, E extends Edge<V>> {
 		
 	}
 	
+	/**
+	 * Return the Czekanovski-Dice between two vertices
+	 * @param vi The first vertex
+	 * @param vj The second vertex
+	 * @return Czekanovski-Dice distance between {@code vi} and {@code vj}
+	 */
 	public double getDistance(V vi, V vj){
 		return distances.get(vi).get(vj);
 	}

@@ -1,6 +1,7 @@
-package graph.layout.orthogonal;
+package graph.layout.router.orthogonal;
 
 import graph.elements.Vertex;
+import graph.layout.orthogonal.EntryDirection;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -8,13 +9,23 @@ import java.util.List;
 
 /**
  * Class represents a point where an edge begins or ends inside a vertex
+ * Used to implement the orthogonal layout
  * @author Renata
  * @param <V> The vertex type
  */
 public class OrthogonalConnector<V extends Vertex> {
 
+	/**
+	 * The vertex containing the connector
+	 */
 	private V vertex;
+	/**
+	 * Direction in which edges enter the connector
+	 */
 	private EntryDirection entryDirection;
+	/**
+	 * The number of edges containing the connector
+	 */
 	private int number;
 	/**
 	 * If there are multiple edges entering or leaving the vertex
@@ -26,6 +37,13 @@ public class OrthogonalConnector<V extends Vertex> {
 	private List<List<Point2D>> edgesWithNodePositions;
 	
 	
+	/**
+	 * Creates a new orthogonal connector belonging to a certain vertex given
+	 * the entry direction and current number of edges
+	 * @param vertex
+	 * @param entryDirection
+	 * @param number
+	 */
 	public OrthogonalConnector(V vertex, EntryDirection entryDirection, int number) {
 		super();
 		this.vertex = vertex;
@@ -34,6 +52,9 @@ public class OrthogonalConnector<V extends Vertex> {
 		edgesWithNodePositions = new ArrayList<List<Point2D>>();
 	}
 	
+	/**
+	 * Number of edges using containing the connector
+	 */
 	public void incNumber(){
 		number++;
 	}
@@ -55,7 +76,7 @@ public class OrthogonalConnector<V extends Vertex> {
 
 
 	/**
-	 * @return the entryDirection
+	 * @return the entry direction
 	 */
 	public EntryDirection getEntryDirection() {
 		return entryDirection;
@@ -63,15 +84,14 @@ public class OrthogonalConnector<V extends Vertex> {
 
 
 	/**
-	 * @param entryDirection the entryDirection to set
+	 * @param entryDirection the entry direction to set
 	 */
 	public void setEntryDirection(EntryDirection entryDirection) {
 		this.entryDirection = entryDirection;
 	}
 
-
 	/**
-	 * @return the number
+	 * @return the number of edges
 	 */
 	public int getNumber() {
 		return number;
@@ -79,21 +99,21 @@ public class OrthogonalConnector<V extends Vertex> {
 
 
 	/**
-	 * @param number the number to set
+	 * @param number the number of edges to set
 	 */
 	public void setNumber(int number) {
 		this.number = number;
 	}
 
 	/**
-	 * @return the nodePositions
+	 * @return A list of edges with their node positions
 	 */
 	public List<List<Point2D>> getEdgesWithNodePositions() {
 		return edgesWithNodePositions;
 	}
 
 	/**
-	 * @param nodePositions the nodePositions to set
+	 * @param nodePositions Positions of nodes of the new edge
 	 */
 	public void addEdge(List<Point2D> nodePositions) {
 		edgesWithNodePositions.add(nodePositions);

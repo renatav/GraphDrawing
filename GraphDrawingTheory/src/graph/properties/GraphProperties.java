@@ -76,7 +76,8 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	}
 
 	/**
-	 * @return {@code true} if graph is biconnected, @{code false} otherwisse
+	 * Checks if the graph is biconnected
+	 * @return {@code true} if graph is biconnected, @{code false} otherwise
 	 */
 	public boolean isBiconnected(){
 		return getCutVertices().size() == 0;
@@ -112,7 +113,8 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	}
 	
 	/**
-	 * @return A list of graph's eigen values
+	 * Finds the graph's eigen values
+	 * @return A list of the graph's eigen values
 	 */
 	public List<Double> getEigenValues(){
 		int[][] adjacencyMatrix = graph.adjacencyMatrix();
@@ -153,6 +155,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	}
 
 	/**
+	 * Checks if the graph is cyclic
 	 * @return {@code true} if graph is cyclic, @{code false} otherwise
 	 */
 	public boolean isCyclic(){
@@ -224,6 +227,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	}
 	
 	/**
+	 * Checks if the graph is a ring
 	 * @return {@code true} if graph is a ring, @{code false} otherwise
 	 */
 	public boolean isRing(){

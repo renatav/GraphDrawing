@@ -10,7 +10,7 @@ import graph.elements.Vertex;
 import java.awt.geom.Point2D;
 
 /**
- * Contains common code used for calling Jung layout algorithms
+ * Contains general code used for calling Jung layout algorithms
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

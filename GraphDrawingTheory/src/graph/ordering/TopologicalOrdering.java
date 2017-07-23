@@ -21,12 +21,13 @@ import graph.util.Util;
 public class TopologicalOrdering {
 
 	/**
-	 * Finds topological ordering
+	 * Finds the topological ordering
 	 * @param graph Graph
 	 * @return A map of vertex to integer values - topological ordering of graph {@code graph}
-	 * @throws CannotBeAppliedException if graph doesn't have a topological ordering
+	 * @throws CannotBeAppliedException if the graph doesn't have topological ordering
 	 */
-	public static <V extends Vertex,E extends Edge<V>>  Map<V,Integer> calculateOrdering(Graph<V,E> graph) throws CannotBeAppliedException{
+	public static <V extends Vertex,E extends Edge<V>>  Map<V,Integer> calculateOrdering
+		(Graph<V,E> graph) throws CannotBeAppliedException{
 		
 		if (!graph.isDirected() || graph.isCyclic())
 			throw new CannotBeAppliedException("Canonical ordering is only for directed acyclic graphs");

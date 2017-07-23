@@ -18,7 +18,7 @@ import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.view.mxGraph;
 
 /**
- * Contains common code used for calling JGraphX layout algorithms
+ * Contains general code used for calling JGraphX layout algorithms
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

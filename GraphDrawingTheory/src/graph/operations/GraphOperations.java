@@ -47,12 +47,13 @@ public class GraphOperations<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	/**
 	 * Finds a graph which is a union of the provided list of graphs
 	 * @param graphs A list of graphs
 	 * @return A graph which is a union of all graphs in list {@code graphs}
 	 */
+	@SuppressWarnings("unchecked")
 	public Graph<V,E> union(List<Graph<V,E>> graphs){
 		Graph<V,E> ret = new Graph<V,E>();
 		for (Graph<V,E> graph : graphs){
@@ -138,7 +139,6 @@ public class GraphOperations<V extends Vertex, E extends Edge<V>> {
 		}
 		
 		//add the last on and close the cycle
-		
 		if (next == null) //only one vertex
 			next = current;
 		
@@ -149,7 +149,7 @@ public class GraphOperations<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	/**
 	 * Creates a new edge connecting two provided vertices
 	 * @param source Source vertex
@@ -157,6 +157,7 @@ public class GraphOperations<V extends Vertex, E extends Edge<V>> {
 	 * @param edgeClass Class of the edge
 	 * @return Edge between {@code source} and {@code destination}
 	 */
+	@SuppressWarnings("unchecked")
 	public E createNewEdge(V source, V destination, Class<?> edgeClass){
 		if (edgeClass == null)
 			throw new RuntimeException("Edge class must be provided!");

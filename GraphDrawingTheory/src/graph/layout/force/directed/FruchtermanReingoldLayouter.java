@@ -7,7 +7,7 @@ import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.FruchtermanReingoldProperties;
 
 /**
- * Layouter using JUNG framework's Fruchterman-Reingold layout
+ * Layouter which uses JUNG framework's Fruchterman-Reingold layout
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

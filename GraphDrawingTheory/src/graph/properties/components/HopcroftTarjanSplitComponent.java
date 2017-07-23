@@ -9,7 +9,7 @@ import graph.elements.Edge;
 import graph.elements.Vertex;
 
 /**
- * A xomponent of a graph used in Hopcroft-Tarjan splitting algorithm
+ * A component of a graph used in Hopcroft-Tarjan splitting algorithm
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 
@@ -33,29 +33,21 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 	 */
 	private List<V> vertices;
 	
-	public SplitTriconnectedComponentType getType() {
-		return type;
-	}
-
-	public void setType(SplitTriconnectedComponentType type) {
-		this.type = type;
-	}
-
-	public List<E> getEdges() {
-		return edges;
-	}
-
-	public void setEdges(List<E> edges) {
-		this.edges = edges;
-		virtualEdges = new ArrayList<E>();
-	}
-	
+	/**
+	 * Creates an empty component
+	 */
 	public HopcroftTarjanSplitComponent() {
 		super();
 		virtualEdges = new ArrayList<E>();
 	}
 	
-
+	/**
+	 * Creates a component with the specified edges and virtual edges
+	 * of the given type
+	 * @param edges Component's edges
+	 * @param virtualEdges Component's virtual edges
+	 * @param type Component's type
+	 */
 	public HopcroftTarjanSplitComponent(List<E> edges, List<E> virtualEdges,
 			SplitTriconnectedComponentType type) {
 		super();
@@ -64,9 +56,45 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 		this.virtualEdges = virtualEdges;
 	}
 	
+	/**
+	 * Creates a component with the specified edges
+	 * of the given type
+	 * @param edges Component's edges
+	 * @param type Component's type
+	 */
 	public HopcroftTarjanSplitComponent(SplitTriconnectedComponentType type, List<E> edges) {
 		super(edges);
 		this.type = type;
+	}
+	
+	/**
+	 * @return Component's type
+	 */
+	public SplitTriconnectedComponentType getType() {
+		return type;
+	}
+
+	/**
+	 * @param type Component's type to set
+	 */
+	public void setType(SplitTriconnectedComponentType type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return Component's edges
+	 */
+	public List<E> getEdges() {
+		return edges;
+	}
+
+	/**
+	 * Sets edges and initializes the virtual edges list.
+	 * @param edges Edges to set.
+	 */
+	public void setEdges(List<E> edges) {
+		this.edges = edges;
+		virtualEdges = new ArrayList<E>();
 	}
 	
 	/**
@@ -98,6 +126,9 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 		return ret;
 	}
 	
+	/**
+	 * Sets the components vertices based on the edges that it contains
+	 */
 	public void setVertices(){
 		vertices = new ArrayList<V>();
 		for (E e : edges){
@@ -110,43 +141,63 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 		}
 	}
 	
-
-	@Override
-	public String toString() {
-		return "HopcroftSplitComponent [edges=" + edges + "]";
-	}
-
+	/**
+	 * @return Separation pair
+	 */
 	public SplitPair<V, E> getSpearaionPair() {
 		return spearaionPair;
 	}
 
+	/**
+	 * @param spearaionPair Separation pair to set
+	 */
 	public void setSpearaionPair(SplitPair<V, E> spearaionPair) {
 		this.spearaionPair = spearaionPair;
 	}
 
+	/**
+	 * @return Virtual edges
+	 */
 	public List<E> getVirtualEdges() {
 		return virtualEdges;
 	}
 
+	/**
+	 * @param virtualEdges Virtual edges to set
+	 */
 	public void setVirtualEdges(List<E> virtualEdges) {
 		this.virtualEdges = virtualEdges;
 	}
 
-	
+	/**
+	 * Adds an edge to the list of edges
+	 * @param e Edge to be added
+	 */
 	public void addEdge(E e){
 		edges.add(e);
 	}
 	
+	/**
+	 * Adds a virtual edge - updates both the list of edges and virtual edges
+	 * @param e
+	 */
 	public void addVirtualEdge(E e){
 		edges.add(e);
 		virtualEdges.add(e);
 	}
 
+	/**
+	 * @return The component's vertices
+	 */
 	public List<V> getVertices() {
 		return vertices;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "HopcroftSplitComponent [edges=" + edges + "]";
+	}
+
 	
 	
 	

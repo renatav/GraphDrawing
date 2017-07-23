@@ -2,7 +2,7 @@ package graph.properties.components;
 
 /**
  * Enumeration listing all possible types of a triconnected component 
- * @author user
+ * @author Renata
  */
 public enum SplitTriconnectedComponentType {
 	

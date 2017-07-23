@@ -7,7 +7,7 @@ import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.SpringProperties;
 
 /**
- * Layouter using JUNG framework's DAG layout
+ * Layouter which uses JUNG framework's DAG layout
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

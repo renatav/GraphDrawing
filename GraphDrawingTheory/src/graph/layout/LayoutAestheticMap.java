@@ -43,8 +43,4 @@ public class LayoutAestheticMap {
 		aestheticCriteriaAlgorithms.put(AestheticCriteria.UNIFORM_FLOW, flow);
 	}
 	
-	public static LayoutAlgorithms pick(AestheticCriteria criterion){
-		//for now
-		return aestheticCriteriaAlgorithms.get(criterion).get(0);
-	}
 }

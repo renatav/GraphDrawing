@@ -16,17 +16,29 @@ public class SplitPair<V extends Vertex, E extends Edge<V>> {
 	 */
 	private V v, u;
 	/**
-	 * Splut pair type
+	 * Split pair type (1 or 2)
 	 */
 	private int type;
 	
 
+	/**
+	 * Construct a split pair consisting of the two given vertices
+	 * @param v The first split pair vertex
+	 * @param u The second split pair vertex
+	 */
 	public SplitPair(V v, V u) {
 		super();
 		this.v = v;
 		this.u = u;
 	}
 	
+	/**
+	 * Construct a split pair consisting of the two given vertices and of the
+	 * specified type
+	 * @param v The first split pair vertex
+	 * @param u The second split pair vertex
+	 * @param type The pair's type (1 or 2)
+	 */
 	public SplitPair(V v, V u, int type) {
 		super();
 		this.v = v;
@@ -34,20 +46,46 @@ public class SplitPair<V extends Vertex, E extends Edge<V>> {
 		this.type = type;
 	}
 
+	/**
+	 * @return The first vertex of the pair
+	 */
 	public V getV() {
 		return v;
 	}
 
+	/**
+	 * @param v The first vertex of the pair to set
+	 */
 	public void setV(V v) {
 		this.v = v;
 	}
 
+	/**
+	 * @return The second vertex of the pair
+	 */
 	public V getU() {
 		return u;
 	}
 
+	/**
+	 * @param u The second vertex of he pair to set
+	 */
 	public void setU(V u) {
 		this.u = u;
+	}
+	
+	/**
+	 * @return Split pair's type (1 or 2)
+	 */
+	public int getType() {
+		return type;
+	}
+
+	/**
+	 * @param type Type of the pair to set (1 or 2)
+	 */
+	public void setType(int type) {
+		this.type = type;
 	}
 
 	@Override
@@ -74,15 +112,5 @@ public class SplitPair<V extends Vertex, E extends Edge<V>> {
 			return v.equals(other.getV());
 		return false;
 	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-		
-	
 
 }

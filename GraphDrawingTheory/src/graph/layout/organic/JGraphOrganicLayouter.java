@@ -9,7 +9,7 @@ import graph.layout.GraphLayoutProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
 
 /**
- * Layouter using JGraphX's organic layout
+ * Layouter which uses JGraphX's organic layout
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

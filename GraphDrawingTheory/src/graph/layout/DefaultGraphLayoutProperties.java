@@ -9,9 +9,7 @@ import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.NodeLinkTreeProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
-import graph.layout.PropertyEnums.PartitionProperties;
 import graph.layout.PropertyEnums.RadialTree2Properties;
-import graph.layout.PropertyEnums.StackProperties;
 
 /**
  * Sets default properties of layout algorithms. 
@@ -23,8 +21,8 @@ public class DefaultGraphLayoutProperties {
 
 	/**
 	 * Sets default layout properties of the algorithm given a graph
-	 * @param algorithm
-	 * @param graph
+	 * @param algorithm Layout algorithm
+	 * @param graph Graph
 	 * @return Default properties of the algorithm
 	 */
 	public static GraphLayoutProperties getDefaultLayoutProperties(LayoutAlgorithms algorithm, Graph<?,?> graph){
@@ -72,14 +70,6 @@ public class DefaultGraphLayoutProperties {
 			properties.setProperty(HierarchicalProperties.INTRA_CELL_SPACING, params[0] + spacing);
 			properties.setProperty(HierarchicalProperties.INTER_RANK_CELL_SPACING, params[1] + spacing);
 			
-		}
-		
-		else if (algorithm == LayoutAlgorithms.STACK){
-			properties.setProperty(StackProperties.HORIZONTAL, true);
-		}
-		
-		else if (algorithm == LayoutAlgorithms.PARTITION){
-			properties.setProperty(PartitionProperties.HORIZONTAL, true);
 		}
 		
 		else if (algorithm == LayoutAlgorithms.RADIAL_TREE2){

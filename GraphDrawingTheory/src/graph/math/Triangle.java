@@ -34,6 +34,12 @@ public class Triangle {
 	 */
 	private boolean beforeParent;
 	
+	/**
+	 * Constructs a triangle with the given 3 points as its apices
+	 * @param a Position of the first apex
+	 * @param b Position of the second apex
+	 * @param c Position of he third apex
+	 */
 	public Triangle(Point2D a, Point2D b, Point2D c) {
 		super();
 		this.a = a;
@@ -41,26 +47,45 @@ public class Triangle {
 		this.c = c;
 	}
 
+	/**
+	 * @return Position of the A apex
+	 */
 	public Point2D getA() {
 		return a;
 	}
 
+	/**
+	 * @param a Position of the A apex to set
+	 */
 	public void setA(Point2D a) {
 		this.a = a;
 	}
 
+	/**
+	 * 
+	 * @return Position of the B apex
+	 */
 	public Point2D getB() {
 		return b;
 	}
 
+	/**
+	 * @param b Position of the B apex to set
+	 */
 	public void setB(Point2D b) {
 		this.b = b;
 	}
 
+	/**
+	 * @return Position of the C apex
+	 */
 	public Point2D getC() {
 		return c;
 	}
 
+	/**
+	 * @param c Position of the C apex to set
+	 */
 	public void setC(Point2D c) {
 		this.c = c;
 	}
@@ -85,28 +110,28 @@ public class Triangle {
 	}
 
 	/**
-	 * @return the parentTriangle
+	 * @return the parent triangle
 	 */
 	public Triangle getParentTriangle() {
 		return parentTriangle;
 	}
 
 	/**
-	 * @param parentTriangle the parentTriangle to set
+	 * @param parentTriangle the parent triangle to set
 	 */
 	public void setParentTriangle(Triangle parentTriangle) {
 		this.parentTriangle = parentTriangle;
 	}
 
 	/**
-	 * @return the beforeParent
+	 * @return Indicator if the triangle should be placed before its parent
 	 */
 	public boolean isBeforeParent() {
 		return beforeParent;
 	}
 
 	/**
-	 * @param beforeParent the beforeParent to set
+	 * @param Indicator if the triangle should be placed before its parent to set
 	 */
 	public void setBeforeParent(boolean beforeParent) {
 		this.beforeParent = beforeParent;

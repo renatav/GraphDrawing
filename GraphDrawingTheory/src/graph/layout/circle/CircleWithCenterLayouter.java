@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
 
 /**
  * This layouter takes places vertices on a circumference of a circle,
- * and places the vertex with most links with other graph vertices in
+ * and places the vertex with the highest number of links with other graph vertices in
  * the center of the circle 
  */
 public class CircleWithCenterLayouter<V extends Vertex, E extends Edge<V>> extends AbstractLayouter<V, E>{ 

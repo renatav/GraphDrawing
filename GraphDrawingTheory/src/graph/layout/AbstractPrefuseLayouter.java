@@ -18,7 +18,7 @@ import prefuse.data.Node;
 import prefuse.data.Table;
 
 /**
- * Contains common code used for calling prefuse layout algorithms
+ * Contains general code used for calling prefuse layout algorithms.
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

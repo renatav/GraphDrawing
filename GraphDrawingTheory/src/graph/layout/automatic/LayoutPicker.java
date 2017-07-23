@@ -35,6 +35,13 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	private Logger log = Logger.getLogger(LayoutPicker.class);
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Picks the appropriate algorithm based on the properties of the graph.
+	 * Graph is created based on the given lists of vertices and edges
+	 * @param vertices Graph's vertices
+	 * @param edges Graph's edges
+	 * @return The chosen algorithm
+	 */
 	public LayoutAlgorithms pickAlgorithm(List<V> vertices, List<E> edges){
 		Graph<V,E> graph = new Graph<V,E>();
 		for (V v : vertices)
@@ -47,7 +54,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Picks the appropriate algorithm based on the properties of the graph
 	 * @param graph
-	 * @return Chosen algorithm
+	 * @return The chosen algorithm
 	 */
 	public LayoutAlgorithms pickAlgorithm(Graph<V,E> graph){
 		

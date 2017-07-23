@@ -1,7 +1,7 @@
 package graph.layout.orthogonal;
 
 /**
- * Direction from which an edge can enter a vertex
+ * Directions from which an edge can enter a vertex
  * @author Renata
  */
 public enum EntryDirection {

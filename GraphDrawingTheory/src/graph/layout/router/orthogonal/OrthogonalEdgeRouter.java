@@ -1,4 +1,4 @@
-package graph.layout.router;
+package graph.layout.router.orthogonal;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -9,7 +9,6 @@ import java.util.Map;
 import graph.elements.Edge;
 import graph.elements.Vertex;
 import graph.layout.orthogonal.EntryDirection;
-import graph.layout.orthogonal.OrthogonalConnector;
 
 /**
  * Part of the orthogonal graph drawing algorithm. Routes edges
@@ -26,7 +25,14 @@ public class OrthogonalEdgeRouter<V extends Vertex, E extends Edge<V>>{
 	private Map<V, List<OrthogonalConnector<V>>> connectorsMap = new HashMap<V, List<OrthogonalConnector<V>>>();
 	private Map<E, Integer> eXMap;
 	private int xDistance = 50;
-	
+
+	/**
+	 * Creates the edge router given list of edges to be positioned and vertices with their positions
+	 * @param edges Edges to be routed
+	 * @param vertexMappings A map of vertices and their positions
+	 * @param eXMap A map of visibility representation's E_x values
+	 * @param xDistance A parameter for calculating horizontal positions of nodes
+	 */
 	public OrthogonalEdgeRouter(List<E> edges, Map<V, Point2D> vertexMappings, Map<E, Integer> eXMap, int xDistance){
 		this.edges = edges;
 		this.vertexMappings = vertexMappings;

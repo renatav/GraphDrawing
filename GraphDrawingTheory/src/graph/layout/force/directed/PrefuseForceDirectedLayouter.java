@@ -7,7 +7,7 @@ import graph.layout.GraphLayoutProperties;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 
 /**
- * Layouter using prefuse framework's force-directed layout
+ * Layouter which uses prefuse framework's force-directed layout
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

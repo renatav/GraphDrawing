@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * Layouter which creates a drawing of a graph using Carr and Kocay's symmetric
- * circular algorithms 
+ * circular algorithm
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

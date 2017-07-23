@@ -40,10 +40,20 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 	 */
 	private LayouterFactory<V,E> layouterFactory;
 
+	/**
+	 * Constructs the layouter without populating list of edges and vertices 
+	 */
 	public Layouter(){
 		layouterFactory = new LayouterFactory<V,E>();
 	}
 
+	/**
+	 * Constructs the layouter and sets lists of vertices and edges, as well
+	 * as the layout algorithm which should be used
+	 * @param vertices A list of vertices
+	 * @param edges A list of edges
+	 * @param algorithm Layout algorithm
+	 */
 	public Layouter(List<V> vertices, List<E> edges, LayoutAlgorithms algorithm){
 		this.edges = edges;
 		this.vertices = vertices;
@@ -51,6 +61,14 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		layouterFactory = new LayouterFactory<V,E>();
 	}
 
+	/**
+	 *  Constructs the layouter and sets lists of vertices and edges, as well
+	 * as the layout algorithm which should be used and its properties 
+	 * @param vertices A list of vertices
+	 * @param edges A list of edges
+	 * @param algorithm Layout algorithm
+	 * @param layoutProperties Algorithm's proeprties
+	 */
 	public Layouter(List<V> vertices, List<E> edges, LayoutAlgorithms algorithm, GraphLayoutProperties layoutProperties){
 		this(vertices, edges, algorithm);
 		this.layoutProperties = layoutProperties;
@@ -58,8 +76,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 	@SuppressWarnings("unchecked")
 	/**
-	 * Create just one graph from all vertices and edges
-	 * Even if it consists of multiple 1-connected components
+	 * Creates just one graph from all vertices and edges,
+	 * even if it consists of multiple 1-connected components
 	 * @param vertices
 	 * @param edges
 	 * @return Constructed graph
@@ -291,14 +309,14 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the layoutProperties
+	 * @return properties of the layout algorithm
 	 */
 	public GraphLayoutProperties getLayoutProperties() {
 		return layoutProperties;
 	}
 
 	/**
-	 * @param layoutProperties the layoutProperties to set
+	 * @param layoutProperties properties of the layout algorithm to set
 	 */
 	public void setLayoutProperties(GraphLayoutProperties layoutProperties) {
 		this.layoutProperties = layoutProperties;

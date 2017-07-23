@@ -39,7 +39,7 @@ import models.java.LayoutGraph;
 import models.java.LayoutSubgraphs;
 
 /**
- * A layouter which lays out a given graph in accordance to the user's description
+ * A layouter which lays out a given graph in accordance with the user's description
  * which needs to conform to the defined dsl.
  * @author Renata
  * @param <V> The vertex type
@@ -88,6 +88,13 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 	int maxYInRow = 0;
 
 
+	/**
+	 * Constructs the DSL layouter given lists of graph's vertices and edges
+	 * and textual description of the desired layout conforming to the dsl
+	 * @param vertices A list of graph's vertices
+	 * @param edges A list of graph's edges
+	 * @param userDescription A textual description of the desired layout conforming to the dsl
+	 */
 	public DSLLayouter(List<V> vertices, List<E> edges, String userDescription){
 		this.vertices = vertices;
 		this.edges = edges;
@@ -95,6 +102,11 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 		layouter = new Layouter<V,E>();
 	}
 
+	/**
+	 * Lays out the graph and returns a mapping of vertices and edges to their positions
+	 * @return Drawing - object containing maps of vertices and edges and their positions
+	 * @throws DSLException If the provided textual description does not conform to the dsl
+	 */
 	public Drawing<V,E> layout() throws DSLException{
 		ILayout layoutDescription = Interpreter.getInstance().execute(userDescription);
 

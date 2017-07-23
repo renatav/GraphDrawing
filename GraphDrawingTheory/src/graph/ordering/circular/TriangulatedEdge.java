@@ -48,7 +48,6 @@ public class TriangulatedEdge<V extends Vertex> implements Edge<V> {
 
 	@Override
 	public void setWeight(int weight) {
-		// TODO Auto-generated method stub
-		
+		this.weight = weight;
 	}
 }

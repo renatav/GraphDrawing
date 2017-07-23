@@ -11,7 +11,7 @@ import prefuse.data.tuple.TupleSet;
 import prefuse.visual.VisualItem;
 
 	/**
-	 * Class needed to get the positions of graph elements after a layout algorithm is performed
+	 * Class needed to get the positions of graph elements after a prefuse's layout algorithm is performed.
 	 * prefuse uses schedulers, so this class is supposed to be instantiated in order to be scheduled
 	 * after the layout action
 	 * @author Renata
@@ -21,20 +21,38 @@ import prefuse.visual.VisualItem;
 		private Map<Integer, Point2D> positionsMap = new HashMap<Integer, Point2D>();
 		private boolean finished = false;
 		
+		/**
+		 * @param duration How long should the action last
+		 */
 		public PositionAction(long duration) {
 			super(duration);
 		}
 		
+		/**
+		 * Defines what the action does.
+		 * Overrides prefuse's Action classes' run method.
+		 */
+		@Override
 		public void run(){
 			exec();
 		}
 
+		
+		/**
+		 * Defines what the action does.
+		 * Overrides prefuse's Action classes' run method.
+		 * Parameter is not used.
+		 */
 		@Override
 		protected void run(long elapsedTime) {
 			exec();
-			
 		}
 
+		/**
+		 * Defines what the action does.
+		 * Overrides prefuse's Action classes' run method.
+		 * Parameter is not used.
+		 */
 		@Override
 		public void run(double frac) {
 			exec();
@@ -56,10 +74,17 @@ import prefuse.visual.VisualItem;
 			finished = true;
 		}
 
+		/**
+		 * Returns the positions of graph's nodes
+		 * @return A map of nodes and their positions
+		 */
 		public Map<Integer, Point2D> getPositionsMap() {
 			return positionsMap;
 		}
 
+		/**
+		 * @return Indicator if the action is over or not
+		 */
 		public boolean isFinished() {
 			return finished;
 		}

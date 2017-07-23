@@ -16,10 +16,20 @@ public class GraphLayoutProperties {
 	 */
 	private Map<PropertyEnums, Object> propeprtiesMap = new HashMap<PropertyEnums, Object>();
 	
+	/**
+	 * Sets a value of a property with the given key
+	 * @param key Property's key
+	 * @param value Value of the property 
+	 */
 	public void setProperty(PropertyEnums key, Object value){
 		propeprtiesMap.put(key, value);
 	}
 	
+	/**
+	 * Return value of the property given its key
+	 * @param key Property's key
+	 * @return Value of the property 
+	 */
 	public Object getProperty(PropertyEnums key){
 		return propeprtiesMap.get(key);
 	}
