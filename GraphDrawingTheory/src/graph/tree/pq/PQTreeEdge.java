@@ -12,6 +12,11 @@ public class PQTreeEdge implements Edge<PQTreeNode>{
 	private PQTreeNode destination;
 	
 	
+	/**
+	 * Constructs the PQ-tree edge given origin and destination nodes
+	 * @param origin Origin node
+	 * @param destination Destination node
+	 */
 	public PQTreeEdge(PQTreeNode origin, PQTreeNode destination) {
 		super();
 		this.origin = origin;
@@ -22,6 +27,7 @@ public class PQTreeEdge implements Edge<PQTreeNode>{
 	public PQTreeNode getOrigin() {
 		return origin;
 	}
+	
 	@Override
 	public PQTreeNode getDestination() {
 		return destination;
@@ -34,15 +40,14 @@ public class PQTreeEdge implements Edge<PQTreeNode>{
 	@Override
 	public void setDestination(PQTreeNode destination) {
 		this.destination = destination;
-		
 	}
+	
 	@Override
 	public int getWeight() {
 		return 0;
 	}
 	@Override
 	public void setWeight(int weight) {
-		
 	}
 
 	@Override

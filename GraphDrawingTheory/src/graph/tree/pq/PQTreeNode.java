@@ -91,6 +91,10 @@ public class PQTreeNode implements Vertex{
 	private PQTreeNode parent;
 	
 	
+	/**
+	 * Construct a PQ-tree node of the given type.
+	 * @param type Type of the node
+	 */
 	public PQTreeNode(PQNodeType type){
 		super();
 		this.type = type;
@@ -110,7 +114,11 @@ public class PQTreeNode implements Vertex{
 		}
 	}
 	
-	
+	/**
+	 * Constructs a PQ-tree node of the given type with the specified content
+	 * @param type Type of the node
+	 * @param content Node's content
+	 */
 	public PQTreeNode(PQNodeType type, Object content) {
 		this(type);
 		this.content = content;
@@ -148,10 +156,16 @@ public class PQTreeNode implements Vertex{
 		return emptyChildren.size();
 	}
 	
+	/**
+	 * Increases pertinent children count
+	 */
 	public void incrementPertinentChildCount(){
 		pertinendChildCount++;
 	}
 	
+	/**
+	 * Decrements pertinent children count
+	 */
 	public void decrementPertinentChildCount(){
 		pertinendChildCount--;
 	}
@@ -178,7 +192,6 @@ public class PQTreeNode implements Vertex{
 	 * @return Indicator if the order is valid
 	 */
 	public PQNodeOrderValid orderValidUpToOnePartial(){
-		
 		
 		boolean hasEmpty = emptyChildrenCount() > 0;
 		boolean hasPartial = partialChildrenCount() > 0;
@@ -400,28 +413,28 @@ public class PQTreeNode implements Vertex{
 	}
 
 	/**
-	 * @return the type
+	 * @return Node's type
 	 */
 	public PQNodeType getType() {
 		return type;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type Node's type to set
 	 */
 	public void setType(PQNodeType type) {
 		this.type = type;
 	}
 
 	/**
-	 * @return the content
+	 * @return The node's content
 	 */
 	public Object getContent() {
 		return content;
 	}
 
 	/**
-	 * @param content the content to set
+	 * @param Node's content to set
 	 */
 	public void setContent(Object content) {
 		this.content = content;
@@ -446,89 +459,123 @@ public class PQTreeNode implements Vertex{
 		
 	}
 
+	/**
+	 * @return Node's children
+	 */
 	public List<PQTreeNode> getChildren() {
 		return children;
 	}
 
+	/**
+	 * @param children Children nodes to set
+	 */
 	public void setChildren(List<PQTreeNode> children) {
 		this.children = children;
 	}
 
+	/**
+	 * @return The node's parent
+	 */
 	public PQTreeNode getParent() {
 		return parent;
 	}
 
+	/**
+	 * @param parent Parent to set
+	 */
 	public void setParent(PQTreeNode parent) {
 		this.parent = parent;
 	}
 
-
+	/**
+	 * @return A list of full children
+	 */
 	public List<PQTreeNode> getFullChildren() {
 		return fullChildren;
 	}
 
-
+	/**
+	 * @return Node's label
+	 */
 	public PQNodeLabel getLabel() {
 		return label;
 	}
 
+	/**
+	 * @param label Label to set
+	 */
 	public void setLabel(PQNodeLabel label) {
 		this.label = label;
 	}
 
+	/**
+	 * @return Node's mark
+	 */
 	public PQNodeMark getMark() {
 		return mark;
 	}
 
+	/**
+	 * @param mark Mark to set
+	 */
 	public void setMark(PQNodeMark mark) {
 		this.mark = mark;
 	}
 
+	/**
+	 * @return A list of partial children
+	 */
 	public List<PQTreeNode> getPartialChildren() {
 		return partialChildren;
 	}
 
+	/**
+	 * @return The number of pertinent children
+	 */
 	public int getPertinendChildCount() {
 		return pertinendChildCount;
 	}
 
+	/**
+	 * @param pertinendChildCount The number of pertinent children
+	 */
 	public void setPertinendChildCount(int pertinendChildCount) {
 		this.pertinendChildCount = pertinendChildCount;
 	}
 
+	/**
+	 * @return The number of pertinent leaves
+	 */
 	public int getPertinentLeafCount() {
 		return pertinentLeafCount;
 	}
 
+	/**
+	 * @param pertinentLeafCount The number of pertinent leaves to set
+	 */
 	public void setPertinentLeafCount(int pertinentLeafCount) {
 		this.pertinentLeafCount = pertinentLeafCount;
 	}
 
-
 	/**
-	 * @return the emptyChildren
+	 * @return the emptyChildren A list of empty children of the node
 	 */
 	public List<PQTreeNode> getEmptyChildren() {
 		return emptyChildren;
 	}
 
-
 	/**
-	 * @return the virtualEdge
+	 * @return The virtual edge
 	 */
 	public Object getVirtualEdge() {
 		return virtualEdge;
 	}
 
-
 	/**
-	 * @param virtualEdge the virtualEdge to set
+	 * @param virtualEdge The virtual edge to set
 	 */
 	public void setVirtualEdge(Object virtualEdge) {
 		this.virtualEdge = virtualEdge;
 	}
-
-
-
 
 }

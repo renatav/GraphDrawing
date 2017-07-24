@@ -17,6 +17,12 @@ import graph.exception.CannotBeAppliedException;
 public class SPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V,E>{
 	
 	
+	/**
+	 *  Constructs a SPQR tree of the given graph
+	 * @param referenceEdge Reference edge
+	 * @param graph Graph
+	 * @throws CannotBeAppliedException if the graph doesn't have a SPQR tree
+	 */
 	public  SPQRTree(E referenceEdge, Graph<V, E> graph) throws CannotBeAppliedException {
 		super(referenceEdge, graph);
 		
@@ -24,13 +30,10 @@ public class SPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V
 		if (!graph.isBiconnected())
 			throw new CannotBeAppliedException("Cannot construct SPQR tree for provided graph. Graph must be biconnected.");
 		
-		
-		
 		constructTree();
-		
 	}
 	
-	/** Construct the spqr tree
+	/** Construct the SPQR tree
 	 *  The SPQR tree of a biconnected planar graph G
 	 *  consists of a Q node representing the reference edge e whose child is the root of the
 	 *  Proto-SPQR tree for G with reference edge e.
@@ -47,7 +50,9 @@ public class SPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V
 		
 	}
 	
-	
+	/**
+	 * Prints the tree
+	 */
 	public void printTree(){
 		root.print("", false);
 	}

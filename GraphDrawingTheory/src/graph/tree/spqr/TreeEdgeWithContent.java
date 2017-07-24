@@ -16,21 +16,34 @@ public class TreeEdgeWithContent<V extends Vertex, E extends Edge<V>> implements
 	private V origin, destination;
 	private Graph<V,E> content;
 	
+	/**
+	 * Construct an empty edge
+	 */
 	public TreeEdgeWithContent() {
 		super();
 	}
 
+	/**
+	 * Constructs an edge between the given two vertices
+	 * @param origin Origin vertex
+	 * @param destination Destination vertex
+	 */
 	public TreeEdgeWithContent(V origin, V destination) {
 		super();
 		this.origin = origin;
 		this.destination = destination;
 	}
 
+	/**
+	 * Constructs an edge between the given two vertices
+	 * @param origin Origin vertex
+	 * @param destination Destination vertex
+	 * @param content The edge's content
+	 */
 	public TreeEdgeWithContent(V origin, V destination, Graph<V, E> content) {
 		this(origin, destination);
 		this.content = content;
 	}
-
 
 	@Override
 	public int getWeight() {
@@ -43,33 +56,31 @@ public class TreeEdgeWithContent<V extends Vertex, E extends Edge<V>> implements
 		return origin;
 	}
 
-
-
 	@Override
 	public void setOrigin(V origin) {
 		this.origin = origin;
 	}
-
-
 
 	@Override
 	public V getDestination() {
 		return destination;
 	}
 
-
-
 	@Override
 	public void setDestination(V destination) {
 		this.destination = destination;
 	}
 
-
+	/**
+	 * @return Edge's content
+	 */
 	public Graph<V, E> getContent() {
 		return content;
 	}
 
-
+	/**
+	 * @param content Content to set
+	 */
 	public void setContent(Graph<V, E> content) {
 		this.content = content;
 	}
@@ -82,8 +93,6 @@ public class TreeEdgeWithContent<V extends Vertex, E extends Edge<V>> implements
 
 	@Override
 	public void setWeight(int weight) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 

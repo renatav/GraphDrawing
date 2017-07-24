@@ -27,18 +27,27 @@ public class AbstractTree<V extends Vertex, E extends Edge<V>> extends Graph<SPQ
 	 */
 	protected Graph<V,E> graph; 
 	
-	
-
+	/**
+	 * Constructors which sets the reference edge and graph for which the tree is being constructed
+	 * @param referenceEdge The reference edge
+	 * @param graph Graph
+	 */
 	public AbstractTree(E referenceEdge, Graph<V, E> graph) {
 		super();
 		this.referenceEdge = referenceEdge;
 		this.graph = graph;
 	}
 
+	/**
+	 * @return The root of the tree
+	 */
 	public SPQRTreeNode<V, TreeEdgeWithContent<V, E>> getRoot() {
 		return root;
 	}
 
+	/**
+	 * @param root The root to set
+	 */
 	public void setRoot(SPQRTreeNode<V, TreeEdgeWithContent<V, E>> root) {
 		this.root = root;
 	}

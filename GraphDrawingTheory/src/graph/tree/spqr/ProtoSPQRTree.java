@@ -47,8 +47,6 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 
 		constructTree();
 
-
-
 	}
 
 
@@ -411,7 +409,6 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 	}
 
 
-
 	private boolean gPrimIsASingleEdge(){
 		if (gPrim.getEdges().size() == 1 && gPrim.getVertices().size() == 2)
 			return true;
@@ -419,34 +416,58 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 
 	}
 
+	/**
+	 * @return G'
+	 */
 	public Graph<V, E> getgPrim() {
 		return gPrim;
 	}
 
+	/**
+	 * @param G' to set
+	 */
 	public void setgPrim(Graph<V, E> gPrim) {
 		this.gPrim = gPrim;
 	}
 
+	/**
+	 * @return The reference edge
+	 */
 	public E getReferenceEdge() {
 		return referenceEdge;
 	}
 
+	/**
+	 * @param referenceEdge The reference edge to set
+	 */
 	public void setReferenceEdge(E referenceEdge) {
 		this.referenceEdge = referenceEdge;
 	}
 
+	/**
+	 * @return Graph
+	 */
 	public Graph<V, E> getGraph() {
 		return graph;
 	}
 
+	/**
+	 * @param graph Graph to set
+	 */
 	public void setGraph(Graph<V, E> graph) {
 		this.graph = graph;
 	}
 
+	/**
+	 * @return Root of the tree
+	 */
 	public SPQRTreeNode<V, TreeEdgeWithContent<V, E>> getRoot() {
 		return root;
 	}
 
+	/**
+	 * @param The root to set
+	 */
 	public void setRoot(SPQRTreeNode<V, TreeEdgeWithContent<V, E>> root) {
 		this.root = root;
 	}

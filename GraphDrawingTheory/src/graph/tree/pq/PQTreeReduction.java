@@ -38,6 +38,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
+	 * Implementation of the bubble procedure
 	 * @param pqTree PQ-tree
 	 * @param S A subset of all nodes
 	 */
@@ -979,7 +980,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return the reversalNum
+	 * @return The number of reversals
 	 */
 	public Map<V, Integer> getReversalNum() {
 		return reversalNum;

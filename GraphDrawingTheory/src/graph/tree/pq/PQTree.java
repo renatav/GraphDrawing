@@ -23,6 +23,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	 * Lists of P-typed, Q-typed nodes and tree leaves
 	 */
 	private List<PQTreeNode> pNodes, qNodes, leaves;
+	
 	private Graph<V,E> graph;
 	/**
 	 * The root of the PQ-tree is the unique node having no immediate siblings and no parent
@@ -31,7 +32,12 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 
 	private Map<V, Integer> stNumbering;
 
-
+	/**
+	 * Construct the PQ tree, given the a graph, a list of virtual edges and st-numbering
+	 * @param graph Graph for which the PQ-tree in being constructed
+	 * @param virtualEdges Virtual edges
+	 * @param stNumbering ST-numbering
+	 */
 	public PQTree(Graph<V,E> graph, List<E> virtualEdges, Map<V, Integer> stNumbering){
 		super();
 		this.graph = graph;
@@ -42,7 +48,6 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 		constructTree(virtualEdges);
 
 	}
-
 
 	@Override
 	public void addVertex(PQTreeNode node){
@@ -100,9 +105,7 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				addEdge(new PQTreeEdge(getVertexByContent(v2), getVertexByContent(v1)));
 				getVertexByContent(v2).addChild(getVertexByContent(v1));
 			}
-
 		}
-
 
 		for (E e : virtualEdges){
 			PQTreeNode treeNode = null;
@@ -127,7 +130,6 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 				treeNode.addChild(node);
 			}
 		}
-
 	}
 
 	/**
@@ -177,55 +179,40 @@ public class PQTree <V extends Vertex, E extends Edge<V>> extends Graph<PQTreeNo
 	}
 
 
+	/**
+	 * @return Root of the tree
+	 */
 	public PQTreeNode getRoot() {
 		return root;
 	}
 
-
+	/**
+	 * @param root Root to set
+	 */
 	public void setRoot(PQTreeNode root) {
 		this.root = root;
 	}
 
-
 	/**
-	 * @return the pNodes
+	 * @return The list of P nodes
 	 */
 	public List<PQTreeNode> getpNodes() {
 		return pNodes;
 	}
 
-
 	/**
-	 * @param pNodes the pNodes to set
-	 */
-	public void setpNodes(List<PQTreeNode> pNodes) {
-		this.pNodes = pNodes;
-	}
-
-
-	/**
-	 * @return the qNodes
+	 * @return A list of Q nodes
 	 */
 	public List<PQTreeNode> getqNodes() {
 		return qNodes;
 	}
 
-
 	/**
-	 * @param qNodes the qNodes to set
-	 */
-	public void setqNodes(List<PQTreeNode> qNodes) {
-		this.qNodes = qNodes;
-	}
-
-
-	/**
-	 * @return the leaves
+	 * @return A list of leaves
 	 */
 	public List<PQTreeNode> getLeaves() {
 		return leaves;
 	}
-
 
 	/**
 	 * @param leaves the leaves to set
