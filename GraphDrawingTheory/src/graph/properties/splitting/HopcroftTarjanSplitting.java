@@ -174,9 +174,13 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	}
 
 
+
 	//TODO problem with some triple bonds not being detected and being joined with the other component
-
-
+	/**
+	 * Executes the algorithms and sets values of the properties which
+	 * contain the results - lists of separation pair and components
+	 * @throws AlgorithmErrorException
+	 */
 	public void execute() throws AlgorithmErrorException{
 
 		init();
@@ -1193,9 +1197,6 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 	}
 
-
-
-
 	/**
 	 * Checks if the adjacency structure is valid according to the following lemma:
 	 * Let A(u) be the adjacency list of vertex u. Let u->v and u -> w be tree arcs
@@ -1319,11 +1320,17 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 
 	}
 
+	/**
+	 * @return A list of found separation pairs
+	 */
 	public List<SeparationPair<V>> getSeparationPairs() {
 		return separationPairs;
 	}
 
 
+	/**
+	 * @return A list of split components
+	 */
 	public List<HopcroftTarjanSplitComponent<V, E>> getSplitComponents() {
 		return splitComponents;
 	}
@@ -1332,10 +1339,16 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 		return separationPairVirtuelEdgeMap;
 	}
 
+	/**
+	 * @return Virtual edges
+	 */
 	public List<E> getVirtualEdges() {
 		return virtualEdges;
 	}
 
+	/**
+	 * @return Paths detected in the path searching phase
+	 */
 	public List<List<E>> getPaths() {
 		return paths;
 	}

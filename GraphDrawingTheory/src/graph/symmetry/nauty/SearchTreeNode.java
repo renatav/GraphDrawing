@@ -29,6 +29,12 @@ public class SearchTreeNode<V extends Vertex>{
 	 */
 	private List<SearchTreeNode<V>> children;
 	
+	/**
+	 * Creates a node of the search tree given its partition, a vertex that splits it and its parent
+	 * @param nodePartition An ordered partition connected with the node
+	 * @param split A vertex that splits the partition
+	 * @param parent Node's parent
+	 */
 	public SearchTreeNode(OrderedPartition<V> nodePartition, V split, SearchTreeNode<V> parent){
 		this.nodePartition = nodePartition;
 		this.parent = parent;
@@ -42,18 +48,30 @@ public class SearchTreeNode<V extends Vertex>{
 			splittingList.add(split);
 	}
 
+	/**
+	 * @return Partition of the node
+	 */
 	public OrderedPartition<V> getNodePartition() {
 		return nodePartition;
 	}
 
+	/**
+	 * @return A list of vertices that split the node
+	 */
 	public List<V> getSplittingList() {
 		return splittingList;
 	}
 
+	/**
+ 	 * @return The node's parent
+	 */
 	public SearchTreeNode<V> getParent() {
 		return parent;
 	}
 
+	/**
+	 * @return The node's children
+	 */
 	public List<SearchTreeNode<V>> getChildren() {
 		return children;
 	}

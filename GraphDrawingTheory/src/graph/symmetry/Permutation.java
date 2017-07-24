@@ -16,17 +16,24 @@ public class Permutation {
 	 */
 	private Map<Integer, Integer> permutation;
 	
+	/**
+	 * Creates an empty permutation
+	 */
 	public Permutation(){
 		permutation = new HashMap<Integer, Integer>();
 	}
 	
+	/**
+	 * Creates a permutation with an initial value
+	 * @param permutation A map representing a permutation
+	 */
 	public Permutation(Map<Integer, Integer> permutation){
 		this.permutation = permutation;
 	}
 	
 	/**
 	 * Calculates inverse permutation
-	 * @return Incerse permutation
+	 * @return Inverse permutation
 	 */
 	public Permutation inverse(){
 	
@@ -57,6 +64,7 @@ public class Permutation {
 	}
 	
 	/**
+	 * Calculates the permutation's order
 	 * @return Permutation's order
 	 */
 	public int order(){
@@ -72,6 +80,7 @@ public class Permutation {
 	}
 	
 	/**
+	 * Checks if the permutation is an identity permutation
 	 * @return {@code true} if the permutation is an identity permutation {@code false}
 	 * otherwise
 	 */
@@ -83,6 +92,7 @@ public class Permutation {
 	}
 	
 	/**
+	 * Finds the cyclis representation of the permutation
 	 * @return Cyclic representation of the permutation
 	 */
 	public List<List<Integer>> cyclicRepresenatation(){
@@ -108,20 +118,22 @@ public class Permutation {
 	}
 	
 	/**
+	 * Finds the fix of the permutation
 	 * @return Fix of the permutation
 	 */
 	public List<Integer> fix(){
 		List<Integer> ret = new ArrayList<Integer>();
 		
 		for (Integer key : permutation.keySet())
-			if (key ==permutation.get(key))
+			if (key == permutation.get(key))
 				ret.add(key);
 		
 		return ret;
 	}
 	
 	/**
-	 * @param u
+	 * Finds he permutations orbit given a vertex
+	 * @param u Vertex
 	 * @return Permutation's orbit
 	 */
 	public List<Integer> orbit(Integer u){
@@ -141,7 +153,9 @@ public class Permutation {
 		return ret;
 	}
 	
-	
+	/**
+	 * @return Map representing the permutation
+	 */
 	public Map<Integer, Integer> getPermutation() {
 		return permutation;
 	}
@@ -153,7 +167,6 @@ public class Permutation {
 	@Override
 	public String toString() {
 		return cyclicRepresenatation() + "";
-		
 	}
 	
 	@Override

@@ -28,11 +28,17 @@ public class CyclicPermutation<V extends Vertex> {
 		}
 	}
 
+	/**
+	 * @return Cycles forming the permutation
+	 */
 	public List<PermutationCycle<V>> getCycles() {
 		return cycles;
 	}
 
-
+	/**
+	 * 
+	 * @param cycles Cycles to set
+	 */
 	public void setCycles(List<PermutationCycle<V>> cycles) {
 		this.cycles = cycles;
 	}

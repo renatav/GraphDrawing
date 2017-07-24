@@ -33,6 +33,10 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 	private boolean directed;
 	
 
+	/**
+	 * Initialized the algorithm's parameters based on the properties of the graph
+	 * @param graph Graph being traversed
+	 */
 	public DijkstraAlgorithm(Graph<V,E> graph) {
 
 		//copy edges
@@ -40,11 +44,19 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 		this.directed = graph.isDirected();
 	}
 	
+	/**
+	 * Initializes the algorithm's parameters based on the given values
+	 * @param edges Edges to be traverse
+	 * @param directed Is the graph directed
+	 */
 	public DijkstraAlgorithm(List<E> edges, boolean directed) {
 		this.edges = new ArrayList<E>(edges);
 		this.directed = directed;
 	}
 	
+	/**
+	 * Sets default value of the directed parameter and leaves the edge empty 
+	 */
 	public DijkstraAlgorithm(){
 		this.directed = false;
 	}
@@ -207,10 +219,16 @@ public class DijkstraAlgorithm<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
+	/**
+	 * @param edges Edges to set
+	 */
 	public void setEdges(List<E> edges) {
 		this.edges = edges;
 	}
 
+	/**
+	 * @param directed Indicator if the graph is directed to set
+	 */
 	public void setDirected(boolean directed) {
 		this.directed = directed;
 	}

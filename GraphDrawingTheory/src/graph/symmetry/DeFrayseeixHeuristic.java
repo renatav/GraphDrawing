@@ -24,7 +24,12 @@ import Jama.Matrix;
  */
 public class DeFrayseeixHeuristic<V extends Vertex, E extends Edge<V>> {
 
-	public void calculate(Graph<V,E> graph){
+	/**
+	 * Calculates the heuristic
+	 * @param graph Graph
+	 * @return A list of pairs consisting of the eugenvalue and a column of the orthonormal basis
+	 */
+	public List<Pair<Double, double[]>>  calculate(Graph<V,E> graph){
 		CzekanovskiDiceDistance<V, E> distance = new CzekanovskiDiceDistance<>(graph);
 		List<V> vertices = graph.getVertices();
 		int n = vertices.size();
@@ -76,6 +81,7 @@ public class DeFrayseeixHeuristic<V extends Vertex, E extends Edge<V>> {
 				double[] column = MatrixUtil.getColumn(orthonormalBasis.getArray(), index);
 				eigenValuesVectors.add(new Pair<Double, double[]>(eigenValue, column));
 			}
+			return eigenValuesVectors;
 	}
 	
 }

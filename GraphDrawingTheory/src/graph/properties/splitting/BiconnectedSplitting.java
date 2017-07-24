@@ -33,6 +33,8 @@ public class BiconnectedSplitting<V extends Vertex, E extends Edge<V>> {
 	}
 	
 	/**
+	 * Divides the graph into biconnected components
+	 * and return them
 	 * @return A list of all biconnected components
 	 */
 	public List<Graph<V,E>> findBiconnectedComponents(){

@@ -699,53 +699,67 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		}
 	}
 
+	/**
+	 * @return A list of found separation pair
+	 */
 	public List<SplitPair<V, E>> getSeparationPairs() {
 		return separationPairs;
 	}
 
+	/**
+	 * @return Adjacency - mapping of vertices to lists of edges which contains them
+	 */
 	public Map<V, List<E>> getAdjacency() {
 		return adjacency;
 	}
 
+	/**
+	 * @return  A map of vertices and all split pairs containing them as first vertices of the pair
+	 */
 	public Map<V, List<SplitPair<V, E>>> getSeparationPairStartVertices() {
 		return separationPairStartVertices;
 	}
 
+	/**
+	 * @return @return  A map of vertices and all split pairs containing them as second vertices of the pair
+	 */
 	public Map<V, List<SplitPair<V, E>>> getSeparationPairEndVertices() {
 		return separationPairEndVertices;
 	}
 
+	/**
+	 * @return DFS tree edges
+	 */
 	public List<E> getTreeEdges() {
 		return treeEdges;
 	}
 
+	/**
+	 * @return Back edges or fronds
+	 */
 	public List<E> getFronds() {
 		return fronds;
 	}
 
+	/**
+	 * @return Lowpt1 values
+	 */
 	public int[] getLowpt1() {
 		return lowpt1;
 	}
 
-	public int[] getNewnum() {
-		return newnum;
-	}
-
+	/**
+	 * @return Highpt values
+	 */
 	public int[] getHighpt() {
 		return highpt;
 	}
 
-	public int[] getInverseNumbering() {
-		return inverseNumbering;
-	}
-
-	public Map<Integer, List<V>> getLowpt1sMap() {
-		return lowpt1sMap;
-	}
-
+	/**
+	 * @return DFS tree
+	 */
 	public DFSTree<V, E> getTree() {
 		return tree;
 	}
-
 
 }

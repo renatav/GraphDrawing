@@ -17,11 +17,17 @@ public class OrderedPartition<V extends Vertex> {
 	 */
 	private List<List<V>> partition;
 	
-	
+	/**
+	 * Creates an empty ordered partition 
+	 */
 	public OrderedPartition() {
 		partition = new ArrayList<List<V>>();
 	}
 	
+	/**
+	 * Create sand ordered partition consisting of one or more parts (lists pf vertices) 
+	 * @param vertices
+	 */
 	@SafeVarargs
 	public OrderedPartition(List<V>...vertices){
 		partition = new ArrayList<List<V>>();
@@ -29,6 +35,10 @@ public class OrderedPartition<V extends Vertex> {
 			partition.add(verticeList);
 	}
 	
+	/**
+	 * Creates a partition give its initial value
+	 * @param partition Partition (list of lists of vertices - parts)
+	 */
 	public OrderedPartition(List<List<V>> partition){
 		this.partition = new ArrayList<List<V>>();
 		this.partition.addAll(partition);
@@ -48,6 +58,7 @@ public class OrderedPartition<V extends Vertex> {
 	}
 	
 	/**
+	 * Finds a part which contains the given vertex
 	 * @param u Vertex
 	 * @return A part which contains {@code u}
 	 */
@@ -59,6 +70,7 @@ public class OrderedPartition<V extends Vertex> {
 	}
 	
 	/**
+	 * Finds the first nontrivial part of the partition
 	 * @return The first nontrivial part of the ordered partition
 	 */
 	public List<V> getFirstNontrivialPart(){
@@ -68,6 +80,11 @@ public class OrderedPartition<V extends Vertex> {
 		return null;
 	}
 	
+	/**
+	 * Forms a list of all vertices of the partition from the first
+	 * to the last one
+	 * @return A list of all of the parition's vertices in order
+	 */
 	public List<V> getVerticesInOrder(){
 		List<V> ret = new ArrayList<V>();
 		for (List<V> part : partition)
@@ -76,14 +93,24 @@ public class OrderedPartition<V extends Vertex> {
 	}
 	
 
+	/**
+	 * @return The partition
+	 */
 	public List<List<V>> getPartition() {
 		return partition;
 	}
 
+	/**
+	 * @param partition Partition to set
+	 */
 	public void setPartition(List<List<V>> partition) {
 		this.partition = partition;
 	}
 	
+	/**
+	 * Adds a new part to the parition
+	 * @param part Part to be added
+	 */
 	public void addPart(List<V> part){
 		partition.add(part);
 	}

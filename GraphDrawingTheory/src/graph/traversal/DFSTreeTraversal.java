@@ -26,12 +26,16 @@ public class DFSTreeTraversal<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 
+	/**
+	 * Forms a DFS tree whose root is the first vertex of the associated graph
+	 * @return DFS tree
+	 */
 	public DFSTree<V,E> formDFSTree(){
 		return formDFSTree(graph.getVertices().get(0));
 	}
 
 	/**
-	 * Forms a DFS tree
+	 * Forms a DFS tree with the given root
 	 * @param root Vertex which should be the root of the DFS tree
 	 * @return DFS tree
 	 */

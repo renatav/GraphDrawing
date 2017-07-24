@@ -19,7 +19,12 @@ public class BinaryRepresentation<V extends Vertex, E extends Edge<V>> {
 	public BinaryRepresentation(Graph<V,E> graph){
 		this.graph = graph;
 	}
-	
+
+	/**
+	 * Finds the binary representation of the graph given a list of its vertices
+	 * @param verticeList A list of graph's vertices
+	 * @return Binary representation
+	 */
 	public String binaryRepresenatation(List<V> verticeList){
 		String representation = "";
 		for (int i = 0; i < verticeList.size(); i++){

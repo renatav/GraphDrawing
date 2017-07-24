@@ -43,6 +43,10 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 	 */
 	private List<Graph<V,E>> pendants = new ArrayList<Graph<V,E>>();
 
+	/**
+	 * Constructs the BC-tree of the specified graph
+	 * @param graph Graph
+	 */
 	public BCTree(Graph<V,E> graph){
 		this.graph = graph;
 		cVertices = new ArrayList<BCTreeNode>();
@@ -99,11 +103,12 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 	}
 	
 
-	@SuppressWarnings("unchecked")
+	
 	/**
 	 * Updates the list of pendants after certain tree nodes were added or removed,
 	 * thus changing degrees of other nodes
 	 */
+	@SuppressWarnings("unchecked")
 	public void updatePendants(){
 		pendants.clear();
 		for (BCTreeNode blockNode : bVertices){
@@ -124,28 +129,28 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 	}
 	
 	/**
-	 * @return the cVertices
+	 * @return The cut vertices
 	 */
 	public List<BCTreeNode> getcVertices() {
 		return cVertices;
 	}
 
 	/**
-	 * @param cVertices the cVertices to set
+	 * @param cVertices The cut vertices to set
 	 */
 	public void setcVertices(List<BCTreeNode> cVertices) {
 		this.cVertices = cVertices;
 	}
 
 	/**
-	 * @return the bVertices
+	 * @return The block vertices
 	 */
 	public List<BCTreeNode> getbVertices() {
 		return bVertices;
 	}
 
 	/**
-	 * @param bVertices the bVertices to set
+	 * @param bVertices The block vertices to set
 	 */
 	public void setbVertices(List<BCTreeNode> bVertices) {
 		this.bVertices = bVertices;
@@ -159,21 +164,21 @@ public class BCTree<V extends Vertex, E extends Edge<V>> extends Graph<BCTreeNod
 	}
 
 	/**
-	 * @param pendants the pendants to set
+	 * @param pendants The pendants to set
 	 */
 	public void setPendants(List<Graph<V, E>> pendants) {
 		this.pendants = pendants;
 	}
 
 	/**
-	 * @return the root
+	 * @return The root
 	 */
 	public BCTreeNode getRoot() {
 		return root;
 	}
 
 	/**
-	 * @param root the root to set
+	 * @param root The root to set
 	 */
 	public void setRoot(BCTreeNode root) {
 		this.root = root;

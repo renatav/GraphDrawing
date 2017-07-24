@@ -17,11 +17,16 @@ public class SearchTree<V extends Vertex>{
 	 */
 	private SearchTreeNode<V> root;
 	
+	/**
+	 * Creates a search tree given its root partition
+	 * @param rootPartition Root partition
+	 */
 	public SearchTree(OrderedPartition<V> rootPartition){
 		root = new SearchTreeNode<V>(rootPartition, null, null);
 	}
 	
 	/**
+	 * Finds all terminal nodes
 	 * @return A list of terminal search tree nodes
 	 */
 	public List<SearchTreeNode<V>> getTerminalNodes(){
@@ -39,10 +44,16 @@ public class SearchTree<V extends Vertex>{
 		}
 	}
 
+	/**
+	 * @return The root of the search tree
+	 */
 	public SearchTreeNode<V> getRoot() {
 		return root;
 	}
 
+	/**
+	 * @param root The root to set
+	 */
 	public void setRoot(SearchTreeNode<V> root) {
 		this.root = root;
 	}

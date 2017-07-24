@@ -29,19 +29,6 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		this.graph = graph;
 	}
 
-	public void execute(){
-
-		OrderedPartition<V> pi = new OrderedPartition<V>(graph.getVertices());
-		binaryRepresenatation = new BinaryRepresentation<V,E>(graph);
-		OrderedPartition<V> refined = refinementProcedure(pi);
-		SearchTree<V> tree = createSearchTree(refined);
-		List<SearchTreeNode<V>> terminalNodes = tree.getTerminalNodes();
-
-		//canonicalIsomorphism(terminalNodes);
-		findAutomorphisms(terminalNodes);
-
-	}
-	
 	/**
 	 * Finds automorphisms of the graph
 	 * @return A list of graph's automorphisms
@@ -122,7 +109,6 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 		return tau;
 
 	}
-
 
 	/*
 	 * For lexicographic total order

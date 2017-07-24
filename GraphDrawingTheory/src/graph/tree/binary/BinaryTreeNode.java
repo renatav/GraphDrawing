@@ -30,13 +30,22 @@ public class BinaryTreeNode<V extends Vertex> {
 	 */
 	private int height = 1;
 	
-	
+	/**
+	 * Constructs a binary tree node associated with the given vertex
+	 * @param vertex Vertex associated with the node
+	 */
 	public BinaryTreeNode(V vertex) {
 		super();
 		this.vertex = vertex;
 	}
-	
 
+	/**
+	 * Construct a binary tree node associated with the given vertex
+	 * and sets nodes to its right and left
+	 * @param vertex Vertex associated with the node
+	 * @param left Node to the left of the node
+	 * @param right Node to the right of the node
+	 */
 	public BinaryTreeNode(V vertex, BinaryTreeNode<V> left,
 			BinaryTreeNode<V> right) {
 		super();
@@ -46,6 +55,14 @@ public class BinaryTreeNode<V extends Vertex> {
 	}
 
 
+	/**
+	 * Construct a binary tree node associated with the given vertex
+	 * and sets nodes to its right and left as well as its parent
+	 * @param vertex Vertex associated with the node
+	 * @param left Node to the left of the node
+	 * @param right Node to the right of the node
+	 * @param parent Node's parent
+	 */
 	public BinaryTreeNode(V vertex, BinaryTreeNode<V> left,
 			BinaryTreeNode<V> right, BinaryTreeNode<V> parent) {
 		super();
@@ -55,34 +72,58 @@ public class BinaryTreeNode<V extends Vertex> {
 		this.parent = parent;
 	}
 
+	/**
+	 * @return Vertex associated with the node
+	 */
 	public V getVertex() {
 		return vertex;
 	}
 
+	/**
+	 * @param vertex Vertex associated with the node to set
+	 */
 	public void setVertex(V vertex) {
 		this.vertex = vertex;
 	}
 
+	/**
+	 * @return Node to the left of the node
+	 */
 	public BinaryTreeNode<V> getLeft() {
 		return left;
 	}
 
+	/**
+	 * @param left Node to the left of the node to set
+	 */
 	public void setLeft(BinaryTreeNode<V> left) {
 		this.left = left;
 	}
 
+	/**
+	 * @return Node to the right of the node
+	 */
 	public BinaryTreeNode<V> getRight() {
 		return right;
 	}
 
+	/**
+	 * @param right Node to the right of the node to set
+	 */
 	public void setRight(BinaryTreeNode<V> right) {
 		this.right = right;
 	}
 
+	/**
+	 * @return Node's parent
+	 */
 	public BinaryTreeNode<V> getParent() {
 		return parent;
 	}
 
+	/**
+	 * @param parent Parent to set
+	 */
 	public void setParent(BinaryTreeNode<V> parent) {
 		this.parent = parent;
 	}
@@ -99,15 +140,19 @@ public class BinaryTreeNode<V extends Vertex> {
 		ret +=" ]";
 		
 		return ret;
-		
 	}
 
 
+	/**
+	 * @return Node's height
+	 */
 	public int getHeight() {
 		return height;
 	}
 
-
+	/**
+	 * @param height Height to set
+	 */
 	public void setHeight(int height) {
 		this.height = height;
 	}

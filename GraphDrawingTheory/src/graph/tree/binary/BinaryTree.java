@@ -43,6 +43,10 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 	 */
 	private boolean canBeConstructed;
 
+	/**
+	 * Tried to construct the binary tree given a graph
+	 * @param graph Graph
+	 */
 	public BinaryTree(Graph<V,E> graph){
 		this.graph = graph;
 		try {
@@ -318,22 +322,37 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
  
 	}
 	
+	/**
+	 * @return Tree's height
+	 */
 	public int height(){
 		return root.getHeight();
 	}
 
+	/**
+	 * @return Tree's root
+	 */
 	public BinaryTreeNode<V> getRoot() {
 		return root;
 	}
 
+	/**
+	 * @param root The root to set
+	 */
 	public void setRoot(BinaryTreeNode<V> root) {
 		this.root = root;
 	}
 
+	/**
+	 * @return Nodes of the tree
+	 */
 	public List<BinaryTreeNode<V>> getNodes() {
 		return nodes;
 	}
 
+	/**
+	 * @param nodes Nodes to set
+	 */
 	public void setNodes(List<BinaryTreeNode<V>> nodes) {
 		this.nodes = nodes;
 	}
@@ -346,6 +365,9 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 		return ret;
 	}
 
+	/**
+	 * @return Indicator if the tree can be constructed
+	 */
 	public boolean isCanBeConstructed() {
 		return canBeConstructed;
 	}

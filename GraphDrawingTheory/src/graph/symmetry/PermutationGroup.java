@@ -20,6 +20,11 @@ public class PermutationGroup {
 	 */
 	private Permutation reflection, rotation;
 	
+	/**
+	 * Constructs a permutation group given a reflection and/or a rotation
+	 * @param reflection Reflection permutation. Can be null.
+	 * @param rotation Rotation permutation Can be null.
+	 */
 	public PermutationGroup(Permutation reflection, Permutation rotation){
 		permutations = new ArrayList<Permutation>();
 		this.reflection = reflection;
@@ -51,6 +56,7 @@ public class PermutationGroup {
 	}
 	
 	/**
+	 * Finds stabilizers of the group with respect to some vertex
 	 * @param u Vertex
 	 * @return A list of all stabilizers with respect to some given {@code u}
 	 */
@@ -66,6 +72,7 @@ public class PermutationGroup {
 	}
 	
 	/**
+	 * Finds stabilizers of the groups with respect to a subset of vertices
 	 * @param Y Subset
 	 * @return A list of stabilizers with respect to a subset {@code Y}
 	 */
@@ -90,6 +97,7 @@ public class PermutationGroup {
 	
 
 	/**
+	 * Finds vertices fixed by the group
 	 * @return A list of vertices fixed by the permutations
 	 */
 	public List<Integer> fix(){
@@ -112,6 +120,7 @@ public class PermutationGroup {
 	}
 	
 	/**
+	 * Finds an orbit of the group with resepct to a vertex
 	 * @param u Vertex
 	 * @return An orbit (list of vertices) of the group with respect to u
 	 */
@@ -144,10 +153,16 @@ public class PermutationGroup {
    		return permutations.size();
    	}
    	
+   	/**
+   	 * @return Permutations forming the group
+   	 */
 	public List<Permutation> getPermutations() {
 		return permutations;
 	}
 
+	/**
+	 * @param permutations Permutations to set
+	 */
 	public void setPermutations(List<Permutation> permutations) {
 		this.permutations = permutations;
 	}

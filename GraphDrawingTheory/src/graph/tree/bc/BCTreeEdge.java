@@ -10,7 +10,12 @@ public class BCTreeEdge implements Edge<BCTreeNode>{
 
 	private BCTreeNode origin;
 	private BCTreeNode destination;
-	
+
+	/**
+	 * Construct a BC-tree edge with the specified origina and destination nodes
+	 * @param origin Origin node
+	 * @param destination Destination node
+	 */
 	public BCTreeEdge(BCTreeNode origin, BCTreeNode destination) {
 		super();
 		this.origin = origin;
@@ -52,7 +57,6 @@ public class BCTreeEdge implements Edge<BCTreeNode>{
 
 	@Override
 	public void setWeight(int weight) {
-		// TODO Auto-generated method stub
 		
 	}
 

@@ -18,8 +18,15 @@ import java.util.Map;
  */
 public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 
+	/**
+	 * Permutations of the given graph
+	 */
 	private List<Permutation> permutations;
 
+	/**
+	 * Given a graph, finds its permutations and intializes the permutations list
+	 * @param graph Graph
+	 */
 	public PermutationAnalyzator(Graph<V, E> graph) {
 		super();
 		McKayGraphLabelingAlgorithm<V, E> nauty = new McKayGraphLabelingAlgorithm<V,E>(graph);
@@ -27,6 +34,7 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
+	 * Finds permutation's reflection groups
 	 * @return List of all reflection permutation groups
 	 */
 	public List<PermutationGroup> findReflectionGroups(){
@@ -41,6 +49,7 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
+	 * Checks if a permutation is reflection group generator
 	 * @param p Permutation
 	 * @return A reflection group if {@code p} is its generator, {@code null} otherwise
 	 */
@@ -51,6 +60,7 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
+	 * Finds permutation's rotation groups
 	 * @return List of all rotation permutation groups
 	 */
 	public List<PermutationGroup> findRotationGroups(){
@@ -65,6 +75,7 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
+	 * Checks if a permutation is rotation group generator
 	 * @param p Permutation
 	 * @return A rotation group if {@code p} is its generator, {@code null} otherwise
 	 */
@@ -96,6 +107,7 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 
 
 	/**
+	 * Finds permutation's dihedral groups
 	 * @return List of all dihedral permutation groups
 	 */
 	public List<PermutationGroup> findDihedralGroups(){
@@ -113,6 +125,7 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
+	 * Checks if a permutation is dihedral group generator
 	 * @param p Permutation
 	 * @return A dihedral group if {@code p} is its generator, {@code null} otherwise
 	 */

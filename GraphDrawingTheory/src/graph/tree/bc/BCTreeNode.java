@@ -14,12 +14,20 @@ public class BCTreeNode implements Vertex {
 	private BCNodeType type;
 	private BCTreeNode parent;
 	
+	/**
+	 * Construct the BC-tree node of the specified type and with the given content
+	 * @param type Type of the node (B or C)
+	 * @param content Node's content
+	 */
 	public BCTreeNode(BCNodeType type, Object content){
 		this.type = type;
 		this.content = content;
 	}
 
-
+	/**
+	 * Construct the BC-tree node with the given content
+	 * @param content Node's content
+	 */
 	public BCTreeNode(Object content) {
 		super();
 		this.content = content;
