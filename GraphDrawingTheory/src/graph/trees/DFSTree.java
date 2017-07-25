@@ -639,38 +639,44 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		}
 	}
 
+	/**
+	 * @return The root of the tree
+	 */
 	public V getRoot() {
 		return root;
 	}
-
+	
+	/**
+	 * @param root Root to set
+	 */
 	public void setRoot(V root) {
 		this.root = root;
 	}
 
+	/**
+	 * @return A map of vertices and their DFS indexes
+	 */
 	public Map<V, Integer> getVerticesWithIndexes() {
 		return verticesWithIndexes;
 	}
 
-	public void setVerticesWithIndexes(Map<V, Integer> verticesWithIndexes) {
-		this.verticesWithIndexes = verticesWithIndexes;
-	}
-
+	/**
+	 * @return A list of tree edges
+	 */
 	public List<E> getTreeEdges() {
 		return treeEdges;
 	}
 
-	public void setTreeEdges(List<E> treeEdges) {
-		this.treeEdges = treeEdges;
-	}
-
+	/**
+	 * @return A list of back edges
+	 */
 	public List<E> getBackEdges() {
 		return backEdges;
 	}
 
-	public void setBackEdges(List<E> backEdges) {
-		this.backEdges = backEdges;
-	}
-
+	/**
+	 * @return All edges
+	 */
 	public List<E> getAllEdges(){
 		List<E> ret = new ArrayList<E>();
 		ret.addAll(backEdges);
@@ -689,8 +695,6 @@ public class DFSTree<V extends Vertex, E extends Edge<V>> extends Graph<V, E>{
 		ret += "\nBack edges: " + backEdges;
 
 		return ret;
-
-
 	}
 	
 
