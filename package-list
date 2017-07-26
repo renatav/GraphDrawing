@@ -20,7 +20,7 @@ graph.layout.dsl
 graph.layout.force.directed
 graph.layout.organic
 graph.layout.orthogonal
-graph.layout.router
+graph.layout.router.orthogonal
 graph.layout.straight.line
 graph.layout.symmetric
 graph.layout.tree
