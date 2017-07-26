@@ -479,8 +479,8 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 
 	/**
 	 * Checks is graph is connected presumed that certain vertices are removed
-	 * @param excluded Vertices without whom the graph should still be connected 
-	 * @return {@code true} if the graph without vertices belonging to {@code excluded}
+	 * @param excluding Vertices without whom the graph should still be connected 
+	 * @return {@code true} if the graph without vertices belonging to {@code excluding}
 	 * is connected, {@code false} otherwise
 	 */
 	public boolean isConnected(List<V> excluding){

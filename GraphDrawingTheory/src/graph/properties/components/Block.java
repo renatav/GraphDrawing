@@ -6,8 +6,9 @@ import graph.elements.Vertex;
 
 /**
  * Class represent a block of a graph.
- * A block is a maximal biconnected subgraph of a given graph 
- * @return {@code true} if graph is connected, @{code false} otherwise
+ * A block is a maximal biconnected subgraph of a given graph
+ * @param <V> The vertex type
+ * @param <E> The edge type 
  */
 public class Block<V extends Vertex, E extends Edge<V>> extends Graph<V,E>{
 

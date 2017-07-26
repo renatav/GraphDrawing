@@ -18,7 +18,6 @@ import graph.properties.splitting.Splitting;
  * Used in the construction of SPQR trees
  * Not a very efficient implementation, needs to be rewritten
  * Can be used for smaller graphs
- * @assume Graph is planar and biconnected
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 
@@ -424,7 +423,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 	}
 
 	/**
-	 * @param G' to set
+	 * @param gPrim G' to set
 	 */
 	public void setgPrim(Graph<V, E> gPrim) {
 		this.gPrim = gPrim;
@@ -466,7 +465,7 @@ public class ProtoSPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractT
 	}
 
 	/**
-	 * @param The root to set
+	 * @param root The root to set
 	 */
 	public void setRoot(SPQRTreeNode<V, TreeEdgeWithContent<V, E>> root) {
 		this.root = root;

@@ -34,7 +34,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	
 	/**
 	 * Checks is graph is connected
-	 * @return @{code true} if the graph is connected @{false}
+	 * @return {@code true} if the graph is connected {@code false} otherwise
 	 */
 	public boolean isConnected(){
 		
@@ -135,7 +135,8 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	
 	/**
 	 * Checks is graph is connected
-	 * @return {@code true} if graph is connected, @{code false} otherwise
+	 * @param excluding A list of vertices such that the graph should stay connected even if they are removed
+	 * @return {@code true} if graph is connected, {@code false} otherwise
 	 */
 	public boolean isConnected(List<V> excluding){
 		DijkstraAlgorithm<V, E> dijkstra = new DijkstraAlgorithm<V,E>(graph);
@@ -186,6 +187,7 @@ public class GraphProperties<V extends Vertex,E extends Edge<V>>{
 	
 	/**
 	 * Lists all tree leaves (presumes that the graph is a tree)
+	 * @param root The tree's root
 	 * @return List of leaves
 	 */
 	public List<V> treeLeaves(V root){

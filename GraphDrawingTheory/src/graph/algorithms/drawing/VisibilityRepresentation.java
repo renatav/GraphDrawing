@@ -279,7 +279,7 @@ public class VisibilityRepresentation<V extends Vertex, E extends Edge<V>> {
 	 * Checks if a list of edges (some cycle) is the external face
 	 * @param test A list of edges that could be the external face
 	 * @param externalFace External face
-	 * @return {@code true} if {@code test} is the external face, {@false} otherwise
+	 * @return {@code true} if {@code test} is the external face, {@code false} otherwise
 	 */
 	public boolean isExternalFace(List<E> test, List<E> externalFace){
 		if (test.size() != externalFace.size())

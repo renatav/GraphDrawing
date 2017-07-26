@@ -179,7 +179,7 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 	
 	/**
 	 * Adds a virtual edge - updates both the list of edges and virtual edges
-	 * @param e
+	 * @param e The virtual edge to be added
 	 */
 	public void addVirtualEdge(E e){
 		edges.add(e);

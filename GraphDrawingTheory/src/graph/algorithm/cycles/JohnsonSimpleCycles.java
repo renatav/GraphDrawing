@@ -71,7 +71,7 @@ public class JohnsonSimpleCycles<V extends Vertex, E extends Edge<V>>{
 
 	/**
 	 * Create a simple cycle finder for the specified graph.
-	 * 
+	 * @param stopWhenOneFound Indicator if the algorithm should stop when as soon as one cycle is detected  
 	 * @param graph A directed graph in which to find cycles.
 	 * @throws IllegalArgumentException if the graph argument is
 	 *         <code>null</code>.

@@ -39,7 +39,6 @@ public class LRPartition<V extends Vertex, E extends Edge<V>> {
 	 * that for every fork all return edges of e ending strictly
 	 * higher than lowpt(e2) belong to one partition, and all return edges of e2 ending strictly
 	 * higher than lowpt(e1) belong to the other.
-	 * @param graph Graph that should be partitioned
 	 * @return {@code true} if it can be partitioned, {@code false} otherwise
 	 */
 	public boolean createLRPartition(){

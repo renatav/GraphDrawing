@@ -20,8 +20,12 @@ public class PlanarEmbedding {
 	 * Calculates a planar embedding of a graph based on the work of Chiba, Nishizeki, Abe and Ozava
 	 * A linear algorithm for embedding planar graphs using PQ-trees, Journal of Computer and System Sciences 30, 1985
 	 * @param graph Graph whose embedding should be found
+	 * @param s The first vertex of the ST-numbering
+	 * @param t The last vertex of the ST-numbering
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return Planar embedding if it exists
-	 * @throws CannotBeAppliedException
+	 * @throws CannotBeAppliedException if the graph is not planar
 	 */
 	public static <V extends Vertex, E extends Edge<V>> Embedding<V,E> emedGraph(Graph<V,E> graph, V s, V t) throws CannotBeAppliedException{
 		Map<V,List<E>> embedding = new HashMap<V, List<E>>();

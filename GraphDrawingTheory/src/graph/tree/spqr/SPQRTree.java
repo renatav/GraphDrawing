@@ -49,16 +49,5 @@ public class SPQRTree<V extends Vertex,E extends Edge<V>> extends AbstractTree<V
 		root.addChildNode(protoTree.getRoot());
 		
 	}
-	
-	/**
-	 * Prints the tree
-	 */
-	public void printTree(){
-		root.print("", false);
-	}
-	
-	
-	
-	
 
 }

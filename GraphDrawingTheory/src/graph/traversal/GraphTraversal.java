@@ -14,8 +14,6 @@ import graph.elements.Vertex;
 /**
  * Contains methods which implement certain graph traversal algorithms
  * @author Renata
- * @param <V> The vertex type
- * @param <E> The edge type 
  */
 public class GraphTraversal {
 
@@ -24,6 +22,8 @@ public class GraphTraversal {
 	 * @param graph Graph
 	 * @param source Source vertex
 	 * @param target Target (destination) vertex
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return All paths in the {@code graph} between {@code source} and {@code target} vertices
 	 */
 	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V source, V target){
@@ -38,6 +38,8 @@ public class GraphTraversal {
 	 * @param source Source vertex
 	 * @param target Target (destination) vertex
 	 * @param containing A list of vertices the path must contain
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return All paths in the {@code graph} between {@code source} and {@code target} vertices containing all of the {@code containing} vertices.
 	 */
 	public static <V extends Vertex,E extends Edge<V>>List<Path<V,E>> findAllPathsDFSContaining(Graph<V,E> graph, V source, V target, List<V> containing){
@@ -61,6 +63,8 @@ public class GraphTraversal {
 	 * @param source Source vertex
 	 * @param target Target (destination) vertex
 	 * @param excluding A list of vertices the path shouldn't contain
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return All paths in the {@code graph} between {@code source} and {@code target} vertices not containing any of the {@code excluding} vertices.
 	 */
 	public static <V extends Vertex,E extends Edge<V>> List<Path<V, E>> findAllPathsDFS(Graph<V,E> graph, V source, V target, List<V> excluding){
@@ -118,6 +122,8 @@ public class GraphTraversal {
 	 * @param graph Graph
 	 * @param source Source vertex
 	 * @param target Target (destination) vertex
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return A path in {@code graph} between {@code source} and {@code target} vertices
 	 */
 	public static <V extends Vertex,E extends Edge<V>> Path<V,E> nonrecursiveDFSPath(Graph<V,E> graph, V source, V target){
@@ -198,12 +204,13 @@ public class GraphTraversal {
 		return null;
 		
 	}
-	
-	
 
 	/**
 	 * Finds the longest path in a graph
 	 * Method should be rewritten to increase its effectiveness
+	 * @param graph The graph
+	 * @param <V> The vertex type
+	 * @param <E> The edge type1
 	 * @return The longest path between any two vertices in a graph
 	 */
 	//TODO efikasnije napraviti ovo

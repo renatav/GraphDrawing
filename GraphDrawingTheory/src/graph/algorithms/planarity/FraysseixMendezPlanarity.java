@@ -42,8 +42,8 @@ public class FraysseixMendezPlanarity<V extends Vertex, E extends Edge<V>> exten
 
 	/**
 	 * Implementation of the procedure for finding a fundamental cycle
-	 * @param tree
-	 * @param edge
+	 * @param tree DFS tree
+	 * @param edge Edge
 	 * @return Fundamental cycle if it exists, null otherwise
 	 */
 	public Path<V,E> findFundamentalCycle(DFSTree<V, E> tree, E edge){

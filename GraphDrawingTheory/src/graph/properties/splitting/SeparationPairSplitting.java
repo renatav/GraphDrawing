@@ -128,7 +128,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	 * Finds all separation pairs of the given graph
 	 * @param graph Graph
 	 * @return A list of separation pairs of graph {@code graph}
-	 * @throws AlgorithmErrorException
+	 * @throws AlgorithmErrorException If an inconsistency is detected
 	 */
 	public List<SplitPair<V, E>> findSeaparationPairs(Graph<V,E> graph) throws AlgorithmErrorException{
 
@@ -721,7 +721,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * @return @return  A map of vertices and all split pairs containing them as second vertices of the pair
+	 * @return  A map of vertices and all split pairs containing them as second vertices of the pair
 	 */
 	public Map<V, List<SplitPair<V, E>>> getSeparationPairEndVertices() {
 		return separationPairEndVertices;

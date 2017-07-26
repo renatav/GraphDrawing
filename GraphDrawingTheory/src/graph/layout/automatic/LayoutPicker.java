@@ -53,7 +53,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	
 	/**
 	 * Picks the appropriate algorithm based on the properties of the graph
-	 * @param graph
+	 * @param graph The graph
 	 * @return The chosen algorithm
 	 */
 	public LayoutAlgorithms pickAlgorithm(Graph<V,E> graph){

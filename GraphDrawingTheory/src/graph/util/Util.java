@@ -32,6 +32,7 @@ public class Util {
 	/**
 	 * Reverses the given list
 	 * @param list List to be reversed
+	 * @param <T> Type od list's elements
 	 */
 	public static <T> void reverseList(List<T> list){
 		List<T> reverse = new ArrayList<T>();
@@ -87,6 +88,8 @@ public class Util {
 	 * @param vertexClass Vertex class
 	 * @param numberOfEdges Number of edges the graph will have
 	 * @param edgesClass Edge class
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return Created graph
 	 */
 	public static <V extends Vertex, E extends Edge<V>> List<?>[] generateRandomGraph(int numberOfVertices, 

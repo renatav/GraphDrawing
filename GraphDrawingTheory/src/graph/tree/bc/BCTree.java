@@ -14,7 +14,6 @@ import graph.elements.Vertex;
  * Let B be the set of blocks and C be the set of cut vertices of a separable graph G. Construct a
  * graph H with vertex set B U C in which adjacencies are defined as follows: 
  * ci in C is adjacent to bj in B if and only if the block bj of G contains the cut vertex ci of G 
- * @assume graph is separable
  * @author Renata
  * @param <V> The vertex type
  * @param <E> The edge type 

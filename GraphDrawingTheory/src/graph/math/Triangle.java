@@ -131,7 +131,7 @@ public class Triangle {
 	}
 
 	/**
-	 * @param Indicator if the triangle should be placed before its parent to set
+	 * @param beforeParent Indicator if the triangle should be placed before its parent to set
 	 */
 	public void setBeforeParent(boolean beforeParent) {
 		this.beforeParent = beforeParent;

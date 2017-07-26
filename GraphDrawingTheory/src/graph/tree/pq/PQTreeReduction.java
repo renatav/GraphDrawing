@@ -41,6 +41,7 @@ public class PQTreeReduction<V extends Vertex, E extends Edge<V>> {
 	 * Implementation of the bubble procedure
 	 * @param pqTree PQ-tree
 	 * @param S A subset of all nodes
+	 * @return Indicator whether the the procedure was successful
 	 */
 	public boolean bubble(PQTree<V,E> pqTree, List<PQTreeNode> S){
 

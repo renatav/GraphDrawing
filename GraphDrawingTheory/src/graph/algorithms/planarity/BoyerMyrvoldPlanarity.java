@@ -884,8 +884,6 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 	/**
 	 * Represents a block used during the implementation of Boyer-Myrvold algorithm
 	 * @author Renata
-	 * @param <V> The vertex type
-	 * @param <E> The edge type 
 	 */
 	public class Block{
 
@@ -930,7 +928,7 @@ public class BoyerMyrvoldPlanarity<V extends Vertex, E extends Edge<V>> extends 
 
 		/**
 		 * Adds a new edge to the block
-		 * @param edge
+		 * @param edge Edge to be added
 		 */
 		public void addEdge(E edge){
 			edges.add(edge);

@@ -6,7 +6,6 @@ import graph.elements.Vertex;
  * A separation pair, used in Hopcroft-Tarjan splitting
  * @author Renata
  * @param <V> The vertex type
- * @param <E> The edge type 
  */
 public class SeparationPair<V extends Vertex> {
 	

@@ -175,9 +175,9 @@ public class Calc {
 	
 	/**
 	 * Finds a line parallel to the given line containing the given point
-	 * @param line1 Line to which the new line should be paralle
+	 * @param line1 Line to which the new line should be parallel
 	 * @param point Point the parallel line should contain
-	 * @return Line parallel to {@code line1} containing {@cod point}
+	 * @return Line parallel to {@code line1} containing {@code point}
 	 */
 	public static Line parallelLineThroughPoint(Line line1, Point2D point){
 		Double k = line1.getK();

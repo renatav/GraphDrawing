@@ -67,7 +67,7 @@ public class PlanarAugmentation<V extends Vertex, E extends Edge<V>> {
 	 * biconnected one.
 	 * @param graph Graph that should be connected and planar that is to be turned into a biconnected graph
 	 * @return Edges to be added
-	 * @throws CannotBeAppliedException
+	 * @throws CannotBeAppliedException if the planar augmentation algorithm cannot be applied (graph is not planar or is not connected)
 	 */
 	@SuppressWarnings("unchecked")
 	public List<E> planarBiconnected(Graph<V,E> graph) throws CannotBeAppliedException{

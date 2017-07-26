@@ -62,7 +62,7 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 	 * Runs the algorithm for forming planar faces
 	 * @param s The first vertex of the st-numbering
 	 * @param t The last vertex of the st-numbering
-	 * @throws CannotBeAppliedException
+	 * @throws CannotBeAppliedException If the graph is not planar 
 	 */
 	public void formFaces(V s, V t) throws CannotBeAppliedException{
 		//Select some edge (v,w)
@@ -202,8 +202,8 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 
 	/**
 	 * Left face of the given edge
-	 * @param edge
-	 * @return left face
+	 * @param edge Edge
+	 * @return left face Edge's left face
 	 */
 	public List<E> leftFaceOf(E edge){
 		return edgeFacesMap.get(edge).get(0);
@@ -211,8 +211,8 @@ public class PlanarFaces<V extends Vertex, E extends Edge<V>> {
 
 	/**
 	 * Right face of the given edge
-	 * @param edge
-	 * @return right face
+	 * @param edge Edge
+	 * @return right face Edge's right face
 	 */
 	public List<E> rightFaceOf(E edge){
 		return edgeFacesMap.get(edge).get(1);

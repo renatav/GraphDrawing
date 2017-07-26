@@ -27,6 +27,8 @@ public class TraversalUtil{
 	 * @param debug Indicator if debug information should be shown
 	 * @param excluding Vertices that cannot be of the path
 	 * @param excludingEdges Edges that cannot be of the path
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return Path from v1 to v2 with such that it is a part of the outer facial cycle
 	 * of a planar embedding of a graph.
 	 */

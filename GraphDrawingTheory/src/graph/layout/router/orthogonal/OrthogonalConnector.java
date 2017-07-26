@@ -40,9 +40,9 @@ public class OrthogonalConnector<V extends Vertex> {
 	/**
 	 * Creates a new orthogonal connector belonging to a certain vertex given
 	 * the entry direction and current number of edges
-	 * @param vertex
-	 * @param entryDirection
-	 * @param number
+	 * @param vertex Vertex containing the connector
+	 * @param entryDirection Direction in which edges enter the connector
+	 * @param number The number of edges containing the connector
 	 */
 	public OrthogonalConnector(V vertex, EntryDirection entryDirection, int number) {
 		super();

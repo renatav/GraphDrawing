@@ -434,7 +434,7 @@ public class PQTreeNode implements Vertex{
 	}
 
 	/**
-	 * @param Node's content to set
+	 * @param content Node's content to set
 	 */
 	public void setContent(Object content) {
 		this.content = content;

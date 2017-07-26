@@ -13,16 +13,16 @@ import graph.util.Util;
 
 /**
  * A topological ordering T(G) is an assignment of integer values T(v) to each
- * vertex v in V such that for every directed edge (u,v) in E T(u)<T(v) 
+ * vertex v in V such that for every directed edge (u,v) in E T(u) &lt; T(v) 
  * @author Renata
- * @param <V> The vertex type
- * @param <E> The edge type 
  */
 public class TopologicalOrdering {
 
 	/**
 	 * Finds the topological ordering
 	 * @param graph Graph
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return A map of vertex to integer values - topological ordering of graph {@code graph}
 	 * @throws CannotBeAppliedException if the graph doesn't have topological ordering
 	 */

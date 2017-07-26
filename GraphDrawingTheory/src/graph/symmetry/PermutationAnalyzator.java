@@ -125,9 +125,10 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * Checks if a permutation is dihedral group generator
-	 * @param p Permutation
-	 * @return A dihedral group if {@code p} is its generator, {@code null} otherwise
+	 * Checks if permutations form a  dihedral group generator
+	 * @param p1 The first permutation
+	 * @param p2 The second permtuation
+	 * @return A dihedral group if {@code p1} and {@code p2} are is generators, {@code null} otherwise
 	 */
 	public PermutationGroup isDehidralGroupGenerator(Permutation p1, Permutation p2){
 		Permutation rotation, axial;

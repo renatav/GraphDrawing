@@ -26,7 +26,7 @@ public class OrderedPartition<V extends Vertex> {
 	
 	/**
 	 * Create sand ordered partition consisting of one or more parts (lists pf vertices) 
-	 * @param vertices
+	 * @param vertices Vertices belonging to the partition
 	 */
 	@SafeVarargs
 	public OrderedPartition(List<V>...vertices){

@@ -184,7 +184,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Lays out the graph and returns an instance of the drawing object
 	 * @return Laid out drawing (mapping of vertices and edges to their calculated positions)
-	 * @throws CannotBeAppliedException
+	 * @throws CannotBeAppliedException If the specified layout algorithm cannot be applied
 	 */
 	public Drawing<V,E> layout() throws CannotBeAppliedException{
 

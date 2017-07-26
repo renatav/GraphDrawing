@@ -22,7 +22,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Finds a list of graph's cut vertices
 	 * A cut vertex is a vertex whose removal would disconnect the remaining graph
-	 * @param graph
+	 * @param graph The graph
 	 * @return A list of cut vertices
 	 */
 	public List<V> findAllCutVertices(Graph<V,E> graph){
@@ -36,7 +36,7 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	 * or if it is a separation pair (it increases the number of connected components)
 	 * in the graph (graph is no longer connected if it is removed)
 	 * @deprecated
-	 * @param graph
+	 * @param graph The graph
 	 * @return A list of split pairs
 	 */
 	public List<SplitPair<V,E>> findAllSplitPairs(Graph<V,E> graph){
@@ -144,8 +144,9 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * All components should have two vertices in common: split pair vertices
 	 * and no edges
-	 * @param components
-	 * @return
+	 * @param components Split components
+	 * @param splitPair Split pair
+	 * @return {@code true} if the test shows that everything is in order, {@code false} otherwise
 	 */
 	public boolean testSplitComponents(List<SplitComponent<V, E>> components, SplitPair<V,E> splitPair){
 		GraphOperations<V, E> operations = new GraphOperations<>();
@@ -200,8 +201,9 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Checks if one split pair is dominated by another given an edge
 	 * A split pair {u,v} is dominated by another split pair {x,y} if
+	 * @param graph The graph
 	 * @param dominanted Potentially dominated split pair
-	 * @param other Potentially dominant split pair
+	 * @param dominant Potentially dominant split pair
 	 * @param edge Edge
 	 * @return {@code true} if {@code dominated} is dominated by @{code other}  
 	 */
@@ -216,13 +218,13 @@ public class Splitting<V extends Vertex, E extends Edge<V>> {
 	}
 
 	/**
-	 * Fins a list of maximal split pair with respect to some edge
+	 * Finds a list of maximal split pair with respect to some edge
 	 * A maximal split pair with respect to some edge 
 	 * is a split pair not dominated by any other split pair with respect to that edge
 	 * There may several such pairs
-	 * @param graph
-	 * @param edge A list of maximal split pairs
-	 * @return
+	 * @param graph The graph
+	 * @param edge The edge with respect to which the pairs are being examined
+	 * @return A list of maximal split pairs
 	 */
 	public List<SplitPair<V, E>> maximalSplitPairs(Graph<V,E> graph, E edge){
 		List<SplitPair<V,E>> ret = new ArrayList<SplitPair<V,E>>();

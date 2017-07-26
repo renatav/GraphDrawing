@@ -179,7 +179,7 @@ public class HopcroftTarjanSplitting<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Executes the algorithms and sets values of the properties which
 	 * contain the results - lists of separation pair and components
-	 * @throws AlgorithmErrorException
+	 * @throws AlgorithmErrorException If an inconsistency is detected
 	 */
 	public void execute() throws AlgorithmErrorException{
 

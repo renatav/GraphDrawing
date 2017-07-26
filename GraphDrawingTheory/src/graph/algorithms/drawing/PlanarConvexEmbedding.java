@@ -107,7 +107,7 @@ public class PlanarConvexEmbedding<V extends Vertex, E extends Edge<V>>  {
 	 * Determines if a 2-connected graph has a convex drawing
 	 * and finds an extendable facial cycle
 	 * @return Extendable facial cycle
-	 * @throws CannotBeAppliedException 
+	 * @throws CannotBeAppliedException  If graph has forbidden separation pairs
 	 */
 	@SuppressWarnings("unchecked")
 	public Path<V,E> convexTesting() throws CannotBeAppliedException{

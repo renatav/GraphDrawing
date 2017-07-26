@@ -84,7 +84,7 @@ public class GraphCopy<V extends Vertex, E extends Edge<V>> extends Graph<V, E> 
 	/**
 	 * Removes an edge from the graph, checking if it is 
 	 * a triangulated edge or a regular one
-	 * @param e
+	 * @param e Edge
 	 */
 	@SuppressWarnings("unchecked")
 	public void removeEdgeWithTriangulated(Edge<V> e){

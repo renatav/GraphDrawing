@@ -28,8 +28,8 @@ public class Matrix {
 
 	/**
 	 * Sets value of a particular cell of the matrix
-	 * @param rows Number of rows
-	 * @param columns Number of columns
+	 * @param row Row number
+	 * @param column Column number
 	 * @param value Value to set
 	 */
 	public void set(int row, int column, double value){
@@ -38,8 +38,8 @@ public class Matrix {
 	
 	/**
 	 * Returns the value of a particular cell of the matrix
-	 * @param rows Number of rows
-	 * @param columns Number of columns
+	 * @param row Row number
+	 * @param column Column number
 	 * @return Value of the cell at [{@code row}][@{code column}]
 	 */
 	public double get(int row, int column){
@@ -48,7 +48,7 @@ public class Matrix {
 	
 	/**
 	 * Returns contents of a row of the matrix
-	 * @param row Row
+	 * @param row Row number
 	 * @return Content of row with index {@code row}
 	 */
 	public double[] get(int row){
