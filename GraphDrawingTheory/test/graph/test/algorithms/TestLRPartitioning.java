@@ -5,7 +5,7 @@ import graph.elements.Graph;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
 import graph.traversal.DFSTreeTraversal;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 import junit.framework.TestCase;
 
 import org.junit.Test;

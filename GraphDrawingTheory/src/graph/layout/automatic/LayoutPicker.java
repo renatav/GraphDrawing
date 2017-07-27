@@ -9,7 +9,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.layout.LayoutAlgorithms;
 import graph.traversal.DFSTreeTraversal;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 
 /**
  * Class used to select an algorithm automatically based on properties

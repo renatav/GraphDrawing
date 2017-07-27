@@ -14,12 +14,15 @@ import java.util.Random;
  */
 public class Util {
 
-	@SuppressWarnings("unchecked")
+	
 	/**
 	 * Creates a copy of a graph
 	 * @param graph Graph to be copied
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return Copy of {@code graph}
 	 */
+	@SuppressWarnings("unchecked")
 	public static <V extends Vertex, E extends Edge<V>> Graph<V,E> copyGraph(Graph<V,E> graph){
 		Graph<V,E> copy = new Graph<V,E>();
 		for (V v : graph.getVertices())
@@ -42,14 +45,17 @@ public class Util {
 		list.addAll(reverse);
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	/**
 	 * Creates a graph edge between two vertices of the given class
 	 * @param origin The first vertex
 	 * @param destination The second vertex
 	 * @param edgeClass Class of the edge
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
 	 * @return Edge between {@code origin} and {@code destination}
 	 */
+	@SuppressWarnings("unchecked")
 	public static <V extends Vertex, E extends Edge<V>> E createEdge(V origin, V destination, Class<?> edgeClass){
 		try {
 			E e = (E) edgeClass.newInstance();
@@ -64,12 +70,14 @@ public class Util {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+
 	/**
 	 * Creates a vertex of the given class
 	 * @param vertexClass Vertex class
+	 * @param <V> The vertex type
 	 * @return New vertex
 	 */
+	@SuppressWarnings("unchecked")
 	public static <V extends Vertex> V createVertex(Class<?> vertexClass){
 		try{
 			V v = (V) vertexClass.newInstance();

@@ -2,7 +2,7 @@ package graph.algorithms.lrpartition;
 
 import graph.elements.Edge;
 import graph.elements.Vertex;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 
 import java.util.ArrayList;
 import java.util.List;

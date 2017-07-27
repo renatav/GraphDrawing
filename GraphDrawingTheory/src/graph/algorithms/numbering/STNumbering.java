@@ -13,7 +13,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.traversal.DFSTreeTraversal;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 
 /**
  * Given any edge {s,t} in a biconnected graph G with n vertices, 

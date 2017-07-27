@@ -354,7 +354,7 @@ public class CommandPanel extends JPanel{
 			GraphEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
 
 			try {
-				new SPQRTree<GraphVertex, GraphEdge>(edge, graph).printTree();
+				new SPQRTree<GraphVertex, GraphEdge>(edge, graph);
 				return "";
 			} catch (CannotBeAppliedException e) {
 				return "Couldn't construct spqr tree: " + e.getMessage();

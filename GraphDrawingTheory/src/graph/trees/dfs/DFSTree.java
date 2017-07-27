@@ -1,4 +1,4 @@
-package graph.trees;
+package graph.trees.dfs;
 
 import graph.elements.Edge;
 import graph.elements.EdgeDirection;

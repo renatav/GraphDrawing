@@ -20,7 +20,7 @@ import graph.symmetry.Permutation;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
 import graph.traversal.DFSTreeTraversal;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 import graph.util.Util;
 
 public class LayoutsSpeedTest {

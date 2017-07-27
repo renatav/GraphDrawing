@@ -7,7 +7,7 @@ import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.enumerations.Direction;
 import graph.traversal.DFSTreeTraversal;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 
 import java.util.ArrayList;
 import java.util.Collections;

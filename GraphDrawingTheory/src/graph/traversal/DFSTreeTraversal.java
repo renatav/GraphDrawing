@@ -6,7 +6,7 @@ import java.util.List;
 import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 
 /**
  * Class for forming a DFS tree given a graph

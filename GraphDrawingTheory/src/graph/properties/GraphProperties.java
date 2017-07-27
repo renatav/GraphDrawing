@@ -12,7 +12,7 @@ import graph.elements.Vertex;
 import graph.properties.splitting.BiconnectedSplitting;
 import graph.traversal.DFSTreeTraversal;
 import graph.traversal.DijkstraAlgorithm;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 
 /**
  * A class containing methods for checking various properties

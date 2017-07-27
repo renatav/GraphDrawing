@@ -6,6 +6,12 @@ import graph.elements.Vertex;
 
 import java.awt.Dimension;
 
+/**
+ * Vertex of the interlacement graph.
+ * @author Renata
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
+ */
 public class InterlacementGraphVertex<V extends Vertex,E extends Edge<V>> implements Vertex{
 
 	private Path<V,E> content;

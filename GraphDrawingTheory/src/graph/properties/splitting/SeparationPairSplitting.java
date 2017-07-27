@@ -4,7 +4,7 @@ import graph.elements.Edge;
 import graph.elements.Graph;
 import graph.elements.Vertex;
 import graph.properties.components.SplitPair;
-import graph.trees.DFSTree;
+import graph.trees.dfs.DFSTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
