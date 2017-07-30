@@ -72,7 +72,7 @@ public class SaveAction extends AbstractAction {
 		            }
 		        }
 		    }
-		
+			MainFrame.getInstance().renameCurrentView(f.getName());
 	}
 
 }

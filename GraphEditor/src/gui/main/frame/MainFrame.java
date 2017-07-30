@@ -13,6 +13,7 @@ import gui.actions.toolbar.RedoAction;
 import gui.actions.toolbar.RemoveAction;
 import gui.actions.toolbar.UndoAction;
 import gui.command.panel.CommandPanel;
+import gui.components.CloseableTabComponent;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
 import gui.properties.PropertiesPanel;
@@ -25,10 +26,20 @@ import gui.util.GuiUtil;
 import gui.util.StatusBar;
 import gui.view.GraphView;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
+import java.util.Properties;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -42,6 +53,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -68,6 +81,8 @@ public class MainFrame extends JFrame{
 	private RedoAction redoAction = new RedoAction();
 	private UndoAction undoAction = new UndoAction();
 
+	private static int graphCount = 1;
+
 	public MainFrame(){
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -87,6 +102,69 @@ public class MainFrame extends JFrame{
 
 		});
 
+		try {
+			// Setup the look and feel properties
+			Properties props = new Properties();
+			props.put("logoString", "");
+
+			String foregroundColor = "228 228 255";
+
+			props.put("backgroundPattern", "off");
+
+			props.put("menuForegroundColor", foregroundColor);
+			props.put("menuBackgroundColor", "24 26 28");
+			props.put("menuSelectionForegroundColor", "0 0 0");
+			props.put("menuSelectionBackgroundColor", "91 151 32");
+			props.put("menuColorLight", "32 32 128");
+			props.put("menuColorDark", "16 16 96");
+
+			props.put("toolbarColorLight", "0 22 90");
+			props.put("toolbarColorDark", "0 22 90");
+
+			props.put("controlForegroundColor", foregroundColor);
+			props.put("controlBackgroundColor", "24 26 28");
+			props.put("controlColorLight", "16 16 96");
+			props.put("controlColorDark", "24 26 28");
+			props.put("controlHighlightColor", "24 26 28");
+			props.put("controlShadowColor", "16 16 64");
+			props.put("controlDarkShadowColor", "8 8 32");
+
+			String btnColor = "91 151 32";
+			props.put("buttonForegroundColor", foregroundColor);
+			props.put("buttonBackgroundColor", "70 103 40");
+			props.put("buttonColorLight", btnColor);
+			props.put("buttonColorDark", btnColor);
+
+			props.put("foregroundColor", foregroundColor);
+			props.put("backgroundColor", "44 47 44");
+			props.put("backgroundColorLight", "16 16 96");
+			props.put("backgroundColorDark", "8 8 64");
+			props.put("alterBackgroundColor", "255 0 0");
+
+			props.put("disabledForegroundColor", foregroundColor);
+			props.put("disabledBackgroundColor", "0 0 0");
+
+			props.put("selectionForegroundColor", foregroundColor);
+			props.put("selectionBackgroundColor", "70 103 40");
+
+			props.put("inputForegroundColor", "228 228 255");
+			props.put("inputBackgroundColor", "82 82 82");
+
+
+			// Set your theme
+			com.jtattoo.plaf.noire.NoireLookAndFeel.setCurrentTheme(props);
+
+			UIManager.setLookAndFeel("com.jtattoo.plaf.noire.NoireLookAndFeel");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+
 		initMenu();
 		initToolBar();
 		initGui();
@@ -94,16 +172,22 @@ public class MainFrame extends JFrame{
 	}
 
 	private void initGui(){
-		
+
 		JPanel centralPanel = new JPanel(new MigLayout("fill"));
 		add(centralPanel, "grow");
-		
+
 		JPanel leftPanel = new JPanel(new MigLayout("fill"));
 		pane = new JTabbedPane();
 		leftPanel.add(pane, "grow");
-		
+
+		pane.addTab("+", new JPanel());
+		pane.setTabComponentAt(pane.getTabCount() - 1, new AddTabComponent());
+		// this tab must not be enabled because we don't want to select this tab
+		pane.setEnabledAt(pane.getTabCount() - 1, false);
+
 		JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		JPanel palettePanel = new JPanel(new MigLayout());
+		palettePanel.setBorder(BorderFactory.createEtchedBorder());
 		ButtonGroup group = new ButtonGroup();
 
 		btnVertex = new JToggleButton(new AddVertexAction());
@@ -113,33 +197,36 @@ public class MainFrame extends JFrame{
 		btnEdge = new JToggleButton(new LinkAction());
 		palettePanel.add(btnEdge, "wrap");
 		group.add(btnEdge);
-		
+
 		btnSelect = new JToggleButton(new SelectAction());
 		palettePanel.add(btnSelect, "wrap");
+
 		group.add(btnSelect);
-		
+
 		palettePanel.add(new JButton(new LayoutAction()));
-		
+
 		propertiesPanel = new JPanel(new MigLayout("fill"));
 		propertiesPanel.add(new JLabel("Properties"), "dock north");
-		
+		propertiesPanel.setBorder(BorderFactory.createEtchedBorder());
+
 		rightSplitPane.setLeftComponent(palettePanel);
 		rightSplitPane.setRightComponent(propertiesPanel);
-	
+
 		commandPanel = new CommandPanel();
 		leftPanel.add(commandPanel, "dock south");
-		
+		commandPanel.setBorder(BorderFactory.createEtchedBorder());
+
 		JSplitPane centralSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		centralSplitPane.setRightComponent(rightSplitPane);
 		centralSplitPane.setResizeWeight(0.9);
 		centralSplitPane.setLeftComponent(leftPanel);
 		centralPanel.add(centralSplitPane, "grow");
-		
+
 		statusBar = new StatusBar();
 		add(statusBar, "height 20:20:20, dock south");
 
 	}
-	
+
 	private void initMenu(){
 
 		menuBar = new JMenuBar();
@@ -154,7 +241,7 @@ public class MainFrame extends JFrame{
 		JMenuItem undoMi = new JMenuItem(undoAction);
 		JMenuItem redoMi = new JMenuItem(redoAction);
 		JMenuItem removeMi = new JMenuItem(removeAction);
-		
+
 		editMenu.add(newMi);
 		editMenu.addSeparator();
 		editMenu.add(undoMi);
@@ -166,7 +253,7 @@ public class MainFrame extends JFrame{
 		fileMenu.add(loadMi);
 		fileMenu.addSeparator();
 		fileMenu.add(exitMi);
-		
+
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
 		setJMenuBar(menuBar);
@@ -174,6 +261,7 @@ public class MainFrame extends JFrame{
 
 	private void initToolBar(){
 		toolBar = new JToolBar();
+		//toolBar.setBackground(Color.RED);
 		add(toolBar, "dock north");
 		toolBar.add(newGraphAction);
 		toolBar.add(saveAction);
@@ -197,16 +285,30 @@ public class MainFrame extends JFrame{
 			return (GraphView) pane.getSelectedComponent();
 		return null;
 	}
+	
+	public void renameCurrentView(String name){
+		((CloseableTabComponent) pane.getTabComponentAt(pane.getSelectedIndex())).rename(name);
+	}
+	
 	public void addNewDiagram(){
 		Graph<GraphVertex, GraphEdge> graph = new Graph<GraphVertex, GraphEdge>();
 		GraphView view = new GraphView(graph);
-		pane.add(view);
+
+		int tabIndex = pane.getTabCount() - 1;
+		String tabTitle = "Graph " + graphCount++ + " ";
+		pane.insertTab(tabTitle, null, view, null, tabIndex);
+		pane.setTabComponentAt(tabIndex, new CloseableTabComponent(pane, tabTitle));
+		pane.setSelectedIndex(tabIndex);
 
 	}
-	public void addDiagram(GraphView view){
-		pane.add(view);
+	public void addDiagram(GraphView view, String name){
+		int tabIndex = pane.getTabCount() - 1;
+		String tabTitle = name;
+		pane.insertTab(tabTitle, null, view, null, tabIndex);
+		pane.setTabComponentAt(tabIndex, new CloseableTabComponent(pane, tabTitle));
+		pane.setSelectedIndex(tabIndex);
 	}
-	
+
 	public void setPropertiesPanel(PropertiesPanel panel){
 		if (propertiesPanel.getComponentCount() > 1)
 			propertiesPanel.remove(1);
@@ -215,7 +317,7 @@ public class MainFrame extends JFrame{
 		propertiesPanel.revalidate();
 		propertiesPanel.repaint();
 	}
-	
+
 	public void updateStatusBarPosition(Point2D position){
 		statusBar.setPositionText((int)position.getX() + ", " + (int)position.getY());
 	}
@@ -232,8 +334,6 @@ public class MainFrame extends JFrame{
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new LinkState(currentView));
 		statusBar.setLabelText("Link");
-
-
 	}
 
 	public void changeToSelect(){
@@ -243,17 +343,85 @@ public class MainFrame extends JFrame{
 		statusBar.setLabelText("Select");
 
 	}
-	
+
 	public void changeToLassoSelect(){
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new LassoSelectState(currentView));
 		statusBar.setLabelText("Lasso selection");
-		
 	}
 
 	public void changeToMoveState(Point2D mousePosition){
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new MoveState(currentView.getSelectionModel().getSelectedVertices(), currentView, mousePosition));
 		statusBar.setLabelText("Move state");
+	}
+
+
+	// A component for the last tab with an add button
+	private static class AddTabComponent extends JPanel {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private JButton addButton = null; 
+
+		public AddTabComponent() {
+			super(new BorderLayout());
+
+			setOpaque(false);
+			setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
+
+			addButton = new AddButton();
+
+			addButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					MainFrame.getInstance().addNewDiagram();
+				}
+
+			});
+
+			add(addButton, BorderLayout.EAST);
+		}
+	}
+
+	// A add button for the last tab in the tabbed pane
+	private static class AddButton extends JButton {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private static final Dimension PREF_SIZE = new Dimension(16, 15);
+
+		public AddButton() {
+			super("+");
+			// setup the button
+			setFont(new Font("Dialog", Font.BOLD, 14));
+			setForeground(Color.red);
+			setContentAreaFilled(false);
+			setBorder(BorderFactory.createEmptyBorder());
+			setFocusable(false);
+			addMouseListener(new MouseAdapter() {
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					setContentAreaFilled(true);
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					setContentAreaFilled(false);
+				}
+			});
+		}
+
+		@Override
+		public Dimension getPreferredSize() {
+			return PREF_SIZE;
+		}
+
 	}
 }

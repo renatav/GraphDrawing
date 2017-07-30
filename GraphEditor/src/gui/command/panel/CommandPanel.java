@@ -6,9 +6,7 @@ import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
 import graph.algorithms.drawing.ConvexDrawing;
 import graph.algorithms.drawing.VisibilityRepresentation;
-import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
-import graph.algorithms.planarity.PQTreePlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.drawing.Drawing;
 import graph.elements.Graph;
@@ -32,6 +30,11 @@ import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
@@ -63,12 +66,22 @@ public class CommandPanel extends JPanel{
 		setLayout(new MigLayout("fill"));
 
 		add(inputField, "dock south, growx");
+		inputField.setText("Enter command");
 
 		centralArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(centralArea);
 		add(scrollPane, "grow");
 
 		initCommands();
+		
+		inputField.addFocusListener(new FocusAdapter() {
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (inputField.getText().equals("Enter command"))
+					inputField.setText("");
+			}
+		});
 
 		inputField.addKeyListener(new KeyListener() {
 
@@ -105,6 +118,7 @@ public class CommandPanel extends JPanel{
 
 			}
 		});
+		
 	}
 
 

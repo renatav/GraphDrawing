@@ -44,7 +44,7 @@ public class LoadAction extends AbstractAction {
 		
 		GraphModel model = (GraphModel) xstream.fromXML(f);
 		GraphView view = new GraphView(model);
-		MainFrame.getInstance().addDiagram(view);
+		MainFrame.getInstance().addDiagram(view, f.getName().substring(0, f.getName().length()-6));
 		view.repaint();
 		
 	}
