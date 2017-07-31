@@ -27,13 +27,9 @@ import gui.util.StatusBar;
 import gui.view.GraphView;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
@@ -41,6 +37,7 @@ import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -139,15 +136,13 @@ public class MainFrame extends JFrame{
 
 			props.put("inputForegroundColor", "228 228 255");
 			props.put("inputBackgroundColor", "71 75 71");
-//			
-//			props.put("systemTextFont", "Arial PLAIN 13");
-//			            props.put("controlTextFont", "Arial PLAIN 13");
-//			             props.put("menuTextFont", "Arial PLAIN 13");
-//			             props.put("userTextFont", "Arial PLAIN 13");
-//			            props.put("subTextFont", "Arial PLAIN 12");
-//			             props.put("windowTitleFont", "Arial BOLD 13");
 			
-
+			props.put("systemTextFont", "Sans PLAIN 15");
+			props.put("controlTextFont", "Sans PLAIN 15");
+			props.put("menuTextFont", "Sans PLAIN 15");
+			props.put("userTextFont", "Sans PLAIN 15");
+			props.put("subTextFont", "Sans PLAIN 15");
+			props.put("windowTitleFont", "Sans BOLD 15");
 
 			// Set your theme
 			com.jtattoo.plaf.noire.NoireLookAndFeel.setCurrentTheme(props);
@@ -239,7 +234,6 @@ public class MainFrame extends JFrame{
 		JMenuItem undoMi = new JMenuItem(undoAction);
 		JMenuItem redoMi = new JMenuItem(redoAction);
 		JMenuItem removeMi = new JMenuItem(removeAction);
-
 		editMenu.add(newMi);
 		editMenu.addSeparator();
 		editMenu.add(undoMi);
@@ -393,27 +387,20 @@ public class MainFrame extends JFrame{
 		 */
 		private static final long serialVersionUID = 1L;
 		private static final Dimension PREF_SIZE = new Dimension(16, 15);
-
+		private final ImageIcon CLOSER_ICON =  new ImageIcon(getClass().getResource("/gui/resources/plus.png"));
+		private final ImageIcon CLOSER_ROLLOVER_ICON =  new ImageIcon(getClass().getResource("/gui/resources/plus_rollover.png"));
+		private final ImageIcon CLOSER_PRESSED_ICON =  new ImageIcon(getClass().getResource("/gui/resources/plus.png"));
+		
 		public AddButton() {
-			super("+");
+			super();
 			// setup the button
-			setFont(new Font("Dialog", Font.BOLD, 14));
-			setForeground(Color.red);
+			// setup the button
+			setIcon(CLOSER_ICON);
+			setRolloverIcon(CLOSER_ROLLOVER_ICON);
+			setPressedIcon(CLOSER_PRESSED_ICON);
+			setFocusable(false);
 			setContentAreaFilled(false);
 			setBorder(BorderFactory.createEmptyBorder());
-			setFocusable(false);
-			addMouseListener(new MouseAdapter() {
-
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					setContentAreaFilled(true);
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-					setContentAreaFilled(false);
-				}
-			});
 		}
 
 		@Override

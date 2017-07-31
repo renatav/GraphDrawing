@@ -1,7 +1,5 @@
 package gui.components;
 
-import gui.main.frame.icons.ImageHelper;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -127,9 +125,9 @@ public class CloseableTabComponent extends JPanel {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
-		private final ImageIcon CLOSER_ICON = ImageHelper.loadImage("closer.gif");
-		private final ImageIcon CLOSER_ROLLOVER_ICON = ImageHelper.loadImage("closer_rollover.gif");
-		private final ImageIcon CLOSER_PRESSED_ICON = ImageHelper.loadImage("closer_pressed.gif");
+		private final ImageIcon CLOSER_ICON =  new ImageIcon(getClass().getResource("/gui/resources/remove_small.png"));
+		private final ImageIcon CLOSER_ROLLOVER_ICON =  new ImageIcon(getClass().getResource("/gui/resources/remove_small_rollover.png"));
+		private final ImageIcon CLOSER_PRESSED_ICON =  new ImageIcon(getClass().getResource("/gui/resources/remove_small.png"));
 
 		private Dimension prefSize = new Dimension(16, 16);
 

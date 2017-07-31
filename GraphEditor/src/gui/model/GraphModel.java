@@ -17,7 +17,8 @@ public class GraphModel extends Observable implements IGraphElement{
 		this.graph = graph;
 		addObserver(view);
 		this.name = "Graph";
-		this.color = new Color(228,228,255);
+		//this.color = new Color(228,228,255);
+		this.color = Color.white;
 	}
 	
 	public void addVertex(GraphVertex v){

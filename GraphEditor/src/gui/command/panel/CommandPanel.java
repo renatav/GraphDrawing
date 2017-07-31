@@ -74,12 +74,19 @@ public class CommandPanel extends JPanel{
 
 		initCommands();
 		
-		inputField.addFocusListener(new FocusAdapter() {
+		inputField.addFocusListener(new FocusListener() {
 			
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (inputField.getText().equals("Enter command"))
 					inputField.setText("");
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (inputField.getText().equals(""))
+					inputField.setText("Enter command");
+				
 			}
 		});
 
