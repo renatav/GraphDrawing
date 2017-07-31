@@ -115,19 +115,9 @@ public class MainFrame extends JFrame{
 			props.put("menuBackgroundColor", "24 26 28");
 			props.put("menuSelectionForegroundColor", "0 0 0");
 			props.put("menuSelectionBackgroundColor", "91 151 32");
-			props.put("menuColorLight", "32 32 128");
-			props.put("menuColorDark", "16 16 96");
 
 			props.put("toolbarColorLight", "0 22 90");
-			props.put("toolbarColorDark", "0 22 90");
-
-			props.put("controlForegroundColor", foregroundColor);
-			props.put("controlBackgroundColor", "24 26 28");
-			props.put("controlColorLight", "16 16 96");
-			props.put("controlColorDark", "24 26 28");
-			props.put("controlHighlightColor", "24 26 28");
-			props.put("controlShadowColor", "16 16 64");
-			props.put("controlDarkShadowColor", "8 8 32");
+			props.put("toolbarColorDark", "2 52 7");
 
 			String btnColor = "91 151 32";
 			props.put("buttonForegroundColor", foregroundColor);
@@ -142,13 +132,21 @@ public class MainFrame extends JFrame{
 			props.put("alterBackgroundColor", "255 0 0");
 
 			props.put("disabledForegroundColor", foregroundColor);
-			props.put("disabledBackgroundColor", "0 0 0");
+			props.put("disabledBackgroundColor", "24 26 28");
 
 			props.put("selectionForegroundColor", foregroundColor);
 			props.put("selectionBackgroundColor", "70 103 40");
 
 			props.put("inputForegroundColor", "228 228 255");
-			props.put("inputBackgroundColor", "82 82 82");
+			props.put("inputBackgroundColor", "71 75 71");
+//			
+//			props.put("systemTextFont", "Arial PLAIN 13");
+//			            props.put("controlTextFont", "Arial PLAIN 13");
+//			             props.put("menuTextFont", "Arial PLAIN 13");
+//			             props.put("userTextFont", "Arial PLAIN 13");
+//			            props.put("subTextFont", "Arial PLAIN 12");
+//			             props.put("windowTitleFont", "Arial BOLD 13");
+			
 
 
 			// Set your theme
