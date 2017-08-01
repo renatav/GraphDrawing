@@ -87,7 +87,7 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new ConvexLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.CIRCLE_CENTER)
 			layouter = new CircleWithCenterLayouter<V,E>();
-		else if (algorithm == LayoutAlgorithms.ORTHOGONAL1)
+		else if (algorithm == LayoutAlgorithms.ORTHOGONAL)
 			layouter = new VisibilityRepresentationLayout<V,E>();
 			
 		return layouter;

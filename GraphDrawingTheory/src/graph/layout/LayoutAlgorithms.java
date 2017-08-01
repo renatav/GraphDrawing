@@ -6,8 +6,19 @@ package graph.layout;
  */
 public enum LayoutAlgorithms {
 
-	AUTOMATIC, ORTHOGONAL1, CONCENTRIC, CONVEX, TUTTE, KAMADA_KAWAI, FRUCHTERMAN_REINGOLD, SPRING, DAG, CIRCLE, CIRCLE_CENTER, BOX,
-	BALLOON, RADIAL_TREE, TREE, COMPACT_TREE, ISOM, FAST_ORGANIC, ORGANIC, HIERARCHICAL, STACK,
-	PARTITION, SPTING2, NODE_LINK_TREE, RADIAL_TREE2, SQUIRED_TREEMAP;
+	AUTOMATIC("Automatic"), ORTHOGONAL("Orthogonal"), CONCENTRIC("Concentric symmetrix"), CONVEX("Convex"), TUTTE("Tutte embedding"), KAMADA_KAWAI("Kamada-Kawai"),
+	FRUCHTERMAN_REINGOLD("Fruchterman-Reingold"), SPRING("Spring"), DAG("DAG"), CIRCLE("Circular"), CIRCLE_CENTER("Circular around vertex"), BOX("Box"),
+	BALLOON("Balloon tree"), RADIAL_TREE("Radial tree"), TREE("Level-based tree"), COMPACT_TREE("Compact tree"), ISOM("Isom"), FAST_ORGANIC("Fast organic"),
+	ORGANIC("Organic"), HIERARCHICAL("Hierarchical"),SPTING2("Spring 2"), NODE_LINK_TREE("Node-link tree"), RADIAL_TREE2("Radial tree 2");
+
+	private String title;
+	
+	private LayoutAlgorithms(String title){
+		this.title = title;
+	}
+	
+	public String getTitle(){
+		return title;
+	}
 	
 }

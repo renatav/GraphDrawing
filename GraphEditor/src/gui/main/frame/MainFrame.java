@@ -94,9 +94,7 @@ public class MainFrame extends JFrame{
 			public void windowClosing(WindowEvent e) {
 				if (GuiUtil.showConfirmDialog("Close application?") == JOptionPane.YES_OPTION)
 					System.exit(0);
-
 			}
-
 		});
 
 		try {
@@ -183,20 +181,26 @@ public class MainFrame extends JFrame{
 		palettePanel.setBorder(BorderFactory.createEtchedBorder());
 		ButtonGroup group = new ButtonGroup();
 
+		Dimension buttonsDim = new Dimension(100,20);
 		btnVertex = new JToggleButton(new AddVertexAction());
+		btnVertex.setPreferredSize(buttonsDim);
 		palettePanel.add(btnVertex, "gapy 10px, wrap");
 		group.add(btnVertex);
 
 		btnEdge = new JToggleButton(new LinkAction());
+		btnEdge.setPreferredSize(buttonsDim);
 		palettePanel.add(btnEdge, "wrap");
 		group.add(btnEdge);
 
 		btnSelect = new JToggleButton(new SelectAction());
+		btnSelect.setPreferredSize(buttonsDim);		
 		palettePanel.add(btnSelect, "wrap");
-
 		group.add(btnSelect);
 
-		palettePanel.add(new JButton(new LayoutAction()));
+		JButton btnLayout = new JButton(new LayoutAction());
+		btnLayout.setPreferredSize(buttonsDim);		
+		palettePanel.add(btnLayout);
+		
 
 		propertiesPanel = new JPanel(new MigLayout("fill"));
 		propertiesPanel.add(new JLabel("Properties"), "dock north");
