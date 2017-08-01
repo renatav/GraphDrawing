@@ -6,10 +6,8 @@ import graph.layout.automatic.AutomaticPropertiesLayout;
 import graph.layout.box.BoxLayouter;
 import graph.layout.circle.CircleLayouter;
 import graph.layout.circle.CircleWithCenterLayouter;
-import graph.layout.force.directed.DAGLayouter;
 import graph.layout.force.directed.FruchtermanReingoldLayouter;
 import graph.layout.force.directed.KamadaKawaiLayouter;
-import graph.layout.force.directed.PrefuseForceDirectedLayouter;
 import graph.layout.force.directed.SpringLayouter;
 import graph.layout.organic.JGraphFastorganicLayouter;
 import graph.layout.organic.JGraphHierarchicalLayouter;
@@ -23,7 +21,6 @@ import graph.layout.tree.JGraphCompactTreeLayout;
 import graph.layout.tree.JungTreeLayouter;
 import graph.layout.tree.PrefuseBalloonLayouter;
 import graph.layout.tree.PrefuseNodeLinkTreeLayouter;
-import graph.layout.tree.PrefuseRadialTreeLayouter;
 import graph.layout.tree.RadialTreeLayouter;
 
 /**
@@ -53,8 +50,6 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new CircleLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.SPRING)
 			layouter = new SpringLayouter<V,E>();
-		else if (algorithm == LayoutAlgorithms.DAG)
-			layouter = new DAGLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.RADIAL_TREE)
 			layouter = new RadialTreeLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.TREE)
@@ -75,14 +70,10 @@ public class LayouterFactory<V extends Vertex, E extends Edge<V>> {
 			layouter = new JGraphOrganicLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.HIERARCHICAL)
 			layouter = new JGraphHierarchicalLayouter<V,E>();
-		else if (algorithm == LayoutAlgorithms.SPTING2)
-			layouter = new PrefuseForceDirectedLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.BALLOON)
 			layouter = new PrefuseBalloonLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.NODE_LINK_TREE)
 			layouter = new PrefuseNodeLinkTreeLayouter<V,E>();
-		else if (algorithm == LayoutAlgorithms.RADIAL_TREE2)
-			layouter = new PrefuseRadialTreeLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.CONVEX)
 			layouter = new ConvexLayouter<V,E>();
 		else if (algorithm == LayoutAlgorithms.CIRCLE_CENTER)

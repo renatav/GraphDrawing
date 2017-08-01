@@ -1,8 +1,5 @@
 package gui.panels.layout;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import graph.layout.LayoutAlgorithms;
 import graph.layout.PropertyEnums.BalloonProperties;
 import graph.layout.PropertyEnums.BoxProperties;
@@ -14,12 +11,14 @@ import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.NodeLinkTreeProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
-import graph.layout.PropertyEnums.RadialTree2Properties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
 import graph.layout.PropertyEnums.SpringProperties;
 import graph.layout.PropertyEnums.SymmetricProperties;
 import graph.layout.PropertyEnums.TreeProperties;
 import graph.layout.PropertyEnums.TutteProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LayoutPanelFactory {
 	
@@ -44,8 +43,6 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(FruchtermanReingoldProperties.class);
 		else if (al == LayoutAlgorithms.SPRING)
 			panel = new LayoutPropertyPanel(SpringProperties.class);
-		else if (al == LayoutAlgorithms.DAG)
-			panel = new LayoutPropertyPanel(SpringProperties.class);
 		else if (al == LayoutAlgorithms.TREE)
 			panel = new LayoutPropertyPanel(TreeProperties.class);
 		else if (al == LayoutAlgorithms.RADIAL_TREE)
@@ -62,8 +59,6 @@ public class LayoutPanelFactory {
 			panel = new LayoutPropertyPanel(BalloonProperties.class);
 		else if (al == LayoutAlgorithms.NODE_LINK_TREE)
 			panel = new NodeLinkTreeLayoutPanel(NodeLinkTreeProperties.class);
-		else if (al == LayoutAlgorithms.RADIAL_TREE2)
-			panel = new LayoutPropertyPanel(RadialTree2Properties.class);
 		panelsMap.put(al, panel);
 		return panel;
 	}

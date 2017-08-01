@@ -25,12 +25,10 @@ public class LayoutAestheticMap {
 		planar.add(LayoutAlgorithms.TUTTE);
 		aestheticCriteriaAlgorithms.put(AestheticCriteria.PLANAR, planar);
 		List<LayoutAlgorithms> minEdgeCrosses = new ArrayList<LayoutAlgorithms>();
-		minEdgeCrosses.add(LayoutAlgorithms.DAG);
 		minEdgeCrosses.add(LayoutAlgorithms.FAST_ORGANIC);
 		minEdgeCrosses.add(LayoutAlgorithms.FRUCHTERMAN_REINGOLD);
 		minEdgeCrosses.add(LayoutAlgorithms.ISOM);
 		minEdgeCrosses.add(LayoutAlgorithms.KAMADA_KAWAI);
-		minEdgeCrosses.add(LayoutAlgorithms.SPTING2);
 		aestheticCriteriaAlgorithms.put(AestheticCriteria.MINIMAL_EDGE_CROESSES, minEdgeCrosses);
 		List<LayoutAlgorithms> symmetric = new ArrayList<LayoutAlgorithms>();
 		symmetric.add(LayoutAlgorithms.CONCENTRIC);

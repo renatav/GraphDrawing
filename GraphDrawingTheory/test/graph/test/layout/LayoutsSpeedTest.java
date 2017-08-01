@@ -1,27 +1,21 @@
 package graph.test.layout;
 
-import java.awt.Dimension;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections15.map.HashedMap;
-
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.elements.Graph;
-import graph.layout.DefaultGraphLayoutProperties;
 import graph.layout.GraphLayoutProperties;
 import graph.layout.LayoutAlgorithms;
 import graph.layout.Layouter;
-import graph.layout.PropertyEnums.CircleProperties;
-import graph.layout.PropertyEnums.SymmetricProperties;
-import graph.symmetry.Permutation;
 import graph.test.elements.TestEdge;
 import graph.test.elements.TestVertex;
 import graph.traversal.DFSTreeTraversal;
 import graph.trees.dfs.DFSTree;
 import graph.util.Util;
+
+import java.awt.Dimension;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class LayoutsSpeedTest {
 
@@ -33,21 +27,19 @@ public class LayoutsSpeedTest {
 		Layouter<TestVertex, TestEdge> layouter = new Layouter<TestVertex, TestEdge>();
 		layouter.setLayoutProperties(layoutProperties);
 		
-		LayoutAlgorithms[] algorithms = new LayoutAlgorithms[14];
+		LayoutAlgorithms[] algorithms = new LayoutAlgorithms[12];
 		algorithms[0] = LayoutAlgorithms.SPRING;
 		algorithms[1] = LayoutAlgorithms.FRUCHTERMAN_REINGOLD;
 		algorithms[2] = LayoutAlgorithms.KAMADA_KAWAI;
 		algorithms[3] = LayoutAlgorithms.ISOM;
 		algorithms[4] = LayoutAlgorithms.FAST_ORGANIC;
 		algorithms[5] = LayoutAlgorithms.ORGANIC;
-		algorithms[6] = LayoutAlgorithms.SPTING2;
-		algorithms[7] = LayoutAlgorithms.HIERARCHICAL;
-		algorithms[8] = LayoutAlgorithms.TREE;
-		algorithms[9] = LayoutAlgorithms.BALLOON;
-		algorithms[10] = LayoutAlgorithms.RADIAL_TREE;
-		algorithms[11] = LayoutAlgorithms.COMPACT_TREE;
-		algorithms[12] = LayoutAlgorithms.RADIAL_TREE2;
-		algorithms[13] = LayoutAlgorithms.NODE_LINK_TREE;
+		algorithms[6] = LayoutAlgorithms.HIERARCHICAL;
+		algorithms[7] = LayoutAlgorithms.TREE;
+		algorithms[8] = LayoutAlgorithms.BALLOON;
+		algorithms[9] = LayoutAlgorithms.RADIAL_TREE;
+		algorithms[10] = LayoutAlgorithms.COMPACT_TREE;
+		algorithms[11] = LayoutAlgorithms.NODE_LINK_TREE;
 		
 		int iterNum = 5;
 		

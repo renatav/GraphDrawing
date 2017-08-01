@@ -9,7 +9,6 @@ import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.NodeLinkTreeProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
-import graph.layout.PropertyEnums.RadialTree2Properties;
 
 /**
  * Sets default properties of layout algorithms. 
@@ -69,11 +68,6 @@ public class DefaultGraphLayoutProperties {
 			properties.setProperty(HierarchicalProperties.FINE_TUNING, true);
 			properties.setProperty(HierarchicalProperties.INTRA_CELL_SPACING, params[0] + spacing);
 			properties.setProperty(HierarchicalProperties.INTER_RANK_CELL_SPACING, params[1] + spacing);
-			
-		}
-		
-		else if (algorithm == LayoutAlgorithms.RADIAL_TREE2){
-			properties.setProperty(RadialTree2Properties.AUSTO_SCALE, true);
 		}
 		
 		else if (algorithm == LayoutAlgorithms.BALLOON){

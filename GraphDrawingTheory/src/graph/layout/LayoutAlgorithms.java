@@ -6,19 +6,39 @@ package graph.layout;
  */
 public enum LayoutAlgorithms {
 
-	AUTOMATIC("Automatic"), ORTHOGONAL("Orthogonal"), CONCENTRIC("Concentric symmetrix"), CONVEX("Convex"), TUTTE("Tutte embedding"), KAMADA_KAWAI("Kamada-Kawai"),
-	FRUCHTERMAN_REINGOLD("Fruchterman-Reingold"), SPRING("Spring"), DAG("DAG"), CIRCLE("Circular"), CIRCLE_CENTER("Circular around vertex"), BOX("Box"),
-	BALLOON("Balloon tree"), RADIAL_TREE("Radial tree"), TREE("Level-based tree"), COMPACT_TREE("Compact tree"), ISOM("Isom"), FAST_ORGANIC("Fast organic"),
-	ORGANIC("Organic"), HIERARCHICAL("Hierarchical"),SPTING2("Spring 2"), NODE_LINK_TREE("Node-link tree"), RADIAL_TREE2("Radial tree 2");
+	AUTOMATIC("Automatic"), BALLOON("Balloon tree"), ORTHOGONAL("Orthogonal"),  RADIAL_TREE("Radial tree"),
+	TREE("Level-based tree"), COMPACT_TREE("Compact tree"), HIERARCHICAL("Hierarchical"),
+	 NODE_LINK_TREE("Node-link tree"), CONCENTRIC("Concentric symmetrix"), CONVEX("Convex"), TUTTE("Tutte embedding"),
+	KAMADA_KAWAI("Kamada-Kawai"), FRUCHTERMAN_REINGOLD("Fruchterman-Reingold"), SPRING("Spring"),
+	CIRCLE("Circular"), CIRCLE_CENTER("Circular around a vertex"), BOX("Box"),
+	ISOM("Isom"), FAST_ORGANIC("Fast organic"),
+	ORGANIC("Organic");
 
-	private String title;
+	private String name;
 	
-	private LayoutAlgorithms(String title){
-		this.title = title;
+	private LayoutAlgorithms(String name){
+		this.name = name;
 	}
 	
-	public String getTitle(){
-		return title;
+	public String getName(){
+		return name;
+	}
+	
+	public static String[] names() {
+		LayoutAlgorithms[] algorithms = values();
+	    String[] names = new String[algorithms.length];
+
+	    for (int i = 0; i < names.length; i++) {
+	        names[i] = algorithms[i].name;
+	    }
+	    return names;
+	}
+	
+	public static LayoutAlgorithms getValue(String name){
+		for (LayoutAlgorithms al : values())
+			if (al.getName().equals(name))
+				return al;
+		return null;
 	}
 	
 }

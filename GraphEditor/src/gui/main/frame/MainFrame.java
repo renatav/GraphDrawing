@@ -167,10 +167,7 @@ public class MainFrame extends JFrame{
 		JPanel centralPanel = new JPanel(new MigLayout("fill"));
 		add(centralPanel, "grow");
 
-		JPanel leftPanel = new JPanel(new MigLayout("fill"));
 		pane = new JTabbedPane();
-		leftPanel.add(pane, "grow");
-
 		pane.addTab("+", new JPanel());
 		pane.setTabComponentAt(pane.getTabCount() - 1, new AddTabComponent());
 		// this tab must not be enabled because we don't want to select this tab
@@ -208,15 +205,22 @@ public class MainFrame extends JFrame{
 
 		rightSplitPane.setLeftComponent(palettePanel);
 		rightSplitPane.setRightComponent(propertiesPanel);
+		
 
 		commandPanel = new CommandPanel();
-		leftPanel.add(commandPanel, "dock south");
+		commandPanel.setPreferredSize(new Dimension(150,150));
 		commandPanel.setBorder(BorderFactory.createEtchedBorder());
+		
+		JSplitPane leftSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		leftSplitPane.setLeftComponent(pane);
+		leftSplitPane.setRightComponent(commandPanel);
+		leftSplitPane.setResizeWeight(0.9);
+		leftSplitPane.setBorder(BorderFactory.createEtchedBorder());
 
 		JSplitPane centralSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		centralSplitPane.setRightComponent(rightSplitPane);
 		centralSplitPane.setResizeWeight(0.9);
-		centralSplitPane.setLeftComponent(leftPanel);
+		centralSplitPane.setLeftComponent(leftSplitPane);
 		centralPanel.add(centralSplitPane, "grow");
 
 		statusBar = new StatusBar();
@@ -277,7 +281,7 @@ public class MainFrame extends JFrame{
 
 
 	public GraphView getCurrentView(){
-		if (pane.getComponentCount() > 0)
+		if (pane.getSelectedComponent() != null && pane.getSelectedComponent() instanceof GraphView)
 			return (GraphView) pane.getSelectedComponent();
 		return null;
 	}

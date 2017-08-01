@@ -26,7 +26,7 @@ public class LayoutDialog extends JDialog{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JComboBox<?> cbAlogorithms = new JComboBox<>(LayoutAlgorithms.values());
+	private JComboBox<String> cbAlogorithms = new JComboBox<String>(LayoutAlgorithms.names());
 	private boolean ok = false;
 	private JPanel layoutPanelContainer = new JPanel();
 	private LayoutPropertyPanel layoutPanel;
@@ -84,9 +84,10 @@ public class LayoutDialog extends JDialog{
 	
 	
 	private void setLayoutPanel(){
-		layoutPanel = LayoutPanelFactory.getPanel((LayoutAlgorithms) cbAlogorithms.getSelectedItem());
+		LayoutAlgorithms algorithm = LayoutAlgorithms.getValue((String) cbAlogorithms.getSelectedItem());
+		layoutPanel = LayoutPanelFactory.getPanel(algorithm);
 		if (layoutPanel != null){
-			layoutPanel.setDefaultValue(DefaultGraphLayoutProperties.getDefaultLayoutProperties((LayoutAlgorithms) cbAlogorithms.getSelectedItem(), 
+			layoutPanel.setDefaultValue(DefaultGraphLayoutProperties.getDefaultLayoutProperties(algorithm, 
 					MainFrame.getInstance().getCurrentView().getModel().getGraph()));
 			layoutPanelContainer.add(layoutPanel);
 		}
