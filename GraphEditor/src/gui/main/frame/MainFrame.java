@@ -1,6 +1,48 @@
 package gui.main.frame;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.Properties;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import graph.algorithm.AlgorithmExecutor;
+import graph.algorithm.ExecuteResult;
+import graph.algorithm.cycles.SimpleCyclesFinder;
+import graph.algorithms.planarity.FraysseixMendezPlanarity;
+import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
+import graph.properties.components.SplitPair;
+import graph.properties.splitting.AlgorithmErrorException;
+import graph.properties.splitting.HopcroftTarjanSplitting;
+import graph.properties.splitting.SeparationPairSplitting;
+import graph.symmetry.Permutation;
+import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.LoadAction;
 import gui.actions.main.frame.NewGraphAction;
@@ -25,34 +67,6 @@ import gui.state.SelectState;
 import gui.util.GuiUtil;
 import gui.util.StatusBar;
 import gui.view.GraphView;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.Point2D;
-import java.util.Properties;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
 import net.miginfocom.swing.MigLayout;
 
 public class MainFrame extends JFrame{
@@ -77,6 +91,13 @@ public class MainFrame extends JFrame{
 	private RemoveAction removeAction = new RemoveAction();
 	private RedoAction redoAction = new RedoAction();
 	private UndoAction undoAction = new UndoAction();
+	private JPopupMenu popup;
+	private PopupClickListener popupListener;
+	private PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest =
+			new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
+	//TODO da se moze ovo pozvati vise puta
+	private SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
+			new SeparationPairSplitting<GraphVertex, GraphEdge>();
 
 	private static int graphCount = 1;
 
@@ -134,7 +155,7 @@ public class MainFrame extends JFrame{
 
 			props.put("inputForegroundColor", "228 228 255");
 			props.put("inputBackgroundColor", "71 75 71");
-			
+
 			props.put("systemTextFont", "Sans PLAIN 15");
 			props.put("controlTextFont", "Sans PLAIN 15");
 			props.put("menuTextFont", "Sans PLAIN 15");
@@ -159,6 +180,7 @@ public class MainFrame extends JFrame{
 		initMenu();
 		initToolBar();
 		initGui();
+		initPopup();
 
 	}
 
@@ -197,7 +219,7 @@ public class MainFrame extends JFrame{
 		JButton btnLayout = new JButton(new LayoutAction());
 		btnLayout.setPreferredSize(buttonsDim);		
 		palettePanel.add(btnLayout);
-		
+
 
 		propertiesPanel = new JPanel(new MigLayout("fill"));
 		propertiesPanel.add(new JLabel("Properties"), "dock north");
@@ -205,12 +227,12 @@ public class MainFrame extends JFrame{
 
 		rightSplitPane.setLeftComponent(palettePanel);
 		rightSplitPane.setRightComponent(propertiesPanel);
-		
+
 
 		commandPanel = new CommandPanel();
 		commandPanel.setPreferredSize(new Dimension(150,150));
 		commandPanel.setBorder(BorderFactory.createEtchedBorder());
-		
+
 		JSplitPane leftSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		leftSplitPane.setLeftComponent(pane);
 		leftSplitPane.setRightComponent(commandPanel);
@@ -273,6 +295,173 @@ public class MainFrame extends JFrame{
 		toolBar.add(redoAction);
 	}
 
+	private void initPopup(){
+		popup = new JPopupMenu("Analyze");
+		JMenuItem connectedMI = new JMenuItem("Check connectivity");
+
+		connectedMI.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String answer = getGraph().isConnected() ? "yes" : "no";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is connected: " +  answer);
+			}
+		});
+
+		JMenuItem biconnectedMI = new JMenuItem("Check biconnectivity");
+		biconnectedMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String answer = getGraph().isBiconnected() ? "yes" : "no";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is biconnected: " +  answer);	
+			}
+		});
+
+		JMenuItem cycleMI = new JMenuItem("Check if cyclic");
+		cycleMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String answer = getGraph().isCyclic() ? "yes" : "no";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is cyclic: " +  answer);	
+			}
+		});
+
+		JMenuItem planarMI = new JMenuItem("Check planarity");
+		planarMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String answer = planarityTest.isPlannar(getGraph()) ? "yes" : "no";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is planar: " +  answer);	
+			}
+		});
+
+		JMenuItem cycleBasisMI = new JMenuItem("Cycles basis");
+		cycleBasisMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				SimpleCyclesFinder<GraphVertex, GraphEdge> cycles = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
+				String cyclesStr = cycles.findCycles(getGraph()).toString();
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Cycles basis: " +  cyclesStr);
+			}
+		});
+
+		JMenuItem cutVerticesMI = new JMenuItem("Cut vertices");
+		cutVerticesMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String cutVertices = getGraph().listCutVertices().toString();
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Cut vertices: " +  cutVertices);	
+			}
+		});
+
+		JMenuItem blocksMI = new JMenuItem("Biconnected components");
+		blocksMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String ret;
+				if (getGraph().isBiconnected())
+					ret = "Graph is biconnected";
+				else{
+					List<Graph<GraphVertex, GraphEdge>> blocks = getGraph().listBiconnectedComponents();
+					StringBuilder builder = new StringBuilder("Biconnected components: \n");
+					for (int i = 0; i < blocks.size(); i++){
+						Graph<GraphVertex, GraphEdge> block  = blocks.get(i);
+						builder.append("Component " + (i+1) + " " + block.printFormat() + "\n");
+					}
+					ret = builder.toString();
+				}
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret);	
+			}
+		});
+		
+		JMenuItem triconnectedMI = new JMenuItem("Check triconnectivity");
+		triconnectedMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String answer = "no";
+				try {
+					answer = separationPairsSplitting.findSeaparationPairs(getGraph()).size() == 0 ? "yes" : "no";
+				} catch (AlgorithmErrorException e) {
+					e.printStackTrace();
+				}
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected: " +  answer);	
+			}
+		});
+		
+		JMenuItem triconnectedComponentsMI = new JMenuItem("Split components");
+		triconnectedComponentsMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(getGraph());
+				try {
+					hopcroftTarjan.execute();
+				} catch (AlgorithmErrorException e) {
+				}
+				
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected: " +  hopcroftTarjan.getSplitComponents());	
+			}
+		});
+		
+		JMenuItem separationPairsMI = new JMenuItem("Separation pairs");
+		separationPairsMI.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String ret;
+				try {
+					List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(getGraph());
+					ret = separationPairs.toString();
+				} catch (AlgorithmErrorException e) {
+					e.printStackTrace();
+					ret = e.getMessage();
+				}
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret);	
+			}
+		});
+		
+		JMenuItem automorphismsMI = new JMenuItem("Automorphisms");
+		automorphismsMI.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String ret = "";
+				McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(getGraph());
+				List<Permutation> automorphisms = nauty.findAutomorphisms();
+				for (Permutation p : automorphisms){
+					ret += p.cyclicRepresenatation() + "\n";
+				}
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret);	
+			}
+		});
+
+		popup.add(connectedMI);
+		popup.add(biconnectedMI);
+		popup.add(triconnectedMI);
+		popup.add(cycleMI);
+		popup.add(planarMI);
+		popup.add(cycleBasisMI);
+		popup.add(cutVerticesMI);
+		popup.add(blocksMI);
+		popup.add(separationPairsMI);
+		popup.add(triconnectedComponentsMI);
+		popup.add(automorphismsMI);
+		//TODO triconnected components posle joinova
+		//TODO find path from to
+		//is tree
+		//is ring
+		popupListener = new PopupClickListener();
+	}
+
+	private Graph<GraphVertex, GraphEdge> getGraph(){
+		return MainFrame.getInstance().getCurrentView().getModel().getGraph();
+	}
+
 	public static MainFrame getInstance(){
 		if (instance == null)
 			instance = new MainFrame();
@@ -285,11 +474,11 @@ public class MainFrame extends JFrame{
 			return (GraphView) pane.getSelectedComponent();
 		return null;
 	}
-	
+
 	public void renameCurrentView(String name){
 		((CloseableTabComponent) pane.getTabComponentAt(pane.getSelectedIndex())).rename(name);
 	}
-	
+
 	public void addNewDiagram(){
 		Graph<GraphVertex, GraphEdge> graph = new Graph<GraphVertex, GraphEdge>();
 		GraphView view = new GraphView(graph);
@@ -299,14 +488,17 @@ public class MainFrame extends JFrame{
 		pane.insertTab(tabTitle, null, view, null, tabIndex);
 		pane.setTabComponentAt(tabIndex, new CloseableTabComponent(pane, tabTitle));
 		pane.setSelectedIndex(tabIndex);
+		view.addMouseListener(popupListener);
 
 	}
+
 	public void addDiagram(GraphView view, String name){
 		int tabIndex = pane.getTabCount() - 1;
 		String tabTitle = name;
 		pane.insertTab(tabTitle, null, view, null, tabIndex);
 		pane.setTabComponentAt(tabIndex, new CloseableTabComponent(pane, tabTitle));
 		pane.setSelectedIndex(tabIndex);
+		view.addMouseListener(popupListener);
 	}
 
 	public void setPropertiesPanel(PropertiesPanel panel){
@@ -398,7 +590,7 @@ public class MainFrame extends JFrame{
 		private final ImageIcon CLOSER_ICON =  new ImageIcon(getClass().getResource("/gui/resources/plus.png"));
 		private final ImageIcon CLOSER_ROLLOVER_ICON =  new ImageIcon(getClass().getResource("/gui/resources/plus_rollover.png"));
 		private final ImageIcon CLOSER_PRESSED_ICON =  new ImageIcon(getClass().getResource("/gui/resources/plus.png"));
-		
+
 		public AddButton() {
 			super();
 			// setup the button
@@ -416,5 +608,21 @@ public class MainFrame extends JFrame{
 			return PREF_SIZE;
 		}
 
+	}
+
+	class PopupClickListener extends MouseAdapter{
+		public void mousePressed(MouseEvent e){
+			if (e.isPopupTrigger())
+				doPop(e);
+		}
+
+		public void mouseReleased(MouseEvent e){
+			if (e.isPopupTrigger())
+				doPop(e);
+		}
+
+		private void doPop(MouseEvent e){
+			popup.show(e.getComponent(), e.getX(), e.getY());
+		}
 	}
 }

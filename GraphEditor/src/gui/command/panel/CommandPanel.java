@@ -232,8 +232,8 @@ public class CommandPanel extends JPanel{
 		}
 
 		if (command.startsWith(commands[8])){
-			//	if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
-			//	return "Graph is biconnected.";
+			if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
+				return "Graph is biconnected.";
 			//return splitting.findAllCutVertices(MainFrame.getInstance().getCurrentView().getModel().getGraph()).toString();
 			return graph.listCutVertices().toString();
 		}		

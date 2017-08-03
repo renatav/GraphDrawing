@@ -93,7 +93,7 @@ public class LayoutDialog extends JDialog{
 		}
 	}
 	public LayoutAlgorithms getAlogithm(){
-		return (LayoutAlgorithms) cbAlogorithms.getSelectedItem();
+		return LayoutAlgorithms.getValue((String) cbAlogorithms.getSelectedItem());
 	}
 	
 	public GraphLayoutProperties getLayoutProperties(){

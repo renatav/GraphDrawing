@@ -666,12 +666,35 @@ public class Graph<V extends Vertex,E extends Edge<V>>{
 	public void setDirected(boolean directed) {
 		this.directed = directed;
 	}
+	
+	/**
+	 * @return Better formatted string representation of the graph. 
+	 */
+	public String printFormat(){
+		String verticesStr = "V={";
+		for (int i = 0; i < vertices.size(); i++){
+			verticesStr += vertices.get(i);
+			if( i < vertices.size() - 1)
+				verticesStr += ", ";
+		}
+		verticesStr += "}";
+		String edgesStr = "E={ ";
+		for (int i = 0; i < edges.size(); i++){
+			edgesStr += "(" + edges.get(i).getOrigin() + ", " + edges.get(i).getDestination() + ")";
+			if( i < edges.size() - 1)
+				edgesStr += ", ";
+		}
+		edgesStr += "}";
+		
+		return verticesStr + ", " + edgesStr;
+		
+	}
 
 	@Override
 	public String toString() {
 		return "Graph [vertices=" + vertices + ", edges=" + edges + "]";
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
