@@ -102,7 +102,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * A map of lowpt1 values and lists of vertices having that value
 	 */
-	private Map<Integer, List<V>> lowpt1sMap = new HashMap<Integer, List<V>>();
+	private Map<Integer, List<V>> lowpt1sMap;
 
 	/**
 	 * A list of separation pairs
@@ -149,6 +149,7 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 		separationPairEndVertices = new HashMap<V,List<SplitPair<V, E>>>();
 		separationPairStartVertices = new HashMap<V,List<SplitPair<V, E>>>();
 		separationPairs = new ArrayList<SplitPair<V,E>>();
+		lowpt1sMap = new HashMap<Integer, List<V>>();
 
 		number = new int[size];
 		flag = new boolean[size];
@@ -198,10 +199,10 @@ public class SeparationPairSplitting<V extends Vertex, E extends Edge<V>> {
 			log.info("setting lowpts, inverse numbering etc.");
 		}
 
-
 		for (V v : vertices){
 
 			int vIndex = vertices.indexOf(v);
+			
 			int[] lowpts = tree.lowpts(v);
 			lowpt1[vIndex] = lowpts[0];
 			lowpt2[vIndex] = lowpts[1];

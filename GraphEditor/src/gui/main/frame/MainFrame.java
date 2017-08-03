@@ -24,25 +24,27 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import graph.algorithm.AlgorithmExecutor;
-import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
+import graph.properties.Bipartite;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.SeparationPairSplitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
+import graph.util.Util;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.LoadAction;
 import gui.actions.main.frame.NewGraphAction;
@@ -95,9 +97,9 @@ public class MainFrame extends JFrame{
 	private PopupClickListener popupListener;
 	private PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest =
 			new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
-	//TODO da se moze ovo pozvati vise puta
-	private SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
-			new SeparationPairSplitting<GraphVertex, GraphEdge>();
+	private JTextArea popupArea;
+	private JScrollPane popupScrollPane;
+	private String prefix = " ";
 
 	private static int graphCount = 1;
 
@@ -108,6 +110,7 @@ public class MainFrame extends JFrame{
 		setTitle("Graph drawing");
 		setLocationRelativeTo(null);
 		setLayout(new MigLayout("fill"));
+		
 
 		addWindowListener(new WindowAdapter() {
 
@@ -177,6 +180,14 @@ public class MainFrame extends JFrame{
 			e.printStackTrace();
 		}
 
+		popupArea = new JTextArea();
+		popupArea.setLineWrap(true);  
+		popupArea.setWrapStyleWord(true); 
+		popupArea.setEditable(false);
+		popupArea.setFocusable(false);
+		popupScrollPane = new JScrollPane(popupArea);
+		popupScrollPane.setPreferredSize(new Dimension( 350, 200));
+		
 		initMenu();
 		initToolBar();
 		initGui();
@@ -303,8 +314,8 @@ public class MainFrame extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String answer = getGraph().isConnected() ? "yes" : "no";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is connected: " +  answer);
+				String answer = getGraph().isConnected() ? "Yes" : "No";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is connected", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 
@@ -313,8 +324,8 @@ public class MainFrame extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String answer = getGraph().isBiconnected() ? "yes" : "no";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is biconnected: " +  answer);	
+				String answer = getGraph().isBiconnected() ? "Yes" : "No";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), 	prefix + answer, "Graph is biconnected", JOptionPane.INFORMATION_MESSAGE);	
 			}
 		});
 
@@ -323,8 +334,8 @@ public class MainFrame extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String answer = getGraph().isCyclic() ? "yes" : "no";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is cyclic: " +  answer);	
+				String answer = getGraph().isCyclic() ? "Yes" : "No";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is cyclic", JOptionPane.INFORMATION_MESSAGE);	
 			}
 		});
 
@@ -333,8 +344,8 @@ public class MainFrame extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String answer = planarityTest.isPlannar(getGraph()) ? "yes" : "no";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is planar: " +  answer);	
+				String answer = planarityTest.isPlannar(getGraph()) ? "Yes" : "No";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is planar", JOptionPane.INFORMATION_MESSAGE);	
 			}
 		});
 
@@ -343,9 +354,23 @@ public class MainFrame extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				SimpleCyclesFinder<GraphVertex, GraphEdge> cycles = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
-				String cyclesStr = cycles.findCycles(getGraph()).toString();
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Cycles basis: " +  cyclesStr);
+				SimpleCyclesFinder<GraphVertex, GraphEdge> cyclesFinder = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
+				List<List<GraphVertex>> cycles = cyclesFinder.findCycles(getGraph());
+				String cyclesStr = "";
+				if (cycles.size() == 0){
+					cyclesStr = "Graph is not cyclic";
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), cyclesStr, "Cycles basis", JOptionPane.INFORMATION_MESSAGE);
+					return;
+				}
+				else{
+					for (int i = 0; i < cycles.size(); i++){
+						cyclesStr += Util.replaceSquareBrackets(cycles.get(i).toString());
+						if (i < cycles.size() - 1)
+							cyclesStr += ", ";
+					}
+					cyclesStr = Util.addNewLines(cyclesStr, "),", 30);
+				}
+				showScrollableOptionPane("Cycles basis", cyclesStr);
 			}
 		});
 
@@ -354,8 +379,14 @@ public class MainFrame extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String cutVertices = getGraph().listCutVertices().toString();
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Cut vertices: " +  cutVertices);	
+				List<GraphVertex> cutVertices = getGraph().listCutVertices();
+				String ret ="";
+				if (cutVertices.size() == 0)
+					ret = "  Graph is biconnected";
+				else{
+					ret = Util.replaceSquareBrackets(Util.addNewLines(cutVertices.toString(), ",", 30));
+				}
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Cut vertices", JOptionPane.INFORMATION_MESSAGE);	
 			}
 		});
 
@@ -365,67 +396,68 @@ public class MainFrame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String ret;
-				if (getGraph().isBiconnected())
-					ret = "Graph is biconnected";
+				if (getGraph().isBiconnected()){
+					ret = "  Graph is biconnected";
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Biconnected components", JOptionPane.INFORMATION_MESSAGE);
+					return;
+				}
 				else{
 					List<Graph<GraphVertex, GraphEdge>> blocks = getGraph().listBiconnectedComponents();
-					StringBuilder builder = new StringBuilder("Biconnected components: \n");
+					StringBuilder builder = new StringBuilder();
 					for (int i = 0; i < blocks.size(); i++){
 						Graph<GraphVertex, GraphEdge> block  = blocks.get(i);
 						builder.append("Component " + (i+1) + " " + block.printFormat() + "\n");
 					}
 					ret = builder.toString();
 				}
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret);	
+				showScrollableOptionPane("Biconnected components", ret);
+					
 			}
 		});
-		
+
 		JMenuItem triconnectedMI = new JMenuItem("Check triconnectivity");
 		triconnectedMI.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String answer = "no";
+				SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
+						new SeparationPairSplitting<GraphVertex, GraphEdge>();
+
+				String answer = "No";
 				try {
-					answer = separationPairsSplitting.findSeaparationPairs(getGraph()).size() == 0 ? "yes" : "no";
+					answer = separationPairsSplitting.findSeaparationPairs(getGraph()).size() == 0 ? "Yes" : "No";
 				} catch (AlgorithmErrorException e) {
 					e.printStackTrace();
 				}
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected: " +  answer);	
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is triconnected", JOptionPane.INFORMATION_MESSAGE);	
 			}
 		});
-		
-		JMenuItem triconnectedComponentsMI = new JMenuItem("Split components");
-		triconnectedComponentsMI.addActionListener(new ActionListener(){
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(getGraph());
-				try {
-					hopcroftTarjan.execute();
-				} catch (AlgorithmErrorException e) {
-				}
-				
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected: " +  hopcroftTarjan.getSplitComponents());	
-			}
-		});
-		
 		JMenuItem separationPairsMI = new JMenuItem("Separation pairs");
 		separationPairsMI.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String ret;
+				String ret = "";
 				try {
+					SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
+							new SeparationPairSplitting<GraphVertex, GraphEdge>();
 					List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(getGraph());
+					if (separationPairs.size() == 0){
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected", "Separation pairs", JOptionPane.INFORMATION_MESSAGE);
+					}
+					
 					ret = separationPairs.toString();
+					ret = Util.removeSquareBrackets(Util.addNewLines(ret, "),", 40));
+					
 				} catch (AlgorithmErrorException e) {
 					e.printStackTrace();
-					ret = e.getMessage();
+					//ret = e.getMessage();
 				}
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret);	
+					
+				showScrollableOptionPane("Separation pairs", ret);
 			}
 		});
-		
+
 		JMenuItem automorphismsMI = new JMenuItem("Automorphisms");
 		automorphismsMI.addActionListener(new ActionListener(){
 			@Override
@@ -436,9 +468,48 @@ public class MainFrame extends JFrame{
 				for (Permutation p : automorphisms){
 					ret += p.cyclicRepresenatation() + "\n";
 				}
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret);	
+				showScrollableOptionPane("Automorphisms", ret);	
 			}
 		});
+		
+		//TODO
+		JMenuItem triconnectedComponentsMI = new JMenuItem("Split components");
+		triconnectedComponentsMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(getGraph());
+				try {
+					hopcroftTarjan.execute();
+				} catch (AlgorithmErrorException e) {
+				}
+
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected: " +  hopcroftTarjan.getSplitComponents());	
+			}
+		});
+		
+		JMenuItem treeMI = new JMenuItem("Check if tree");
+		treeMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String answer = getGraph().isTree() ? "Yes" : "No";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a tree", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		
+		JMenuItem bipartiteMI = new JMenuItem("Check if bipartite");
+		bipartiteMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Bipartite<GraphVertex, GraphEdge> bipartite = new Bipartite<>(getGraph());
+				String answer = bipartite.isBipartite() ? "Yes" : "No";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a bipartite", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		
+		//TODO find path from to
 
 		popup.add(connectedMI);
 		popup.add(biconnectedMI);
@@ -450,12 +521,17 @@ public class MainFrame extends JFrame{
 		popup.add(blocksMI);
 		popup.add(separationPairsMI);
 		popup.add(triconnectedComponentsMI);
+		popup.add(treeMI);
+		popup.add(bipartiteMI);
 		popup.add(automorphismsMI);
-		//TODO triconnected components posle joinova
-		//TODO find path from to
-		//is tree
-		//is ring
+		
+		
 		popupListener = new PopupClickListener();
+	}
+	
+	private void showScrollableOptionPane(String title, String text){
+		popupArea.setText(text);
+		JOptionPane.showMessageDialog(getInstance(), popupScrollPane, title, JOptionPane.PLAIN_MESSAGE);  
 	}
 
 	private Graph<GraphVertex, GraphEdge> getGraph(){

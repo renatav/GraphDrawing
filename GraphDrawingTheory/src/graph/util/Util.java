@@ -129,5 +129,42 @@ public class Util {
 		return ret;
 		
 	}
+	
+	/**
+	 * Inserts new lines into a string, after a certain number of characters and right after a specified sequence of characters
+	 * @param input Original string
+	 * @param after Sequence of characters after which a new line can be placed
+	 * @param numberOfChars A number of characters after which a new line can be placed
+	 * @return Input with added new lines
+	 */
+	public static String addNewLines(String input, String after, int numberOfChars){
+		String ret = "";
+		String splitRegexp = after;
+		if (after.contains(")"))
+			splitRegexp = after.replace(")", "\\)");
+		int num = 1;
+		String[] split = input.split(splitRegexp);
+		String str;
+		for (int i = 0; i < split.length; i++){
+			str = split[i];
+			ret += str;
+			if (i < split.length - 1)
+				ret += after;
+			num += str.length();
+			if (num >= numberOfChars){
+				ret += "\n";
+				num = 1;
+			}
+		}
+		return ret;
+	}
+	
+	public static String replaceSquareBrackets(String input){
+		return input.replace("[", "(").replace("]", ")");
+	}
+	
+	public static String removeSquareBrackets(String input){
+		return input.replace("[", "").replace("]", "");
+	}
 
 }
