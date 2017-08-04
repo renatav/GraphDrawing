@@ -38,10 +38,12 @@ import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
 import graph.properties.Bipartite;
+import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.SeparationPairSplitting;
+import graph.properties.splitting.TriconnectedSplitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.util.Util;
@@ -472,19 +474,28 @@ public class MainFrame extends JFrame{
 			}
 		});
 		
-		//TODO
-		JMenuItem triconnectedComponentsMI = new JMenuItem("Split components");
+		JMenuItem triconnectedComponentsMI = new JMenuItem("Triconnected components");
 		triconnectedComponentsMI.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(getGraph());
-				try {
-					hopcroftTarjan.execute();
-				} catch (AlgorithmErrorException e) {
+				TriconnectedSplitting<GraphVertex, GraphEdge> splitting = new TriconnectedSplitting<GraphVertex, GraphEdge>(getGraph());
+				List<HopcroftTarjanSplitComponent<GraphVertex, GraphEdge>>  components = splitting.formTriconnectedComponents();
+				String ret = "";
+				if (components.size() == 0){
+					ret = "Graph is triconnected";
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Biconnected components", JOptionPane.INFORMATION_MESSAGE);
+					return;
 				}
-
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected: " +  hopcroftTarjan.getSplitComponents());	
+				else{
+					StringBuilder builder = new StringBuilder();
+					for (int i = 0; i < components.size(); i++){
+						HopcroftTarjanSplitComponent<GraphVertex, GraphEdge> component  = components.get(i);
+						builder.append("Component " + (i+1) + " " + component + "\n");
+					}
+					ret = builder.toString();
+				}
+				showScrollableOptionPane("Biconnected components", ret);
 			}
 		});
 		
@@ -519,6 +530,7 @@ public class MainFrame extends JFrame{
 		popup.add(cycleBasisMI);
 		popup.add(cutVerticesMI);
 		popup.add(blocksMI);
+		popup.add(triconnectedComponentsMI);
 		popup.add(separationPairsMI);
 		popup.add(triconnectedComponentsMI);
 		popup.add(treeMI);
