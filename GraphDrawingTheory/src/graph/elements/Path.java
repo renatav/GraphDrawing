@@ -203,22 +203,22 @@ public class Path<V extends Vertex, E extends Edge<V>> {
 	
 	@Override
 	public String toString() {
-//		String ret = "Path";
-//		for (int i = 0; i < path.size(); i++){
-//			if (directions.size() <= i || directions.get(i) == EdgeDirection.TO_DESTINATION){
-//				if (i == 0)
-//					ret += " " + path.get(i).getOrigin();
-//				ret += " " + path.get(i).getDestination();
-//				
-//			}
-//			else{
-//				if (i == 0)
-//					ret += " " + path.get(i).getDestination();
-//				ret += " " + path.get(i).getOrigin();
-//			}
-//		}
-//		return ret;
-		return path.toString();
+		String ret = "(";
+		for (int i = 0; i < path.size(); i++){
+			if (directions.size() <= i || directions.get(i) == EdgeDirection.TO_DESTINATION){
+				if (i == 0)
+					ret += " " + path.get(i).getOrigin();
+				ret += "-" + path.get(i).getDestination();
+				
+			}
+			else{
+				if (i == 0)
+					ret += " " + path.get(i).getDestination();
+				ret += "-" + path.get(i).getOrigin();
+			}
+		}
+		ret += ")";
+		return ret;
 	}
 
 	/**

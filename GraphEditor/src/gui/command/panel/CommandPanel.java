@@ -13,26 +13,27 @@ import graph.elements.Graph;
 import graph.exception.CannotBeAppliedException;
 import graph.exception.DSLException;
 import graph.layout.dsl.DSLLayouter;
+import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
 import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.SeparationPairSplitting;
 import graph.properties.splitting.Splitting;
+import graph.properties.splitting.TriconnectedSplitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.PermutationAnalyzator;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.tree.binary.BinaryTree;
 import graph.tree.spqr.SPQRTree;
+import graph.util.Util;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
+import gui.model.GraphModel;
 import gui.model.GraphVertex;
 import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -41,6 +42,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -73,9 +75,9 @@ public class CommandPanel extends JPanel{
 		add(scrollPane, "grow");
 
 		initCommands();
-		
+
 		inputField.addFocusListener(new FocusListener() {
-			
+
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (inputField.getText().equals("Enter command"))
@@ -86,7 +88,7 @@ public class CommandPanel extends JPanel{
 			public void focusLost(FocusEvent e) {
 				if (inputField.getText().equals(""))
 					inputField.setText("Enter command");
-				
+
 			}
 		});
 
@@ -125,7 +127,7 @@ public class CommandPanel extends JPanel{
 
 			}
 		});
-		
+
 	}
 
 
@@ -135,12 +137,11 @@ public class CommandPanel extends JPanel{
 		allCommands.add(command);
 		currentCommandIndex = allCommands.size();
 
-		Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 
-		if (command.equals(commands[0]))
-			System.exit(0);
-		if (command.startsWith(commands[1])){ //create graph
-			command = command.substring(commands[1].length()).trim();
+		//TODO svugde vreme osim kod kreiranja
+
+		if (command.startsWith(commands[0])){ //create graph
+			command = command.substring(commands[0].length()).trim();
 			String[] split = command.split(" ");
 			if (split.length == 0)
 				return "Plese enter graph's name";
@@ -158,13 +159,22 @@ public class CommandPanel extends JPanel{
 				}
 			}
 
-			return directed ? "Directed graph \"" + name + "\" created" : "Undirected graph \"" + name + "\" created";
-
+			String ret = directed ? "Directed graph \"" + name + "\" created" : "Undirected graph \"" + name + "\" created";
+			Graph<GraphVertex, GraphEdge> newGraph = new Graph<GraphVertex, GraphEdge>(directed);
+			GraphView view = new GraphView(newGraph);
+			MainFrame.getInstance().addDiagram(view, name);
+			return ret;
 		}
-		if (command.startsWith(commands[2])){ //add vertex
-			command = command.substring(commands[2].length()).trim();
+
+		if (MainFrame.getInstance().getCurrentView() == null)
+			return "Create or open a graph";
+
+		Graph<GraphVertex, GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
+
+		if (command.startsWith(commands[1])){ //add vertex
+			command = command.substring(commands[1].length()).trim();
 			String[] split = command.split(" ");
-			if (split.length < 2)
+			if (split.length == 0)
 				return "Please enter vertex name and position as (x, y)";
 			if (split[0].contains("(") && !split[1].contains("("))
 				return "Please enter vertex name and position as (x, y)";
@@ -188,7 +198,7 @@ public class CommandPanel extends JPanel{
 			return "Vertex " + content + " added at position " + "(" + x + ", " + y +")";
 		}
 
-		if (command.startsWith(commands[3])){
+		if (command.startsWith(commands[2])){
 			command = command.substring(commands[3].length()).trim();
 			String[] split = command.split(" ");
 			if (split.length < 2)
@@ -211,142 +221,133 @@ public class CommandPanel extends JPanel{
 		}
 
 
-
-		if (command.startsWith(commands[4])){
+		if (command.startsWith(commands[3])){
 			return MainFrame.getInstance().getCurrentView().getModel().getGraph().isConnected() ? "yes" : "no";
 		}
 
-		if (command.startsWith(commands[5])){
+		if (command.startsWith(commands[4])){
 			return MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected() ? "yes" : "no";
 
 		}
 
-		if (command.startsWith(commands[6])){
+		if (command.startsWith(commands[5])){
 			return MainFrame.getInstance().getCurrentView().getModel().getGraph().isCyclic() ? "yes" : "no";
 
 		}
 
-		if (command.startsWith(commands[7])){
+		if (command.startsWith(commands[6])){
 			ExecuteResult result = AlgorithmExecutor.execute(planarityTest, "isPlannar", MainFrame.getInstance().getCurrentView().getModel().getGraph());
 			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
 		}
 
-		if (command.startsWith(commands[8])){
-			if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
-				return "Graph is biconnected.";
-			//return splitting.findAllCutVertices(MainFrame.getInstance().getCurrentView().getModel().getGraph()).toString();
-			return graph.listCutVertices().toString();
+		if (command.startsWith(commands[7])){
+			List<GraphVertex> cutVertices = graph.listCutVertices();
+			String ret ="";
+			if (cutVertices.size() == 0)
+				ret = " Graph is biconnected";
+			else{
+				ret = Util.replaceSquareBrackets(Util.addNewLines(cutVertices.toString(), ",", 30));
+			}
+			return ret;
 		}		
 
+		if (command.startsWith(commands[8])){
+			String ret;
+			if (graph.isBiconnected()){
+				ret = " Graph is biconnected";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Biconnected components", JOptionPane.INFORMATION_MESSAGE);
+			}
+			else{
+				List<Graph<GraphVertex, GraphEdge>> blocks = graph.listBiconnectedComponents();
+				StringBuilder builder = new StringBuilder();
+				for (int i = 0; i < blocks.size(); i++){
+					Graph<GraphVertex, GraphEdge> block  = blocks.get(i);
+					builder.append("Component " + (i+1) + " " + block.printFormat() + "\n");
+				}
+				ret = builder.toString();
+			}
+			return ret;
+		}	
+
 		if (command.startsWith(commands[9])){
-			if (MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
-				return "Graph is biconnected.";
-			return graph.listBiconnectedComponents() + ""; 
+			String ret = "";
+			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
+					new SeparationPairSplitting<GraphVertex, GraphEdge>();
+			List<SplitPair<GraphVertex, GraphEdge>> separationPairs;
+			try {
+				separationPairs = separationPairsSplitting.findSeaparationPairs(graph);
+
+				if (separationPairs.size() == 0){
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected", "Separation pairs", JOptionPane.INFORMATION_MESSAGE);
+				}
+				ret = separationPairs.toString();
+				ret = Util.removeSquareBrackets(Util.addNewLines(ret, "),", 40));
+			} catch (AlgorithmErrorException e) {
+				e.printStackTrace();
+			}
+			return ret;
 		}	
 
 		if (command.startsWith(commands[10])){
-			if (!MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected())
-				return "Graph is not biconnected.";
-			return splitting.findAllSplitPairs(MainFrame.getInstance().getCurrentView().getModel().getGraph()).toString(); 
-		}	
+			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
+					new SeparationPairSplitting<GraphVertex, GraphEdge>();
+
+			String answer = "no";
+			try {
+				answer = separationPairsSplitting.findSeaparationPairs(graph).size() == 0 ? "yes" : "no";
+			} catch (AlgorithmErrorException e) {
+				e.printStackTrace();
+			}
+			return answer;
+		}
 
 		if (command.startsWith(commands[11])){
-			if (!graph.isBiconnected())
-				return "Graph is not biconnected.";
-			String[] split = command.split(",");
-			if (split.length < 2)
-				return "Please enter a split pair consisting of two vertices";
-			String v1 = split[0].substring(commands[11].length()).trim();
-			String v2 = split[1];
-
-			GraphVertex vert1 = graph.getVertexByContent(v1);
-			if (vert1 == null)
-				return "Unknown vertex \"" + v1 + "\"";
-			GraphVertex vert2 = graph.getVertexByContent(v2);
-			if (vert2 == null)
-				return "Unknown vertex \"" + v2 + "\"";
-
-			SplitPair<GraphVertex, GraphEdge> pair = new SplitPair<GraphVertex, GraphEdge>(vert1, vert2);
-
-			return splitting.findAllSplitComponents(graph, pair).toString(); 
+			TriconnectedSplitting<GraphVertex, GraphEdge> splitting = new TriconnectedSplitting<GraphVertex, GraphEdge>(graph);
+			List<HopcroftTarjanSplitComponent<GraphVertex, GraphEdge>>  components = splitting.formTriconnectedComponents();
+			String ret = "";
+			if (components.size() == 0){
+				ret = "Graph is triconnected";
+			}
+			else{
+				StringBuilder builder = new StringBuilder();
+				for (int i = 0; i < components.size(); i++){
+					HopcroftTarjanSplitComponent<GraphVertex, GraphEdge> component  = components.get(i);
+					builder.append("Component " + (i+1) + " " + component.printFormat() + "\n");
+				}
+				ret = builder.toString();
+			}
+			return ret;
 		}
+
 
 		if (command.startsWith(commands[12])){
-			command = command.substring(commands[12].length()).trim();
-			String[] split = command.split(" ");
-			if (split.length < 2)
-				return "Please enter split pair and edge";
-
-			if (!graph.isBiconnected())
-				return "Graph is not biconnected.";
-
-			String sp = split[0].substring(1, split[0].length()-1);
-			String[] split2 = sp.split(",");
-			if (split2.length < 2)
-				return "Please enter a split pair consisting of two vertices";
-			String v1 = split2[0];
-			String v2 = split2[1];
-
-			GraphVertex vert1 = graph.getVertexByContent(v1);
-			if (vert1 == null)
-				return "Unknown vertex \"" + v1 + "\"";
-			GraphVertex vert2 = graph.getVertexByContent(v2);
-			if (vert2 == null)
-				return "Unknown vertex \"" + v2 + "\"";
-
-			sp = split[1].substring(1, split[1].length()-1);
-			split2 = sp.split(",");
-			if (split2.length < 2)
-				return "Please enter an edge consisting of two vertices";
-			v1 = split2[0];
-			v2 = split2[1];
-
-			GraphVertex vert3 = graph.getVertexByContent(v1);
-			if (vert3 == null)
-				return "Unknown vertex \"" + v1 + "\"";
-			GraphVertex vert4 = graph.getVertexByContent(v2);
-			if (vert4 == null)
-				return "Unknown vertex \"" + v2 + "\"";
-			if (!graph.hasEdge(vert3, vert4))
-				return "Edge doesn't exist";
-			GraphEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
-
-			SplitPair<GraphVertex, GraphEdge> pair = new SplitPair<GraphVertex, GraphEdge>(vert1, vert2);
-
-			return splitting.splitGraph(pair, edge, graph).toString(); 
+			String ret = "";
+			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
+			List<Permutation> automorphisms = nauty.findAutomorphisms();
+			for (Permutation p : automorphisms){
+				ret += p.cyclicRepresenatation() + "\n";
+			}
+			return ret;
 		}
-
 
 		if (command.startsWith(commands[13])){
-			command = command.substring(commands[13].length()).trim();
-			String[] split = command.split(" ");
-			if (split.length < 1)
-				return "Please enter one edge";
-
-			if (!graph.isBiconnected())
-				return "Graph is not biconnected.";
-
-
-			String sp = split[0].substring(1, split[0].length()-1);
-			String[] split2 = sp.split(",");
-			if (split2.length < 2)
-				return "Please enter an edge consisting of two vertices";
-			String v1 = split2[0];
-			String v2 = split2[1];
-
-			GraphVertex vert3 = graph.getVertexByContent(v1);
-			if (vert3 == null)
-				return "Unknown vertex \"" + v1 + "\"";
-			GraphVertex vert4 = graph.getVertexByContent(v2);
-			if (vert4 == null)
-				return "Unknown vertex \"" + v2 + "\"";
-			if (!graph.hasEdge(vert3, vert4))
-				return "Edge doesn't exist";
-			GraphEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
-
-			return splitting.maximalSplitPairs(graph, edge).toString(); 
+			SimpleCyclesFinder<GraphVertex, GraphEdge> cyclesFinder = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
+			List<List<GraphVertex>> cycles = cyclesFinder.findCycles(graph);
+			String cyclesStr = "";
+			if (cycles.size() == 0)
+				cyclesStr = "Graph is not cyclic";
+			else{
+				for (int i = 0; i < cycles.size(); i++){
+					cyclesStr += Util.replaceSquareBrackets(cycles.get(i).toString());
+					if (i < cycles.size() - 1)
+						cyclesStr += ", ";
+				}
+				cyclesStr = Util.addNewLines(cyclesStr, "),", 30);
+			}
+			return cyclesStr;
 		}
 
+		//TODO
 		if (command.startsWith(commands[14])){
 			command = command.substring(commands[14].length()).trim();
 			String[] split = command.split(" ");
@@ -461,10 +462,10 @@ public class CommandPanel extends JPanel{
 			//Layout DSL input
 			List<GraphVertex> vertices = graph.getVertices();
 			List<GraphEdge> edges = graph.getEdges();
-			
+
 			DSLLayouter<GraphVertex, GraphEdge> dslLayout =
 					new DSLLayouter<GraphVertex, GraphEdge>(vertices, edges, command);	
-					
+
 			try{
 				Drawing<GraphVertex, GraphEdge> drawing = dslLayout.layout();
 				GraphView view = MainFrame.getInstance().getCurrentView();
@@ -493,34 +494,34 @@ public class CommandPanel extends JPanel{
 		}
 		else if (command.trim().equals("test")){
 			//execute whatever that is being tested
-//			try {
-//				//Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
-//				//System.out.println(ordering);
-//				//BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
-//				//System.out.println(bcTree);
-//			PlanarAugmentation<GraphVertex, GraphEdge> planarAugmentation = new PlanarAugmentation<GraphVertex, GraphEdge>();
-//			List<GraphEdge> edges = planarAugmentation.planarBiconnected(graph);
-//			return "Should add: " + edges;
-//			} catch (CannotBeAppliedException e) {
-//				e.printStackTrace();
-//			}
-//			GraphVertex s = graph.getVertices().get(0);
-//			GraphVertex t = graph.getVertices().get(1);
-//			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph, s,t);
-//			return stNumbering.getOrder() + "";
-			
-//			try {
-//				//Embedding<GraphVertex, GraphEdge> embedding = PlanarEmbedding.emedGraph(graph);
-//				//return embedding + "";
-//				PlanarFaces<GraphVertex, GraphEdge> planarFaces = new PlanarFaces<GraphVertex, GraphEdge>(graph);
-//				planarFaces.formFaces(null, null);
-//			} catch (NotPlanarException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			
-			VisibilityRepresentation visibilityRepresentation = new VisibilityRepresentation(graph);
-			
+			//			try {
+			//				//Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
+			//				//System.out.println(ordering);
+			//				//BCTree<GraphVertex, GraphEdge> bcTree = new BCTree<GraphVertex, GraphEdge>(graph);
+			//				//System.out.println(bcTree);
+			//			PlanarAugmentation<GraphVertex, GraphEdge> planarAugmentation = new PlanarAugmentation<GraphVertex, GraphEdge>();
+			//			List<GraphEdge> edges = planarAugmentation.planarBiconnected(graph);
+			//			return "Should add: " + edges;
+			//			} catch (CannotBeAppliedException e) {
+			//				e.printStackTrace();
+			//			}
+			//			GraphVertex s = graph.getVertices().get(0);
+			//			GraphVertex t = graph.getVertices().get(1);
+			//			STNumbering<GraphVertex, GraphEdge> stNumbering = new STNumbering<GraphVertex, GraphEdge>(graph, s,t);
+			//			return stNumbering.getOrder() + "";
+
+			//			try {
+			//				//Embedding<GraphVertex, GraphEdge> embedding = PlanarEmbedding.emedGraph(graph);
+			//				//return embedding + "";
+			//				PlanarFaces<GraphVertex, GraphEdge> planarFaces = new PlanarFaces<GraphVertex, GraphEdge>(graph);
+			//				planarFaces.formFaces(null, null);
+			//			} catch (NotPlanarException e) {
+			//				// TODO Auto-generated catch block
+			//				e.printStackTrace();
+			//			}
+
+			//VisibilityRepresentation visibilityRepresentation = new VisibilityRepresentation(graph);
+
 		}
 
 		if (command.equals(commands[15])){
@@ -548,37 +549,33 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[29];
+		commands = new String[23];
 
-		commands[0] = "quit";
-		commands[1] = "create graph";
-		commands[2] = "add vertex";
-		commands[3] = "add edge";
-		commands[4] = "is connected";
-		commands[5] = "is biconnected";
-		commands[6] = "is cyclic";
-		commands[7] = "is planar";
-		commands[8] = "list cut vertices";
-		commands[9] = "list blocks";
-		commands[10] = "list split pairs";
-		commands[11] = "list split components";
-		commands[12] = "split graph";
-		commands[13] = "maximal split pairs";
-		commands[14] = "spqr";
-		commands[15] = "help";
-		commands[16] = "automorphisms";
-		commands[17] = "list base cycles";
-		commands[18] = "list all cycles";
-		commands[19] = "groups";
-		commands[20] = "convex";
-		commands[21] = "list biconnected components";
-		commands[22] = "separation pairs";
-		commands[23] = "clear";
-		commands[24] = "splitting";
-		commands[25] = "lay out";
-		commands[26] = "binary tree";
-		commands[27] = "is ring";
-		commands[28] = "test";
+		commands[0] = "create graph";
+		commands[1] = "add vertex";
+		commands[2] = "add edge";
+		commands[3] = "is connected";
+		commands[4] = "is biconnected";
+		commands[5] = "is cyclic";
+		commands[6] = "is planar";
+		commands[7] = "list cut vertices";
+		commands[8] = "list blocks";
+		commands[9] = "list separation pairs";
+		commands[10] = "is triconnected";
+		commands[11] = "list triconnected components";
+		commands[12] = "list automorphisms";
+		commands[13] = "cycles basis";
+
+		//TODO
+		commands[14] = "list all cycles";
+		commands[15] = "groups"; //atomorphisms groups
+		commands[16] = "is tree";
+		commands[17] = "is binary tree";
+		commands[18] = "is ring";
+		commands[19] = "i bipartite";
+		commands[20] = "clear";
+		commands[21] = "lay out";
+		commands[22] = "test";
 	}
 
 

@@ -48,6 +48,7 @@ import graph.properties.splitting.TriconnectedSplitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.traversal.DijkstraAlgorithm;
+import graph.tree.binary.BinaryTree;
 import graph.util.Util;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.LoadAction;
@@ -115,7 +116,7 @@ public class MainFrame extends JFrame{
 		setTitle("Graph drawing");
 		setLocationRelativeTo(null);
 		setLayout(new MigLayout("fill"));
-		
+
 
 		addWindowListener(new WindowAdapter() {
 
@@ -192,11 +193,11 @@ public class MainFrame extends JFrame{
 		popupArea.setFocusable(false);
 		popupScrollPane = new JScrollPane(popupArea);
 		popupScrollPane.setPreferredSize(new Dimension( 350, 200));
-		
+
 		pathPanel = new PathPanel();
-		
-		
-		
+
+
+
 		initMenu();
 		initToolBar();
 		initGui();
@@ -391,11 +392,11 @@ public class MainFrame extends JFrame{
 				List<GraphVertex> cutVertices = getGraph().listCutVertices();
 				String ret ="";
 				if (cutVertices.size() == 0)
-					ret = "  Graph is biconnected";
+					ret = " Graph is biconnected";
 				else{
 					ret = Util.replaceSquareBrackets(Util.addNewLines(cutVertices.toString(), ",", 30));
 				}
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Cut vertices", JOptionPane.INFORMATION_MESSAGE);	
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + ret, "Cut vertices", JOptionPane.INFORMATION_MESSAGE);	
 			}
 		});
 
@@ -420,7 +421,7 @@ public class MainFrame extends JFrame{
 					ret = builder.toString();
 				}
 				showScrollableOptionPane("Biconnected components", ret);
-					
+
 			}
 		});
 
@@ -454,15 +455,15 @@ public class MainFrame extends JFrame{
 					if (separationPairs.size() == 0){
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected", "Separation pairs", JOptionPane.INFORMATION_MESSAGE);
 					}
-					
+
 					ret = separationPairs.toString();
 					ret = Util.removeSquareBrackets(Util.addNewLines(ret, "),", 40));
-					
+
 				} catch (AlgorithmErrorException e) {
 					e.printStackTrace();
 					//ret = e.getMessage();
 				}
-					
+
 				showScrollableOptionPane("Separation pairs", ret);
 			}
 		});
@@ -480,7 +481,7 @@ public class MainFrame extends JFrame{
 				showScrollableOptionPane("Automorphisms", ret);	
 			}
 		});
-		
+
 		JMenuItem triconnectedComponentsMI = new JMenuItem("Triconnected components");
 		triconnectedComponentsMI.addActionListener(new ActionListener(){
 
@@ -494,18 +495,16 @@ public class MainFrame extends JFrame{
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Triconnected components", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				else{
-					StringBuilder builder = new StringBuilder();
-					for (int i = 0; i < components.size(); i++){
-						HopcroftTarjanSplitComponent<GraphVertex, GraphEdge> component  = components.get(i);
-						builder.append("Component " + (i+1) + " " + component.printFormat() + "\n");
-					}
-					ret = builder.toString();
+				StringBuilder builder = new StringBuilder();
+				for (int i = 0; i < components.size(); i++){
+					HopcroftTarjanSplitComponent<GraphVertex, GraphEdge> component  = components.get(i);
+					builder.append("Component " + (i+1) + " " + component.printFormat() + "\n");
 				}
+				ret = builder.toString();
 				showScrollableOptionPane("Triconnected components", ret);
 			}
 		});
-		
+
 		JMenuItem treeMI = new JMenuItem("Check if tree");
 		treeMI.addActionListener(new ActionListener(){
 
@@ -516,6 +515,18 @@ public class MainFrame extends JFrame{
 			}
 		});
 		
+
+		JMenuItem binaaryTreeMI = new JMenuItem("Check if binary tree");
+		binaaryTreeMI.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<>(getGraph());
+				String answer = binaryTree.isCanBeConstructed() ? "Yes" : "No";
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a binary tree", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+
 		JMenuItem bipartiteMI = new JMenuItem("Check if bipartite");
 		bipartiteMI.addActionListener(new ActionListener(){
 
@@ -526,10 +537,10 @@ public class MainFrame extends JFrame{
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a bipartite", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		
+
 		JMenuItem pathMI = new JMenuItem("Path");
 		pathMI.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				pathPanel.clearFields();
@@ -538,50 +549,58 @@ public class MainFrame extends JFrame{
 				String v1Str = pathPanel.getV1();
 				String v2Str = pathPanel.getV2();
 				Graph<GraphVertex, GraphEdge> graph = getGraph();
-				
+
 				GraphVertex v1 = graph.getVertexByContent(v1Str);
-				
+
 				if (v1 == null)
 					message = "Entered origin does not exist\n";
-				
+
 				GraphVertex v2 = graph.getVertexByContent(v2Str);
 				if (v2 == null)
 					message += "Entered destination does not exist";
-				
+
 				if (!message.equals("")){
 					JOptionPane.showMessageDialog(getInstance(), message, "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				
+
 				DijkstraAlgorithm<GraphVertex, GraphEdge> dijsktra = new DijkstraAlgorithm<>(graph);
 				Path<GraphVertex, GraphEdge> path = dijsktra.getPath(v1, v2);
-				String answer = Util.addNewLines(path.toString(), ",", 30);
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Path between " + v1Str + ", " + v2Str, JOptionPane.INFORMATION_MESSAGE);
-				
+				String answer;
+				if (path == null)
+					answer = "Vertices are not connected";
+				else
+					answer = Util.addNewLines(path.toString(), ",", 30);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Path between " + v1Str + " and " + v2Str, JOptionPane.INFORMATION_MESSAGE);
+
 			}
 		});
-		
-		//TODO find path from to
 
 		popup.add(connectedMI);
+		popup.addSeparator();
 		popup.add(biconnectedMI);
-		popup.add(triconnectedMI);
-		popup.add(cycleMI);
-		popup.add(planarMI);
-		popup.add(cycleBasisMI);
 		popup.add(cutVerticesMI);
 		popup.add(blocksMI);
-		popup.add(triconnectedComponentsMI);
+		popup.addSeparator();
+		popup.add(triconnectedMI);
 		popup.add(separationPairsMI);
 		popup.add(triconnectedComponentsMI);
+		popup.addSeparator();
+		popup.add(cycleMI);
+		popup.add(cycleBasisMI);
+		popup.addSeparator();
+		popup.add(planarMI);
 		popup.add(treeMI);
+		popup.add(binaaryTreeMI);
 		popup.add(bipartiteMI);
+		popup.addSeparator();
 		popup.add(automorphismsMI);
+		popup.addSeparator();
 		popup.add(pathMI);
-		
+
 		popupListener = new PopupClickListener();
 	}
-	
+
 	private void showScrollableOptionPane(String title, String text){
 		popupArea.setText(text);
 		JOptionPane.showMessageDialog(getInstance(), popupScrollPane, title, JOptionPane.PLAIN_MESSAGE);  
@@ -754,7 +773,7 @@ public class MainFrame extends JFrame{
 			popup.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
-	
+
 	private class PathPanel extends JPanel
 	{
 		/**
@@ -763,7 +782,7 @@ public class MainFrame extends JFrame{
 		private static final long serialVersionUID = 1L;
 		private JTextField tfV1 = new JTextField(10);
 		private JTextField tfV2 = new JTextField(10);
-		
+
 		public PathPanel()
 		{
 			setLayout(new MigLayout());
@@ -773,16 +792,16 @@ public class MainFrame extends JFrame{
 			add(new JLabel("Destination"));
 			add(tfV2, "wrap");
 		}
-		
+
 		public void clearFields(){
 			tfV1.setText("");
 			tfV2.setText("");
 		}
-		
+
 		public String getV1(){
 			return tfV1.getText().trim();
 		}
-		
+
 		public String getV2(){
 			return tfV2.getText().trim();
 		}
