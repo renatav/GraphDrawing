@@ -115,6 +115,18 @@ public class GraphTraversal {
 			findAllPathsDFS(graph, temp, directionsTemp, paths, nextVert, start, end, excluding);
 		}
 	}
+	/**
+	 * Finds  path between two vertices
+	 * @param graph Graph
+	 * @param source Source vertex
+	 * @param target Target (destination) vertex
+	 * @param <V> The vertex type
+	 * @param <E> The edge type
+	 * @return A path in {@code graph} between {@code source} and {@code target} vertices
+	 */
+	public static <V extends Vertex,E extends Edge<V>> Path<V,E> findPath(Graph<V,E> graph, V source, V target){
+		return nonrecursiveDFSPath(graph, source, target);
+	}
 
 	/**
 	 * A non-recursive implementation of the depth-first search for finding a path between two vertices

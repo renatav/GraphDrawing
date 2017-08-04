@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
@@ -37,15 +38,16 @@ import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
+import graph.elements.Path;
 import graph.properties.Bipartite;
 import graph.properties.components.HopcroftTarjanSplitComponent;
 import graph.properties.components.SplitPair;
 import graph.properties.splitting.AlgorithmErrorException;
-import graph.properties.splitting.HopcroftTarjanSplitting;
 import graph.properties.splitting.SeparationPairSplitting;
 import graph.properties.splitting.TriconnectedSplitting;
 import graph.symmetry.Permutation;
 import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
+import graph.traversal.DijkstraAlgorithm;
 import graph.util.Util;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.LoadAction;
@@ -101,6 +103,7 @@ public class MainFrame extends JFrame{
 			new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
 	private JTextArea popupArea;
 	private JScrollPane popupScrollPane;
+	private PathPanel pathPanel;
 	private String prefix = " ";
 
 	private static int graphCount = 1;
@@ -189,6 +192,10 @@ public class MainFrame extends JFrame{
 		popupArea.setFocusable(false);
 		popupScrollPane = new JScrollPane(popupArea);
 		popupScrollPane.setPreferredSize(new Dimension( 350, 200));
+		
+		pathPanel = new PathPanel();
+		
+		
 		
 		initMenu();
 		initToolBar();
@@ -484,18 +491,18 @@ public class MainFrame extends JFrame{
 				String ret = "";
 				if (components.size() == 0){
 					ret = "Graph is triconnected";
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Biconnected components", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Triconnected components", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
 				else{
 					StringBuilder builder = new StringBuilder();
 					for (int i = 0; i < components.size(); i++){
 						HopcroftTarjanSplitComponent<GraphVertex, GraphEdge> component  = components.get(i);
-						builder.append("Component " + (i+1) + " " + component + "\n");
+						builder.append("Component " + (i+1) + " " + component.printFormat() + "\n");
 					}
 					ret = builder.toString();
 				}
-				showScrollableOptionPane("Biconnected components", ret);
+				showScrollableOptionPane("Triconnected components", ret);
 			}
 		});
 		
@@ -520,6 +527,40 @@ public class MainFrame extends JFrame{
 			}
 		});
 		
+		JMenuItem pathMI = new JMenuItem("Path");
+		pathMI.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pathPanel.clearFields();
+				JOptionPane.showMessageDialog(getInstance(), pathPanel, "Enter vertices", JOptionPane.PLAIN_MESSAGE);
+				String message = "";
+				String v1Str = pathPanel.getV1();
+				String v2Str = pathPanel.getV2();
+				Graph<GraphVertex, GraphEdge> graph = getGraph();
+				
+				GraphVertex v1 = graph.getVertexByContent(v1Str);
+				
+				if (v1 == null)
+					message = "Entered origin does not exist\n";
+				
+				GraphVertex v2 = graph.getVertexByContent(v2Str);
+				if (v2 == null)
+					message += "Entered destination does not exist";
+				
+				if (!message.equals("")){
+					JOptionPane.showMessageDialog(getInstance(), message, "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				DijkstraAlgorithm<GraphVertex, GraphEdge> dijsktra = new DijkstraAlgorithm<>(graph);
+				Path<GraphVertex, GraphEdge> path = dijsktra.getPath(v1, v2);
+				String answer = Util.addNewLines(path.toString(), ",", 30);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Path between " + v1Str + ", " + v2Str, JOptionPane.INFORMATION_MESSAGE);
+				
+			}
+		});
+		
 		//TODO find path from to
 
 		popup.add(connectedMI);
@@ -536,7 +577,7 @@ public class MainFrame extends JFrame{
 		popup.add(treeMI);
 		popup.add(bipartiteMI);
 		popup.add(automorphismsMI);
-		
+		popup.add(pathMI);
 		
 		popupListener = new PopupClickListener();
 	}
@@ -698,7 +739,7 @@ public class MainFrame extends JFrame{
 
 	}
 
-	class PopupClickListener extends MouseAdapter{
+	private class PopupClickListener extends MouseAdapter{
 		public void mousePressed(MouseEvent e){
 			if (e.isPopupTrigger())
 				doPop(e);
@@ -711,6 +752,39 @@ public class MainFrame extends JFrame{
 
 		private void doPop(MouseEvent e){
 			popup.show(e.getComponent(), e.getX(), e.getY());
+		}
+	}
+	
+	private class PathPanel extends JPanel
+	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private JTextField tfV1 = new JTextField(10);
+		private JTextField tfV2 = new JTextField(10);
+		
+		public PathPanel()
+		{
+			setLayout(new MigLayout());
+			setSize(200,200);
+			add(new JLabel("Origin"));
+			add(tfV1, "wrap");
+			add(new JLabel("Destination"));
+			add(tfV2, "wrap");
+		}
+		
+		public void clearFields(){
+			tfV1.setText("");
+			tfV2.setText("");
+		}
+		
+		public String getV1(){
+			return tfV1.getText().trim();
+		}
+		
+		public String getV2(){
+			return tfV2.getText().trim();
 		}
 	}
 }

@@ -34,22 +34,17 @@ public class TriconnectedSplitting<V extends Vertex, E extends Edge<V>>  {
 		hopcroftTarjanSplitting = new HopcroftTarjanSplitting<V,E>(graph, false);
 		virtualEdgesSplitComponentsMap = new HashMap<E, List<HopcroftTarjanSplitComponent<V, E>>>();
 	}
-
-	public List<HopcroftTarjanSplitComponent<V, E>> formTriconnectedComponents(){
+	
+	
+	public List<HopcroftTarjanSplitComponent<V, E>> formTriconnectedComponents(List<HopcroftTarjanSplitComponent<V, E>> splitComponents){
 		
-		try {
-			hopcroftTarjanSplitting.execute();
-		} catch (AlgorithmErrorException e1) {
-		}
-		List<HopcroftTarjanSplitComponent<V, E>> splitComponenets = hopcroftTarjanSplitting.getSplitComponents();
-		initVirtualEdgesComponentsMap(splitComponenets);
-		System.out.println(virtualEdgesSplitComponentsMap);
+		initVirtualEdgesComponentsMap(splitComponents);
 		
 		List<HopcroftTarjanSplitComponent<V,E>> triconnectedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
 		
 		List<HopcroftTarjanSplitComponent<V, E>> processedComponents = new ArrayList<HopcroftTarjanSplitComponent<V,E>>();
 
-		for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponenets){
+		for (HopcroftTarjanSplitComponent<V, E> splitComponent : splitComponents){
 			if (processedComponents.contains(splitComponent))
 				continue;
 			if (splitComponent.getType() == SplitTriconnectedComponentType.TRICONNECTED_GRAPH)
@@ -133,6 +128,16 @@ public class TriconnectedSplitting<V extends Vertex, E extends Edge<V>>  {
 			processedComponents.add(splitComponent);
 		}
 		return triconnectedComponents;
+	}
+
+	public List<HopcroftTarjanSplitComponent<V, E>> formTriconnectedComponents(){
+		
+		try {
+			hopcroftTarjanSplitting.execute();
+		} catch (AlgorithmErrorException e1) {
+		}
+		List<HopcroftTarjanSplitComponent<V, E>> splitComponenets = hopcroftTarjanSplitting.getSplitComponents();
+		return formTriconnectedComponents(splitComponenets);
 	}
 	
 	private void initVirtualEdgesComponentsMap(List<HopcroftTarjanSplitComponent<V, E>>  components){

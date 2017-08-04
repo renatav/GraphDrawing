@@ -197,8 +197,18 @@ public class HopcroftTarjanSplitComponent<V extends Vertex, E extends Edge<V>> e
 	public String toString() {
 		return "HopcroftSplitComponent [edges=" + edges + "]";
 	}
-
 	
-	
-	
+	/**
+	 * @return Better formatted string representation of the component. 
+	 */
+	public String printFormat(){
+		String edgesStr = "E={ ";
+		for (int i = 0; i < edges.size(); i++){
+			edgesStr += "(" + edges.get(i).getOrigin() + ", " + edges.get(i).getDestination() + ")";
+			if( i < edges.size() - 1)
+				edgesStr += ", ";
+		}
+		edgesStr += "}";
+		return edgesStr;
+	}
 }
