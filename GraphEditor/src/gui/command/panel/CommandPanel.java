@@ -1,25 +1,12 @@
 package gui.command.panel;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import graph.algorithm.AlgorithmExecutor;
 import graph.algorithm.ExecuteResult;
 import graph.algorithm.cycles.SimpleCyclesFinder;
 import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
+import graph.algorithms.planarity.BoyerMyrvoldPlanarity;
 import graph.algorithms.planarity.FraysseixMendezPlanarity;
+import graph.algorithms.planarity.PQTreePlanarity;
 import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.drawing.Drawing;
 import graph.elements.Graph;
@@ -44,6 +31,22 @@ import gui.model.GraphVertex;
 import gui.view.GraphView;
 import gui.view.painters.EdgePainter;
 import gui.view.painters.VertexPainter;
+
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import net.miginfocom.swing.MigLayout;
 
 public class CommandPanel extends JPanel{
@@ -56,9 +59,9 @@ public class CommandPanel extends JPanel{
 	private List<String> allCommands = new ArrayList<String>();
 	private static Map<String, String> help = new HashMap<String, String>();
 	private int currentCommandIndex;
-	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
-	//private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
-	//private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new PQTreePlanarity<GraphVertex, GraphEdge>();
+	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTestFM = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
+	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTestBM = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
+	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTestPQ = new PQTreePlanarity<GraphVertex, GraphEdge>();
 
 	//TODO
 	//biranje planarity algoritma
@@ -248,7 +251,21 @@ public class CommandPanel extends JPanel{
 
 		}
 
-		if (command.trim().equals(commands[7])){
+		if (command.trim().startsWith(commands[7])){
+			command = command.substring(commands[7].length()).trim();
+			PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest;
+			if (command.length() == 0)
+				 planarityTest = planarityTestFM;
+			else{
+				if (command.equals("Fraysseix-Mendez"))
+					planarityTest = planarityTestFM;
+				else if (command.equals("Boyer-Myrvold"))
+					planarityTest = planarityTestBM;
+				else if (command.equals("PQ"))
+					planarityTest = planarityTestPQ;
+				else
+					return "Unknown algorithm specified. Type \"help is planar\" for more details";
+			}
 			ExecuteResult result = AlgorithmExecutor.execute(planarityTest, "isPlannar", graph);
 			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
 		}
@@ -493,7 +510,7 @@ public class CommandPanel extends JPanel{
 			if (command.length() == 0){
 				StringBuilder builder = new StringBuilder("Commands:\n");
 				for (int i = 0; i < commands.length - 1; i++){
-					builder.append(help.get(commands[i]));
+					builder.append(help.get(commands[i]) + "\n");
 				}
 				return builder.toString();
 			}
@@ -513,7 +530,7 @@ public class CommandPanel extends JPanel{
 		help.put("is connected", "is connected - Checks if the current graph is connected");
 		help.put("is biconnected", "is biconnected - Checks if the current graph is biconnected");
 		help.put("is cyclic", "is cyclic - Checks if the current graph is cyclic");
-		help.put("is planar", "is planar - Checks if the current graph is planar");
+		help.put("is planar", "is planar [Fraysseix-Mendez|Boyer-Myrvold|PQ] - Checks if the current graph is planar. An algorithm can optionally be specified.");
 		help.put("is triconnected", "is triconnected - Checks if the current graph is triconnected");
 		help.put("list cut vertices", "list cut vertices - Lists cut vertices of the current graph");
 		help.put("list blocks", "list blocks - Lists blocks of the current graph");

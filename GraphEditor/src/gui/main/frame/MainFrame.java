@@ -50,6 +50,7 @@ import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
 import graph.traversal.DijkstraAlgorithm;
 import graph.tree.binary.BinaryTree;
 import graph.util.Util;
+import gui.actions.main.frame.ConnectedAction;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.LoadAction;
 import gui.actions.main.frame.NewGraphAction;
@@ -98,6 +99,7 @@ public class MainFrame extends JFrame{
 	private RemoveAction removeAction = new RemoveAction();
 	private RedoAction redoAction = new RedoAction();
 	private UndoAction undoAction = new UndoAction();
+	private ConnectedAction connectionAction = new ConnectedAction();
 	private JPopupMenu popup;
 	private PopupClickListener popupListener;
 	private PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest =
@@ -299,6 +301,11 @@ public class MainFrame extends JFrame{
 
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
+		
+		JMenu toolsMenu = new JMenu("Tools");
+		toolsMenu.add(new JMenuItem(connectionAction));
+		menuBar.add(toolsMenu);
+		
 		setJMenuBar(menuBar);
 	}
 
@@ -318,16 +325,7 @@ public class MainFrame extends JFrame{
 
 	private void initPopup(){
 		popup = new JPopupMenu("Analyze");
-		JMenuItem connectedMI = new JMenuItem("Check connectivity");
-
-		connectedMI.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String answer = getGraph().isConnected() ? "Yes" : "No";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is connected", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
+		JMenuItem connectedMI = new JMenuItem(connectionAction);
 
 		JMenuItem biconnectedMI = new JMenuItem("Check biconnectivity");
 		biconnectedMI.addActionListener(new ActionListener(){

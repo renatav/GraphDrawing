@@ -85,7 +85,7 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 		this.s = s;
 		this.t = t;
 	}
-	
+
 	public PQTreePlanarity(){
 	}
 
@@ -122,20 +122,21 @@ public class PQTreePlanarity<V extends Vertex, E extends Edge<V>> extends Planar
 	@Override
 	public boolean isPlannar(Graph<V, E> graph) {
 
+		if (graph.isTree())
+			return true;
+		
 		this.graph = graph;
 		gPrimMap.clear();
 		upwardsEmbedding.clear();
 
 
-		if (s == null && t == null){
-			//assign st-numbers to all vertices of G
-			//s and t should be connected, but it is not stated
-			//that they should meet any special condition
-			//so, let st be the first edge
-			E st = graph.getEdges().get(0);
-			s = st.getOrigin();
-			t = st.getDestination();
-		}
+		//assign st-numbers to all vertices of G
+		//s and t should be connected, but it is not stated
+		//that they should meet any special condition
+		//so, let st be the first edge
+		E st = graph.getEdges().get(0);
+		s = st.getOrigin();
+		t = st.getDestination();
 
 		PQTreeNode pertRoot = null;
 
