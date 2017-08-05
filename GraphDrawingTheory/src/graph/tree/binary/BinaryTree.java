@@ -49,6 +49,10 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 	 */
 	public BinaryTree(Graph<V,E> graph){
 		this.graph = graph;
+		execute();
+	}
+	
+	public void execute(){
 		try {
 			formBinaryTree(graph);
 			canBeConstructed = true;
@@ -56,6 +60,7 @@ public class BinaryTree<V extends Vertex, E extends Edge<V>> {
 			canBeConstructed = false;
 		}
 	}
+	
 
 	private void formBinaryTree(Graph<V, E> graph) throws CannotBeAppliedException{
 		//start with the leaves and go upwards

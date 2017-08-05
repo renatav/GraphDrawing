@@ -1,39 +1,5 @@
 package gui.command.panel;
 
-import graph.algorithm.AlgorithmExecutor;
-import graph.algorithm.ExecuteResult;
-import graph.algorithm.cycles.SimpleCyclesFinder;
-import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
-import graph.algorithms.drawing.ConvexDrawing;
-import graph.algorithms.drawing.VisibilityRepresentation;
-import graph.algorithms.planarity.FraysseixMendezPlanarity;
-import graph.algorithms.planarity.PlanarityTestingAlgorithm;
-import graph.drawing.Drawing;
-import graph.elements.Graph;
-import graph.exception.CannotBeAppliedException;
-import graph.exception.DSLException;
-import graph.layout.dsl.DSLLayouter;
-import graph.properties.components.HopcroftTarjanSplitComponent;
-import graph.properties.components.SplitPair;
-import graph.properties.splitting.AlgorithmErrorException;
-import graph.properties.splitting.HopcroftTarjanSplitting;
-import graph.properties.splitting.SeparationPairSplitting;
-import graph.properties.splitting.Splitting;
-import graph.properties.splitting.TriconnectedSplitting;
-import graph.symmetry.Permutation;
-import graph.symmetry.PermutationAnalyzator;
-import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
-import graph.tree.binary.BinaryTree;
-import graph.tree.spqr.SPQRTree;
-import graph.util.Util;
-import gui.main.frame.MainFrame;
-import gui.model.GraphEdge;
-import gui.model.GraphModel;
-import gui.model.GraphVertex;
-import gui.view.GraphView;
-import gui.view.painters.EdgePainter;
-import gui.view.painters.VertexPainter;
-
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -42,12 +8,40 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import graph.algorithm.AlgorithmExecutor;
+import graph.algorithm.ExecuteResult;
+import graph.algorithm.cycles.SimpleCyclesFinder;
+import graph.algorithm.cycles.SimpleUndirectedCyclesFinder;
+import graph.algorithms.planarity.FraysseixMendezPlanarity;
+import graph.algorithms.planarity.PlanarityTestingAlgorithm;
+import graph.drawing.Drawing;
+import graph.elements.Graph;
+import graph.elements.Path;
+import graph.exception.DSLException;
+import graph.layout.dsl.DSLLayouter;
+import graph.properties.Bipartite;
+import graph.properties.components.HopcroftTarjanSplitComponent;
+import graph.properties.components.SplitPair;
+import graph.properties.splitting.SeparationPairSplitting;
+import graph.properties.splitting.TriconnectedSplitting;
+import graph.symmetry.Permutation;
+import graph.symmetry.PermutationAnalyzator;
+import graph.symmetry.PermutationGroup;
+import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
+import graph.traversal.DijkstraAlgorithm;
+import graph.tree.binary.BinaryTree;
+import graph.util.Util;
+import gui.main.frame.MainFrame;
+import gui.model.GraphEdge;
+import gui.model.GraphVertex;
+import gui.view.GraphView;
+import gui.view.painters.EdgePainter;
+import gui.view.painters.VertexPainter;
 import net.miginfocom.swing.MigLayout;
 
 public class CommandPanel extends JPanel{
@@ -62,7 +56,6 @@ public class CommandPanel extends JPanel{
 	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
 	//private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
 	//private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest = new PQTreePlanarity<GraphVertex, GraphEdge>();
-	private static Splitting<GraphVertex, GraphEdge> splitting = new Splitting<>();
 
 	public CommandPanel(){
 		setLayout(new MigLayout("fill"));
@@ -132,6 +125,7 @@ public class CommandPanel extends JPanel{
 
 
 
+	@SuppressWarnings("unchecked")
 	private String processCommand(String command){
 		command = command.trim();
 		allCommands.add(command);
@@ -140,7 +134,7 @@ public class CommandPanel extends JPanel{
 
 		//TODO svugde vreme osim kod kreiranja
 
-		if (command.startsWith(commands[0])){ //create graph
+		if (command.trim().equals(commands[0])){ //create graph
 			command = command.substring(commands[0].length()).trim();
 			String[] split = command.split(" ");
 			if (split.length == 0)
@@ -199,7 +193,7 @@ public class CommandPanel extends JPanel{
 		}
 
 		if (command.startsWith(commands[2])){
-			command = command.substring(commands[3].length()).trim();
+			command = command.substring(commands[2].length()).trim();
 			String[] split = command.split(" ");
 			if (split.length < 2)
 				return "Please enter two vertices";
@@ -221,89 +215,96 @@ public class CommandPanel extends JPanel{
 		}
 
 
-		if (command.startsWith(commands[3])){
-			return MainFrame.getInstance().getCurrentView().getModel().getGraph().isConnected() ? "yes" : "no";
+		if (command.trim().equals(commands[3])){
+			ExecuteResult result = AlgorithmExecutor.execute(graph, "isConnected");
+			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]"; 
 		}
 
-		if (command.startsWith(commands[4])){
-			return MainFrame.getInstance().getCurrentView().getModel().getGraph().isBiconnected() ? "yes" : "no";
-
-		}
-
-		if (command.startsWith(commands[5])){
-			return MainFrame.getInstance().getCurrentView().getModel().getGraph().isCyclic() ? "yes" : "no";
-
-		}
-
-		if (command.startsWith(commands[6])){
-			ExecuteResult result = AlgorithmExecutor.execute(planarityTest, "isPlannar", MainFrame.getInstance().getCurrentView().getModel().getGraph());
+		if (command.trim().equals(commands[4])){
+			ExecuteResult result = AlgorithmExecutor.execute(graph, "isBiconnected");
 			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
 		}
 
-		if (command.startsWith(commands[7])){
-			List<GraphVertex> cutVertices = graph.listCutVertices();
-			String ret ="";
+		if (command.trim().equals(commands[5])){
+			ExecuteResult result = AlgorithmExecutor.execute(graph, "isCyclix");
+			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
+
+		}
+
+		if (command.trim().equals(commands[6])){
+			ExecuteResult result = AlgorithmExecutor.execute(planarityTest, "isPlannar", graph);
+			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
+		}
+
+		if (command.trim().equals(commands[7])){
+			ExecuteResult result = AlgorithmExecutor.execute(graph, "listCutVertices");
+			String time =  " [in " + result.getDuration() + " ms]";
+			List<GraphVertex> cutVertices = (List<GraphVertex>) result.getValue();
+			String ret;
 			if (cutVertices.size() == 0)
-				ret = " Graph is biconnected";
+				ret = "Graph is biconnected";
 			else{
 				ret = Util.replaceSquareBrackets(Util.addNewLines(cutVertices.toString(), ",", 30));
 			}
-			return ret;
+			return ret + time;
 		}		
 
-		if (command.startsWith(commands[8])){
+		if (command.trim().equals(commands[8])){
 			String ret;
 			if (graph.isBiconnected()){
-				ret = " Graph is biconnected";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Biconnected components", JOptionPane.INFORMATION_MESSAGE);
+				ret = "Graph is biconnected";
+				return ret;
 			}
 			else{
-				List<Graph<GraphVertex, GraphEdge>> blocks = graph.listBiconnectedComponents();
+				ExecuteResult result = AlgorithmExecutor.execute(graph, "listBiconnectedComponents");
+				String time =  " [in " + result.getDuration() + " ms]";
+				List<Graph<GraphVertex, GraphEdge>> blocks = (List<Graph<GraphVertex, GraphEdge>>) result.getValue();
 				StringBuilder builder = new StringBuilder();
 				for (int i = 0; i < blocks.size(); i++){
 					Graph<GraphVertex, GraphEdge> block  = blocks.get(i);
 					builder.append("Component " + (i+1) + " " + block.printFormat() + "\n");
 				}
 				ret = builder.toString();
+				return ret + time;
 			}
-			return ret;
 		}	
 
-		if (command.startsWith(commands[9])){
+		if (command.trim().equals(commands[9])){
 			String ret = "";
 			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
 					new SeparationPairSplitting<GraphVertex, GraphEdge>();
 			List<SplitPair<GraphVertex, GraphEdge>> separationPairs;
-			try {
-				separationPairs = separationPairsSplitting.findSeaparationPairs(graph);
 
-				if (separationPairs.size() == 0){
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected", "Separation pairs", JOptionPane.INFORMATION_MESSAGE);
-				}
-				ret = separationPairs.toString();
-				ret = Util.removeSquareBrackets(Util.addNewLines(ret, "),", 40));
-			} catch (AlgorithmErrorException e) {
-				e.printStackTrace();
+			ExecuteResult result = AlgorithmExecutor.execute(separationPairsSplitting, "findSeaparationPairs", graph);
+			String time =  " [in " + result.getDuration() + " ms]";
+			separationPairs = (List<SplitPair<GraphVertex, GraphEdge>>) result.getValue();
+
+			if (separationPairs.size() == 0){
+				ret = "Graph is triconnected";
 			}
-			return ret;
+			else{
+				ret = separationPairs.toString();
+			}
+			return ret + time;
 		}	
 
-		if (command.startsWith(commands[10])){
+		if (command.trim().equals(commands[10])){
 			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
 					new SeparationPairSplitting<GraphVertex, GraphEdge>();
 
 			String answer = "no";
-			try {
-				answer = separationPairsSplitting.findSeaparationPairs(graph).size() == 0 ? "yes" : "no";
-			} catch (AlgorithmErrorException e) {
-				e.printStackTrace();
-			}
-			return answer;
+			ExecuteResult result = AlgorithmExecutor.execute(separationPairsSplitting, "findSeaparationPairs", graph);
+			String time =  " [in " + result.getDuration() + " ms]";
+			List<SplitPair<GraphVertex, GraphEdge>> separationPairs = (List<SplitPair<GraphVertex, GraphEdge>>) result.getValue();
+			answer = separationPairs.size() == 0 ? "yes" : "no";
+			return answer + time;
 		}
 
-		if (command.startsWith(commands[11])){
+		if (command.trim().equals(commands[11])){
 			TriconnectedSplitting<GraphVertex, GraphEdge> splitting = new TriconnectedSplitting<GraphVertex, GraphEdge>(graph);
-			List<HopcroftTarjanSplitComponent<GraphVertex, GraphEdge>>  components = splitting.formTriconnectedComponents();
+			ExecuteResult result = AlgorithmExecutor.execute(splitting, "formTriconnectedComponents");
+			List<HopcroftTarjanSplitComponent<GraphVertex, GraphEdge>>  components = (List<HopcroftTarjanSplitComponent<GraphVertex, GraphEdge>>) result.getValue();
+			String time =  " [in " + result.getDuration() + " ms]";
 			String ret = "";
 			if (components.size() == 0){
 				ret = "Graph is triconnected";
@@ -316,23 +317,27 @@ public class CommandPanel extends JPanel{
 				}
 				ret = builder.toString();
 			}
-			return ret;
+			return ret + time;
 		}
 
 
-		if (command.startsWith(commands[12])){
+		if (command.trim().equals(commands[12])){
 			String ret = "";
 			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
-			List<Permutation> automorphisms = nauty.findAutomorphisms();
+			ExecuteResult result = AlgorithmExecutor.execute(nauty, "findAutomorphisms");
+			String time =  " [in " + result.getDuration() + " ms]";
+			List<Permutation> automorphisms = (List<Permutation>) result.getValue();
 			for (Permutation p : automorphisms){
 				ret += p.cyclicRepresenatation() + "\n";
 			}
-			return ret;
+			return ret + time;
 		}
 
-		if (command.startsWith(commands[13])){
+		if (command.trim().equals(commands[13])){
 			SimpleCyclesFinder<GraphVertex, GraphEdge> cyclesFinder = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
-			List<List<GraphVertex>> cycles = cyclesFinder.findCycles(graph);
+			ExecuteResult result = AlgorithmExecutor.execute(cyclesFinder, "findCycles", graph);
+			String time =  " [in " + result.getDuration() + " ms]";
+			List<List<GraphVertex>> cycles = (List<List<GraphVertex>>) result.getValue();
 			String cyclesStr = "";
 			if (cycles.size() == 0)
 				cyclesStr = "Graph is not cyclic";
@@ -344,121 +349,114 @@ public class CommandPanel extends JPanel{
 				}
 				cyclesStr = Util.addNewLines(cyclesStr, "),", 30);
 			}
-			return cyclesStr;
+			return cyclesStr + time;
 		}
 
-		//TODO
-		if (command.startsWith(commands[14])){
-			command = command.substring(commands[14].length()).trim();
-			String[] split = command.split(" ");
-			if (split.length < 1)
-				return "Please enter one edge";
-
-			if (!graph.isBiconnected())
-				return "Graph is not biconnected.";
-
-
-			String sp = split[0].substring(1, split[0].length()-1);
-			String[] split2 = sp.split(",");
-			if (split2.length < 2)
-				return "Please enter an edge consisting of two vertices";
-			String v1 = split2[0];
-			String v2 = split2[1];
-
-			GraphVertex vert3 = graph.getVertexByContent(v1);
-			if (vert3 == null)
-				return "Unknown vertex \"" + v1 + "\"";
-			GraphVertex vert4 = graph.getVertexByContent(v2);
-			if (vert4 == null)
-				return "Unknown vertex \"" + v2 + "\"";
-			if (!graph.hasEdge(vert3, vert4))
-				return "Edge doesn't exist";
-			GraphEdge edge = graph.edgeesBetween(vert3, vert4).get(0);
-
-			try {
-				new SPQRTree<GraphVertex, GraphEdge>(edge, graph);
-				return "";
-			} catch (CannotBeAppliedException e) {
-				return "Couldn't construct spqr tree: " + e.getMessage();
-			}
-		}
-
-		if (command.equals(commands[16])){
-			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
-			List<Permutation> automorphisms = nauty.findAutomorphisms();
-			String ret = "\n";
-			for (Permutation p : automorphisms){
-				ret += p.cyclicRepresenatation() + "\n";
-			}
-
-			return ret;
-		}
-
-		if (command.equals(commands[17])){
-			SimpleCyclesFinder<GraphVertex, GraphEdge> jcycles = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
-			System.out.println(jcycles.findCycles(graph));
-			return (jcycles.toString());
-		}
-		if (command.equals(commands[18])){
+		if (command.trim().equals(commands[14])){
 			SimpleUndirectedCyclesFinder<GraphVertex, GraphEdge> cycles = 
 					new SimpleUndirectedCyclesFinder<GraphVertex, GraphEdge>(graph);
+			ExecuteResult result = AlgorithmExecutor.execute(cycles, "findAllCycles");
+			List<List<GraphVertex>> allCycles = (List<List<GraphVertex>>) result.getValue();
+			String time =  " [in " + result.getDuration() + " ms]";
 			String ret = "\n";
-			for (List<GraphVertex> cycle : cycles.findAllCycles())
+			for (List<GraphVertex> cycle : allCycles)
 				ret += cycle + "\n";
-			return ret;
+			return Util.replaceSquareBrackets(ret) + time;
 		}
 
-		if (command.equals(commands[19])){
+		if (command.trim().equals(commands[15])){
 			String ret = "";
-			PermutationAnalyzator<GraphVertex, GraphEdge> analyzator =new PermutationAnalyzator<GraphVertex,GraphEdge>(graph);
-			ret += analyzator.findReflectionGroups() + "\n";
-			ret += analyzator.findRotationGroups() + "\n";
-			ret += analyzator.findDihedralGroups();
-			return ret;
+			long totalTime = 0;
+			PermutationAnalyzator<GraphVertex, GraphEdge> analyzator = new PermutationAnalyzator<GraphVertex,GraphEdge>(graph);
+			ExecuteResult result = AlgorithmExecutor.execute(analyzator, "findReflectionGroups");
+			totalTime += result.getDuration();
+			List<PermutationGroup> groups = (List<PermutationGroup>) result.getValue();
+			result = AlgorithmExecutor.execute(analyzator, "findRotationGroups");
+			totalTime += result.getDuration();
+			groups.addAll((List<PermutationGroup>) result.getValue());
+			result = AlgorithmExecutor.execute(analyzator, "findDihedralGroups");
+			totalTime += result.getDuration();
+			groups.addAll((List<PermutationGroup>) result.getValue());
+			for (PermutationGroup gr : groups)
+				ret += gr + "\n";
+			
+			String time =  " [in " + totalTime + " ms]";
+			return ret + time;
 
 		}
 
-		if (command.equals(commands[20])){
-			System.out.println("convex");
-			ConvexDrawing<GraphVertex, GraphEdge> drawing = new ConvexDrawing<GraphVertex,GraphEdge>(graph);
-			drawing.execute();
+		if (command.trim().equals(commands[16])){
+			ExecuteResult result = AlgorithmExecutor.execute(graph, "isTree");
+			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
 		}
 
-		if (command.equals(commands[21])){
-			return graph.listBiconnectedComponents().toString();
+		if (command.trim().equals(commands[17])){
+			BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
+			ExecuteResult result = AlgorithmExecutor.execute(binaryTree, "execute");
+			return binaryTree.isCanBeConstructed() ? "yes" : "no" + " [in " + result.getDuration() + " ms]";
 		}
 
-		if (command.equals(commands[22])){
-			SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting = new SeparationPairSplitting<GraphVertex, GraphEdge>();
-			try {
-				List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(graph);
-				return separationPairs.toString();
-			} catch (AlgorithmErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return e.getMessage();
-			}
-
+		if (command.trim().equals(commands[18])){
+			BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
+			ExecuteResult result = AlgorithmExecutor.execute(binaryTree, "execute");
+			long totalTime = result.getDuration();
+			if (!binaryTree.isCanBeConstructed())
+				return "Not a binary tree" + " [in " + totalTime + " ms]";
+			result = AlgorithmExecutor.execute(binaryTree, "isBalanced");
+			totalTime += result.getDuration();
+			String answer = binaryTree.isBalanced() ? "yes" : "no";
+			return answer + " [in " + totalTime + " ms]";
 		}
 
-
-		else if (command.equals(commands[24])){
-			HopcroftTarjanSplitting<GraphVertex, GraphEdge> hopcroftTarjan = new HopcroftTarjanSplitting<GraphVertex, GraphEdge>(graph);
-			try {
-				hopcroftTarjan.execute();
-			} catch (AlgorithmErrorException e) {
-				return e.getMessage();
-			}
-			return "Done";
-
+		if (command.trim().equals(commands[19])){
+			ExecuteResult result = AlgorithmExecutor.execute(graph, "isRing");
+			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
 		}
 
-		else if (command.equals(commands[23])){
+		if (command.trim().equals(commands[20])){
+			Bipartite<GraphVertex, GraphEdge> bipartite = new Bipartite<>(graph);
+			ExecuteResult result = AlgorithmExecutor.execute(bipartite, "isBipartite");
+			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
+		}
+
+		if (command.startsWith(commands[21])){
+			command = command.substring(commands[21].length()).trim();
+			String[] split = command.split(" ");
+			if (split.length < 2)
+				return "Please enter two vertices";
+
+			String v1 = split[0].trim();
+			String v2 = split[1].trim();
+
+			GraphVertex vert1 = MainFrame.getInstance().getCurrentView().getModel().getVertexByContent(v1);
+			if (vert1 == null)
+				return "Unknown vertex \"" + v1 + "\"";
+			GraphVertex vert2 = MainFrame.getInstance().getCurrentView().getModel().getVertexByContent(v2);
+			if (vert2 == null)
+				return "Unknown vertex \"" + v2 + "\"";
+
+			DijkstraAlgorithm<GraphVertex, GraphEdge> dijsktra = new DijkstraAlgorithm<>(graph);
+			
+			String answer;
+			long start = System.currentTimeMillis();
+			Path<GraphVertex, GraphEdge> path = dijsktra.getPath(vert1, vert2);
+			long end = System.currentTimeMillis();
+			long duration = end - start;
+			String time = " [in " + duration + " ms]";
+			
+			if (path == null)
+				answer = "Vertices are not connected";
+			else
+				answer = path.toString();
+			return answer + time;
+		}
+
+		if (command.trim().equals(commands[22])){
 			centralArea.setText("");
 			return "";
 		}
 
-		else if (command.startsWith(commands[25])){
+		if (command.startsWith(commands[23])){
 			//Layout DSL input
 			List<GraphVertex> vertices = graph.getVertices();
 			List<GraphEdge> edges = graph.getEdges();
@@ -484,15 +482,8 @@ public class CommandPanel extends JPanel{
 			}
 		}
 
-		else if (command.trim().equals("Binary tree")){
-			BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<GraphVertex,GraphEdge>(graph);
-			boolean balanced = binaryTree.isBalanced();
-			return binaryTree.toString() + "\n Balanced: " + balanced;
-		}
-		else if (command.trim().equals("is ring")){
-			return graph.isRing() + "";
-		}
-		else if (command.trim().equals("test")){
+
+		if (command.trim().equals("test")){
 			//execute whatever that is being tested
 			//			try {
 			//				//Map<GraphVertex,Integer> ordering = TopologicalOrdering.calculateOrdering(graph);
@@ -523,6 +514,9 @@ public class CommandPanel extends JPanel{
 			//VisibilityRepresentation visibilityRepresentation = new VisibilityRepresentation(graph);
 
 		}
+		
+		//TODO help
+		//biranje planarity algoritma
 
 		if (command.equals(commands[15])){
 			StringBuilder builder = new StringBuilder("Commands:\n");
@@ -549,7 +543,7 @@ public class CommandPanel extends JPanel{
 
 
 	private static  void initCommands(){
-		commands = new String[23];
+		commands = new String[25];
 
 		commands[0] = "create graph";
 		commands[1] = "add vertex";
@@ -565,17 +559,17 @@ public class CommandPanel extends JPanel{
 		commands[11] = "list triconnected components";
 		commands[12] = "list automorphisms";
 		commands[13] = "cycles basis";
-
-		//TODO
 		commands[14] = "list all cycles";
-		commands[15] = "groups"; //atomorphisms groups
+		commands[15] = "automorphism groups";
 		commands[16] = "is tree";
 		commands[17] = "is binary tree";
-		commands[18] = "is ring";
-		commands[19] = "i bipartite";
-		commands[20] = "clear";
-		commands[21] = "lay out";
-		commands[22] = "test";
+		commands[18] = "is balanced binary tree";
+		commands[19] = "is ring";
+		commands[20] = "is bipartite";
+		commands[21] = "path between";
+		commands[22] = "clear";
+		commands[23] = "lay out";
+		commands[24] = "help";
 	}
 
 
