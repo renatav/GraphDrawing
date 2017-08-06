@@ -29,8 +29,8 @@ public class PermutationAnalyzator<V extends Vertex, E extends Edge<V>> {
 	 */
 	public PermutationAnalyzator(Graph<V, E> graph) {
 		super();
-		McKayGraphLabelingAlgorithm<V, E> nauty = new McKayGraphLabelingAlgorithm<V,E>(graph);
-		permutations = nauty.findAutomorphisms();
+		McKayGraphLabelingAlgorithm<V, E> nauty = new McKayGraphLabelingAlgorithm<V,E>();
+		permutations = nauty.findAutomorphisms(graph);
 	}
 
 	/**

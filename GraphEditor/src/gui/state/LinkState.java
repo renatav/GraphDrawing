@@ -79,7 +79,7 @@ public class LinkState extends State{
 	private void link(){
 		GraphEdge edge = new GraphEdge(startVertex, endVertex);
 		List<Point2D> edgePoints = new ArrayList<Point2D>(linkPoints);
-		edge.setLinkNodes(edgePoints);
+		edge.setLinkNodesFromPositions(edgePoints);
 		Command command = new AddElementCommand(edge, view);
 		CommandExecutor.getInstance().execute(command);
 		clearAll();

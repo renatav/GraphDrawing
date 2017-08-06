@@ -3,6 +3,7 @@ package gui.commands;
 import gui.model.GraphEdge;
 import gui.model.GraphElement;
 import gui.model.GraphVertex;
+import gui.model.LinkNode;
 import gui.view.GraphView;
 
 import java.awt.geom.Point2D;
@@ -54,19 +55,19 @@ public class MoveCommand extends Command {
 					processedEdges.add(edge);
 					if (elements.contains(edge.getOrigin()) && elements.contains(edge.getDestination())){
 						//move all edges
-						for (Point2D p : edge.getLinkNodes()){
-							int currentNodeX = (int) p.getX();
-							int currentNodeY = (int) p.getY();
-							p.setLocation(currentNodeX + moveX, currentNodeY + moveY);
+						for (LinkNode node : edge.getLinkNodes()){
+							int currentNodeX = (int) node.getPosition().getX();
+							int currentNodeY = (int) node.getPosition().getY();
+							node.getPosition().setLocation(currentNodeX + moveX, currentNodeY + moveY);
 						}
 					}
 					else{
 
 						Point2D currentNodePoint;
 						if (edge.getOrigin() == v)
-							currentNodePoint = edge.getLinkNodes().get(0);
+							currentNodePoint = edge.getLinkNodes().get(0).getPosition();
 						else
-							currentNodePoint = edge.getLinkNodes().get(edge.getLinkNodes().size() - 1);
+							currentNodePoint = edge.getLinkNodes().get(edge.getLinkNodes().size() - 1).getPosition();
 						int currentNodeX = (int) currentNodePoint.getX();
 						int currentNodeY = (int) currentNodePoint.getY();
 						currentNodePoint.setLocation(currentNodeX + moveX, currentNodeY + moveY);

@@ -2,14 +2,15 @@ package gui.main.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
-import java.util.List;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -28,29 +29,28 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import graph.algorithm.cycles.SimpleCyclesFinder;
-import graph.algorithms.planarity.FraysseixMendezPlanarity;
-import graph.algorithms.planarity.PlanarityTestingAlgorithm;
 import graph.elements.Graph;
-import graph.elements.Path;
-import graph.properties.Bipartite;
-import graph.properties.components.HopcroftTarjanSplitComponent;
-import graph.properties.components.SplitPair;
-import graph.properties.splitting.AlgorithmErrorException;
-import graph.properties.splitting.SeparationPairSplitting;
-import graph.properties.splitting.TriconnectedSplitting;
-import graph.symmetry.Permutation;
-import graph.symmetry.nauty.McKayGraphLabelingAlgorithm;
-import graph.traversal.DijkstraAlgorithm;
-import graph.tree.binary.BinaryTree;
-import graph.util.Util;
-import gui.actions.main.frame.ConnectedAction;
+import gui.actions.analysis.AutomorphismsAction;
+import gui.actions.analysis.BiconnectedAction;
+import gui.actions.analysis.BiconnectedComponentsAction;
+import gui.actions.analysis.BinaryTreeCheckAction;
+import gui.actions.analysis.BipartiteAction;
+import gui.actions.analysis.ConnectedAction;
+import gui.actions.analysis.CutVerticesAction;
+import gui.actions.analysis.CycleBasisAction;
+import gui.actions.analysis.CyclicAction;
+import gui.actions.analysis.PathAction;
+import gui.actions.analysis.PlanarityAction;
+import gui.actions.analysis.SeparationPairsAction;
+import gui.actions.analysis.TreeCheckAction;
+import gui.actions.analysis.TriconnectedAction;
+import gui.actions.analysis.TriconnectedComponentsAction;
 import gui.actions.main.frame.ExitAction;
 import gui.actions.main.frame.LoadAction;
 import gui.actions.main.frame.NewGraphAction;
@@ -72,6 +72,7 @@ import gui.state.LassoSelectState;
 import gui.state.LinkState;
 import gui.state.MoveState;
 import gui.state.SelectState;
+import gui.state.State;
 import gui.util.GuiUtil;
 import gui.util.StatusBar;
 import gui.view.GraphView;
@@ -100,14 +101,25 @@ public class MainFrame extends JFrame{
 	private RedoAction redoAction = new RedoAction();
 	private UndoAction undoAction = new UndoAction();
 	private ConnectedAction connectionAction = new ConnectedAction();
+	private BiconnectedAction biconnectedAction = new BiconnectedAction();
+	private CyclicAction cyclicAction = new CyclicAction();
+	private PlanarityAction planarAction = new PlanarityAction();
+	private CycleBasisAction cycleBasisAction = new CycleBasisAction();
+	private CutVerticesAction cutVerticesAction = new CutVerticesAction();
+	private BiconnectedComponentsAction biconnectedComponentsAction = new BiconnectedComponentsAction();
+	private TriconnectedAction triconnectedAction = new TriconnectedAction();
+	private SeparationPairsAction separationPairsAction = new SeparationPairsAction();
+	private AutomorphismsAction automorphismsActions = new AutomorphismsAction();
+	private TriconnectedComponentsAction triconnectedComponentsAction = new TriconnectedComponentsAction();
+	private TreeCheckAction treeCheckAction = new TreeCheckAction();
+	private BinaryTreeCheckAction binaryTreeCheckAction = new BinaryTreeCheckAction();
+	private BipartiteAction bipartiteAction = new BipartiteAction();
+	private PathAction pathAction;
 	private JPopupMenu popup;
 	private PopupClickListener popupListener;
-	private PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTest =
-			new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
 	private JTextArea popupArea;
 	private JScrollPane popupScrollPane;
-	private PathPanel pathPanel;
-	private String prefix = " ";
+	private boolean showPopup = true;
 
 	private static int graphCount = 1;
 
@@ -195,10 +207,8 @@ public class MainFrame extends JFrame{
 		popupArea.setFocusable(false);
 		popupScrollPane = new JScrollPane(popupArea);
 		popupScrollPane.setPreferredSize(new Dimension( 350, 200));
-
-		pathPanel = new PathPanel();
-
-
+		
+		pathAction = new PathAction();
 
 		initMenu();
 		initToolBar();
@@ -298,12 +308,32 @@ public class MainFrame extends JFrame{
 		fileMenu.add(loadMi);
 		fileMenu.addSeparator();
 		fileMenu.add(exitMi);
-
+		
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
 		
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.add(new JMenuItem(connectionAction));
+		toolsMenu.addSeparator();
+		toolsMenu.add(new JMenuItem(biconnectedAction));
+		toolsMenu.add(new JMenuItem(cutVerticesAction));
+		toolsMenu.add(new JMenuItem(biconnectedComponentsAction));
+		toolsMenu.addSeparator();
+		toolsMenu.add(new JMenuItem(triconnectedAction));
+		toolsMenu.add(new JMenuItem(separationPairsAction));
+		toolsMenu.add(new JMenuItem(triconnectedComponentsAction));
+		toolsMenu.addSeparator();
+		toolsMenu.add(new JMenuItem(cyclicAction));
+		toolsMenu.add(new JMenuItem(cycleBasisAction));
+		toolsMenu.addSeparator();
+		toolsMenu.add(new JMenuItem(planarAction));
+		toolsMenu.add(new JMenuItem(treeCheckAction));
+		toolsMenu.add(new JMenuItem(binaryTreeCheckAction));
+		toolsMenu.add(new JMenuItem(bipartiteAction));
+		toolsMenu.addSeparator();
+		toolsMenu.add(new JMenuItem(automorphismsActions));
+		toolsMenu.addSeparator();
+		toolsMenu.add(new JMenuItem(pathAction));
 		menuBar.add(toolsMenu);
 		
 		setJMenuBar(menuBar);
@@ -326,253 +356,21 @@ public class MainFrame extends JFrame{
 	private void initPopup(){
 		popup = new JPopupMenu("Analyze");
 		JMenuItem connectedMI = new JMenuItem(connectionAction);
+		JMenuItem biconnectedMI = new JMenuItem(biconnectedAction);
+		JMenuItem cycleMI = new JMenuItem(cyclicAction);
+		JMenuItem planarMI = new JMenuItem(planarAction);
+		JMenuItem cycleBasisMI = new JMenuItem(cycleBasisAction);
+		JMenuItem cutVerticesMI = new JMenuItem(cutVerticesAction);
+		JMenuItem blocksMI = new JMenuItem(biconnectedComponentsAction);
+		JMenuItem triconnectedMI = new JMenuItem(triconnectedAction);
+		JMenuItem separationPairsMI = new JMenuItem(separationPairsAction);
+		JMenuItem automorphismsMI = new JMenuItem(automorphismsActions);
+		JMenuItem triconnectedComponentsMI = new JMenuItem(triconnectedComponentsAction);
+		JMenuItem treeMI = new JMenuItem(treeCheckAction);
+		JMenuItem binaaryTreeMI = new JMenuItem(binaryTreeCheckAction);
+		JMenuItem bipartiteMI = new JMenuItem(bipartiteAction);
+		JMenuItem pathMI = new JMenuItem(pathAction);
 
-		JMenuItem biconnectedMI = new JMenuItem("Check biconnectivity");
-		biconnectedMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String answer = getGraph().isBiconnected() ? "Yes" : "No";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), 	prefix + answer, "Graph is biconnected", JOptionPane.INFORMATION_MESSAGE);	
-			}
-		});
-
-		JMenuItem cycleMI = new JMenuItem("Check if cyclic");
-		cycleMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String answer = getGraph().isCyclic() ? "Yes" : "No";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is cyclic", JOptionPane.INFORMATION_MESSAGE);	
-			}
-		});
-
-		JMenuItem planarMI = new JMenuItem("Check planarity");
-		planarMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String answer = planarityTest.isPlannar(getGraph()) ? "Yes" : "No";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is planar", JOptionPane.INFORMATION_MESSAGE);	
-			}
-		});
-
-		JMenuItem cycleBasisMI = new JMenuItem("Cycles basis");
-		cycleBasisMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				SimpleCyclesFinder<GraphVertex, GraphEdge> cyclesFinder = new SimpleCyclesFinder<GraphVertex,GraphEdge>();
-				List<List<GraphVertex>> cycles = cyclesFinder.findCycles(getGraph());
-				String cyclesStr = "";
-				if (cycles.size() == 0){
-					cyclesStr = "Graph is not cyclic";
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), cyclesStr, "Cycles basis", JOptionPane.INFORMATION_MESSAGE);
-					return;
-				}
-				else{
-					for (int i = 0; i < cycles.size(); i++){
-						cyclesStr += Util.replaceSquareBrackets(cycles.get(i).toString());
-						if (i < cycles.size() - 1)
-							cyclesStr += ", ";
-					}
-					cyclesStr = Util.addNewLines(cyclesStr, "),", 30);
-				}
-				showScrollableOptionPane("Cycles basis", cyclesStr);
-			}
-		});
-
-		JMenuItem cutVerticesMI = new JMenuItem("Cut vertices");
-		cutVerticesMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				List<GraphVertex> cutVertices = getGraph().listCutVertices();
-				String ret ="";
-				if (cutVertices.size() == 0)
-					ret = " Graph is biconnected";
-				else{
-					ret = Util.replaceSquareBrackets(Util.addNewLines(cutVertices.toString(), ",", 30));
-				}
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + ret, "Cut vertices", JOptionPane.INFORMATION_MESSAGE);	
-			}
-		});
-
-		JMenuItem blocksMI = new JMenuItem("Biconnected components");
-		blocksMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String ret;
-				if (getGraph().isBiconnected()){
-					ret = "  Graph is biconnected";
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Biconnected components", JOptionPane.INFORMATION_MESSAGE);
-					return;
-				}
-				else{
-					List<Graph<GraphVertex, GraphEdge>> blocks = getGraph().listBiconnectedComponents();
-					StringBuilder builder = new StringBuilder();
-					for (int i = 0; i < blocks.size(); i++){
-						Graph<GraphVertex, GraphEdge> block  = blocks.get(i);
-						builder.append("Component " + (i+1) + " " + block.printFormat() + "\n");
-					}
-					ret = builder.toString();
-				}
-				showScrollableOptionPane("Biconnected components", ret);
-
-			}
-		});
-
-		JMenuItem triconnectedMI = new JMenuItem("Check triconnectivity");
-		triconnectedMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
-						new SeparationPairSplitting<GraphVertex, GraphEdge>();
-
-				String answer = "No";
-				try {
-					answer = separationPairsSplitting.findSeaparationPairs(getGraph()).size() == 0 ? "Yes" : "No";
-				} catch (AlgorithmErrorException e) {
-					e.printStackTrace();
-				}
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is triconnected", JOptionPane.INFORMATION_MESSAGE);	
-			}
-		});
-
-		JMenuItem separationPairsMI = new JMenuItem("Separation pairs");
-		separationPairsMI.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String ret = "";
-				try {
-					SeparationPairSplitting<GraphVertex, GraphEdge> separationPairsSplitting =
-							new SeparationPairSplitting<GraphVertex, GraphEdge>();
-					List<SplitPair<GraphVertex, GraphEdge>> separationPairs = separationPairsSplitting.findSeaparationPairs(getGraph());
-					if (separationPairs.size() == 0){
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Graph is triconnected", "Separation pairs", JOptionPane.INFORMATION_MESSAGE);
-					}
-
-					ret = separationPairs.toString();
-					ret = Util.removeSquareBrackets(Util.addNewLines(ret, "),", 40));
-
-				} catch (AlgorithmErrorException e) {
-					e.printStackTrace();
-					//ret = e.getMessage();
-				}
-
-				showScrollableOptionPane("Separation pairs", ret);
-			}
-		});
-
-		JMenuItem automorphismsMI = new JMenuItem("Automorphisms");
-		automorphismsMI.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String ret = "";
-				McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(getGraph());
-				List<Permutation> automorphisms = nauty.findAutomorphisms();
-				for (Permutation p : automorphisms){
-					ret += p.cyclicRepresenatation() + "\n";
-				}
-				showScrollableOptionPane("Automorphisms", ret);	
-			}
-		});
-
-		JMenuItem triconnectedComponentsMI = new JMenuItem("Triconnected components");
-		triconnectedComponentsMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				TriconnectedSplitting<GraphVertex, GraphEdge> splitting = new TriconnectedSplitting<GraphVertex, GraphEdge>(getGraph());
-				List<HopcroftTarjanSplitComponent<GraphVertex, GraphEdge>>  components = splitting.formTriconnectedComponents();
-				String ret = "";
-				if (components.size() == 0){
-					ret = "Graph is triconnected";
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), ret, "Triconnected components", JOptionPane.INFORMATION_MESSAGE);
-					return;
-				}
-				StringBuilder builder = new StringBuilder();
-				for (int i = 0; i < components.size(); i++){
-					HopcroftTarjanSplitComponent<GraphVertex, GraphEdge> component  = components.get(i);
-					builder.append("Component " + (i+1) + " " + component.printFormat() + "\n");
-				}
-				ret = builder.toString();
-				showScrollableOptionPane("Triconnected components", ret);
-			}
-		});
-
-		JMenuItem treeMI = new JMenuItem("Check if tree");
-		treeMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String answer = getGraph().isTree() ? "Yes" : "No";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a tree", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		
-
-		JMenuItem binaaryTreeMI = new JMenuItem("Check if binary tree");
-		binaaryTreeMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<>(getGraph());
-				String answer = binaryTree.isCanBeConstructed() ? "Yes" : "No";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a binary tree", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-
-		JMenuItem bipartiteMI = new JMenuItem("Check if bipartite");
-		bipartiteMI.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				Bipartite<GraphVertex, GraphEdge> bipartite = new Bipartite<>(getGraph());
-				String answer = bipartite.isBipartite() ? "Yes" : "No";
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a bipartite", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-
-		JMenuItem pathMI = new JMenuItem("Path");
-		pathMI.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				pathPanel.clearFields();
-				JOptionPane.showMessageDialog(getInstance(), pathPanel, "Enter vertices", JOptionPane.PLAIN_MESSAGE);
-				String message = "";
-				String v1Str = pathPanel.getV1();
-				String v2Str = pathPanel.getV2();
-				Graph<GraphVertex, GraphEdge> graph = getGraph();
-
-				GraphVertex v1 = graph.getVertexByContent(v1Str);
-
-				if (v1 == null)
-					message = "Entered origin does not exist\n";
-
-				GraphVertex v2 = graph.getVertexByContent(v2Str);
-				if (v2 == null)
-					message += "Entered destination does not exist";
-
-				if (!message.equals("")){
-					JOptionPane.showMessageDialog(getInstance(), message, "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				DijkstraAlgorithm<GraphVertex, GraphEdge> dijsktra = new DijkstraAlgorithm<>(graph);
-				Path<GraphVertex, GraphEdge> path = dijsktra.getPath(v1, v2);
-				String answer;
-				if (path == null)
-					answer = "Vertices are not connected";
-				else
-					answer = Util.addNewLines(path.toString(), ",", 30);
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Path between " + v1Str + " and " + v2Str, JOptionPane.INFORMATION_MESSAGE);
-
-			}
-		});
 
 		popup.add(connectedMI);
 		popup.addSeparator();
@@ -599,7 +397,7 @@ public class MainFrame extends JFrame{
 		popupListener = new PopupClickListener();
 	}
 
-	private void showScrollableOptionPane(String title, String text){
+	public void showScrollableOptionPane(String title, String text){
 		popupArea.setText(text);
 		JOptionPane.showMessageDialog(getInstance(), popupScrollPane, title, JOptionPane.PLAIN_MESSAGE);  
 	}
@@ -679,6 +477,7 @@ public class MainFrame extends JFrame{
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new SelectState(currentView));
 		statusBar.setLabelText("Select");
+		showPopup = false;
 
 	}
 
@@ -768,40 +567,17 @@ public class MainFrame extends JFrame{
 		}
 
 		private void doPop(MouseEvent e){
-			popup.show(e.getComponent(), e.getX(), e.getY());
+			if (MainFrame.getInstance().isShowPopup())
+				popup.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
 
-	private class PathPanel extends JPanel
-	{
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private JTextField tfV1 = new JTextField(10);
-		private JTextField tfV2 = new JTextField(10);
-
-		public PathPanel()
-		{
-			setLayout(new MigLayout());
-			setSize(200,200);
-			add(new JLabel("Origin"));
-			add(tfV1, "wrap");
-			add(new JLabel("Destination"));
-			add(tfV2, "wrap");
-		}
-
-		public void clearFields(){
-			tfV1.setText("");
-			tfV2.setText("");
-		}
-
-		public String getV1(){
-			return tfV1.getText().trim();
-		}
-
-		public String getV2(){
-			return tfV2.getText().trim();
-		}
+	public boolean isShowPopup() {
+		return showPopup;
 	}
+
+	public void setShowPopup(boolean showPopup) {
+		this.showPopup = showPopup;
+	}
+
 }

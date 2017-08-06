@@ -53,7 +53,7 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	 */
 	public CyclicSymmetricGraphDrawing(Graph<V,E> graph){
 		this.graph = graph;
-		this.nauty = new McKayGraphLabelingAlgorithm<V, E>(graph);
+		this.nauty = new McKayGraphLabelingAlgorithm<V, E>();
 	}
 	
 	
@@ -164,7 +164,7 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 			= new HashMap<Integer, List<PermutationCycle<V>>>();
 		Map<Integer, List<PermutationCycle<V>>> permutationFoundPaths; 
 
-		List<Permutation> automorphisms = nauty.findAutomorphisms();
+		List<Permutation> automorphisms = nauty.findAutomorphisms(graph);
 		for (Permutation p : automorphisms){
 			permutationFoundPaths = executeForPermutation(p);
 			if (bestFoundPaths.size() == 0 || permutationFoundPaths.get(-1).size() < bestFoundPaths.get(-1).size()){
@@ -288,7 +288,7 @@ public class CyclicSymmetricGraphDrawing<V extends Vertex, E extends Edge<V>> {
 	 */
 	private Pair<List<List<Integer>>,Integer> findPermutation(){
 
-		List<Permutation> automorphisms = nauty.findAutomorphisms();
+		List<Permutation> automorphisms = nauty.findAutomorphisms(graph);
 		List<List<Integer>> cyclicRepresentation = new ArrayList<List<Integer>>();
 		int maxKM = 0;
 		Integer cycleLength = null;

@@ -1,4 +1,4 @@
-package gui.actions.main.frame;
+package gui.actions.analysis;
 
 import gui.main.frame.MainFrame;
 
@@ -9,9 +9,6 @@ import javax.swing.JOptionPane;
 public class ConnectedAction extends AnalysisAction{
 
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public ConnectedAction(){

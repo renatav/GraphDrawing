@@ -62,9 +62,9 @@ public class CommandPanel extends JPanel{
 	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTestFM = new FraysseixMendezPlanarity<GraphVertex, GraphEdge>();
 	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTestBM = new BoyerMyrvoldPlanarity<GraphVertex, GraphEdge>();
 	private static PlanarityTestingAlgorithm<GraphVertex, GraphEdge> planarityTestPQ = new PQTreePlanarity<GraphVertex, GraphEdge>();
+	private static McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>();
 
 	//TODO
-	//biranje planarity algoritma
 	//uputstvo za DSL
 
 	public CommandPanel(){
@@ -346,8 +346,8 @@ public class CommandPanel extends JPanel{
 
 		if (command.trim().equals(commands[12])){
 			String ret = "";
-			McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty = new McKayGraphLabelingAlgorithm<GraphVertex,GraphEdge>(graph);
-			ExecuteResult result = AlgorithmExecutor.execute(nauty, "findAutomorphisms");
+			
+			ExecuteResult result = AlgorithmExecutor.execute(nauty, "findAutomorphisms", graph);
 			String time =  " [in " + result.getDuration() + " ms]";
 			List<Permutation> automorphisms = (List<Permutation>) result.getValue();
 			for (Permutation p : automorphisms){
@@ -495,7 +495,7 @@ public class CommandPanel extends JPanel{
 				}
 				for (GraphEdge edge : drawing.getEdgeMappings().keySet()){
 					List<Point2D> points = drawing.getEdgeMappings().get(edge);
-					edge.setLinkNodes(points);
+					edge.setLinkNodesFromPositions(points);
 				}
 				view.repaint();
 				return "Done";

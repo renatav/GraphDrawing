@@ -7,6 +7,7 @@ import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphElement;
 import gui.model.GraphVertex;
+import gui.model.LinkNode;
 import gui.view.GraphView;
 
 import java.awt.event.MouseEvent;
@@ -112,7 +113,8 @@ public class MoveState extends State{
 				processedEdges.add(edge);
 				if (vertices.contains(edge.getOrigin()) && vertices.contains(edge.getDestination())){
 					//move all edges
-					for (Point2D p : edge.getLinkNodes()){
+					for (LinkNode node : edge.getLinkNodes()){
+						Point2D p = node.getPosition();
 						int currentNodeX = (int) p.getX();
 						int currentNodeY = (int) p.getY();
 						p.setLocation(currentNodeX + moveX, currentNodeY + moveY);
@@ -122,9 +124,9 @@ public class MoveState extends State{
 
 					Point2D currentNodePoint;
 					if (edge.getOrigin() == v)
-						currentNodePoint = edge.getLinkNodes().get(0);
+						currentNodePoint = edge.getLinkNodes().get(0).getPosition();
 					else
-						currentNodePoint = edge.getLinkNodes().get(edge.getLinkNodes().size() - 1);
+						currentNodePoint = edge.getLinkNodes().get(edge.getLinkNodes().size() - 1).getPosition();
 					int currentNodeX = (int) currentNodePoint.getX();
 					int currentNodeY = (int) currentNodePoint.getY();
 					currentNodePoint.setLocation(currentNodeX + moveX, currentNodeY + moveY);

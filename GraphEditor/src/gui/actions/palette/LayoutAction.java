@@ -51,7 +51,7 @@ public class LayoutAction extends AbstractAction{
 				}
 				for (GraphEdge edge : graph.getEdges()){
 					List<Point2D> points = drawing.getEdgeMappings().get(edge);
-					edge.setLinkNodes(points);
+					edge.setLinkNodesFromPositions(points);
 				}
 				view.repaint();
 			}

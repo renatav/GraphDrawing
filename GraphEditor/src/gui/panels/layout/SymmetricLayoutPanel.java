@@ -27,9 +27,9 @@ public class SymmetricLayoutPanel extends LayoutPropertyPanel{
 		
 		Graph<GraphVertex,GraphEdge> graph = MainFrame.getInstance().getCurrentView().getModel().getGraph();
 		McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge> nauty =
-				new McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge>(graph);
+				new McKayGraphLabelingAlgorithm<GraphVertex, GraphEdge>();
 		
-		List<Permutation> permutations = nauty.findAutomorphisms();
+		List<Permutation> permutations = nauty.findAutomorphisms(graph);
 		
 		Permutation[] permutationArray = new Permutation[permutations.size() +1];
 		permutationArray[0] = new Permutation();

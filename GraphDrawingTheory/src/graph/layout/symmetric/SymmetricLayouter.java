@@ -42,8 +42,8 @@ public abstract class SymmetricLayouter <V extends Vertex, E extends Edge<V>> ex
 		}
 		
 		if (p == null){
-			McKayGraphLabelingAlgorithm<V, E> graphLavelingAlg = new McKayGraphLabelingAlgorithm<>(graph);
-			p = graphLavelingAlg.findAutomorphisms().get(0);
+			McKayGraphLabelingAlgorithm<V, E> graphLavelingAlg = new McKayGraphLabelingAlgorithm<>();
+			p = graphLavelingAlg.findAutomorphisms(graph).get(0);
 		}
 	}
 

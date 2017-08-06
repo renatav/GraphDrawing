@@ -30,15 +30,15 @@ public class EdgePainter implements IElementPainter{
 		g.setStroke(stroke);
 
 		path.reset();
-		path.moveTo(edge.getLinkNodes().get(0).getX(), edge.getLinkNodes().get(0).getY());
+		path.moveTo(edge.getLinkNodes().get(0).getPosition().getX(), edge.getLinkNodes().get(0).getPosition().getY());
 		for (int i = 1; i < edge.getLinkNodes().size() - 1; i++){
-			path.lineTo(edge.getLinkNodes().get(i).getX(), edge.getLinkNodes().get(i).getY());
+			path.lineTo(edge.getLinkNodes().get(i).getPosition().getX(), edge.getLinkNodes().get(i).getPosition().getY());
 		}
 
 
 		//last segment
-		Point2D p1 = edge.getLinkNodes().get(edge.getLinkNodes().size() - 2);
-		Point2D p2 = edge.getLinkNodes().get(edge.getLinkNodes().size() - 1);
+		Point2D p1 = edge.getLinkNodes().get(edge.getLinkNodes().size() - 2).getPosition();
+		Point2D p2 = edge.getLinkNodes().get(edge.getLinkNodes().size() - 1).getPosition();
 
 		Point2D intersection;
 		try{
@@ -103,12 +103,12 @@ public class EdgePainter implements IElementPainter{
 	  }
 	
 	public boolean containsPoint(Point2D point) {
-		Point2D currentPoint = edge.getLinkNodes().get(0);
+		Point2D currentPoint = edge.getLinkNodes().get(0).getPosition();
 		Point2D previousPoint;
 		Line2D.Double currentSegment=new Line2D.Double();
 		for (int i = 1; i < edge.getLinkNodes().size(); i++){
 			previousPoint=currentPoint;
-			currentPoint =  edge.getLinkNodes().get(i);
+			currentPoint =  edge.getLinkNodes().get(i).getPosition();
 			currentSegment.setLine(previousPoint,currentPoint);
 			if (currentSegment.ptLineDist(point) <= selectionMaxDistance && inRange(previousPoint,currentPoint,point))
 				return true;

@@ -8,6 +8,7 @@ import gui.model.GraphElement;
 import gui.model.GraphModel;
 import gui.model.GraphVertex;
 import gui.model.IGraphElement;
+import gui.model.LinkNode;
 import gui.model.SelectionModel;
 import gui.state.SelectState;
 import gui.state.State;
@@ -132,9 +133,9 @@ public class GraphView extends JPanel implements Observer{
 
 		for (EdgePainter edgePainter : edgePainters){
 			if (selectionModel.isSelected(edgePainter.getEdge())){
-				for (Point2D linkNode : edgePainter.getEdge().getLinkNodes()){
+				for (LinkNode linkNode : edgePainter.getEdge().getLinkNodes()){
 					int dim = 6;
-					g.fillRect((int)linkNode.getX() - dim/2, (int)linkNode.getY() - dim/2, dim, dim);
+					g.fillRect((int)linkNode.getPosition().getX() - dim/2, (int)linkNode.getPosition().getY() - dim/2, dim, dim);
 				}
 			}
 		}

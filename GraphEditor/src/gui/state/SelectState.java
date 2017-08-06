@@ -18,6 +18,7 @@ public class SelectState extends State{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		MainFrame.getInstance().setShowPopup(true);
 		IGraphElement hitElement = view.elementAtPoint(e.getPoint());
 		if (hitElement != null){
 			if (hitElement instanceof GraphVertex){

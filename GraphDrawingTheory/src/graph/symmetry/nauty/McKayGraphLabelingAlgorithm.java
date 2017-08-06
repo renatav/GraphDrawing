@@ -24,17 +24,17 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 	private Graph<V,E> graph;
 	private BinaryRepresentation<V, E> binaryRepresenatation;
 
-
-	public McKayGraphLabelingAlgorithm(Graph<V,E> graph){
-		this.graph = graph;
+	
+	public McKayGraphLabelingAlgorithm(){
 	}
 
 	/**
 	 * Finds automorphisms of the graph
 	 * @return A list of graph's automorphisms
 	 */
-	public List<Permutation> findAutomorphisms(){
+	public List<Permutation> findAutomorphisms(Graph<V,E> graph){
 
+		this.graph = graph;
 		OrderedPartition<V> pi = new OrderedPartition<V>(graph.getVertices());
 		binaryRepresenatation = new BinaryRepresentation<V,E>(graph);
 		OrderedPartition<V> refined = refinementProcedure(pi);
@@ -294,6 +294,10 @@ public class McKayGraphLabelingAlgorithm<V extends Vertex, E extends Edge<V>> {
 				deg ++;
 		}
 		return deg;
+	}
+
+	public void setGraph(Graph<V, E> graph) {
+		this.graph = graph;
 	}
 
 }

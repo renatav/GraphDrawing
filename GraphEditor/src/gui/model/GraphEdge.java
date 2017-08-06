@@ -1,23 +1,22 @@
 package gui.model;
 
-import graph.elements.Edge;
-
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.elements.Edge;
+
 public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 
 	private GraphVertex origin, destination;
-	private List<Point2D> linkNodes = new ArrayList<Point2D>();
+	private List<LinkNode> linkNodes = new ArrayList<LinkNode>();
 	private int weight;
 	
 	public GraphEdge(GraphVertex origin, GraphVertex destination){
 		this.origin = origin;
 		this.destination = destination;
 		this.color = Color.BLUE;
-		
 	}
 	
 	public GraphEdge(){
@@ -25,8 +24,8 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 	}
 	
 	public void setNodesBasedOnVertices(){
-		linkNodes.add(origin.getPosition());
-		linkNodes.add(destination.getPosition());
+		linkNodes.add(new LinkNode(origin.getPosition()));
+		linkNodes.add(new LinkNode(destination.getPosition()));
 	}
 
 	@Override
@@ -56,11 +55,17 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 		return weight;
 	}
 
-	public List<Point2D> getLinkNodes() {
+
+	public List<LinkNode> getLinkNodes() {
 		return linkNodes;
 	}
 
-	public void setLinkNodes(List<Point2D> linkNodes) {
+	public void setLinkNodesFromPositions(List<Point2D> positions){
+		linkNodes.clear();
+		for (Point2D point : positions)
+			linkNodes.add(new LinkNode(point));
+	}
+	public void setLinkNodes(List<LinkNode> linkNodes) {
 		this.linkNodes = linkNodes;
 	}
 
