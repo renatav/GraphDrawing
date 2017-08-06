@@ -10,6 +10,7 @@ public class SelectionModel extends Observable{
 	
 	private List<GraphVertex> selectedVertices = new ArrayList<GraphVertex>();
 	private List<GraphEdge> selectedEdges = new ArrayList<GraphEdge>();
+	private LinkNode selectedNode;
 	
 	public SelectionModel(GraphView view){
 		addObserver(view);
@@ -106,6 +107,14 @@ public class SelectionModel extends Observable{
 
 	public void setSelectedEdges(List<GraphEdge> selectedEdges) {
 		this.selectedEdges = selectedEdges;
+	}
+
+	public LinkNode getSelectedNode() {
+		return selectedNode;
+	}
+
+	public void setSelectedNode(LinkNode selectedNode) {
+		this.selectedNode = selectedNode;
 	}
 
 }

@@ -2,8 +2,9 @@ package gui.state;
 
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
-import gui.model.IGraphElement;
 import gui.model.GraphVertex;
+import gui.model.IGraphElement;
+import gui.model.LinkNode;
 import gui.properties.PropertiesFactory;
 import gui.view.GraphView;
 
@@ -21,6 +22,13 @@ public class SelectState extends State{
 		MainFrame.getInstance().setShowPopup(true);
 		IGraphElement hitElement = view.elementAtPoint(e.getPoint());
 		if (hitElement != null){
+			LinkNode hitNode;
+			if (hitElement instanceof LinkNode){
+				hitNode = (LinkNode) hitElement;
+				hitElement = hitNode.getEdge();
+				view.getSelectionModel().setSelectedNode(hitNode);
+			}
+			
 			if (hitElement instanceof GraphVertex){
 				GraphVertex hitVertex = (GraphVertex)hitElement;
 				if (e.isControlDown()){
@@ -34,6 +42,7 @@ public class SelectState extends State{
 						view.getSelectionModel().selecteVertex(hitVertex);
 				}
 			}
+			
 			else if (hitElement instanceof GraphEdge){
 				GraphEdge hitEdge = (GraphEdge)hitElement;	
 				if (e.isControlDown()){
@@ -85,9 +94,10 @@ public class SelectState extends State{
 			MainFrame.getInstance().changeToLassoSelect();
 		}
 		else{
-			//change to move state
-			MainFrame.getInstance().changeToMoveState(e.getPoint());
-			
+			if (hitElement instanceof LinkNode)
+				MainFrame.getInstance().changeToMoveNodeState(e.getPoint());
+			else if (hitElement instanceof GraphVertex)
+				MainFrame.getInstance().changeToMoveState(e.getPoint());
 		}
 		
 	}

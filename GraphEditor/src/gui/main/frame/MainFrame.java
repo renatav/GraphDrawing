@@ -2,10 +2,8 @@ package gui.main.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -31,7 +29,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -70,9 +67,9 @@ import gui.properties.PropertiesPanel;
 import gui.state.AddState;
 import gui.state.LassoSelectState;
 import gui.state.LinkState;
+import gui.state.MoveNodeState;
 import gui.state.MoveState;
 import gui.state.SelectState;
-import gui.state.State;
 import gui.util.GuiUtil;
 import gui.util.StatusBar;
 import gui.view.GraphView;
@@ -402,10 +399,6 @@ public class MainFrame extends JFrame{
 		JOptionPane.showMessageDialog(getInstance(), popupScrollPane, title, JOptionPane.PLAIN_MESSAGE);  
 	}
 
-	private Graph<GraphVertex, GraphEdge> getGraph(){
-		return MainFrame.getInstance().getCurrentView().getModel().getGraph();
-	}
-
 	public static MainFrame getInstance(){
 		if (instance == null)
 			instance = new MainFrame();
@@ -490,6 +483,12 @@ public class MainFrame extends JFrame{
 	public void changeToMoveState(Point2D mousePosition){
 		GraphView currentView = getCurrentView();
 		currentView.setCurrentState(new MoveState(currentView.getSelectionModel().getSelectedVertices(), currentView, mousePosition));
+		statusBar.setLabelText("Move state");
+	}
+	
+	public void changeToMoveNodeState(Point2D mousePosition){
+		GraphView currentView = getCurrentView();
+		currentView.setCurrentState(new MoveNodeState(currentView.getSelectionModel().getSelectedNode(), currentView, mousePosition));
 		statusBar.setLabelText("Move state");
 	}
 
