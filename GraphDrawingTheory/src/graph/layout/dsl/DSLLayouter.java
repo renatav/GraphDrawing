@@ -264,11 +264,11 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 			else if(algorithm.get("name").equals("compact")){
 				layoutAlgorithm = LayoutAlgorithms.COMPACT_TREE;
 				if (algorithm.containsKey("horizontal"))
-					layoutProperties.setProperty(CompactTreeProperties.HORIZONTAL, algorithm.get("horizontal"));
+					layoutProperties.setProperty(CompactTreeProperties.HORIZONTAL, true);
 				if (algorithm.containsKey("invert"))
-					layoutProperties.setProperty(CompactTreeProperties.INVERT, algorithm.get("invert"));
+					layoutProperties.setProperty(CompactTreeProperties.INVERT, true);
 				if (algorithm.containsKey("resizeParents"))
-					layoutProperties.setProperty(CompactTreeProperties.RESIZE_PARENTS, algorithm.get("resizeParents"));
+					layoutProperties.setProperty(CompactTreeProperties.RESIZE_PARENTS, true);
 				if (algorithm.containsKey("levelDistance"))
 					layoutProperties.setProperty(CompactTreeProperties.LEVEL_DISTANCE, algorithm.get("levelDistance"));
 				if (algorithm.containsKey("nodeDistance"))
@@ -305,9 +305,9 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 			else if (algorithm.get("name").equals("hierarchical")){
 				layoutAlgorithm = LayoutAlgorithms.HIERARCHICAL;
 				if (algorithm.containsKey("resizeParent"))
-					layoutProperties.setProperty(HierarchicalProperties.RESIZE_PARENT, algorithm.get("resizeParent"));
+					layoutProperties.setProperty(HierarchicalProperties.RESIZE_PARENT, true);
 				if (algorithm.containsKey("moveParent"))
-					layoutProperties.setProperty(HierarchicalProperties.MOVE_PARENT, algorithm.get("moveParent"));
+					layoutProperties.setProperty(HierarchicalProperties.MOVE_PARENT, true);
 				if (algorithm.containsKey("parentBorder"))
 					layoutProperties.setProperty(HierarchicalProperties.PARENT_BORDER, algorithm.get("parentBorder"));
 				if (algorithm.containsKey("intraCellSpacing"))
@@ -319,7 +319,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 				if (algorithm.containsKey("parallelEdgesSpacing"))
 					layoutProperties.setProperty(HierarchicalProperties.PARALLEL_EDGE_SPACING, algorithm.get("parallelEdgesSpacing"));
 				if (algorithm.containsKey("fineTune"))
-					layoutProperties.setProperty(HierarchicalProperties.FINE_TUNING, algorithm.get("fineTune"));
+					layoutProperties.setProperty(HierarchicalProperties.FINE_TUNING, true);
 				if (algorithm.containsKey("orientation")){
 					String orientation = (String)algorithm.get("orientation");
 					if (orientation.equals("right"))
@@ -410,7 +410,6 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 					layoutProperties.setProperty(BoxProperties.COLUMNS, algorithm.get("numOfColumns"));
 			}
 			else if (algorithm.get("name").equals("concentric")){
-				System.out.println("symmetric");
 				layoutAlgorithm = LayoutAlgorithms.CONCENTRIC;
 			}
 			
@@ -491,7 +490,7 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 
 				name = (String) criterion.get("criterion");
 				switch (name){
-				case "planar":
+				case "planarity":
 					planar = i;
 					break;
 				case "crossings":
@@ -506,13 +505,13 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 				case "flow":
 					uniformFlow = i;
 					break;
-				case "symmetric":
+				case "symmetry":
 					symmetric = i;
 					break;
-				case "distribute":
+				case "distribution":
 					nodeDistribution = i;
 					break;
-				case "optimize":
+				case "optimization":
 					edgeLengths = i;
 					break;
 				case "similar":

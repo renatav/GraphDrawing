@@ -32,8 +32,12 @@ public class JGraphCompactTreeLayout<V extends Vertex, E extends Edge<V>> extend
 		mxCompactTreeLayout treeLayout = new mxCompactTreeLayout(jGraphXGraph);
 		if (horizontal != null)
 			treeLayout.setHorizontal((boolean)horizontal);
+		else
+			treeLayout.setHorizontal(false);
 		if (invert != null)
 			treeLayout.setInvert((boolean) invert);
+		else
+			treeLayout.setInvert(false);
 		if (levelDistance != null)
 			treeLayout.setLevelDistance((int)levelDistance);
 		if (resizeParents != null)

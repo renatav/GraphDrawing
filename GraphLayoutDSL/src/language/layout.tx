@@ -15,7 +15,7 @@ LayoutSubraph:
 ;
 
 Subgraph:
-	'subgraph' vertices += Vertex[',']
+	'subgraph' 'containing'? vertices += Vertex[',']
 ;
 
 
@@ -24,7 +24,7 @@ LayoutEnum:
 ;
 
 LayoutStyle:
-	'style' style = LayoutStyleEnum
+	'using'? 'style' style = LayoutStyleEnum
 ;
 
 LayoutStyleEnum:
@@ -32,11 +32,11 @@ LayoutStyleEnum:
 ;
 
 AestheticCriteria:
-	'criteria' aestheticCriteria += AestheticCriteion[',']
+	('conforming' 'to')? 'criteria'? aestheticCriteria += AestheticCriteion[',']
 ;
 
 LayoutAlgorithm:
-	'algorithm' algorithm = LayoutAlgorithmEnum
+	'using'? 'algorithm'? algorithm = LayoutAlgorithmEnum
 ;
 
 AestheticCriteion:
@@ -50,18 +50,18 @@ EdgeCrossings:
 ;
 
 MinimizeCrossings:
-	'minimize'? 'edge' criterion = 'crossings'
+	('minimization' 'of')? 'edge' criterion = 'crossings'
 ;
 Planar:
-	criterion = 'planar'
+	criterion = 'planarity'
 ;
 
 MinimumAngles:
-	('maximize' 'minimal')? criterion = 'angle' ('threshold' '=' threshold = INT)?
+	('maximization' 'of' 'minimum')? criterion = 'angle' ('threshold' '=' threshold = INT)?
 ;
 
 MinimumBands:
-	'minimize'? criterion = 'bands'
+	('minimization' 'of')? criterion = 'bands'
 ;
 
 UniformFlow:
@@ -69,16 +69,16 @@ UniformFlow:
 ;
 
 Symmetry:
-	criterion = 'symmetric' ('automorphism' automorphism = Automorphism)?
+	criterion = 'symmetry' ('automorphism' automorphism = Automorphism)?
 ;
 
 
 NodeDistribution:
-	criterion = 'distribute' 'nodes' 'evenly'
+	'even' 'nodes' criterion = 'distribution'
 ;
 
 EdgeLengths:
-	criterion = 'optimize' 'edges' 'lengths'
+	criterion = 'optimization' 'of' 'edges' 'lengths'
 ;
 
 EdgeVariation:
@@ -99,7 +99,7 @@ TreeAlgorithm:
 
 RadialTreeAlgorithm:
 	name = 'radial' 'tree'
-	properties *= RadialTreeAlgorithmProperty[',']
+	('(' properties *= RadialTreeAlgorithmProperty[','] ')')?
 ;
 
 RadialTreeAlgorithmProperty:
@@ -116,7 +116,7 @@ VerticalTreeProperty:
 
 LevelBasedTreeAlgorithm:
 	name = 'level' 'based' 'tree'
-	properties *= LevelBasedTreeAlgorithmProperty[',']
+	('('properties *= LevelBasedTreeAlgorithmProperty[',']')')?
 ;
 
 LevelBasedTreeAlgorithmProperty:
@@ -125,7 +125,7 @@ LevelBasedTreeAlgorithmProperty:
 
 CompactTreeAlgorithm:
 	name = 'compact' 'tree'
-	properties *= CompactTreeAlgorithmProperty[',']
+	('('properties *= CompactTreeAlgorithmProperty[',']')')?
 ;
 
 CompactTreeAlgorithmProperty:
@@ -155,7 +155,7 @@ NodeDistanceProperty:
 	
 NodeLinkTreeAlgorithm:
 	name = 'node' 'link' 'tree'
-	properties *= NodeLinkTreeAlgorithmProperty[',']
+	('('properties *= NodeLinkTreeAlgorithmProperty[',']')')?
 ;
 
 NodeLinkTreeAlgorithmProperty:
@@ -185,7 +185,7 @@ OffsetForRootNodeProperty:
 	
 BalloonTreeAlgorithm:
 	name = 'balloon' 'tree'
-	properties *= BalloonTreeAlgorithmProperty[',']
+	('('properties *= BalloonTreeAlgorithmProperty[',']')')?
 ;
 
 //this was done in order to avoid inconsistencies  with other rules of this kind and to enable easy addition of additional properties 
@@ -194,12 +194,12 @@ BalloonTreeAlgorithmProperty:
 ;
 
 MinimalRadiusProperty:
-	'minimal' 'radius' '=' minRadius = INT
+	'minimum' 'radius' '=' minRadius = INT
 ;
 
 HierarchicalAlgorithm:
 	name = 'hierarchical'
-	properties *= HierarchicalAlgorithmProperty[',']
+	'('(properties *= HierarchicalAlgorithmProperty[',']')')?
 ;
 
 HierarchicalAlgorithmProperty:
