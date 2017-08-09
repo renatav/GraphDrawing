@@ -32,7 +32,6 @@ public class MoveState extends State{
 		startY = (int) startPosition.getY();
 		prevLocationX = startX;
 		prevLocationY = startY;
-
 	}
 
 	@Override

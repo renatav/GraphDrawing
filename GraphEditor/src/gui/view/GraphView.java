@@ -77,8 +77,6 @@ public class GraphView extends JPanel implements Observer{
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
 		getActionMap().put("deleteAction", new RemoveAction());
-		//getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
-	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 	}
 
@@ -94,8 +92,6 @@ public class GraphView extends JPanel implements Observer{
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
 		getActionMap().put("deleteAction", new RemoveAction());
-		//getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAction");
-	//	getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelAction");
 		
 
 		//initialize painters
@@ -164,16 +160,27 @@ public class GraphView extends JPanel implements Observer{
 	public IGraphElement elementAtPoint(Point2D point){
 
 		//if both element and link are hit, return element
-
+	
+		GraphEdge hitEdge = null;
+		
+		for (EdgePainter ep : edgePainters){
+			for (LinkNode node : ep.getEdge().getLinkNodes()){
+				if (point.getX() >= node.getPosition().getX() - node.getSize()/2 && point.getX() <= node.getPosition().getX() + node.getSize()/2
+					&& point.getY() >= node.getPosition().getY() - node.getSize()/2 && point.getY() <= node.getPosition().getY() + node.getSize()/2)
+					return node;
+			}
+			
+			if (ep.containsPoint(point))
+				hitEdge = ep.getEdge();
+		}
+		
+		
 		for (VertexPainter vp : vertexPainters)
 			if (vp.containsPoint(point))
 				return vp.getVertex();
-
-		for (EdgePainter ep : edgePainters)
-			if (ep.containsPoint(point))
-				return ep.getEdge();
-
-		return null;
+		
+		return hitEdge;
+		
 	}
 
 	public GraphVertex vertexAtPoint(Point2D point){
@@ -208,6 +215,12 @@ public class GraphView extends JPanel implements Observer{
 		edgePainters.remove(edgePainter);
 	}
 	
+	public VertexPainter findVertexPainter(GraphVertex vertex){
+		for (VertexPainter painter : vertexPainters)
+			if (painter.getVertex() == vertex)
+				return painter;
+		return null;
+	}
 	
 	public List<IElementPainter> removePainters(List<GraphElement> elements){
 		

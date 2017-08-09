@@ -24,8 +24,8 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 	}
 	
 	public void setNodesBasedOnVertices(){
-		linkNodes.add(new LinkNode(origin.getPosition()));
-		linkNodes.add(new LinkNode(destination.getPosition()));
+		linkNodes.add(new LinkNode(this, origin.getPosition()));
+		linkNodes.add(new LinkNode(this, destination.getPosition()));
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class GraphEdge extends GraphElement implements Edge<GraphVertex>{
 	public void setLinkNodesFromPositions(List<Point2D> positions){
 		linkNodes.clear();
 		for (Point2D point : positions)
-			linkNodes.add(new LinkNode(point));
+			linkNodes.add(new LinkNode(this, point));
 	}
 	public void setLinkNodes(List<LinkNode> linkNodes) {
 		this.linkNodes = linkNodes;
