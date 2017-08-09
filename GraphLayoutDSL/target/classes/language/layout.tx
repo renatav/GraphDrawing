@@ -199,7 +199,7 @@ MinimalRadiusProperty:
 
 HierarchicalAlgorithm:
 	name = 'hierarchical'
-	'('(properties *= HierarchicalAlgorithmProperty[',']')')?
+	('('properties *= HierarchicalAlgorithmProperty[',']')')?
 ;
 
 HierarchicalAlgorithmProperty:
@@ -238,7 +238,7 @@ IsFineTuneProperty:
 
 CircularAlgorithm:
 	name = 'circular'
-	properties *= CircularAlgorithmProperty[',']
+	('('properties *= CircularAlgorithmProperty[',']')')?
 ;
 
 CircularAlgorithmProperty:
@@ -253,13 +253,12 @@ DistanceProperty:
 ;
 
 SymmetricAlgorithm:
-	ConcentricSymmetricAlgorithm | PlanarSymmetricAlgorithm
+	ConcentricSymmetricAlgorithm
 ;
 
 ConcentricSymmetricAlgorithm:
 	name = 'concentric' 'symmetric'
-	properties *= ConcentricSymmetricAlgorithmProperty[',']
-	
+	('('properties *= ConcentricSymmetricAlgorithmProperty[',']')')?
 ;
 
 ConcentricSymmetricAlgorithmProperty:
@@ -279,8 +278,8 @@ ForceDirectedAlgorithm:
 ;
 
 KamadaKawai:
-	name = 'Kamada' 'Kawai'
-	properties *= KamadaKawaiProperties[',']
+	name = 'Kamada' '-' 'Kawai'
+	('('properties *= KamadaKawaiProperties[',']')')?
 ;
 
 KamadaKawaiProperties:
@@ -299,8 +298,8 @@ MaxIterationsProperty:
 ;
 
 FruchtermanReingold:
-	name = 'Fruchterman' 'Reingold'
-	properties *= FruchtermanReingoldProperty[',']
+	name = 'Fruchterman' '-' 'Reingold'
+	('('properties *= FruchtermanReingoldProperty[',']')')?
 ;
 
 FruchtermanReingoldProperty:
@@ -317,7 +316,7 @@ ResolutionMultiplierProperty:
 
 Spring:
 	name = 'spring'
-	properties *= SpringProperty[',']
+	('('properties *= SpringProperty[',']')')?
 ;
 
 SpringProperty:
@@ -338,7 +337,7 @@ ForceMultiplierProperty:
 
 FastOrganic:
 	type = 'fast' name = 'organic'
-	properties *= FastOrganicProperty[',']
+	('('properties *= FastOrganicProperty[',']')')?
 ;
 
 FastOrganicProperty:
@@ -360,7 +359,7 @@ InitialTemperatureProperty:
 
 Organic:
 	name = 'organic'
-	properties *= OrganicProperty[',']
+	('('properties *= OrganicProperty[',']')')?
 ;
 
 OrganicProperty:
@@ -422,7 +421,7 @@ AverageScaleFactorProperty:
 
 BoxAlgorithm:
 	name = 'box'
-	properties *= BoxAlgorithmPropery[',']
+	('('properties *= BoxAlgorithmPropery[',']')')?
 ;
 
 BoxAlgorithmPropery:
@@ -439,8 +438,8 @@ StraightLineAlgorithm:
 ;
 
 TutteEmbedding:
-	name = 'Tutte' 'embedding'
-	properties *= TutteEmbeddingProperty[',']
+	name = 'Tutte' 'embedding'?
+	('('properties *= TutteEmbeddingProperty[',']')')?
 ;
 
 TutteEmbeddingProperty:
@@ -453,7 +452,7 @@ DistanceProperty:
 
 ConvexAlgorithm:
 	name = 'convex'
-	properties *= ConvexAlgorithmProperty[',']
+	('('properties *= ConvexAlgorithmProperty[',']')')?
 ;
 
 ConvexAlgorithmProperty:

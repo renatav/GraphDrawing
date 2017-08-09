@@ -31,6 +31,7 @@ import graph.layout.PropertyEnums.OrganicProperties;
 import graph.layout.PropertyEnums.RadialTreeProperties;
 import graph.layout.PropertyEnums.SpringProperties;
 import graph.layout.PropertyEnums.TreeProperties;
+import graph.layout.PropertyEnums.TutteProperties;
 import graph.util.Pair;
 import interfaces.ILayout;
 import interfaces.ILayoutGraph;
@@ -325,16 +326,15 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 					if (orientation.equals("right"))
 						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, SwingConstants.EAST);
 					else if (orientation.equals("left"))
-						layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, SwingConstants.WEST);
+						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, SwingConstants.WEST);
 					else if (orientation.equals("down"))
-						layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, SwingConstants.SOUTH);
+						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, SwingConstants.SOUTH);
 					else if (orientation.equals("up"))
-						layoutProperties.setProperty(NodeLinkTreeProperties.ORIENTATION, SwingConstants.NORTH);
+						layoutProperties.setProperty(HierarchicalProperties.ORIENTATION, SwingConstants.NORTH);
 				}
 			}
 			else if (algorithm.get("name").equals("circular")){
 				layoutAlgorithm = LayoutAlgorithms.CIRCLE;
-				System.out.println(algorithm);
 				if (algorithm.containsKey("optimize"))
 					layoutProperties.setProperty(CircleProperties.OPTIMIZE_CROSSINGS, algorithm.get("optimize"));
 				if (algorithm.containsKey("dist"))
@@ -382,19 +382,21 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 			else if (algorithm.get("name").equals("organic")) {
 				layoutAlgorithm = LayoutAlgorithms.ORGANIC;
 				if (algorithm.containsKey("optimizeEdgeCrossings"))
-					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, algorithm.get("optimizeEdgeCrossings"));
+					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, true);
 				if (algorithm.containsKey("edgeCrossingFactor"))
 					layoutProperties.setProperty(OrganicProperties.EDGE_CROSSING_FACTOR, algorithm.get("edgeCrossingFactor"));
 				if (algorithm.containsKey("optimizeEdgeDistance"))
-					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, algorithm.get("optimizeEdgeDistance"));
+					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, true);
 				if (algorithm.containsKey("edgeDistanceFactor"))
 					layoutProperties.setProperty(OrganicProperties.EDGE_DISTANCE_FACTOR, algorithm.get("edgeDistanceFactor"));
+				if (algorithm.containsKey("optimizeBorderLine"))
+					layoutProperties.setProperty(OrganicProperties.IS_OPTIMIZE_BORDER_LINE, true);
 				if (algorithm.containsKey("borderLineFactor"))
 					layoutProperties.setProperty(OrganicProperties.BORDER_LINE_FACTOR, algorithm.get("borderLineFactor"));
 				if (algorithm.containsKey("nodeDistributionFactor"))
 					layoutProperties.setProperty(OrganicProperties.NODE_DISTRIBUTION_FACTOR, algorithm.get("nodeDistributionFactor"));
 				if (algorithm.containsKey("fineTune"))
-					layoutProperties.setProperty(OrganicProperties.IS_FINE_TUNING, algorithm.get("fineTune"));
+					layoutProperties.setProperty(OrganicProperties.IS_FINE_TUNING, true);
 				if (algorithm.containsKey("fineTuningRadius"))
 					layoutProperties.setProperty(OrganicProperties.FINE_TUNING_RADIUS, algorithm.get("fineTuningRadius"));
 				if (algorithm.containsKey("averageNodeArea"))
@@ -411,6 +413,14 @@ public class DSLLayouter<V extends Vertex, E extends Edge<V>>  {
 			}
 			else if (algorithm.get("name").equals("concentric")){
 				layoutAlgorithm = LayoutAlgorithms.CONCENTRIC;
+			}
+			else if (((String)algorithm.get("name")).toLowerCase().equals("tutte")){
+				layoutAlgorithm = LayoutAlgorithms.TUTTE;
+				if (algorithm.containsKey("dist"))
+					layoutProperties.setProperty(TutteProperties.DISTANCE, algorithm.get("dist"));
+			}
+			else if (algorithm.get("name").equals("convex")){
+				layoutAlgorithm = LayoutAlgorithms.CONVEX;
 			}
 			
 
