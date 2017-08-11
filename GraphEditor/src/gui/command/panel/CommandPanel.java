@@ -246,7 +246,7 @@ public class CommandPanel extends JPanel{
 		}
 
 		if (command.trim().equals(commands[6])){
-			ExecuteResult result = AlgorithmExecutor.execute(graph, "isCyclix");
+			ExecuteResult result = AlgorithmExecutor.execute(graph, "isCyclic");
 			return ((Boolean) result.getValue() ? "yes" : "no" )+ " [in " + result.getDuration() + " ms]";
 
 		}

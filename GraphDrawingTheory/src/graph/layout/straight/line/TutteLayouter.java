@@ -27,7 +27,7 @@ public class TutteLayouter <V extends Vertex, E extends Edge<V>> extends Symmetr
 			GraphLayoutProperties layoutProperties) {
 
 		if (layoutProperties.getProperty(TutteProperties.DISTANCE) != null)
-			distance =  ((Integer) layoutProperties.getProperty(TutteProperties.DISTANCE)).doubleValue();
+			distance =  (Double) layoutProperties.getProperty(TutteProperties.DISTANCE);
 		if (layoutProperties.getProperty(TutteProperties.CENTER) != null)
 			center = (Point2D) layoutProperties.getProperty(TutteProperties.CENTER);
 

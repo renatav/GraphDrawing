@@ -4,7 +4,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JOptionPane;
 
+import graph.properties.Bipartite;
 import gui.main.frame.MainFrame;
+import gui.model.GraphEdge;
+import gui.model.GraphVertex;
 
 public class BipartiteAction extends AnalysisAction{
 
@@ -18,8 +21,9 @@ public class BipartiteAction extends AnalysisAction{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String answer = getGraph().isTree() ? "Yes" : "No";
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a tree", JOptionPane.INFORMATION_MESSAGE);
+		Bipartite<GraphVertex, GraphEdge> bipartite = new Bipartite<>(getGraph());
+		String answer = bipartite.isBipartite() ? "Yes" : "No";
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a bipartite", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 }

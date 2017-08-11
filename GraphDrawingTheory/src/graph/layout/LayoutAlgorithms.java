@@ -8,7 +8,7 @@ public enum LayoutAlgorithms {
 
 	AUTOMATIC("Automatic"), BALLOON("Balloon tree"), ORTHOGONAL("Orthogonal"),  RADIAL_TREE("Radial tree"),
 	TREE("Level-based tree"), COMPACT_TREE("Compact tree"), HIERARCHICAL("Hierarchical"),
-	 NODE_LINK_TREE("Node-link tree"), CONCENTRIC("Concentric symmetrix"), CONVEX("Convex"), TUTTE("Tutte embedding"),
+	 NODE_LINK_TREE("Node-link tree"), CONCENTRIC("Concentric symmetric"), CONVEX("Convex"), TUTTE("Tutte embedding"),
 	KAMADA_KAWAI("Kamada-Kawai"), FRUCHTERMAN_REINGOLD("Fruchterman-Reingold"), SPRING("Spring"),
 	CIRCLE("Circular"), CIRCLE_CENTER("Circular around a vertex"), BOX("Box"),
 	ISOM("Isom"), FAST_ORGANIC("Fast organic"),

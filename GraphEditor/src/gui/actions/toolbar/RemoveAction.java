@@ -27,7 +27,7 @@ public class RemoveAction extends AbstractAction {
 		putValue(SMALL_ICON, new ImageIcon(getClass().getResource("/gui/resources/remove.png")));
 		putValue(NAME, "Delete");
 		putValue(SHORT_DESCRIPTION, "Delete selected elements");
-		putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+	//	putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 	}
 
 	@Override

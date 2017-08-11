@@ -77,7 +77,7 @@ public class GraphView extends JPanel implements Observer{
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
 		getActionMap().put("deleteAction", new RemoveAction());
-		
+
 	}
 
 	public GraphView(GraphModel model){
@@ -92,14 +92,14 @@ public class GraphView extends JPanel implements Observer{
 		selectionModel = new SelectionModel(this);
 		getActionMap().put("cancelAction", cancelAction);
 		getActionMap().put("deleteAction", new RemoveAction());
-		
+
 
 		//initialize painters
 		for (GraphVertex vertex : model.getGraph().getVertices())
 			vertexPainters.add(new VertexPainter(vertex));
 		for (GraphEdge edge : model.getGraph().getEdges())
 			edgePainters.add(new EdgePainter(edge, model.getGraph()));
-		
+
 	}
 
 	@Override
@@ -160,27 +160,28 @@ public class GraphView extends JPanel implements Observer{
 	public IGraphElement elementAtPoint(Point2D point){
 
 		//if both element and link are hit, return element
-	
+
 		GraphEdge hitEdge = null;
-		
+
 		for (EdgePainter ep : edgePainters){
-			for (LinkNode node : ep.getEdge().getLinkNodes()){
-				if (point.getX() >= node.getPosition().getX() - node.getSize()/2 && point.getX() <= node.getPosition().getX() + node.getSize()/2
-					&& point.getY() >= node.getPosition().getY() - node.getSize()/2 && point.getY() <= node.getPosition().getY() + node.getSize()/2)
-					return node;
-			}
-			
+			if (getSelectionModel().isSelected(ep.getEdge()))
+				for (LinkNode node : ep.getEdge().getLinkNodes()){
+					if (point.getX() >= node.getPosition().getX() - node.getSize()/2 && point.getX() <= node.getPosition().getX() + node.getSize()/2
+							&& point.getY() >= node.getPosition().getY() - node.getSize()/2 && point.getY() <= node.getPosition().getY() + node.getSize()/2)
+						return node;
+				}
+
 			if (ep.containsPoint(point))
 				hitEdge = ep.getEdge();
 		}
-		
-		
+
+
 		for (VertexPainter vp : vertexPainters)
 			if (vp.containsPoint(point))
 				return vp.getVertex();
-		
+
 		return hitEdge;
-		
+
 	}
 
 	public GraphVertex vertexAtPoint(Point2D point){
@@ -198,7 +199,7 @@ public class GraphView extends JPanel implements Observer{
 	public GraphModel getModel(){
 		return model;
 	}
-	
+
 	public void addVertexPainter(VertexPainter vertexPainter){
 		vertexPainters.add(vertexPainter);
 	}
@@ -206,7 +207,7 @@ public class GraphView extends JPanel implements Observer{
 	public void addEdgePainter(EdgePainter edgePainter){
 		edgePainters.add(edgePainter);
 	}
-	
+
 	public void removeVertexPainter(VertexPainter vertexPainter){
 		vertexPainters.remove(vertexPainter);
 	}
@@ -214,18 +215,18 @@ public class GraphView extends JPanel implements Observer{
 	public void removeEdgePainter(EdgePainter edgePainter){
 		edgePainters.remove(edgePainter);
 	}
-	
+
 	public VertexPainter findVertexPainter(GraphVertex vertex){
 		for (VertexPainter painter : vertexPainters)
 			if (painter.getVertex() == vertex)
 				return painter;
 		return null;
 	}
-	
+
 	public List<IElementPainter> removePainters(List<GraphElement> elements){
-		
+
 		List<IElementPainter> removedPainters = new ArrayList<IElementPainter>();
-		
+
 		Iterator<VertexPainter> vertexIt =vertexPainters.iterator();
 		while (vertexIt.hasNext()){
 			VertexPainter current = vertexIt.next();
@@ -234,7 +235,7 @@ public class GraphView extends JPanel implements Observer{
 				removedPainters.add(current);
 			}
 		}
-		
+
 		Iterator<EdgePainter> edgeIt = edgePainters.iterator();
 		while (edgeIt.hasNext()){
 			EdgePainter current = edgeIt.next();
@@ -243,7 +244,7 @@ public class GraphView extends JPanel implements Observer{
 				removedPainters.add(current);
 			}
 		}
-		
+
 		return removedPainters;
 
 	}
@@ -504,7 +505,7 @@ public class GraphView extends JPanel implements Observer{
 
 		}
 
-		
+
 		public class CancelAction extends AbstractAction{
 
 			/**
@@ -515,9 +516,9 @@ public class GraphView extends JPanel implements Observer{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				currentState.cancel();
-				
+
 			}
-			
+
 		}
 
 	}

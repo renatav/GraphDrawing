@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 
 import graph.properties.Bipartite;
+import graph.tree.binary.BinaryTree;
 import gui.main.frame.MainFrame;
 import gui.model.GraphEdge;
 import gui.model.GraphVertex;
@@ -21,8 +22,8 @@ public class BinaryTreeCheckAction extends AnalysisAction{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Bipartite<GraphVertex, GraphEdge> bipartite = new Bipartite<>(getGraph());
-		String answer = bipartite.isBipartite() ? "Yes" : "No";
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a bipartite", JOptionPane.INFORMATION_MESSAGE);
+		BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<>(getGraph());
+		String answer = binaryTree.isCanBeConstructed() ? "Yes" : "No";
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a binary tree", JOptionPane.INFORMATION_MESSAGE);
 	}
 }

@@ -21,8 +21,7 @@ public class TreeCheckAction extends AnalysisAction{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		BinaryTree<GraphVertex, GraphEdge> binaryTree = new BinaryTree<>(getGraph());
-		String answer = binaryTree.isCanBeConstructed() ? "Yes" : "No";
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a binary tree", JOptionPane.INFORMATION_MESSAGE);
+		String answer = getGraph().isTree() ? "Yes" : "No";
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), prefix + answer, "Graph is a tree", JOptionPane.INFORMATION_MESSAGE);
 	}
 }
