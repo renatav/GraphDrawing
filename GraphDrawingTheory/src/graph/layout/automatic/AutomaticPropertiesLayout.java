@@ -36,8 +36,7 @@ public class AutomaticPropertiesLayout<V extends Vertex, E extends Edge<V>> exte
 		LayoutAlgorithms algorithm = layoutPicker.pickAlgorithm(graph);
 		AbstractLayouter<V, E> layouter = layoutFactory.createLayouter(algorithm);
 		positionsEdges = layouter.isPositionsEdges();
-		if (layoutProperties == null)
-			layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(algorithm, graph);
+		layoutProperties = DefaultGraphLayoutProperties.getDefaultLayoutProperties(algorithm, graph);
 		
 		return layouter.layout(graph, layoutProperties);
 	}

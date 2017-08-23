@@ -24,8 +24,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 	 */
 	private List<E> edges;
 	/**
-	* Vertices of the graph (diagram) that is to be laid out
-	*/
+	 * Vertices of the graph (diagram) that is to be laid out
+	 */
 	private List<V> vertices;
 	/**
 	 * Names the layout algorithm to be applied
@@ -132,7 +132,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 			formGraph(graph, v, coveredVertices, coveredEdges);
 			graphs.add(graph);
 		}
-		
+
 		if (notConnected != null)
 			graphs.add(notConnected);
 
@@ -195,7 +195,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 		int spaceY = 200;
 		int numInRow = 4;
 		int currentIndex = 1;
-		
+
 		int currentStartPositionX = startX;
 		int currentStartPositionY = startY;
 
@@ -218,11 +218,12 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 			if (!layouter.isPositionsEdges())
 				drawing.positionEdges(edges);
-			
+
 			return drawing;
 		}
 
-		for (Graph<V,E> graph : formGraphs(vertices, edges)){
+		List<Graph<V,E>> graphs = formGraphs(vertices, edges);
+		for (Graph<V,E> graph : graphs){
 			try{
 				drawing = layouter.layout(graph, layoutProperties);
 			}
@@ -230,29 +231,34 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				ex.printStackTrace();
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
-				
-			int currentLeftmost = drawing.findLeftmostPosition();
-			int currentTop = drawing.findTop();
 
 
-			//leftmost should start at point currentStartPositionX
-			int moveByX = currentStartPositionX - currentLeftmost;
+			if (graphs.size() > 1){
 
-			//top should start at point currentStartPositionY
-			int moveByY = currentStartPositionY - currentTop;
 
-			drawing.moveBy(moveByX, moveByY);
+				int currentLeftmost = drawing.findLeftmostPosition();
+				int currentTop = drawing.findTop();
 
-			int[] bounds = drawing.getBounds();
-			if (bounds[1] > maxYInRow)
-				maxYInRow = bounds[1];
 
-			currentStartPositionX += bounds[0] + spaceX;
+				//leftmost should start at point currentStartPositionX
+				int moveByX = currentStartPositionX - currentLeftmost;
 
-			if (currentIndex % numInRow == 0){
-				currentStartPositionY += maxYInRow + spaceY;
-				maxYInRow = 0;
-				currentStartPositionX = startX;
+				//top should start at point currentStartPositionY
+				int moveByY = currentStartPositionY - currentTop;
+
+				drawing.moveByIncludingEdges(moveByX, moveByY);
+
+				int[] bounds = drawing.getBounds();
+				if (bounds[1] > maxYInRow)
+					maxYInRow = bounds[1];
+
+				currentStartPositionX += bounds[0] + spaceX;
+
+				if (currentIndex % numInRow == 0){
+					currentStartPositionY += maxYInRow + spaceY;
+					maxYInRow = 0;
+					currentStartPositionX = startX;
+				}
 			}
 
 			ret.getVertexMappings().putAll(drawing.getVertexMappings());
@@ -260,7 +266,7 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 
 			currentIndex ++;
 		}
-		
+
 		if (!layouter.isPositionsEdges())
 			ret.positionEdges(edges);
 		return ret;

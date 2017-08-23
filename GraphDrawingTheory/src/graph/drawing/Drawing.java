@@ -378,8 +378,9 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 			pos.setLocation(pos.getX() + x, pos.getY() + y);
 		}
 		for (E e : edgeMappings.keySet()){
-			for (Point2D node : edgeMappings.get(e))
+			for (Point2D node : edgeMappings.get(e)){
 				node.setLocation(node.getX() + x, node.getY() + y);
+			}
 		}
 	}
 

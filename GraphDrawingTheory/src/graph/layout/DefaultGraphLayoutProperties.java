@@ -68,6 +68,7 @@ public class DefaultGraphLayoutProperties {
 			properties.setProperty(HierarchicalProperties.FINE_TUNING, true);
 			properties.setProperty(HierarchicalProperties.INTRA_CELL_SPACING, params[0] + spacing);
 			properties.setProperty(HierarchicalProperties.INTER_RANK_CELL_SPACING, params[1] + spacing);
+			properties.setProperty(HierarchicalProperties.ORIENTATION, 1);
 		}
 		
 		else if (algorithm == LayoutAlgorithms.BALLOON){

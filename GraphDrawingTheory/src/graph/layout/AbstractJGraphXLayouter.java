@@ -107,13 +107,16 @@ public abstract class AbstractJGraphXLayouter<V extends Vertex, E extends Edge<V
 				mxGeometry geometry = model.getGeometry(edgesMap.get(e));
 				if (geometry != null && geometry.getPoints() != null){
 					List<Point2D> points = new ArrayList<Point2D>();
-					points.add(drawing.getVertexMappings().get(e.getOrigin()));
+					Point2D originPoint = drawing.getVertexMappings().get(e.getOrigin());
+					points.add(new Point2D.Double(originPoint.getX(), originPoint.getY()));
 					for (int i = 1; i < geometry.getPoints().size() - 1; i++)
 						points.add(geometry.getPoints().get(i).getPoint());
-					points.add(drawing.getVertexMappings().get(e.getDestination()));
+					Point2D destinationPoint = drawing.getVertexMappings().get(e.getDestination());
+					points.add(new Point2D.Double(destinationPoint.getX(), destinationPoint.getY()));
 					drawing.getEdgeMappings().put(e,points);
 				}
 			}
+			
 			return drawing;
 		}
 
