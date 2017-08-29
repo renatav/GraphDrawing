@@ -216,8 +216,8 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				throw new CannotBeAppliedException("Algorithm cannot be applied. " + ex.getMessage());
 			}
 
-			if (!layouter.isPositionsEdges())
-				drawing.positionEdges(edges);
+			//if (!layouter.isPositionsEdges())
+			drawing.positionEdges(edges);
 
 			return drawing;
 		}
@@ -261,14 +261,16 @@ public class Layouter<V extends Vertex, E extends Edge<V>> {
 				}
 			}
 
+			
 			ret.getVertexMappings().putAll(drawing.getVertexMappings());
 			ret.getEdgeMappings().putAll(drawing.getEdgeMappings());
 
 			currentIndex ++;
 		}
-
-		if (!layouter.isPositionsEdges())
-			ret.positionEdges(edges);
+		
+		//if (!layouter.isPositionsEdges())
+		ret.positionEdges(edges);
+		
 		return ret;
 	}
 

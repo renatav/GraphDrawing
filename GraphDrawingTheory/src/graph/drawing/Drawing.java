@@ -127,10 +127,15 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 			int distanceMultiplicity = 1;
 			
 			for (int i = 0; i <  multipleEdges.size(); i++){
+
+				
 				
 				E multEedge = multipleEdges.get(i);
 				Point2D originPosition = edgeMappings.get(multEedge).get(0);
 				Point2D destinationPosition = edgeMappings.get(multEedge).get(1);
+				
+				System.out.println(originPosition);
+				System.out.println(destinationPosition);
 				
 				if (i < (int) multipleEdges.size()/2){
 					originPosition.setLocation((int)(originPosition.getX() - distanceMultiplicity * distanceOrigin),
@@ -150,6 +155,9 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 					distanceMultiplicity = 1;
 				else
 					distanceMultiplicity ++;
+				
+				System.out.println(originPosition);
+				System.out.println(destinationPosition);
 					
 			}
 			
@@ -158,6 +166,8 @@ public class Drawing<V extends Vertex, E extends Edge<V>> {
 			
 		}
 	}
+	
+
 	
 	private List<E> findMultipleEdgesForEdge(E edge){
 		List<E> ret = new ArrayList<E>();

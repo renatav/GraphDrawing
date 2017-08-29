@@ -9,6 +9,7 @@ import graph.layout.PropertyEnums.HierarchicalProperties;
 import graph.layout.PropertyEnums.KamadaKawaiProperties;
 import graph.layout.PropertyEnums.NodeLinkTreeProperties;
 import graph.layout.PropertyEnums.OrganicProperties;
+import graph.layout.force.directed.KamadaKawaiLayouter;
 
 /**
  * Sets default properties of layout algorithms. 
@@ -26,37 +27,44 @@ public class DefaultGraphLayoutProperties {
 	 */
 	public static GraphLayoutProperties getDefaultLayoutProperties(LayoutAlgorithms algorithm, Graph<?,?> graph){
 		GraphLayoutProperties properties = new GraphLayoutProperties();
+		
+		double[] maxValues = maxWidthHeight(graph);
+		double maxWidth = maxValues[0];
+		double maxHeight = maxValues[1];
+		double max = Math.max(maxWidth, maxHeight);
 
 		if (algorithm == LayoutAlgorithms.KAMADA_KAWAI){
 
+			double factor = max/70;
+			
 			if (graph.getVertices().size() < 4){
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 0.4);
-				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 0.8);
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 0.4 * factor);
+				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 0.8  * factor);
 			}
 			else if (graph.getVertices().size() < 10){
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 0.6);
-				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 3);
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 0.8  * factor);
+				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 4  * factor);
 			}
 			else if (graph.getVertices().size() < 20){
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 1);
-				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 5);
+				factor = max/100;
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 1 * factor);
+				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 5  * factor);
 			}
 			else {
-				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 1.2);
-				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 10);
+				factor = max/100;
+				properties.setProperty(KamadaKawaiProperties.LENGTH_FACTOR, 1.2 * factor);
+				properties.setProperty(KamadaKawaiProperties.DISCONNECTED_DISTANCE_MULTIPLIER, 10  * factor);
 			}
 		}
 		
 		else if (algorithm == LayoutAlgorithms.ORGANIC){
-			double[] params = maxWidthHeight(graph);
-			double r = Math.max(params[0], params[1]);
 			
 			properties.setProperty(OrganicProperties.IS_FINE_TUNING, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_BORDER_LINE, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_CROSSING, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_EDGE_DISTANCE, true);
 			properties.setProperty(OrganicProperties.IS_OPTIMIZE_NODE_DISTRIBUTION, true);
-			properties.setProperty(OrganicProperties.EDGE_DISTANCE_FACTOR, r * 200000);
+			properties.setProperty(OrganicProperties.EDGE_DISTANCE_FACTOR, max * 2000);
 		}
 		
 		else if (algorithm == LayoutAlgorithms.HIERARCHICAL){
@@ -72,13 +80,15 @@ public class DefaultGraphLayoutProperties {
 		}
 		
 		else if (algorithm == LayoutAlgorithms.BALLOON){
-			double[] params = maxWidthHeight(graph);
-			double r = Math.max(params[0], params[1]);
-			properties.setProperty(BalloonProperties.MIN_RADIUS, (int)(r * 0.6));
+			properties.setProperty(BalloonProperties.MIN_RADIUS, (int)(max * 0.6));
 		}
-		else if (algorithm == LayoutAlgorithms.CIRCLE || algorithm == LayoutAlgorithms.CIRCLE_CENTER){
+		else if (algorithm == LayoutAlgorithms.CIRCLE){
 			properties.setProperty(CircleProperties.OPTIMIZE_CROSSINGS, true);
-			properties.setProperty(CircleProperties.DISTANCE, 50);
+			properties.setProperty(CircleProperties.DISTANCE, (int)max);
+		}
+		else if (algorithm == LayoutAlgorithms.CIRCLE_CENTER){
+			properties.setProperty(CircleProperties.DISTANCE,  2 * (int) max);
+			properties.setProperty(CircleProperties.OPTIMIZE_CROSSINGS, true);
 		}
 		else if (algorithm == LayoutAlgorithms.COMPACT_TREE){
 			properties.setProperty(CompactTreeProperties.HORIZONTAL, false);

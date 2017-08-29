@@ -27,7 +27,7 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 	/**
 	 * Used to determine if hierarchical layouter should be used 
 	 */
-	private double hierarchicalFactor = 0.34;
+	private double hierarchicalFactor = 0.25;
 	/**
 	 * Used to determine if circle layouter with a vertex in center should be used
 	 */
@@ -71,6 +71,8 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 			ret = LayoutAlgorithms.ISOM;
 		else if (graph.isRing())
 			ret = LayoutAlgorithms.CIRCLE;
+		else if (checkCircularWithCenter(graph))
+			ret = LayoutAlgorithms.CIRCLE_CENTER;
 		else if (graph.isTree()){
 			
 			log.info("Graph is a tree. Finding the best tree algorithm");
@@ -104,11 +106,8 @@ public class LayoutPicker<V extends Vertex, E extends Edge<V>> {
 		}
 		else if (checkHierachicalTendency(graph))
 			ret = LayoutAlgorithms.HIERARCHICAL;
-		else if (checkCircularWithCenter(graph)){
-			ret = LayoutAlgorithms.CIRCLE_CENTER;
-		}
 		else //else force-directed
-			ret =  LayoutAlgorithms.ORGANIC;
+			ret =  LayoutAlgorithms.KAMADA_KAWAI;
 		
 		log.info("Chosen algorithm: " + ret);
 		return ret;
