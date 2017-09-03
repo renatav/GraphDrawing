@@ -1,23 +1,28 @@
 package interpreter.java;
 
 
-import interfaces.ILayout;
-import interfaces.ILayoutGraph;
-import interfaces.ILayoutSubgraphs;
-
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import models.java.LayoutGraph;
-import models.java.LayoutSubgraphs;
+import java.util.Map;
 
 import org.python.core.PyInstance;
 import org.python.core.PyObjectDerived;
 import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 
+import interfaces.IExpression;
+import interfaces.IFactor;
+import interfaces.ILayout;
+import interfaces.ILayoutGraph;
+import interfaces.ILayoutSubgraphs;
+import interfaces.ITerm;
+import models.java.Expression;
+import models.java.Factor;
+import models.java.LayoutGraph;
+import models.java.LayoutSubgraphs;
+import models.java.Term;
 import util.Factory;
 
 /**
@@ -71,12 +76,12 @@ public class Interpreter {
 
     /**
      * The create method is responsible for performing the actual
-     * coercion of the referenced python module into Java bytecode
+     * conversion of the referenced python module into Java bytecode
      */
     public ILayout execute(String model) {
 
     	PyObjectDerived interpreted = (PyObjectDerived) grammarInterpreter.
-    			invoke("execute",new PyString(model));
+    			invoke("execute", new PyString(model));
     	String type = interpreted.getType().toString();
     	ILayout ret;
     	if (type.contains("MLayoutGraph")){
@@ -84,29 +89,57 @@ public class Interpreter {
     		LayoutGraph layoutGraph;
     		if (!pyLayoutGraph.getException().equals(""))
     			layoutGraph = new LayoutGraph(pyLayoutGraph.getException());
-    		else
+    		else{
+    			Expression criteriaExpression = null;
+    			if (pyLayoutGraph.getType().equals("mathCriteria"))
+    				criteriaExpression = createExpression(pyLayoutGraph.getCriteriaExpression());
     			layoutGraph = new LayoutGraph(pyLayoutGraph.getGraph(), 
     				pyLayoutGraph.getType(), pyLayoutGraph.getStyle(),
-    				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm(),
+    				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm(), criteriaExpression,
     				pyLayoutGraph.isGraphContent());
+    		}
     		ret = layoutGraph;
     	}
     	else{
     		ILayoutSubgraphs pyLayoutSubgraphs =  (ILayoutSubgraphs) Factory.createJavaObject(ILayoutSubgraphs.class, interpreted);
     		List<ILayoutGraph> subgraphs = new ArrayList<ILayoutGraph>();
     		for (ILayoutGraph pyLayoutGraph : pyLayoutSubgraphs.getSubgraphs()){
+    			Expression criteriaExpression = null;
+    			if (pyLayoutGraph.getType().equals("mathCriteria"))
+    				criteriaExpression = createExpression(pyLayoutGraph.getCriteriaExpression());
     			LayoutGraph layoutGraph = new LayoutGraph(pyLayoutGraph.getGraph(), 
         				pyLayoutGraph.getType(), pyLayoutGraph.getStyle(),
-        				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm(), 
+        				pyLayoutGraph.getAestheticCriteria(), pyLayoutGraph.getAlgorithm(), criteriaExpression,
         				pyLayoutGraph.isGraphContent());
     			subgraphs.add(layoutGraph);
     		}
     		LayoutSubgraphs layoutSubgraphs = new LayoutSubgraphs(subgraphs);
     		ret = layoutSubgraphs;
     	}
-    	
     	return ret;	 
-        
+    }
+    
+    private Expression createExpression(IExpression pyExpression){
+    	List<ITerm> terms = new ArrayList<ITerm>();
+    	for (ITerm pyTerm : pyExpression.getTerms()){
+    		List<IFactor> factors = new ArrayList<IFactor>();
+    		for (IFactor pyFactor : pyTerm.getFactors()){
+    			Expression expression = null;
+    			Map<String, Object> aestheticCriterion = null;
+    			if (pyFactor.getExpression() != null){
+    				expression = createExpression(pyFactor.getExpression());
+    			}
+    			else{
+    				aestheticCriterion = pyFactor.getAestheticCriterion();
+    			}
+    			Factor factor = new Factor(pyFactor.isNegative(), aestheticCriterion, expression);
+    			factors.add(factor);
+    		}
+    		Term term = new Term(factors);
+    		terms.add(term);
+    	}
+    	return new Expression(terms);
+    		
     }
     
 }

@@ -13,7 +13,6 @@ public class LayoutSubgraphs implements ILayoutSubgraphs{
 		this.subgraphs = subgraphs;
 	}
 	
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

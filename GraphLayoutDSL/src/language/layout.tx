@@ -20,7 +20,7 @@ Subgraph:
 
 
 LayoutEnum:
-	LayoutStyle | AestheticCriteria | LayoutAlgorithm
+	LayoutStyle | AestheticCriteriaMath | AestheticCriteria | LayoutAlgorithm 
 ;
 
 LayoutStyle:
@@ -35,8 +35,33 @@ AestheticCriteria:
 	('conforming' 'to')? 'criteria'? aestheticCriteria += AestheticCriteion[',']
 ;
 
+
 LayoutAlgorithm:
 	'using'? 'algorithm'? algorithm = LayoutAlgorithmEnum
+;
+
+AestheticCriteriaMath:
+	expression = CriteriaExpression	
+;
+
+CriteriaFactor:
+	negative ?= 'not' ( criterion = AestheticCriteion | ('(' expression = CriteriaExpression ')'))
+;
+
+CriteriaTerm:
+	termStartFactor = CriteriaFactor termFactors *=  CriteriaAndFactor
+;
+
+CriteriaAndFactor:
+	'and' factor = CriteriaFactor
+;
+
+CriteriaExpression:
+	expressionStartTerm = CriteriaTerm expressionTerms *= CriteriaOrTerm
+;
+
+CriteriaOrTerm:
+	'or' term = CriteriaTerm
 ;
 
 AestheticCriteion:

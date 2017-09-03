@@ -1,5 +1,6 @@
 package models.java;
 
+import interfaces.IExpression;
 import interfaces.ILayoutGraph;
 
 import java.util.List;
@@ -15,11 +16,13 @@ public class LayoutGraph implements ILayoutGraph{
 	private Map<String, Object> algorithm;
 	private boolean graphContent;
 	private String exception;
+	private IExpression criteriaExpression;
 	
 	
 	public LayoutGraph(String graph, String type, String style,
 			List<Map<String, Object>> aestheticCriteria,
-			Map<String, Object> algorithm, boolean graphContent) {
+			Map<String, Object> algorithm, IExpression criteriaExpression,
+			boolean graphContent) {
 		super();
 		this.graph = graph;
 		this.type = type;
@@ -27,6 +30,7 @@ public class LayoutGraph implements ILayoutGraph{
 		this.aestheticCriteria = aestheticCriteria;
 		this.algorithm = algorithm;
 		this.graphContent = graphContent;
+		this.criteriaExpression = criteriaExpression;
 	}
 	
 	public LayoutGraph(String exception){
@@ -40,7 +44,8 @@ public class LayoutGraph implements ILayoutGraph{
 	public String toString() {
 		return "LayoutGraph [graph=" + graph + ", type=" + type + ", style="
 				+ style + ", aestheticCriteria=" + aestheticCriteria
-				+ ", algorithm=" + algorithm + "]";
+				+ ", algorithm=" + algorithm +
+				", criteria expression= " +  criteriaExpression + "]";
 	}
 
 
@@ -70,6 +75,11 @@ public class LayoutGraph implements ILayoutGraph{
 
 	public String getException() {
 		return exception;
+	}
+
+	@Override
+	public IExpression getCriteriaExpression() {
+		return criteriaExpression;
 	}
 
 }

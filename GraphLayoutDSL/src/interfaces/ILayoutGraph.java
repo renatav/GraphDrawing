@@ -12,4 +12,5 @@ public interface ILayoutGraph extends ILayout{
 	public List<Map<String, Object>> getAestheticCriteria();
 	public Map<String, Object> getAlgorithm();
 	public String getException();
+	public IExpression getCriteriaExpression();
 }

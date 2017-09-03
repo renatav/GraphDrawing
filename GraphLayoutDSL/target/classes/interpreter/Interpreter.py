@@ -1,7 +1,7 @@
 from textx.metamodel import metamodel_from_file
 from textx.export import metamodel_export, model_export
 from textx.exceptions import TextXSyntaxError
-from pythonmodels import MLayoutGraph, MLayoutSubgraphs
+from pythonmodels import MLayoutGraph, MLayoutSubgraphs, MExpression, MTerm, MFactor
 import os
 import sys
 
@@ -48,8 +48,8 @@ class Interpreter():
                         graph = vertices
                    
                
-                layoutType = layoutSubgraph.layoutType
-                layoutOneSubgraph = Interpreter.execute_one(layoutType, graph)
+                layout_type = layoutSubgraph.layoutType
+                layoutOneSubgraph = Interpreter.execute_one(layout_type, graph)
                 layoutOneSubgraph.attr_graphContent = content
               
                 subgraphs.append(layoutOneSubgraph)  
@@ -62,13 +62,17 @@ class Interpreter():
     def execute_one(layout, graph):
         
             if layout.__class__.__name__ == "LayoutStyle":
-                layoutType = "style"
+                layout_type = "style"
             elif layout.__class__.__name__ == "LayoutAlgorithm":
-                layoutType = "algorithm"
+                layout_type = "algorithm"
+            elif layout.__class__.__name__ == "AestheticCriteria":
+                layout_type = "criteria"
             else:
-                layoutType = "criteria"
+                layout_type = "mathCriteria"
             
-            if layoutType == 'algorithm':
+            print(layout_type)
+            
+            if layout_type == 'algorithm':
                 #a map that will contain all information about the algorithm
                 algorithmProperties = {}
                 algorithm = layout.algorithm
@@ -83,13 +87,13 @@ class Interpreter():
                         else:
                             algorithmProperties[attr] = value
                       
-                layoutGraph =  MLayoutGraph(graph = graph, type = layoutType, algorithm =  algorithmProperties)  
+                layoutGraph =  MLayoutGraph(graph = graph, type = layout_type, algorithm =  algorithmProperties)  
                 return layoutGraph
-            elif layoutType == 'style':
+            elif layout_type == 'style':
                 style = layout.style
-                layoutGraph =  MLayoutGraph(graph = graph, type = layoutType, style = style)
+                layoutGraph =  MLayoutGraph(graph=graph, type=layout_type, style=style)
                 return layoutGraph
-            elif layoutType == 'criteria':
+            elif layout_type == 'criteria':
                 criteriaList = [];
                 criteria = layout.aestheticCriteria
                 for criterion in criteria:
@@ -98,5 +102,49 @@ class Interpreter():
                         if not (attr.startswith('_') or attr == 'parent'):
                             criterionProperties[attr] = value
                     criteriaList.append(criterionProperties)
-                layoutGraph = MLayoutGraph(graph = graph, type = layoutType, aestheticCriteria = criteriaList)
+                layoutGraph = MLayoutGraph(graph=graph, type=layout_type, aestheticCriteria=criteriaList)
                 return layoutGraph
+            elif layout_type == 'mathCriteria':
+                m_expression = Interpreter.form_expression(layout.expression)
+                layout_graph = MLayoutGraph(graph=graph, type=layout_type, criteriaExpression=m_expression )
+                print(layout_graph.getCriteriaExpression())
+                return layout_graph
+               
+    @staticmethod          
+    def form_expression(expression):
+            
+        terms = [expression.expressionStartTerm]
+        for orTerm in expression.expressionTerms:
+            terms.append(orTerm.term)
+            
+        m_terms = [] 
+        for term in terms:
+            
+            factors = [term.termStartFactor]
+            for andFactor in term.termFactors:
+                factors.append(andFactor.factor)
+            m_factors = []
+            
+            for factor in factors:
+                
+                criterionProperties = None
+                m_expression = None
+                
+                if factor.criterion is not None:
+                    criterionProperties = {}
+                    for attr, value in factor.criterion.__dict__.iteritems():
+                        if not (attr.startswith('_') or attr == 'parent'):
+                            criterionProperties[attr] = value
+                            
+                if factor.expression is not None:
+                    m_expression = Interpreter.form_expression(factor.expression)
+                    
+                m_factor = MFactor(factor.negative, criterionProperties, m_expression)
+                m_factors.append(m_factor)
+                
+            m_term = MTerm(m_factors)
+            m_terms.append(m_term)
+            
+        return MExpression(m_terms)        
+                
+            
